@@ -8,3 +8,11 @@ services:
     container_name: sample
     ports:
       - 8082:8080
+
+  caller:
+    build:
+      context: backend/caller
+      dockerfile: build/Dockerfile
+    container_name: caller
+    ports:
+      - 8081:8080
