@@ -3,7 +3,7 @@ version: '3.7'
 services:
   sample:
     build:
-      context: ./sample
+      context: ./backend/sample
       dockerfile: build/Dockerfile
     container_name: sample
     ports:
