@@ -3,8 +3,8 @@ version: '3.7'
 services:
   sample:
     build:
-      context: ./backend/sample
+      context: backend/sample
       dockerfile: build/Dockerfile
     container_name: sample
     ports:
-      - 8080:8080
+      - 8082:8080
