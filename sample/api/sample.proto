@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package sample;
+
+option go_package = "github.com/manhrev/runtracking/sample/pkg/api;sample";
+
+service Sample {
+    rpc Get(GetRequest) returns (GetReply);
+    rpc Reverse(ReversRequest) returns (ReverseReply);
+}
+
+message GetRequest {
+}
+
+message GetReply {
+    string reply = 1;
+}
+
+message ReversRequest {
+    int32 num = 1;
+}
+
+message ReverseReply {
+    int32 rev = 1;
+}
