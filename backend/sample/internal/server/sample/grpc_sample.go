@@ -1,7 +1,7 @@
 package sample
 
 import (
-	sample "github.com/manhrev/runtracking/sample/pkg/api"
+	sample "github.com/manhrev/runtracking/backend/sample/pkg/api"
 )
 
 func NewServer() sample.SampleServer {

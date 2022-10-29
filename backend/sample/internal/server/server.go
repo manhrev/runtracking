@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/manhrev/runtracking/sample/internal/server/sample"
-	pb "github.com/manhrev/runtracking/sample/pkg/api"
+	"github.com/manhrev/runtracking/backend/sample/internal/server/sample"
+	pb "github.com/manhrev/runtracking/backend/sample/pkg/api"
 	"google.golang.org/grpc"
 )
 

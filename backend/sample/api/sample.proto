@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package sample;
 
-option go_package = "github.com/manhrev/runtracking/sample/pkg/api;sample";
+option go_package = "github.com/manhrev/runtracking/backend/sample/pkg/api;sample";
 
 service Sample {
     rpc Get(GetRequest) returns (GetReply);

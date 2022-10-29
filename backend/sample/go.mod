@@ -1,4 +1,4 @@
-module github.com/manhrev/runtracking/sample
+module github.com/manhrev/runtracking/backend/sample
 
 go 1.18
 

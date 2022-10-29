@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/manhrev/runtracking/sample/internal/server"
+	"github.com/manhrev/runtracking/backend/sample/internal/server"
 )
 
 func main() {
