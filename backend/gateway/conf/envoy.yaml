@@ -48,6 +48,14 @@ static_resources:
                       headers:
                         - exact_match: /status
                           name: :path
+                  - name: envoy.filters.http.ext_authz
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+                      grpc_service:
+                        envoy_grpc:
+                          cluster_name: auth_cluster
+                        timeout: 0.250s
+                      transport_api_version: V3
                   - name: envoy.filters.http.router
 
   clusters:
@@ -64,4 +72,19 @@ static_resources:
                   address:
                     socket_address:
                       address: caller
+                      port_value: 8080
+
+    - name: auth_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: auth_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: auth
                       port_value: 8080

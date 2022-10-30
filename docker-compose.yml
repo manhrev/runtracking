@@ -20,3 +20,9 @@ services:
     container_name: gateway
     ports:
       - 8080:8080
+  
+  auth:
+    build:
+      context: backend/auth
+      dockerfile: build/Dockerfile
+    container_name: auth
