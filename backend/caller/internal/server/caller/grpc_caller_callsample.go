@@ -16,7 +16,7 @@ func (s *callerServer) CallSample(ctx context.Context, request *caller.CallSampl
 	}
 	
 	client := sample.NewSampleClient(conn)
-	res, err := client.Reverse(ctx, &sample.ReversRequest{Num: 12})
+	res, err := client.Reverse(ctx, &sample.ReversRequest{Num: request.GetNum()})
 	if err != nil {
 		return nil, err
 	}
