@@ -5,16 +5,26 @@ package sample;
 option go_package = "github.com/manhrev/runtracking/backend/sample/pkg/api;sample";
 
 service Sample {
+    rpc Set(SetRequest) returns (SetReply);
     rpc Get(GetRequest) returns (GetReply);
     rpc Reverse(ReversRequest) returns (ReverseReply);
 }
 
+message SetRequest{
+    string set = 1;
+}
+
+message SetReply{}
+
 message GetRequest {
+    int64 id = 1;
 }
 
 message GetReply {
     string reply = 1;
 }
+
+
 
 message ReversRequest {
     int32 num = 1;

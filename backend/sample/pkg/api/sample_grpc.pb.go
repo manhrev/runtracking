@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SampleClient interface {
+	Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetReply, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetReply, error)
 	Reverse(ctx context.Context, in *ReversRequest, opts ...grpc.CallOption) (*ReverseReply, error)
 }
@@ -32,6 +33,15 @@ type sampleClient struct {
 
 func NewSampleClient(cc grpc.ClientConnInterface) SampleClient {
 	return &sampleClient{cc}
+}
+
+func (c *sampleClient) Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetReply, error) {
+	out := new(SetReply)
+	err := c.cc.Invoke(ctx, "/sample.Sample/Set", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *sampleClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetReply, error) {
@@ -56,6 +66,7 @@ func (c *sampleClient) Reverse(ctx context.Context, in *ReversRequest, opts ...g
 // All implementations must embed UnimplementedSampleServer
 // for forward compatibility
 type SampleServer interface {
+	Set(context.Context, *SetRequest) (*SetReply, error)
 	Get(context.Context, *GetRequest) (*GetReply, error)
 	Reverse(context.Context, *ReversRequest) (*ReverseReply, error)
 	mustEmbedUnimplementedSampleServer()
@@ -65,6 +76,9 @@ type SampleServer interface {
 type UnimplementedSampleServer struct {
 }
 
+func (UnimplementedSampleServer) Set(context.Context, *SetRequest) (*SetReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+}
 func (UnimplementedSampleServer) Get(context.Context, *GetRequest) (*GetReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
@@ -82,6 +96,24 @@ type UnsafeSampleServer interface {
 
 func RegisterSampleServer(s grpc.ServiceRegistrar, srv SampleServer) {
 	s.RegisterService(&Sample_ServiceDesc, srv)
+}
+
+func _Sample_Set_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SampleServer).Set(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sample.Sample/Set",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SampleServer).Set(ctx, req.(*SetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Sample_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -127,6 +159,10 @@ var Sample_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "sample.Sample",
 	HandlerType: (*SampleServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Set",
+			Handler:    _Sample_Set_Handler,
+		},
 		{
 			MethodName: "Get",
 			Handler:    _Sample_Get_Handler,

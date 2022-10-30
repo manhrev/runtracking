@@ -6,6 +6,16 @@ services:
       context: backend/sample
       dockerfile: build/Dockerfile
     container_name: sample
+    ports:
+      - 8081:8080
+    depends_on:
+      - sample_db
+
+  sample_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: sample
 
   caller:
     build:

@@ -38,6 +38,11 @@ static_resources:
                             prefix: /caller.Caller/CallSample
                           route:
                             cluster: caller_cluster
+                        - match:
+                            prefix: /sample.Sample
+                          route:
+                            cluster: sample_cluster
+
                 http_filters:
                   - name: envoy.filters.http.grpc_web
                   - name: envoy.filters.http.cors
@@ -72,6 +77,21 @@ static_resources:
                   address:
                     socket_address:
                       address: caller
+                      port_value: 8080
+
+    - name: sample_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: sample_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: sample
                       port_value: 8080
 
     - name: auth_cluster
