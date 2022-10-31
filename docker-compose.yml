@@ -22,6 +22,8 @@ services:
       context: backend/caller
       dockerfile: build/Dockerfile
     container_name: caller
+    depends_on:
+      - sample
 
   gateway:
     build:
