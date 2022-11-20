@@ -38,3 +38,14 @@ services:
       context: backend/auth
       dockerfile: build/Dockerfile
     container_name: auth
+
+  auth_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: auth
+    container_name: 'db-auth'
+    volumes:
+      - "./tmp/db/auth:/var/lib/mysql"
+    ports:
+      - 33306:3306
