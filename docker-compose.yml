@@ -49,3 +49,24 @@ services:
       - "./tmp/db/auth:/var/lib/mysql"
     ports:
       - 33306:3306
+
+  group:
+    build:
+      context: backend/group
+      dockerfile: build/Dockerfile
+    container_name: group
+    depends_on:
+      - group_db
+
+  group_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: group
+    container_name: 'db-group'
+    volumes:
+      - "./tmp/db/group:/var/lib/mysql"
+    ports:
+      - 33307:3306
+  
+
