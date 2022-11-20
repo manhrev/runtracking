@@ -42,6 +42,10 @@ static_resources:
                             prefix: /sample.Sample
                           route:
                             cluster: sample_cluster
+                        - match:
+                            prefix: /auth.Auth
+                          route:
+                            cluster: auth_cluster
 
                 http_filters:
                   - name: envoy.filters.http.grpc_web

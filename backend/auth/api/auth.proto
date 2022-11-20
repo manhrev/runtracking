@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/manhrev/runtracking/backend/auth/pkg/api;auth";
+
+service Auth {
+    rpc Login(LoginRequest) returns (LoginReply);
+    rpc SignUp(SignUpRequest) returns (SignUpReply);
+}
+
+message LoginRequest {
+
+}
+
+message LoginReply {
+
+}
+
+message SignUpRequest {}
+
+message SignUpReply {}
