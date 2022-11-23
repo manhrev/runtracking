@@ -7,4 +7,5 @@ COPY wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
 RUN apk add --no-cache bash
 EXPOSE 8080
-CMD ["/wait-for-it.sh","sample_db:3306", "--","/server"]
+
+CMD ["/wait-for-it.sh","auth_db:3306", "--","/server"]

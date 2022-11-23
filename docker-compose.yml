@@ -38,6 +38,11 @@ services:
       context: backend/auth
       dockerfile: build/Dockerfile
     container_name: auth
+    volumes:
+      - ./backend/auth:/app
+    depends_on:
+      - auth_db
+      - redis
 
   auth_db:
     image: mysql
@@ -49,6 +54,16 @@ services:
       - "./tmp/db/auth:/var/lib/mysql"
     ports:
       - 33306:3306
+  
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports: 
+      - "6379:6379"
+    restart: always
+
+    
+
 
   group:
     build:
