@@ -62,9 +62,6 @@ services:
       - "6379:6379"
     restart: always
 
-    
-
-
   group:
     build:
       context: backend/group

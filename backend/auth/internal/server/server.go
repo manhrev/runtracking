@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/auth/internal/cache"
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signin"
+	"github.com/manhrev/runtracking/backend/auth/internal/feature/signup"
 	"github.com/manhrev/runtracking/backend/auth/internal/server/auth"
 	authz "github.com/manhrev/runtracking/backend/auth/internal/server/authz"
 	"github.com/manhrev/runtracking/backend/auth/internal/service/token"
@@ -64,6 +65,12 @@ func Serve(server *grpc.Server) {
 	if err != nil {
 		log.Fatalf("cannot create featureSignIn: %v", err)
 	}
+
+	featureSignUp, err := signup.New(entClient, tokenService)
+	if err != nil {
+		log.Fatalf("cannot create featureSignUp: %v", err)
+	}
+
 	cacheService, err := cache.New(entClient)
 
 	if err != nil {
@@ -79,7 +86,7 @@ func Serve(server *grpc.Server) {
 		logger.Fatal("can not create cache", zap.Error(err))
 	}
 
-	pb.RegisterAuthServer(server, auth.NewServer(entClient, tokenService, featureSignIn, cacheService, extractorService))
+	pb.RegisterAuthServer(server, auth.NewServer(entClient, tokenService, featureSignIn, featureSignUp, cacheService, extractorService))
 
 	lis, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {

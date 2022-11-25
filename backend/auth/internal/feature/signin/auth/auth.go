@@ -32,7 +32,7 @@ func New(
 
 func (s auth) SignIn(ctx context.Context, request *pb.LoginRequest) (*pb.LoginReply, *token.Tokens, error) {
 
-	username := strings.ToLower(request.GetUsername())
+	username := strings.ToLower(request.GetUserName())
 	user, err := s.ent.User.Query().
 		Where(user.Username(username)).
 		Only(ctx)
