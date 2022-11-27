@@ -1,3 +1,4 @@
 backend/sample/vendor
 backend/caller/vendor
 tmp
+frontend/node_modules
