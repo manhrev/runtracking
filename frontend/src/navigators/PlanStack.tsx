@@ -8,7 +8,7 @@ export const PlanStack = () => {
   return (
     <Stack.Navigator screenOptions={{ header: CustomNavBar }}>
       <Stack.Screen
-        name="Plan Home"
+        name="PlanHome"
         options={{
           title: "Your Plan",
         }}

@@ -8,7 +8,7 @@ export const GroupStack = () => {
   return (
     <Stack.Navigator screenOptions={{ header: CustomNavBar }}>
       <Stack.Screen
-        name="Group Home"
+        name="GroupHome"
         options={{
           title: "Group",
         }}

@@ -8,7 +8,7 @@ export const NotificationStack = () => {
   return (
     <Stack.Navigator screenOptions={{ header: CustomNavBar }}>
       <Stack.Screen
-        name="Notification Home"
+        name="NotificationHome"
         options={{
           title: "Notifications",
         }}

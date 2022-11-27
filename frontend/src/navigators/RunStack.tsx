@@ -8,7 +8,7 @@ export const RunStack = () => {
   return (
     <Stack.Navigator screenOptions={{ header: CustomNavBar }}>
       <Stack.Screen
-        name="Run Home"
+        name="RunHome"
         options={{
           title: "Run",
         }}

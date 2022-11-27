@@ -1,4 +1,5 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAppTheme } from "../../theme";
 import { RootActivityParamList } from "../../navigators/ActivityStack";
@@ -11,11 +12,11 @@ export default function Activity({
   return (
     <View style={styles(theme).container}>
       <Button
+        mode="outlined"
         onPress={() => navigation.push("ActivityList", {})}
-        title="View all activities"
-        color={theme.colors.primary}
-        accessibilityLabel="Learn more about this purple button"
-      />
+      >
+        View all activities
+      </Button>
     </View>
   );
 }
