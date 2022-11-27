@@ -6,6 +6,12 @@ generate-code:
 	mkdir -p ./pkg/code
 	protoc --go_out=./pkg/code --go-grpc_out=./pkg/code  ./api/auth_code.proto
 
+generate-ts:
+	mkdir -p ./npm/code
+	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth.proto
+	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth_code.proto
+	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/abc.proto
+
 generate-ent:
 	mkdir -p ./pkg/ent
 	cp -R ./schema ./pkg/ent/schema
