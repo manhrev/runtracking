@@ -504,10 +504,24 @@ func (m *UserMutation) AddedHeight() (r int32, exists bool) {
 	return *v, true
 }
 
+// ClearHeight clears the value of the "height" field.
+func (m *UserMutation) ClearHeight() {
+	m.height = nil
+	m.addheight = nil
+	m.clearedFields[user.FieldHeight] = struct{}{}
+}
+
+// HeightCleared returns if the "height" field was cleared in this mutation.
+func (m *UserMutation) HeightCleared() bool {
+	_, ok := m.clearedFields[user.FieldHeight]
+	return ok
+}
+
 // ResetHeight resets all changes to the "height" field.
 func (m *UserMutation) ResetHeight() {
 	m.height = nil
 	m.addheight = nil
+	delete(m.clearedFields, user.FieldHeight)
 }
 
 // SetWeight sets the "weight" field.
@@ -560,10 +574,24 @@ func (m *UserMutation) AddedWeight() (r int32, exists bool) {
 	return *v, true
 }
 
+// ClearWeight clears the value of the "weight" field.
+func (m *UserMutation) ClearWeight() {
+	m.weight = nil
+	m.addweight = nil
+	m.clearedFields[user.FieldWeight] = struct{}{}
+}
+
+// WeightCleared returns if the "weight" field was cleared in this mutation.
+func (m *UserMutation) WeightCleared() bool {
+	_, ok := m.clearedFields[user.FieldWeight]
+	return ok
+}
+
 // ResetWeight resets all changes to the "weight" field.
 func (m *UserMutation) ResetWeight() {
 	m.weight = nil
 	m.addweight = nil
+	delete(m.clearedFields, user.FieldWeight)
 }
 
 // SetProfilePicture sets the "profile_picture" field.
@@ -957,7 +985,14 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldHeight) {
+		fields = append(fields, user.FieldHeight)
+	}
+	if m.FieldCleared(user.FieldWeight) {
+		fields = append(fields, user.FieldWeight)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -970,6 +1005,14 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldHeight:
+		m.ClearHeight()
+		return nil
+	case user.FieldWeight:
+		m.ClearWeight()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 

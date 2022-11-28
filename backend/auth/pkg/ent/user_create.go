@@ -39,9 +39,25 @@ func (uc *UserCreate) SetDisplayName(s string) *UserCreate {
 	return uc
 }
 
+// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+func (uc *UserCreate) SetNillableDisplayName(s *string) *UserCreate {
+	if s != nil {
+		uc.SetDisplayName(*s)
+	}
+	return uc
+}
+
 // SetEmail sets the "email" field.
 func (uc *UserCreate) SetEmail(s string) *UserCreate {
 	uc.mutation.SetEmail(s)
+	return uc
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uc *UserCreate) SetNillableEmail(s *string) *UserCreate {
+	if s != nil {
+		uc.SetEmail(*s)
+	}
 	return uc
 }
 
@@ -51,9 +67,25 @@ func (uc *UserCreate) SetPhone(s string) *UserCreate {
 	return uc
 }
 
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePhone(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPhone(*s)
+	}
+	return uc
+}
+
 // SetRole sets the "role" field.
 func (uc *UserCreate) SetRole(i int32) *UserCreate {
 	uc.mutation.SetRole(i)
+	return uc
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uc *UserCreate) SetNillableRole(i *int32) *UserCreate {
+	if i != nil {
+		uc.SetRole(*i)
+	}
 	return uc
 }
 
@@ -63,9 +95,25 @@ func (uc *UserCreate) SetAge(i int32) *UserCreate {
 	return uc
 }
 
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (uc *UserCreate) SetNillableAge(i *int32) *UserCreate {
+	if i != nil {
+		uc.SetAge(*i)
+	}
+	return uc
+}
+
 // SetHeight sets the "height" field.
 func (uc *UserCreate) SetHeight(i int32) *UserCreate {
 	uc.mutation.SetHeight(i)
+	return uc
+}
+
+// SetNillableHeight sets the "height" field if the given value is not nil.
+func (uc *UserCreate) SetNillableHeight(i *int32) *UserCreate {
+	if i != nil {
+		uc.SetHeight(*i)
+	}
 	return uc
 }
 
@@ -75,9 +123,25 @@ func (uc *UserCreate) SetWeight(i int32) *UserCreate {
 	return uc
 }
 
+// SetNillableWeight sets the "weight" field if the given value is not nil.
+func (uc *UserCreate) SetNillableWeight(i *int32) *UserCreate {
+	if i != nil {
+		uc.SetWeight(*i)
+	}
+	return uc
+}
+
 // SetProfilePicture sets the "profile_picture" field.
 func (uc *UserCreate) SetProfilePicture(s string) *UserCreate {
 	uc.mutation.SetProfilePicture(s)
+	return uc
+}
+
+// SetNillableProfilePicture sets the "profile_picture" field if the given value is not nil.
+func (uc *UserCreate) SetNillableProfilePicture(s *string) *UserCreate {
+	if s != nil {
+		uc.SetProfilePicture(*s)
+	}
 	return uc
 }
 
@@ -197,6 +261,30 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *UserCreate) defaults() {
+	if _, ok := uc.mutation.DisplayName(); !ok {
+		v := user.DefaultDisplayName
+		uc.mutation.SetDisplayName(v)
+	}
+	if _, ok := uc.mutation.Email(); !ok {
+		v := user.DefaultEmail
+		uc.mutation.SetEmail(v)
+	}
+	if _, ok := uc.mutation.Phone(); !ok {
+		v := user.DefaultPhone
+		uc.mutation.SetPhone(v)
+	}
+	if _, ok := uc.mutation.Role(); !ok {
+		v := user.DefaultRole
+		uc.mutation.SetRole(v)
+	}
+	if _, ok := uc.mutation.Age(); !ok {
+		v := user.DefaultAge
+		uc.mutation.SetAge(v)
+	}
+	if _, ok := uc.mutation.ProfilePicture(); !ok {
+		v := user.DefaultProfilePicture
+		uc.mutation.SetProfilePicture(v)
+	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		v := user.DefaultCreatedAt
 		uc.mutation.SetCreatedAt(v)
@@ -225,12 +313,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Age(); !ok {
 		return &ValidationError{Name: "age", err: errors.New(`ent: missing required field "User.age"`)}
-	}
-	if _, ok := uc.mutation.Height(); !ok {
-		return &ValidationError{Name: "height", err: errors.New(`ent: missing required field "User.height"`)}
-	}
-	if _, ok := uc.mutation.Weight(); !ok {
-		return &ValidationError{Name: "weight", err: errors.New(`ent: missing required field "User.weight"`)}
 	}
 	if _, ok := uc.mutation.ProfilePicture(); !ok {
 		return &ValidationError{Name: "profile_picture", err: errors.New(`ent: missing required field "User.profile_picture"`)}
