@@ -3,5 +3,4 @@ backend/caller/vendor
 backend/group/vendor
 backend/auth/vendor
 tmp
-tmp
 frontend/node_modules

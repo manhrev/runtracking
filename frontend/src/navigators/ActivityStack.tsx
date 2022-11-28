@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ActivityHome from "../screens/Activity/ActivityHome";
 import ActivityDetail from "../screens/Activity/ActivityDetail";
 import ActivityList from "../screens/Activity/ActivityList";
-import { CustomNavBar } from "./NavBar";
+import { CustomNavBar } from "../comp/NavBar";
 
 export type RootActivityParamList = {
   ActivityHome: undefined;
