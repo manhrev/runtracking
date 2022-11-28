@@ -1,6 +1,7 @@
 import { StatusCode as grpcStatusCode } from "grpc-web";
 
 import { GRPCClientResponse, ErrorHandler, GRPCClientConfig } from "./types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const KEY_ACCESS_TOKEN = "accessToken";
 export const QUERY_PARAM_ACCESS_TOKEN = "token";
@@ -28,11 +29,17 @@ class gRPCClientAbstract {
     request: any,
     option: any = {}
   ): Promise<GRPCClientResponse<T>> {
+    var access_token = "";
     try {
-      const token = localStorage.getItem(KEY_ACCESS_TOKEN);
-      if (token) {
-        option = { ...option, Authorization: `Bearer ${token}` };
+      const token = await AsyncStorage.getItem(KEY_ACCESS_TOKEN);
+      if (token != null) {
+        access_token = token;
       }
+    } catch (e) {
+      console.log("Cannot connect to async storage");
+    }
+    try {
+      option = { ...option, Authorization: `Bearer ${access_token}` };
 
       console.log(
         `%c gRPCClientRequest -> [${this.logFuncName(func)}] -> REQUEST:`,
