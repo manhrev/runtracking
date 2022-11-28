@@ -11,16 +11,16 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "username", Type: field.TypeString},
+		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
-		{Name: "display_name", Type: field.TypeString},
-		{Name: "email", Type: field.TypeString},
-		{Name: "phone", Type: field.TypeString},
-		{Name: "role", Type: field.TypeInt32},
-		{Name: "age", Type: field.TypeInt32},
-		{Name: "height", Type: field.TypeInt32},
-		{Name: "weight", Type: field.TypeInt32},
-		{Name: "profile_picture", Type: field.TypeString},
+		{Name: "display_name", Type: field.TypeString, Default: ""},
+		{Name: "email", Type: field.TypeString, Default: ""},
+		{Name: "phone", Type: field.TypeString, Default: ""},
+		{Name: "role", Type: field.TypeInt32, Default: 1},
+		{Name: "age", Type: field.TypeInt32, Default: 0},
+		{Name: "height", Type: field.TypeInt32, Nullable: true},
+		{Name: "weight", Type: field.TypeInt32, Nullable: true},
+		{Name: "profile_picture", Type: field.TypeString, Default: ""},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// UsersTable holds the schema information for the "users" table.

@@ -47,9 +47,25 @@ func (uu *UserUpdate) SetDisplayName(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableDisplayName(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetDisplayName(*s)
+	}
+	return uu
+}
+
 // SetEmail sets the "email" field.
 func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
 	uu.mutation.SetEmail(s)
+	return uu
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableEmail(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetEmail(*s)
+	}
 	return uu
 }
 
@@ -59,10 +75,26 @@ func (uu *UserUpdate) SetPhone(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePhone(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPhone(*s)
+	}
+	return uu
+}
+
 // SetRole sets the "role" field.
 func (uu *UserUpdate) SetRole(i int32) *UserUpdate {
 	uu.mutation.ResetRole()
 	uu.mutation.SetRole(i)
+	return uu
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableRole(i *int32) *UserUpdate {
+	if i != nil {
+		uu.SetRole(*i)
+	}
 	return uu
 }
 
@@ -79,6 +111,14 @@ func (uu *UserUpdate) SetAge(i int32) *UserUpdate {
 	return uu
 }
 
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableAge(i *int32) *UserUpdate {
+	if i != nil {
+		uu.SetAge(*i)
+	}
+	return uu
+}
+
 // AddAge adds i to the "age" field.
 func (uu *UserUpdate) AddAge(i int32) *UserUpdate {
 	uu.mutation.AddAge(i)
@@ -92,9 +132,23 @@ func (uu *UserUpdate) SetHeight(i int32) *UserUpdate {
 	return uu
 }
 
+// SetNillableHeight sets the "height" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableHeight(i *int32) *UserUpdate {
+	if i != nil {
+		uu.SetHeight(*i)
+	}
+	return uu
+}
+
 // AddHeight adds i to the "height" field.
 func (uu *UserUpdate) AddHeight(i int32) *UserUpdate {
 	uu.mutation.AddHeight(i)
+	return uu
+}
+
+// ClearHeight clears the value of the "height" field.
+func (uu *UserUpdate) ClearHeight() *UserUpdate {
+	uu.mutation.ClearHeight()
 	return uu
 }
 
@@ -105,15 +159,37 @@ func (uu *UserUpdate) SetWeight(i int32) *UserUpdate {
 	return uu
 }
 
+// SetNillableWeight sets the "weight" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableWeight(i *int32) *UserUpdate {
+	if i != nil {
+		uu.SetWeight(*i)
+	}
+	return uu
+}
+
 // AddWeight adds i to the "weight" field.
 func (uu *UserUpdate) AddWeight(i int32) *UserUpdate {
 	uu.mutation.AddWeight(i)
 	return uu
 }
 
+// ClearWeight clears the value of the "weight" field.
+func (uu *UserUpdate) ClearWeight() *UserUpdate {
+	uu.mutation.ClearWeight()
+	return uu
+}
+
 // SetProfilePicture sets the "profile_picture" field.
 func (uu *UserUpdate) SetProfilePicture(s string) *UserUpdate {
 	uu.mutation.SetProfilePicture(s)
+	return uu
+}
+
+// SetNillableProfilePicture sets the "profile_picture" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableProfilePicture(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetProfilePicture(*s)
+	}
 	return uu
 }
 
@@ -266,11 +342,17 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.AddedHeight(); ok {
 		_spec.AddField(user.FieldHeight, field.TypeInt32, value)
 	}
+	if uu.mutation.HeightCleared() {
+		_spec.ClearField(user.FieldHeight, field.TypeInt32)
+	}
 	if value, ok := uu.mutation.Weight(); ok {
 		_spec.SetField(user.FieldWeight, field.TypeInt32, value)
 	}
 	if value, ok := uu.mutation.AddedWeight(); ok {
 		_spec.AddField(user.FieldWeight, field.TypeInt32, value)
+	}
+	if uu.mutation.WeightCleared() {
+		_spec.ClearField(user.FieldWeight, field.TypeInt32)
 	}
 	if value, ok := uu.mutation.ProfilePicture(); ok {
 		_spec.SetField(user.FieldProfilePicture, field.TypeString, value)
@@ -350,9 +432,25 @@ func (uuo *UserUpdateOne) SetDisplayName(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableDisplayName(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetDisplayName(*s)
+	}
+	return uuo
+}
+
 // SetEmail sets the "email" field.
 func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
 	uuo.mutation.SetEmail(s)
+	return uuo
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableEmail(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetEmail(*s)
+	}
 	return uuo
 }
 
@@ -362,10 +460,26 @@ func (uuo *UserUpdateOne) SetPhone(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePhone(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPhone(*s)
+	}
+	return uuo
+}
+
 // SetRole sets the "role" field.
 func (uuo *UserUpdateOne) SetRole(i int32) *UserUpdateOne {
 	uuo.mutation.ResetRole()
 	uuo.mutation.SetRole(i)
+	return uuo
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableRole(i *int32) *UserUpdateOne {
+	if i != nil {
+		uuo.SetRole(*i)
+	}
 	return uuo
 }
 
@@ -382,6 +496,14 @@ func (uuo *UserUpdateOne) SetAge(i int32) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableAge(i *int32) *UserUpdateOne {
+	if i != nil {
+		uuo.SetAge(*i)
+	}
+	return uuo
+}
+
 // AddAge adds i to the "age" field.
 func (uuo *UserUpdateOne) AddAge(i int32) *UserUpdateOne {
 	uuo.mutation.AddAge(i)
@@ -395,9 +517,23 @@ func (uuo *UserUpdateOne) SetHeight(i int32) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableHeight sets the "height" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableHeight(i *int32) *UserUpdateOne {
+	if i != nil {
+		uuo.SetHeight(*i)
+	}
+	return uuo
+}
+
 // AddHeight adds i to the "height" field.
 func (uuo *UserUpdateOne) AddHeight(i int32) *UserUpdateOne {
 	uuo.mutation.AddHeight(i)
+	return uuo
+}
+
+// ClearHeight clears the value of the "height" field.
+func (uuo *UserUpdateOne) ClearHeight() *UserUpdateOne {
+	uuo.mutation.ClearHeight()
 	return uuo
 }
 
@@ -408,15 +544,37 @@ func (uuo *UserUpdateOne) SetWeight(i int32) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableWeight sets the "weight" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableWeight(i *int32) *UserUpdateOne {
+	if i != nil {
+		uuo.SetWeight(*i)
+	}
+	return uuo
+}
+
 // AddWeight adds i to the "weight" field.
 func (uuo *UserUpdateOne) AddWeight(i int32) *UserUpdateOne {
 	uuo.mutation.AddWeight(i)
 	return uuo
 }
 
+// ClearWeight clears the value of the "weight" field.
+func (uuo *UserUpdateOne) ClearWeight() *UserUpdateOne {
+	uuo.mutation.ClearWeight()
+	return uuo
+}
+
 // SetProfilePicture sets the "profile_picture" field.
 func (uuo *UserUpdateOne) SetProfilePicture(s string) *UserUpdateOne {
 	uuo.mutation.SetProfilePicture(s)
+	return uuo
+}
+
+// SetNillableProfilePicture sets the "profile_picture" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableProfilePicture(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetProfilePicture(*s)
+	}
 	return uuo
 }
 
@@ -599,11 +757,17 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.AddedHeight(); ok {
 		_spec.AddField(user.FieldHeight, field.TypeInt32, value)
 	}
+	if uuo.mutation.HeightCleared() {
+		_spec.ClearField(user.FieldHeight, field.TypeInt32)
+	}
 	if value, ok := uuo.mutation.Weight(); ok {
 		_spec.SetField(user.FieldWeight, field.TypeInt32, value)
 	}
 	if value, ok := uuo.mutation.AddedWeight(); ok {
 		_spec.AddField(user.FieldWeight, field.TypeInt32, value)
+	}
+	if uuo.mutation.WeightCleared() {
+		_spec.ClearField(user.FieldWeight, field.TypeInt32)
 	}
 	if value, ok := uuo.mutation.ProfilePicture(); ok {
 		_spec.SetField(user.FieldProfilePicture, field.TypeString, value)
