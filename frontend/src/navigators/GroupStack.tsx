@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ExampleScreen from "../screens/ExampleScreen";
-import { CustomNavBar } from "./NavBar";
+import { CustomNavBar } from "../comp/NavBar";
 
 const Stack = createNativeStackNavigator();
 
