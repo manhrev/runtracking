@@ -2,10 +2,8 @@ package auth
 
 import (
 	"context"
-	"fmt"
-	"math/rand"
+	"log"
 	"strings"
-	"time"
 
 	"github.com/manhrev/runtracking/backend/auth/internal/service/token"
 	pb "github.com/manhrev/runtracking/backend/auth/pkg/api"
@@ -43,29 +41,28 @@ func (s auth) SignUp(ctx context.Context, request *pb.SignUpRequest) (*pb.SignUp
 		err     error
 	)
 
-	rand.Seed(time.Now().UnixNano())
-
 	newUser, err = s.ent.User.Create().
 		SetUsername(username).
 		SetPassword(pwd).
-		SetID(rand.Int63()).
 		SetAge(32).
-		SetDisplayName("dasd").
+		SetDisplayName("").
 		SetEmail(" ").
-		SetPhone("09").
+		SetPhone("").
 		SetRole(1).
-		SetHeight(12).
-		SetWeight(12).
-		SetProfilePicture("Dadsadas").
+		SetHeight(1).
+		SetWeight(1).
+		SetProfilePicture("").
 		Save(ctx)
 
 	if err != nil {
-		fmt.Println("Can not Sign up for user")
+		log.Println("Can not Sign up for user")
+		return nil, nil, err
 	}
 
 	tokens, err = s.token.Create(newUser.ID)
 	if err != nil {
-		fmt.Println("Can not create access token when sign up")
+		log.Println("Can not create access token when sign up")
+		return nil, nil, err
 	}
 
 	return &pb.SignUpReply{

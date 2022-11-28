@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 
 	"github.com/manhrev/runtracking/backend/auth/internal/service/token"
@@ -45,13 +46,15 @@ func (s auth) SignIn(ctx context.Context, request *pb.LoginRequest) (*pb.LoginRe
 	}
 
 	if user.Password != request.GetPassword() {
+		log.Println("User password don't match")
 		return nil, nil, errors.New("User password don't match")
 	}
 
 	tokens, err := s.token.Create(user.ID)
 
 	if err != nil {
-		return nil, nil, err
+		log.Println("Can't create access token")
+		return nil, nil, errors.New("Can't create access token")
 	}
 
 	// fmt.Printf("Tokens: %s", tokens.AccessToken.Raw)
