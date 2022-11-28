@@ -3,20 +3,37 @@ syntax = "proto3";
 package auth;
 
 option go_package = "github.com/manhrev/runtracking/backend/auth/pkg/api;auth";
+import "google/protobuf/empty.proto";
 
 service Auth {
     rpc Login(LoginRequest) returns (LoginReply);
     rpc SignUp(SignUpRequest) returns (SignUpReply);
+    rpc LogOut(google.protobuf.Empty) returns (google.protobuf.Empty) {} 
 }
 
 message LoginRequest {
-
+    string user_name = 1;
+    string password = 2;
 }
 
 message LoginReply {
-
+    int64 user_id = 1;
+    string user_name = 2;
+    string access_token = 3;
 }
 
-message SignUpRequest {}
+message SignUpRequest {
+    string user_name = 1;
+    string password = 2;
+}
 
-message SignUpReply {}
+message SignUpReply {
+    TokenInfo token_info = 1;
+}
+
+message TokenInfo{
+  int64 user_id = 1;
+  string user_name = 2;
+  string id_token = 3;
+  string access_token = 4;
+}

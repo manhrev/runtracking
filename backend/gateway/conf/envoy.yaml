@@ -34,6 +34,12 @@ static_resources:
                         max_age: "1728000"
                         expose_headers: grpc-status,grpc-message
                       routes:
+                        - match: { prefix: "/auth.Auth" }
+                          route: { cluster: auth_cluster }
+                          typed_per_filter_config:
+                            envoy.filters.http.ext_authz:
+                              "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                              disabled: true
                         - match:
                             prefix: /caller.Caller/CallSample
                           route:
@@ -42,10 +48,10 @@ static_resources:
                             prefix: /sample.Sample
                           route:
                             cluster: sample_cluster
-                        - match:
-                            prefix: /auth.Auth
+                        - match: 
+                            prefix: /group.Group
                           route:
-                            cluster: auth_cluster
+                            cluster: group_cluster
 
                 http_filters:
                   - name: envoy.filters.http.grpc_web
@@ -111,4 +117,19 @@ static_resources:
                   address:
                     socket_address:
                       address: auth
+                      port_value: 8080
+
+    - name: group_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: group_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: group
                       port_value: 8080

@@ -6,6 +6,10 @@ generate-code:
 	mkdir -p ./pkg/code
 	protoc --go_out=./pkg/code --go-grpc_out=./pkg/code  ./api/auth_code.proto
 
+generate-cache:
+	mkdir -p ./pkg/data
+	protoc --go_out=./pkg/data --go-grpc_out=./pkg/data  ./api/auth_cache.proto
+
 generate-ent:
 	mkdir -p ./pkg/ent
 	cp -R ./schema ./pkg/ent/schema
@@ -13,7 +17,7 @@ generate-ent:
 
 #rm -r ./pkg/ent/schema
 generate:
-	make generate-proto generate-code generate-ent
+	make generate-proto generate-code generate-ent generate-cache
 
 run:
 	go run ./cmd/.

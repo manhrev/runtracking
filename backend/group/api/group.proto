@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package group;
+
+option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;group";
+
+service Group {
+    rpc GetGroup(GetGroupRequest) returns (GetGroupReply){};
+    rpc SetGroup(SetGroupRequest) returns (SetGroupReply){};
+}
+
+message GetGroupRequest{
+    string id = 1;
+}
+
+message GetGroupReply{
+    GroupInfo group = 1;
+}
+
+message SetGroupRequest{
+    GroupInfo group = 1;
+}
+
+message SetGroupReply{
+    string group_id = 1;
+}
+
+message GroupInfo{
+    string id = 1;
+    string name = 2;
+}
+

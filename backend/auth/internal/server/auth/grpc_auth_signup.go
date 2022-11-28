@@ -7,5 +7,12 @@ import (
 )
 
 func (s *authServer) SignUp(ctx context.Context, request *auth.SignUpRequest) (*auth.SignUpReply, error) {
-	return &auth.SignUpReply{}, nil
+	reply, tokens, err := s.signUp.SignUp(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	s.cacheTokens(ctx, tokens)
+
+	return reply, nil
 }
