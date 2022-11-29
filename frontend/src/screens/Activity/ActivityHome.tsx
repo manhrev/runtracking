@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import UpperRightMenu from "../../comp/UpperRightMenu";
 import { useIsFocused } from "@react-navigation/native";
 
+import { baseStyles } from "../baseStyle";
+
 export default function Activity({
   navigation,
   route,
@@ -15,13 +17,17 @@ export default function Activity({
   const isFocused = useIsFocused();
   useEffect(() => {});
   return (
-    <View style={styles(theme).container}>
-      <Button
-        mode="outlined"
-        onPress={() => navigation.push("ActivityList", {})}
-      >
-        View all activities
-      </Button>
+    <>
+      <View style={baseStyles(theme).container}>
+        <View style={baseStyles(theme).innerWrapper}>
+          <Button
+            mode="outlined"
+            onPress={() => navigation.push("ActivityList", {})}
+          >
+            View all activities
+          </Button>
+        </View>
+      </View>
       {isFocused && (
         <UpperRightMenu
           menuList={[
@@ -43,16 +49,8 @@ export default function Activity({
           ]}
         />
       )}
-    </View>
+    </>
   );
 }
 
-const styles = (theme: any) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  });
+const styles = (theme: any) => StyleSheet.create({});

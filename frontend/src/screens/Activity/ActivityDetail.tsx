@@ -1,9 +1,10 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Divider, Text } from "react-native-paper";
+
 import { RootActivityParamList } from "../../navigators/ActivityStack";
 import { useAppTheme } from "../../theme";
-import { Dimensions } from "react-native";
+import { baseStyles } from "../baseStyle";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -13,8 +14,8 @@ export default function ActivityDetail({
 }: NativeStackScreenProps<RootActivityParamList, "ActivityDetail">) {
   const theme = useAppTheme();
   return (
-    <View style={styles(theme).container}>
-      <View style={styles(theme).innerWrapper}>
+    <View style={baseStyles(theme).container}>
+      <View style={baseStyles(theme).innerWrapper}>
         <View style={{ marginVertical: 10 }}>
           <Text variant="bodyMedium">
             22/09/2022 - 15:30{"\n"}Running activity
@@ -113,14 +114,6 @@ export default function ActivityDetail({
 
 const styles = (theme: any) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    innerWrapper: {
-      width: windowWidth - 30,
-      alignSelf: "center",
-    },
     unit: {
       fontWeight: "700",
       color: theme.colors.secondary,

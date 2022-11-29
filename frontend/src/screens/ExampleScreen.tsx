@@ -5,7 +5,6 @@ import { authClient } from "../utils/grpc/index";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { selectCommonSlice, setData } from "../redux/features/common/slice";
 import UpperRightMenu from "../comp/UpperRightMenu";
-import { useEffect } from "react";
 import { useIsFocused } from "@react-navigation/native";
 
 export default function ExampleScreen() {
