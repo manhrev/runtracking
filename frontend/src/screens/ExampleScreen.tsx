@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
-import { useAppTheme } from "../theme";
+import { AppTheme, useAppTheme } from "../theme";
 import { authClient } from "../utils/grpc/index";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { selectCommonSlice, setData } from "../redux/features/common/slice";
@@ -66,7 +66,7 @@ export default function ExampleScreen() {
   );
 }
 
-const styles = (theme: any) =>
+const styles = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,

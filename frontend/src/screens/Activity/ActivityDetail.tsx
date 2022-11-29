@@ -3,7 +3,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Divider, Text } from "react-native-paper";
 
 import { RootActivityParamList } from "../../navigators/ActivityStack";
-import { useAppTheme } from "../../theme";
+import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 
 const windowWidth = Dimensions.get("window").width;
@@ -112,7 +112,7 @@ export default function ActivityDetail({
   );
 }
 
-const styles = (theme: any) =>
+const styles = (theme: AppTheme) =>
   StyleSheet.create({
     unit: {
       fontWeight: "700",
