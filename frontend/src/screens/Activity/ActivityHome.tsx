@@ -28,7 +28,7 @@ export default function Activity({
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles(theme).analyticContainer}>
               <Text
-                variant="titleLarge"
+                variant="bodyLarge"
                 style={{ fontWeight: "bold", textAlignVertical: "center" }}
               >
                 Analytic for
@@ -62,7 +62,7 @@ export default function Activity({
                 }}
               >
                 <Text
-                  variant="titleMedium"
+                  variant="bodyLarge"
                   style={{
                     fontWeight: "bold",
                     textAlignVertical: "center",
@@ -89,14 +89,14 @@ export default function Activity({
                   </Text>
                 </View>
                 <View style={{ alignItems: "flex-end" }}>
-                  <Text variant="titleMedium">4</Text>
-                  <Text variant="titleMedium">12'33''</Text>
-                  <Text variant="titleMedium">2:33</Text>
+                  <Text variant="bodyLarge">4</Text>
+                  <Text variant="bodyLarge">12'33''</Text>
+                  <Text variant="bodyLarge">2:33</Text>
                 </View>
                 <View>
-                  <Text variant="titleMedium">Runs</Text>
-                  <Text variant="titleMedium">Avg. pace</Text>
-                  <Text variant="titleMedium">Hours</Text>
+                  <Text variant="bodyLarge">Runs</Text>
+                  <Text variant="bodyLarge">Avg. pace</Text>
+                  <Text variant="bodyLarge">Hours</Text>
                 </View>
               </View>
 
@@ -131,7 +131,7 @@ export default function Activity({
             </View>
 
             <View style={styles(theme).recentActivityContainer}>
-              <Text variant="titleLarge" style={{ fontWeight: "bold" }}>
+              <Text variant="bodyLarge" style={{ fontWeight: "bold" }}>
                 Recent activities
               </Text>
               {ids.map((id) => {
