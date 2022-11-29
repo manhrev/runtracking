@@ -1,7 +1,6 @@
 import { Appbar } from "react-native-paper";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { Platform } from "react-native";
-import { useState } from "react";
 import { useAppDispatch } from "../redux/store";
 import { showRightMenu } from "../redux/features/toggle/slice";
 

@@ -111,8 +111,9 @@ const ExtendedDefaultTheme = {
     backdrop: "rgba(44, 50, 41, 0.4)",
   },
 };
-export const theme = ExtendedDarkTheme;
+export const darkTheme = ExtendedDefaultTheme;
+export const lightTheme = ExtendedDarkTheme;
 
-export type AppTheme = typeof theme;
+export type AppTheme = typeof lightTheme;
 
 export const useAppTheme = () => useTheme<AppTheme>();

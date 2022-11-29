@@ -3,10 +3,12 @@ import { RootState } from "../../reducers";
 
 interface ToggleState {
   isRightMenuShow: boolean;
+  isNightMode: boolean;
 }
 
 const initialState: ToggleState = {
   isRightMenuShow: false,
+  isNightMode: false,
 };
 
 const slice = createSlice({
@@ -19,10 +21,13 @@ const slice = createSlice({
     hideRightMenu: (state: ToggleState) => {
       state.isRightMenuShow = false;
     },
+    switchNightMode: (state: ToggleState) => {
+      state.isNightMode = !state.isNightMode;
+    },
   },
 });
 
-export const { showRightMenu, hideRightMenu } = slice.actions;
+export const { showRightMenu, hideRightMenu, switchNightMode } = slice.actions;
 
 export const selectToggleSlice = (state: RootState) => state.toggle;
 

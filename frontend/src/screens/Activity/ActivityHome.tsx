@@ -1,11 +1,18 @@
-import { StyleSheet, View } from "react-native";
-import { Button } from "react-native-paper";
+import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
+import { Button, IconButton, SegmentedButtons, Text } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useAppTheme } from "../../theme";
+import { AppTheme, useAppTheme } from "../../theme";
 import { RootActivityParamList } from "../../navigators/ActivityStack";
-import { useEffect } from "react";
+import { useState } from "react";
 import UpperRightMenu from "../../comp/UpperRightMenu";
 import { useIsFocused } from "@react-navigation/native";
+
+import { baseStyles } from "../baseStyle";
+import { BarChart } from "react-native-chart-kit";
+import ActivityListItem from "./comp/ActivityListItem";
+
+const windowWidth = Dimensions.get("window").width;
+const ids = [...Array(3 + 1).keys()].slice(1);
 
 export default function Activity({
   navigation,
@@ -13,15 +20,142 @@ export default function Activity({
 }: NativeStackScreenProps<RootActivityParamList, "ActivityHome">) {
   const theme = useAppTheme();
   const isFocused = useIsFocused();
-  useEffect(() => {});
+  const [filterByValue, setFilterByValue] = useState("week");
   return (
-    <View style={styles(theme).container}>
-      <Button
-        mode="outlined"
-        onPress={() => navigation.push("ActivityList", {})}
-      >
-        View all activities
-      </Button>
+    <>
+      <View style={baseStyles(theme).container}>
+        <View style={baseStyles(theme).innerWrapper}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles(theme).analyticContainer}>
+              <Text
+                variant="titleLarge"
+                style={{ fontWeight: "bold", textAlignVertical: "center" }}
+              >
+                Analytic for
+              </Text>
+              <SegmentedButtons
+                style={{ marginTop: 10, alignSelf: "center" }}
+                value={filterByValue}
+                onValueChange={setFilterByValue}
+                density="medium"
+                buttons={[
+                  {
+                    value: "week",
+                    label: "Week",
+                  },
+                  {
+                    value: "month",
+                    label: "Month",
+                  },
+                  {
+                    value: "year",
+                    label: "Year",
+                  },
+                  { value: "all", label: "All" },
+                ]}
+              />
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  variant="titleMedium"
+                  style={{
+                    fontWeight: "bold",
+                    textAlignVertical: "center",
+                    color: theme.colors.secondary,
+                  }}
+                >
+                  Activity type: Running
+                </Text>
+                <IconButton
+                  icon="cog"
+                  iconColor={theme.colors.primary}
+                  size={18}
+                  onPress={() => console.log("Pressed")}
+                />
+              </View>
+              <View style={styles(theme).generalInfoContainter}>
+                <View style={{ justifyContent: "center" }}>
+                  <Text variant="displayMedium">32 km</Text>
+                  <Text
+                    variant="bodyMedium"
+                    style={{ marginTop: -5, alignSelf: "center" }}
+                  >
+                    Total distance
+                  </Text>
+                </View>
+                <View style={{ alignItems: "flex-end" }}>
+                  <Text variant="titleMedium">4</Text>
+                  <Text variant="titleMedium">12'33''</Text>
+                  <Text variant="titleMedium">2:33</Text>
+                </View>
+                <View>
+                  <Text variant="titleMedium">Runs</Text>
+                  <Text variant="titleMedium">Avg. pace</Text>
+                  <Text variant="titleMedium">Hours</Text>
+                </View>
+              </View>
+
+              <BarChart
+                yAxisSuffix=""
+                data={{
+                  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+                  datasets: [
+                    {
+                      data: [20, 45, 28, 80, 99, 43],
+                    },
+                  ],
+                }}
+                width={windowWidth - 20}
+                height={200}
+                yAxisLabel={""}
+                chartConfig={{
+                  backgroundColor: theme.colors.elevation.level4,
+                  backgroundGradientFrom: theme.colors.secondaryContainer,
+                  backgroundGradientTo: theme.colors.tertiaryContainer,
+                  decimalPlaces: 2,
+                  color: () => theme.colors.primary,
+                  style: {
+                    borderRadius: 16,
+                  },
+                }}
+                style={{
+                  borderRadius: 16,
+                  alignSelf: "center",
+                }}
+              />
+            </View>
+
+            <View style={styles(theme).recentActivityContainer}>
+              <Text variant="titleLarge" style={{ fontWeight: "bold" }}>
+                Recent activities
+              </Text>
+              {ids.map((id) => {
+                return (
+                  <ActivityListItem
+                    id={id}
+                    onPress={() =>
+                      navigation.push("ActivityDetail", { activityId: id })
+                    }
+                    key={id}
+                  />
+                );
+              })}
+              <Button
+                mode="contained"
+                onPress={() => navigation.push("ActivityList", {})}
+                style={{ marginTop: 10 }}
+              >
+                View all activities
+              </Button>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
       {isFocused && (
         <UpperRightMenu
           menuList={[
@@ -43,16 +177,25 @@ export default function Activity({
           ]}
         />
       )}
-    </View>
+    </>
   );
 }
 
-const styles = (theme: any) =>
+const styles = (theme: AppTheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-      alignItems: "center",
-      justifyContent: "center",
+    analyticContainer: {
+      paddingTop: 10,
+    },
+    generalInfoContainter: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-around",
+      backgroundColor: theme.colors.elevation.level1,
+      marginBottom: 14,
+      borderRadius: 40,
+      paddingVertical: 10,
+    },
+    recentActivityContainer: {
+      paddingVertical: 20,
     },
   });

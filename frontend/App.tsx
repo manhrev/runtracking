@@ -4,16 +4,25 @@ import { Provider as ReduxProvider } from "react-redux";
 
 import store from "./src/redux/store";
 import TabNav from "./src/navigators/Tab";
-import { theme } from "./src/theme";
+import { lightTheme, darkTheme } from "./src/theme";
+import { selectToggleSlice } from "./src/redux/features/toggle/slice";
+import { useAppSelector } from "./src/redux/store";
 
 export default function App() {
   return (
     <ReduxProvider store={store}>
-      <PaperProvider theme={theme}>
-        <NavigationContainer theme={theme}>
-          <TabNav />
-        </NavigationContainer>
-      </PaperProvider>
+      <AppInsideRedux />
     </ReduxProvider>
+  );
+}
+
+function AppInsideRedux() {
+  const { isNightMode } = useAppSelector(selectToggleSlice);
+  return (
+    <PaperProvider theme={isNightMode ? darkTheme : lightTheme}>
+      <NavigationContainer theme={isNightMode ? darkTheme : lightTheme}>
+        <TabNav />
+      </NavigationContainer>
+    </PaperProvider>
   );
 }
