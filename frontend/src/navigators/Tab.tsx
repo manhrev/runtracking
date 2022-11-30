@@ -2,7 +2,7 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import React from "react";
 import { ActivityStack } from "./ActivityStack";
 import { GroupStack } from "./GroupStack";
-import { NotificationStack } from "./NotificationStack";
+import { ProfileStack } from "./ProfileStack";
 import { PlanStack } from "./PlanStack";
 import { RunStack } from "./RunStack";
 
@@ -32,9 +32,9 @@ export default function TabNav() {
         options={{ tabBarIcon: "file-document-edit" }}
       />
       <Tab.Screen
-        name="Notification"
-        component={NotificationStack}
-        options={{ tabBarIcon: "bell" }}
+        name="Profile"
+        component={ProfileStack}
+        options={{ tabBarIcon: "account" }}
       />
     </Tab.Navigator>
   );
