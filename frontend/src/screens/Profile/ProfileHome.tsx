@@ -28,7 +28,7 @@ export default function ProfileHome({
         <View style={baseStyles(theme).innerWrapper}>
           <Text
             variant="headlineMedium"
-            style={{ fontWeight: "bold", marginBottom: 20 }}
+            style={{ fontWeight: "bold", marginBottom: 15 }}
           >
             Duy Tuan
           </Text>
@@ -92,7 +92,7 @@ const styles = (theme: AppTheme) =>
     extendedBaseContainer: {
       ...baseStyles(theme).container,
       paddingTop: 44,
-      paddingBottom: 20,
+      paddingBottom: 15,
       flex: 0,
     },
     profileBackgroundContainer: {

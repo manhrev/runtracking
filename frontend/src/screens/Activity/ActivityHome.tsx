@@ -31,7 +31,7 @@ export default function Activity({
                 variant="bodyLarge"
                 style={{ fontWeight: "bold", textAlignVertical: "center" }}
               >
-                Analytic for
+                General statistics
               </Text>
               <SegmentedButtons
                 style={{ marginTop: 10, alignSelf: "center" }}

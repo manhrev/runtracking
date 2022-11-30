@@ -26,11 +26,15 @@ export default function ProfileAchievement() {
             }}
           >
             <View style={styles(theme).achievementBoxLeft}>
-              <Text variant="displayMedium">312</Text>
+              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+                312
+              </Text>
               <Text variant="bodyLarge">Total kilometers</Text>
             </View>
             <View style={styles(theme).achievementBoxRight}>
-              <Text variant="displayMedium">122k</Text>
+              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+                122k
+              </Text>
               <Text variant="bodyLarge">Total calories burned</Text>
             </View>
           </View>
@@ -54,11 +58,15 @@ export default function ProfileAchievement() {
             }}
           >
             <View style={styles(theme).achievementBoxLeft}>
-              <Text variant="displayMedium">1034</Text>
+              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+                1034
+              </Text>
               <Text variant="bodyLarge">Total kilometers</Text>
             </View>
             <View style={styles(theme).achievementBoxRight}>
-              <Text variant="displayMedium">1920k</Text>
+              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+                1920k
+              </Text>
               <Text variant="bodyLarge">Total calories burned</Text>
             </View>
           </View>
@@ -80,14 +88,14 @@ const styles = (theme: AppTheme) =>
     },
     achievementBoxLeft: {
       flex: 1,
-      backgroundColor: theme.colors.elevation.level3,
+      backgroundColor: theme.colors.elevation.level1,
       borderRadius: 20,
       padding: 10,
       marginRight: 8,
     },
     achievementBoxRight: {
       flex: 1,
-      backgroundColor: theme.colors.elevation.level3,
+      backgroundColor: theme.colors.elevation.level1,
       borderRadius: 20,
       padding: 10,
       marginLeft: 8,
