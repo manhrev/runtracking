@@ -26,13 +26,19 @@ export default function ProfileAchievement() {
             }}
           >
             <View style={styles(theme).achievementBoxLeft}>
-              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+              <Text
+                variant="displayMedium"
+                style={{ fontStyle: "italic", fontWeight: "bold" }}
+              >
                 312
               </Text>
               <Text variant="bodyLarge">Total kilometers</Text>
             </View>
             <View style={styles(theme).achievementBoxRight}>
-              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+              <Text
+                variant="displayMedium"
+                style={{ fontStyle: "italic", fontWeight: "bold" }}
+              >
                 122k
               </Text>
               <Text variant="bodyLarge">Total calories burned</Text>
@@ -58,13 +64,19 @@ export default function ProfileAchievement() {
             }}
           >
             <View style={styles(theme).achievementBoxLeft}>
-              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+              <Text
+                variant="displayMedium"
+                style={{ fontStyle: "italic", fontWeight: "bold" }}
+              >
                 1034
               </Text>
               <Text variant="bodyLarge">Total kilometers</Text>
             </View>
             <View style={styles(theme).achievementBoxRight}>
-              <Text variant="displayMedium" style={{ fontStyle: "italic" }}>
+              <Text
+                variant="displayMedium"
+                style={{ fontStyle: "italic", fontWeight: "bold" }}
+              >
                 1920k
               </Text>
               <Text variant="bodyLarge">Total calories burned</Text>

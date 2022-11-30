@@ -3,22 +3,9 @@ import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { Platform } from "react-native";
 import { useAppDispatch } from "../redux/store";
 import { showRightMenu } from "../redux/features/toggle/slice";
+import { isHome } from "../config";
 
 const MORE_ICON = Platform.OS === "ios" ? "dots-horizontal" : "dots-vertical";
-
-const isHome = (screenName: string) => {
-  if (
-    [
-      "GroupHome",
-      "ProfileHome",
-      "PlanHome",
-      "RunHome",
-      "ActivityHome",
-    ].includes(screenName)
-  )
-    return true;
-  return false;
-};
 
 export function CustomNavBar(props: NativeStackHeaderProps) {
   const dispatch = useAppDispatch();

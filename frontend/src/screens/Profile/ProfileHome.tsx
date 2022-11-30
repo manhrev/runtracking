@@ -14,12 +14,18 @@ export default function ProfileHome({
 }: NativeStackScreenProps<RootProfileParamList, "ProfileHome">) {
   const theme = useAppTheme();
   const [isInfoSelected, setIsInfoSelected] = useState(true);
+  const handleEditYourProfile = () => {
+    navigation.push("ProfileSetting");
+  };
+  const handleSettingApp = () => {
+    navigation.push("AppSetting");
+  };
   return (
     <>
       <View style={styles(theme).profileBackgroundContainer}>
         <Avatar.Text
           size={170}
-          label="XD"
+          label="DT"
           style={styles(theme).profilePicture}
         />
         <View style={styles(theme).profilePictureBack}></View>
@@ -37,7 +43,7 @@ export default function ProfileHome({
               <Button
                 icon="lead-pencil"
                 mode="contained-tonal"
-                onPress={() => {}}
+                onPress={handleEditYourProfile}
               >
                 <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
                   Edit your profile
@@ -48,7 +54,15 @@ export default function ProfileHome({
               <IconButton
                 mode="contained-tonal"
                 icon="cog-outline"
-                onPress={() => {}}
+                onPress={handleSettingApp}
+              />
+            </View>
+            <View>
+              <IconButton
+                mode="contained-tonal"
+                icon="bell-outline"
+                onPress={handleSettingApp}
+                style={{ marginHorizontal: 0 }}
               />
             </View>
           </View>

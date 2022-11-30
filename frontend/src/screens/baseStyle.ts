@@ -1,7 +1,8 @@
 import { Dimensions, StyleSheet } from "react-native";
+import { AppTheme } from "../theme";
 
 const windowWidth = Dimensions.get("window").width;
-export const baseStyles = (theme: any) =>
+export const baseStyles = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
