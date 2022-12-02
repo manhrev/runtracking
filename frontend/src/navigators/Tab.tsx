@@ -10,7 +10,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 export default function TabNav() {
   return (
-    <Tab.Navigator initialRouteName="Run" shifting>
+    <Tab.Navigator initialRouteName="Run" backBehavior="initialRoute" shifting>
       <Tab.Screen
         name="Group"
         component={GroupStack}

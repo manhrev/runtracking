@@ -15,10 +15,13 @@ export default function ProfileHome({
   const theme = useAppTheme();
   const [isInfoSelected, setIsInfoSelected] = useState(true);
   const handleEditYourProfile = () => {
-    navigation.push("ProfileSetting");
+    navigation.navigate("ProfileSetting");
   };
   const handleSettingApp = () => {
-    navigation.push("AppSetting");
+    navigation.navigate("AppSetting");
+  };
+  const handleViewNofification = () => {
+    navigation.navigate("Activity", { screen: "ActivityDetail" });
   };
   return (
     <>
@@ -61,7 +64,7 @@ export default function ProfileHome({
               <IconButton
                 mode="contained-tonal"
                 icon="bell-outline"
-                onPress={handleSettingApp}
+                onPress={handleViewNofification}
                 style={{ marginHorizontal: 0 }}
               />
             </View>

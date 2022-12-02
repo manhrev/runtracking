@@ -22,7 +22,7 @@ export default function ActivityList({
               <ActivityListItem
                 id={id}
                 onPress={() =>
-                  navigation.push("ActivityDetail", { activityId: id })
+                  navigation.navigate("ActivityDetail", { activityId: id })
                 }
                 key={id}
               />
@@ -32,7 +32,9 @@ export default function ActivityList({
           <Button
             style={{ marginVertical: 10 }}
             mode="elevated"
-            onPress={() => navigation.push("ActivityDetail", { activityId: 4 })}
+            onPress={() =>
+              navigation.navigate("ActivityDetail", { activityId: 4 })
+            }
           >
             Load more
           </Button>

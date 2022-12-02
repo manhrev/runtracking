@@ -139,7 +139,7 @@ export default function Activity({
                   <ActivityListItem
                     id={id}
                     onPress={() =>
-                      navigation.push("ActivityDetail", { activityId: id })
+                      navigation.navigate("ActivityDetail", { activityId: id })
                     }
                     key={id}
                   />
@@ -147,7 +147,7 @@ export default function Activity({
               })}
               <Button
                 mode="contained"
-                onPress={() => navigation.push("ActivityList", {})}
+                onPress={() => navigation.navigate("ActivityList", {})}
                 style={{ marginTop: 10 }}
               >
                 View all activities

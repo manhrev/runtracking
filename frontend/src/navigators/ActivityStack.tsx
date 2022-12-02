@@ -28,6 +28,7 @@ export const ActivityStack = () => {
         name="ActivityList"
         options={{
           title: "All activities",
+          headerBackVisible: true,
         }}
         component={ActivityList}
       />
@@ -35,6 +36,7 @@ export const ActivityStack = () => {
         name="ActivityDetail"
         options={{
           title: "Detail",
+          headerBackVisible: true,
         }}
         component={ActivityDetail}
       />

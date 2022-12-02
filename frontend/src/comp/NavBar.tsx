@@ -3,7 +3,6 @@ import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { Platform } from "react-native";
 import { useAppDispatch } from "../redux/store";
 import { showRightMenu } from "../redux/features/toggle/slice";
-import { isHome } from "../config";
 
 const MORE_ICON = Platform.OS === "ios" ? "dots-horizontal" : "dots-vertical";
 
@@ -18,7 +17,7 @@ export function CustomNavBar(props: NativeStackHeaderProps) {
 
   return (
     <Appbar.Header mode="center-aligned" elevated>
-      {!isHome(props.route.name) && (
+      {props.options.headerBackVisible && (
         <Appbar.BackAction
           onPress={() => {
             props.navigation.canGoBack() ? props.navigation.goBack() : null;

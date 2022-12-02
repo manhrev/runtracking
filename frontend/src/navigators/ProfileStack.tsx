@@ -8,6 +8,7 @@ export type RootProfileParamList = {
   ProfileHome: undefined;
   ProfileSetting: undefined;
   AppSetting: undefined;
+  Activity: { screen: string };
 };
 
 const Stack = createNativeStackNavigator<RootProfileParamList>();
@@ -27,6 +28,7 @@ export const ProfileStack = () => {
         name="AppSetting"
         options={{
           title: "Settings",
+          headerBackVisible: true,
         }}
         component={AppSetting}
       />
@@ -34,6 +36,7 @@ export const ProfileStack = () => {
         name="ProfileSetting"
         options={{
           title: "Profile settings",
+          headerBackVisible: true,
         }}
         component={ProfileSetting}
       />
