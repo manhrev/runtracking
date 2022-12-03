@@ -3,7 +3,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { Provider as ReduxProvider } from "react-redux";
 
 import store from "./src/redux/store";
-import TabNav from "./src/navigators/Tab";
+import { BaseStack } from "./src/navigators/BaseStack";
 import { lightTheme, darkTheme } from "./src/theme";
 import { selectToggleSlice } from "./src/redux/features/toggle/slice";
 import { useAppSelector } from "./src/redux/store";
@@ -21,7 +21,7 @@ function AppInsideRedux() {
   return (
     <PaperProvider theme={isNightMode ? darkTheme : lightTheme}>
       <NavigationContainer theme={isNightMode ? darkTheme : lightTheme}>
-        <TabNav />
+        <BaseStack />
       </NavigationContainer>
     </PaperProvider>
   );

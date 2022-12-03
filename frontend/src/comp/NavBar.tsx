@@ -1,24 +1,10 @@
-import { Appbar } from "react-native-paper";
+import { Appbar, Text } from "react-native-paper";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { Platform } from "react-native";
 import { useAppDispatch } from "../redux/store";
 import { showRightMenu } from "../redux/features/toggle/slice";
 
 const MORE_ICON = Platform.OS === "ios" ? "dots-horizontal" : "dots-vertical";
-
-const isHome = (screenName: string) => {
-  if (
-    [
-      "GroupHome",
-      "NotificationHome",
-      "PlanHome",
-      "RunHome",
-      "ActivityHome",
-    ].includes(screenName)
-  )
-    return true;
-  return false;
-};
 
 export function CustomNavBar(props: NativeStackHeaderProps) {
   const dispatch = useAppDispatch();
@@ -31,15 +17,25 @@ export function CustomNavBar(props: NativeStackHeaderProps) {
 
   return (
     <Appbar.Header mode="center-aligned" elevated>
-      {!isHome(props.route.name) && (
+      {props.options.headerBackVisible && (
         <Appbar.BackAction
           onPress={() => {
             props.navigation.canGoBack() ? props.navigation.goBack() : null;
           }}
         />
       )}
-      <Appbar.Content title={props.options.title} />
-      <Appbar.Action icon={MORE_ICON} onPress={toggleLeftMenu} />
+      <Appbar.Content
+        title={
+          <Text
+            variant="titleLarge"
+            style={{ fontWeight: "bold", textAlignVertical: "center" }}
+          >
+            {props.options.title}
+          </Text>
+        }
+      />
+      {/* <Appbar.Action icon="bell" /> */}
+      {/* <Appbar.Action icon={MORE_ICON} onPress={toggleLeftMenu} /> */}
     </Appbar.Header>
   );
 }

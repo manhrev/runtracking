@@ -2,7 +2,6 @@ import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import { Button, IconButton, SegmentedButtons, Text } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
-import { RootActivityParamList } from "../../navigators/ActivityStack";
 import { useState } from "react";
 import UpperRightMenu from "../../comp/UpperRightMenu";
 import { useIsFocused } from "@react-navigation/native";
@@ -10,6 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { baseStyles } from "../baseStyle";
 import { BarChart } from "react-native-chart-kit";
 import ActivityListItem from "./comp/ActivityListItem";
+import { RootHomeTabsParamList } from "../../navigators/HomeTab";
 
 const windowWidth = Dimensions.get("window").width;
 const ids = [...Array(3 + 1).keys()].slice(1);
@@ -17,21 +17,21 @@ const ids = [...Array(3 + 1).keys()].slice(1);
 export default function Activity({
   navigation,
   route,
-}: NativeStackScreenProps<RootActivityParamList, "ActivityHome">) {
+}: NativeStackScreenProps<RootHomeTabsParamList, "ActivityHome">) {
   const theme = useAppTheme();
   const isFocused = useIsFocused();
   const [filterByValue, setFilterByValue] = useState("week");
   return (
     <>
-      <View style={baseStyles(theme).container}>
+      <View style={baseStyles(theme).homeContainer}>
         <View style={baseStyles(theme).innerWrapper}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles(theme).analyticContainer}>
               <Text
-                variant="titleLarge"
+                variant="bodyLarge"
                 style={{ fontWeight: "bold", textAlignVertical: "center" }}
               >
-                Analytic for
+                General statistics
               </Text>
               <SegmentedButtons
                 style={{ marginTop: 10, alignSelf: "center" }}
@@ -62,7 +62,7 @@ export default function Activity({
                 }}
               >
                 <Text
-                  variant="titleMedium"
+                  variant="bodyLarge"
                   style={{
                     fontWeight: "bold",
                     textAlignVertical: "center",
@@ -89,14 +89,14 @@ export default function Activity({
                   </Text>
                 </View>
                 <View style={{ alignItems: "flex-end" }}>
-                  <Text variant="titleMedium">4</Text>
-                  <Text variant="titleMedium">12'33''</Text>
-                  <Text variant="titleMedium">2:33</Text>
+                  <Text variant="bodyLarge">4</Text>
+                  <Text variant="bodyLarge">12'33''</Text>
+                  <Text variant="bodyLarge">2:33</Text>
                 </View>
                 <View>
-                  <Text variant="titleMedium">Runs</Text>
-                  <Text variant="titleMedium">Avg. pace</Text>
-                  <Text variant="titleMedium">Hours</Text>
+                  <Text variant="bodyLarge">Runs</Text>
+                  <Text variant="bodyLarge">Avg. pace</Text>
+                  <Text variant="bodyLarge">Hours</Text>
                 </View>
               </View>
 
@@ -131,7 +131,7 @@ export default function Activity({
             </View>
 
             <View style={styles(theme).recentActivityContainer}>
-              <Text variant="titleLarge" style={{ fontWeight: "bold" }}>
+              <Text variant="bodyLarge" style={{ fontWeight: "bold" }}>
                 Recent activities
               </Text>
               {ids.map((id) => {
@@ -139,7 +139,7 @@ export default function Activity({
                   <ActivityListItem
                     id={id}
                     onPress={() =>
-                      navigation.push("ActivityDetail", { activityId: id })
+                      navigation.navigate("ActivityDetail", { activityId: id })
                     }
                     key={id}
                   />
@@ -147,7 +147,7 @@ export default function Activity({
               })}
               <Button
                 mode="contained"
-                onPress={() => navigation.push("ActivityList", {})}
+                onPress={() => navigation.navigate("ActivityList", {})}
                 style={{ marginTop: 10 }}
               >
                 View all activities
@@ -184,7 +184,7 @@ export default function Activity({
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
     analyticContainer: {
-      paddingTop: 10,
+      paddingTop: 20,
     },
     generalInfoContainter: {
       display: "flex",

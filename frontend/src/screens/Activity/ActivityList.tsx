@@ -1,17 +1,17 @@
 import { Button, Divider } from "react-native-paper";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootActivityParamList } from "../../navigators/ActivityStack";
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 import ActivityListItem from "./comp/ActivityListItem";
+import { RootBaseStackParamList } from "../../navigators/BaseStack";
 
 const ids = [...Array(10 + 1).keys()].slice(1);
 
 export default function ActivityList({
   navigation,
   route,
-}: NativeStackScreenProps<RootActivityParamList, "ActivityList">) {
+}: NativeStackScreenProps<RootBaseStackParamList, "ActivityList">) {
   const theme = useAppTheme();
   return (
     <View style={baseStyles(theme).container}>
@@ -22,7 +22,7 @@ export default function ActivityList({
               <ActivityListItem
                 id={id}
                 onPress={() =>
-                  navigation.push("ActivityDetail", { activityId: id })
+                  navigation.navigate("ActivityDetail", { activityId: id })
                 }
                 key={id}
               />
@@ -30,9 +30,11 @@ export default function ActivityList({
           })}
 
           <Button
-            style={{ marginVertical: 10 }}
+            style={{ marginTop: 10, marginBottom: 40 }}
             mode="elevated"
-            onPress={() => navigation.push("ActivityDetail", { activityId: 4 })}
+            onPress={() =>
+              navigation.navigate("ActivityDetail", { activityId: 4 })
+            }
           >
             Load more
           </Button>
