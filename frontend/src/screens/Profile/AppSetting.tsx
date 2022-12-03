@@ -1,43 +1,55 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { RootProfileParamList } from "../../navigators/ProfileStack";
+import { RootBaseStackParamList } from "../../navigators/BaseStack";
 import { AppTheme, useAppTheme } from "../../theme";
 import SettingItem from "./comp/SettingItem";
 
 export default function AppSetting({
   navigation,
   route,
-}: NativeStackScreenProps<RootProfileParamList, "AppSetting">) {
+}: NativeStackScreenProps<RootBaseStackParamList, "AppSetting">) {
   const theme = useAppTheme();
   return (
     <View style={styles(theme).container}>
       <View style={styles(theme).settingGroup}>
-        <SettingItem left="Profile" topDivider />
-        <SettingItem left="Units of Measure" />
+        <SettingItem
+          left="Profile"
+          topDivider
+          onPress={() => {
+            navigation.navigate("ProfileSetting");
+          }}
+        />
+        <SettingItem left="Units of Measure" onPress={() => {}} />
       </View>
       <View style={styles(theme).settingGroup}>
-        <SettingItem left="Notification" topDivider />
-        <SettingItem left="Privacy" />
+        <SettingItem left="Notification" topDivider onPress={() => {}} />
+        <SettingItem left="Privacy" onPress={() => {}} />
       </View>
       <View style={styles(theme).settingGroup}>
-        <SettingItem left="Country/Region" topDivider />
-        <SettingItem left="Language" />
+        <SettingItem left="Country/Region" topDivider onPress={() => {}} />
+        <SettingItem left="Language" onPress={() => {}} />
       </View>
       <View style={styles(theme).settingGroup}>
-        <SettingItem left="About this Version" topDivider />
-        <SettingItem left="Terms of Use" />
-        <SettingItem left="Privacy Policy" />
-        <SettingItem left="Contact Us" />
+        <SettingItem left="About this Version" topDivider onPress={() => {}} />
+        <SettingItem left="Terms of Use" onPress={() => {}} />
+        <SettingItem left="Privacy Policy" onPress={() => {}} />
+        <SettingItem left="Contact Us" onPress={() => {}} />
       </View>
       <View style={styles(theme).settingGroup}>
         <SettingItem
           left="Delete Account"
           topDivider
           color={theme.colors.error}
+          onPress={() => {}}
         />
       </View>
       <View style={styles(theme).settingGroup}>
-        <SettingItem left="Log Out" topDivider color={theme.colors.error} />
+        <SettingItem
+          left="Log Out"
+          topDivider
+          color={theme.colors.error}
+          onPress={() => {}}
+        />
       </View>
     </View>
   );

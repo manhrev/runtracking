@@ -2,7 +2,6 @@ import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import { Button, IconButton, SegmentedButtons, Text } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
-import { RootActivityParamList } from "../../navigators/ActivityStack";
 import { useState } from "react";
 import UpperRightMenu from "../../comp/UpperRightMenu";
 import { useIsFocused } from "@react-navigation/native";
@@ -10,6 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { baseStyles } from "../baseStyle";
 import { BarChart } from "react-native-chart-kit";
 import ActivityListItem from "./comp/ActivityListItem";
+import { RootHomeTabsParamList } from "../../navigators/HomeTab";
 
 const windowWidth = Dimensions.get("window").width;
 const ids = [...Array(3 + 1).keys()].slice(1);
@@ -17,13 +17,13 @@ const ids = [...Array(3 + 1).keys()].slice(1);
 export default function Activity({
   navigation,
   route,
-}: NativeStackScreenProps<RootActivityParamList, "ActivityHome">) {
+}: NativeStackScreenProps<RootHomeTabsParamList, "ActivityHome">) {
   const theme = useAppTheme();
   const isFocused = useIsFocused();
   const [filterByValue, setFilterByValue] = useState("week");
   return (
     <>
-      <View style={baseStyles(theme).container}>
+      <View style={baseStyles(theme).homeContainer}>
         <View style={baseStyles(theme).innerWrapper}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles(theme).analyticContainer}>
@@ -184,7 +184,7 @@ export default function Activity({
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
     analyticContainer: {
-      paddingTop: 10,
+      paddingTop: 20,
     },
     generalInfoContainter: {
       display: "flex",

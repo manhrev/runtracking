@@ -7,14 +7,17 @@ interface SettingItemProps {
   left: string;
   right?: string;
   color?: string;
+  onPress: Function;
 }
 
 export default function SettingItem(props: SettingItemProps) {
   const theme = useAppTheme();
-  const { left, right, topDivider, color } = props;
+  const { left, right, topDivider, color, onPress } = props;
+  let action = () => {};
+
   return (
     <TouchableRipple
-      onPress={() => {}}
+      onPress={() => onPress()}
       style={{ backgroundColor: theme.colors.elevation.level1 }}
     >
       <>

@@ -34,7 +34,7 @@ export function CustomNavBar(props: NativeStackHeaderProps) {
           </Text>
         }
       />
-      <Appbar.Action icon="bell" />
+      {/* <Appbar.Action icon="bell" /> */}
       {/* <Appbar.Action icon={MORE_ICON} onPress={toggleLeftMenu} /> */}
     </Appbar.Header>
   );

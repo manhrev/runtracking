@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { StyleSheet, View, StatusBar } from "react-native";
 import { Avatar, Button, Divider, IconButton, Text } from "react-native-paper";
-import { RootProfileParamList } from "../../navigators/ProfileStack";
+import { RootHomeTabsParamList } from "../../navigators/HomeTab";
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 import ProfileAchievement from "./comp/ProfileAchievement";
@@ -11,7 +11,7 @@ import ProfileInfo from "./comp/ProfileInfo";
 export default function ProfileHome({
   navigation,
   route,
-}: NativeStackScreenProps<RootProfileParamList, "ProfileHome">) {
+}: NativeStackScreenProps<RootHomeTabsParamList, "ProfileHome">) {
   const theme = useAppTheme();
   const [isInfoSelected, setIsInfoSelected] = useState(true);
   const handleEditYourProfile = () => {
@@ -21,7 +21,7 @@ export default function ProfileHome({
     navigation.navigate("AppSetting");
   };
   const handleViewNofification = () => {
-    navigation.navigate("Activity", { screen: "ActivityDetail" });
+    navigation.navigate("NotificationList");
   };
   return (
     <>

@@ -2,16 +2,16 @@ import { StyleSheet, View, Dimensions } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Divider, Text } from "react-native-paper";
 
-import { RootActivityParamList } from "../../navigators/ActivityStack";
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
+import { RootBaseStackParamList } from "../../navigators/BaseStack";
 
 const windowWidth = Dimensions.get("window").width;
 
 export default function ActivityDetail({
   navigation,
   route,
-}: NativeStackScreenProps<RootActivityParamList, "ActivityDetail">) {
+}: NativeStackScreenProps<RootBaseStackParamList, "ActivityDetail">) {
   const theme = useAppTheme();
   return (
     <View style={baseStyles(theme).container}>
