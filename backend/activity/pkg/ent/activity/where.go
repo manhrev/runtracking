@@ -80,6 +80,20 @@ func IDLTE(id int64) predicate.Activity {
 	})
 }
 
+// ActivityName applies equality check predicate on the "activity_name" field. It's identical to ActivityNameEQ.
+func ActivityName(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNote applies equality check predicate on the "activity_note" field. It's identical to ActivityNoteEQ.
+func ActivityNote(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldActivityNote), v))
+	})
+}
+
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
@@ -133,6 +147,204 @@ func Duration(v uint64) predicate.Activity {
 func CreatedAt(v time.Time) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
+	})
+}
+
+// ActivityNameEQ applies the EQ predicate on the "activity_name" field.
+func ActivityNameEQ(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameNEQ applies the NEQ predicate on the "activity_name" field.
+func ActivityNameNEQ(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameIn applies the In predicate on the "activity_name" field.
+func ActivityNameIn(vs ...string) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldActivityName), v...))
+	})
+}
+
+// ActivityNameNotIn applies the NotIn predicate on the "activity_name" field.
+func ActivityNameNotIn(vs ...string) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldActivityName), v...))
+	})
+}
+
+// ActivityNameGT applies the GT predicate on the "activity_name" field.
+func ActivityNameGT(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameGTE applies the GTE predicate on the "activity_name" field.
+func ActivityNameGTE(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameLT applies the LT predicate on the "activity_name" field.
+func ActivityNameLT(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameLTE applies the LTE predicate on the "activity_name" field.
+func ActivityNameLTE(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameContains applies the Contains predicate on the "activity_name" field.
+func ActivityNameContains(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameHasPrefix applies the HasPrefix predicate on the "activity_name" field.
+func ActivityNameHasPrefix(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameHasSuffix applies the HasSuffix predicate on the "activity_name" field.
+func ActivityNameHasSuffix(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameEqualFold applies the EqualFold predicate on the "activity_name" field.
+func ActivityNameEqualFold(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNameContainsFold applies the ContainsFold predicate on the "activity_name" field.
+func ActivityNameContainsFold(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldActivityName), v))
+	})
+}
+
+// ActivityNoteEQ applies the EQ predicate on the "activity_note" field.
+func ActivityNoteEQ(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteNEQ applies the NEQ predicate on the "activity_note" field.
+func ActivityNoteNEQ(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteIn applies the In predicate on the "activity_note" field.
+func ActivityNoteIn(vs ...string) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldActivityNote), v...))
+	})
+}
+
+// ActivityNoteNotIn applies the NotIn predicate on the "activity_note" field.
+func ActivityNoteNotIn(vs ...string) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldActivityNote), v...))
+	})
+}
+
+// ActivityNoteGT applies the GT predicate on the "activity_note" field.
+func ActivityNoteGT(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteGTE applies the GTE predicate on the "activity_note" field.
+func ActivityNoteGTE(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteLT applies the LT predicate on the "activity_note" field.
+func ActivityNoteLT(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteLTE applies the LTE predicate on the "activity_note" field.
+func ActivityNoteLTE(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteContains applies the Contains predicate on the "activity_note" field.
+func ActivityNoteContains(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteHasPrefix applies the HasPrefix predicate on the "activity_note" field.
+func ActivityNoteHasPrefix(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteHasSuffix applies the HasSuffix predicate on the "activity_note" field.
+func ActivityNoteHasSuffix(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteEqualFold applies the EqualFold predicate on the "activity_note" field.
+func ActivityNoteEqualFold(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldActivityNote), v))
+	})
+}
+
+// ActivityNoteContainsFold applies the ContainsFold predicate on the "activity_note" field.
+func ActivityNoteContainsFold(v string) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldActivityNote), v))
 	})
 }
 

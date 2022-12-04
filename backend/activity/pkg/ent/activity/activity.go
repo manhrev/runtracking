@@ -11,6 +11,10 @@ const (
 	Label = "activity"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldActivityName holds the string denoting the activity_name field in the database.
+	FieldActivityName = "activity_name"
+	// FieldActivityNote holds the string denoting the activity_note field in the database.
+	FieldActivityNote = "activity_note"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
 	// FieldType holds the string denoting the type field in the database.
@@ -36,6 +40,8 @@ const (
 // Columns holds all SQL columns for activity fields.
 var Columns = []string{
 	FieldID,
+	FieldActivityName,
+	FieldActivityNote,
 	FieldUserID,
 	FieldType,
 	FieldTotalDistance,

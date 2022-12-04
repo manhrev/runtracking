@@ -11,6 +11,8 @@ var (
 	// ActivitiesColumns holds the columns for the "activities" table.
 	ActivitiesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "activity_name", Type: field.TypeString},
+		{Name: "activity_note", Type: field.TypeString},
 		{Name: "user_id", Type: field.TypeInt64},
 		{Name: "type", Type: field.TypeUint32, Default: 0},
 		{Name: "total_distance", Type: field.TypeFloat64},

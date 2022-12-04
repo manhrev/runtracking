@@ -254,12 +254,12 @@ func (aq *ActivityQuery) Clone() *ActivityQuery {
 // Example:
 //
 //	var v []struct {
-//		UserID int64 `json:"user_id,omitempty"`
+//		ActivityName string `json:"activity_name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Activity.Query().
-//		GroupBy(entactivity.FieldUserID).
+//		GroupBy(entactivity.FieldActivityName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -283,11 +283,11 @@ func (aq *ActivityQuery) GroupBy(field string, fields ...string) *ActivityGroupB
 // Example:
 //
 //	var v []struct {
-//		UserID int64 `json:"user_id,omitempty"`
+//		ActivityName string `json:"activity_name,omitempty"`
 //	}
 //
 //	client.Activity.Query().
-//		Select(entactivity.FieldUserID).
+//		Select(entactivity.FieldActivityName).
 //		Scan(ctx, &v)
 //
 func (aq *ActivityQuery) Select(fields ...string) *ActivitySelect {

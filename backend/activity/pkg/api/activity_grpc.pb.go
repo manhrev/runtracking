@@ -22,7 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ActivityClient interface {
-	Act(ctx context.Context, in *ActivityInfo, opts ...grpc.CallOption) (*ActivityInfo, error)
+	CreateActivityInfo(ctx context.Context, in *CreateActivityInfoRequest, opts ...grpc.CallOption) (*CreateActivityInfoReply, error)
+	ListActivityInfo(ctx context.Context, in *ListActivityInfoRequest, opts ...grpc.CallOption) (*ListActivityInfoReply, error)
+	DeleteActivityInfo(ctx context.Context, in *DeleteActivityInfoRequest, opts ...grpc.CallOption) (*DeleteActivityInfoReply, error)
 }
 
 type activityClient struct {
@@ -33,9 +35,27 @@ func NewActivityClient(cc grpc.ClientConnInterface) ActivityClient {
 	return &activityClient{cc}
 }
 
-func (c *activityClient) Act(ctx context.Context, in *ActivityInfo, opts ...grpc.CallOption) (*ActivityInfo, error) {
-	out := new(ActivityInfo)
-	err := c.cc.Invoke(ctx, "/activity.Activity/Act", in, out, opts...)
+func (c *activityClient) CreateActivityInfo(ctx context.Context, in *CreateActivityInfoRequest, opts ...grpc.CallOption) (*CreateActivityInfoReply, error) {
+	out := new(CreateActivityInfoReply)
+	err := c.cc.Invoke(ctx, "/activity.Activity/CreateActivityInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *activityClient) ListActivityInfo(ctx context.Context, in *ListActivityInfoRequest, opts ...grpc.CallOption) (*ListActivityInfoReply, error) {
+	out := new(ListActivityInfoReply)
+	err := c.cc.Invoke(ctx, "/activity.Activity/ListActivityInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *activityClient) DeleteActivityInfo(ctx context.Context, in *DeleteActivityInfoRequest, opts ...grpc.CallOption) (*DeleteActivityInfoReply, error) {
+	out := new(DeleteActivityInfoReply)
+	err := c.cc.Invoke(ctx, "/activity.Activity/DeleteActivityInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +66,9 @@ func (c *activityClient) Act(ctx context.Context, in *ActivityInfo, opts ...grpc
 // All implementations must embed UnimplementedActivityServer
 // for forward compatibility
 type ActivityServer interface {
-	Act(context.Context, *ActivityInfo) (*ActivityInfo, error)
+	CreateActivityInfo(context.Context, *CreateActivityInfoRequest) (*CreateActivityInfoReply, error)
+	ListActivityInfo(context.Context, *ListActivityInfoRequest) (*ListActivityInfoReply, error)
+	DeleteActivityInfo(context.Context, *DeleteActivityInfoRequest) (*DeleteActivityInfoReply, error)
 	mustEmbedUnimplementedActivityServer()
 }
 
@@ -54,8 +76,14 @@ type ActivityServer interface {
 type UnimplementedActivityServer struct {
 }
 
-func (UnimplementedActivityServer) Act(context.Context, *ActivityInfo) (*ActivityInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Act not implemented")
+func (UnimplementedActivityServer) CreateActivityInfo(context.Context, *CreateActivityInfoRequest) (*CreateActivityInfoReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateActivityInfo not implemented")
+}
+func (UnimplementedActivityServer) ListActivityInfo(context.Context, *ListActivityInfoRequest) (*ListActivityInfoReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListActivityInfo not implemented")
+}
+func (UnimplementedActivityServer) DeleteActivityInfo(context.Context, *DeleteActivityInfoRequest) (*DeleteActivityInfoReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteActivityInfo not implemented")
 }
 func (UnimplementedActivityServer) mustEmbedUnimplementedActivityServer() {}
 
@@ -70,20 +98,56 @@ func RegisterActivityServer(s grpc.ServiceRegistrar, srv ActivityServer) {
 	s.RegisterService(&Activity_ServiceDesc, srv)
 }
 
-func _Activity_Act_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ActivityInfo)
+func _Activity_CreateActivityInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateActivityInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ActivityServer).Act(ctx, in)
+		return srv.(ActivityServer).CreateActivityInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/activity.Activity/Act",
+		FullMethod: "/activity.Activity/CreateActivityInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActivityServer).Act(ctx, req.(*ActivityInfo))
+		return srv.(ActivityServer).CreateActivityInfo(ctx, req.(*CreateActivityInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Activity_ListActivityInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListActivityInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActivityServer).ListActivityInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/activity.Activity/ListActivityInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActivityServer).ListActivityInfo(ctx, req.(*ListActivityInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Activity_DeleteActivityInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteActivityInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActivityServer).DeleteActivityInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/activity.Activity/DeleteActivityInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActivityServer).DeleteActivityInfo(ctx, req.(*DeleteActivityInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,8 +160,16 @@ var Activity_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ActivityServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Act",
-			Handler:    _Activity_Act_Handler,
+			MethodName: "CreateActivityInfo",
+			Handler:    _Activity_CreateActivityInfo_Handler,
+		},
+		{
+			MethodName: "ListActivityInfo",
+			Handler:    _Activity_ListActivityInfo_Handler,
+		},
+		{
+			MethodName: "DeleteActivityInfo",
+			Handler:    _Activity_DeleteActivityInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

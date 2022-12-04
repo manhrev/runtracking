@@ -22,6 +22,18 @@ type ActivityCreate struct {
 	hooks    []Hook
 }
 
+// SetActivityName sets the "activity_name" field.
+func (ac *ActivityCreate) SetActivityName(s string) *ActivityCreate {
+	ac.mutation.SetActivityName(s)
+	return ac
+}
+
+// SetActivityNote sets the "activity_note" field.
+func (ac *ActivityCreate) SetActivityNote(s string) *ActivityCreate {
+	ac.mutation.SetActivityNote(s)
+	return ac
+}
+
 // SetUserID sets the "user_id" field.
 func (ac *ActivityCreate) SetUserID(i int64) *ActivityCreate {
 	ac.mutation.SetUserID(i)
@@ -73,7 +85,7 @@ func (ac *ActivityCreate) SetDuration(u uint64) *ActivityCreate {
 }
 
 // SetRoute sets the "route" field.
-func (ac *ActivityCreate) SetRoute(ap []activity.TrackPoint) *ActivityCreate {
+func (ac *ActivityCreate) SetRoute(ap []*activity.TrackPoint) *ActivityCreate {
 	ac.mutation.SetRoute(ap)
 	return ac
 }
@@ -187,6 +199,12 @@ func (ac *ActivityCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ac *ActivityCreate) check() error {
+	if _, ok := ac.mutation.ActivityName(); !ok {
+		return &ValidationError{Name: "activity_name", err: errors.New(`ent: missing required field "Activity.activity_name"`)}
+	}
+	if _, ok := ac.mutation.ActivityNote(); !ok {
+		return &ValidationError{Name: "activity_note", err: errors.New(`ent: missing required field "Activity.activity_note"`)}
+	}
 	if _, ok := ac.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Activity.user_id"`)}
 	}
@@ -246,6 +264,14 @@ func (ac *ActivityCreate) createSpec() (*Activity, *sqlgraph.CreateSpec) {
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := ac.mutation.ActivityName(); ok {
+		_spec.SetField(entactivity.FieldActivityName, field.TypeString, value)
+		_node.ActivityName = value
+	}
+	if value, ok := ac.mutation.ActivityNote(); ok {
+		_spec.SetField(entactivity.FieldActivityNote, field.TypeString, value)
+		_node.ActivityNote = value
 	}
 	if value, ok := ac.mutation.UserID(); ok {
 		_spec.SetField(entactivity.FieldUserID, field.TypeInt64, value)

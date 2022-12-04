@@ -31,6 +31,18 @@ func (au *ActivityUpdate) Where(ps ...predicate.Activity) *ActivityUpdate {
 	return au
 }
 
+// SetActivityName sets the "activity_name" field.
+func (au *ActivityUpdate) SetActivityName(s string) *ActivityUpdate {
+	au.mutation.SetActivityName(s)
+	return au
+}
+
+// SetActivityNote sets the "activity_note" field.
+func (au *ActivityUpdate) SetActivityNote(s string) *ActivityUpdate {
+	au.mutation.SetActivityNote(s)
+	return au
+}
+
 // SetUserID sets the "user_id" field.
 func (au *ActivityUpdate) SetUserID(i int64) *ActivityUpdate {
 	au.mutation.ResetUserID()
@@ -117,13 +129,13 @@ func (au *ActivityUpdate) AddDuration(u int64) *ActivityUpdate {
 }
 
 // SetRoute sets the "route" field.
-func (au *ActivityUpdate) SetRoute(ap []activity.TrackPoint) *ActivityUpdate {
+func (au *ActivityUpdate) SetRoute(ap []*activity.TrackPoint) *ActivityUpdate {
 	au.mutation.SetRoute(ap)
 	return au
 }
 
 // AppendRoute appends ap to the "route" field.
-func (au *ActivityUpdate) AppendRoute(ap []activity.TrackPoint) *ActivityUpdate {
+func (au *ActivityUpdate) AppendRoute(ap []*activity.TrackPoint) *ActivityUpdate {
 	au.mutation.AppendRoute(ap)
 	return au
 }
@@ -219,6 +231,12 @@ func (au *ActivityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := au.mutation.ActivityName(); ok {
+		_spec.SetField(entactivity.FieldActivityName, field.TypeString, value)
+	}
+	if value, ok := au.mutation.ActivityNote(); ok {
+		_spec.SetField(entactivity.FieldActivityNote, field.TypeString, value)
+	}
 	if value, ok := au.mutation.UserID(); ok {
 		_spec.SetField(entactivity.FieldUserID, field.TypeInt64, value)
 	}
@@ -283,6 +301,18 @@ type ActivityUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ActivityMutation
+}
+
+// SetActivityName sets the "activity_name" field.
+func (auo *ActivityUpdateOne) SetActivityName(s string) *ActivityUpdateOne {
+	auo.mutation.SetActivityName(s)
+	return auo
+}
+
+// SetActivityNote sets the "activity_note" field.
+func (auo *ActivityUpdateOne) SetActivityNote(s string) *ActivityUpdateOne {
+	auo.mutation.SetActivityNote(s)
+	return auo
 }
 
 // SetUserID sets the "user_id" field.
@@ -371,13 +401,13 @@ func (auo *ActivityUpdateOne) AddDuration(u int64) *ActivityUpdateOne {
 }
 
 // SetRoute sets the "route" field.
-func (auo *ActivityUpdateOne) SetRoute(ap []activity.TrackPoint) *ActivityUpdateOne {
+func (auo *ActivityUpdateOne) SetRoute(ap []*activity.TrackPoint) *ActivityUpdateOne {
 	auo.mutation.SetRoute(ap)
 	return auo
 }
 
 // AppendRoute appends ap to the "route" field.
-func (auo *ActivityUpdateOne) AppendRoute(ap []activity.TrackPoint) *ActivityUpdateOne {
+func (auo *ActivityUpdateOne) AppendRoute(ap []*activity.TrackPoint) *ActivityUpdateOne {
 	auo.mutation.AppendRoute(ap)
 	return auo
 }
@@ -502,6 +532,12 @@ func (auo *ActivityUpdateOne) sqlSave(ctx context.Context) (_node *Activity, err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := auo.mutation.ActivityName(); ok {
+		_spec.SetField(entactivity.FieldActivityName, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.ActivityNote(); ok {
+		_spec.SetField(entactivity.FieldActivityNote, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.UserID(); ok {
 		_spec.SetField(entactivity.FieldUserID, field.TypeInt64, value)

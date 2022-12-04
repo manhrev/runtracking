@@ -34,6 +34,8 @@ type ActivityMutation struct {
 	op                Op
 	typ               string
 	id                *int64
+	activity_name     *string
+	activity_note     *string
 	user_id           *int64
 	adduser_id        *int64
 	_type             *uint32
@@ -46,8 +48,8 @@ type ActivityMutation struct {
 	end_time          *time.Time
 	duration          *uint64
 	addduration       *int64
-	route             *[]activity.TrackPoint
-	appendroute       []activity.TrackPoint
+	route             *[]*activity.TrackPoint
+	appendroute       []*activity.TrackPoint
 	created_at        *time.Time
 	clearedFields     map[string]struct{}
 	done              bool
@@ -157,6 +159,78 @@ func (m *ActivityMutation) IDs(ctx context.Context) ([]int64, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetActivityName sets the "activity_name" field.
+func (m *ActivityMutation) SetActivityName(s string) {
+	m.activity_name = &s
+}
+
+// ActivityName returns the value of the "activity_name" field in the mutation.
+func (m *ActivityMutation) ActivityName() (r string, exists bool) {
+	v := m.activity_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActivityName returns the old "activity_name" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldActivityName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActivityName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActivityName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActivityName: %w", err)
+	}
+	return oldValue.ActivityName, nil
+}
+
+// ResetActivityName resets all changes to the "activity_name" field.
+func (m *ActivityMutation) ResetActivityName() {
+	m.activity_name = nil
+}
+
+// SetActivityNote sets the "activity_note" field.
+func (m *ActivityMutation) SetActivityNote(s string) {
+	m.activity_note = &s
+}
+
+// ActivityNote returns the value of the "activity_note" field in the mutation.
+func (m *ActivityMutation) ActivityNote() (r string, exists bool) {
+	v := m.activity_note
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActivityNote returns the old "activity_note" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldActivityNote(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActivityNote is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActivityNote requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActivityNote: %w", err)
+	}
+	return oldValue.ActivityNote, nil
+}
+
+// ResetActivityNote resets all changes to the "activity_note" field.
+func (m *ActivityMutation) ResetActivityNote() {
+	m.activity_note = nil
 }
 
 // SetUserID sets the "user_id" field.
@@ -512,13 +586,13 @@ func (m *ActivityMutation) ResetDuration() {
 }
 
 // SetRoute sets the "route" field.
-func (m *ActivityMutation) SetRoute(ap []activity.TrackPoint) {
+func (m *ActivityMutation) SetRoute(ap []*activity.TrackPoint) {
 	m.route = &ap
 	m.appendroute = nil
 }
 
 // Route returns the value of the "route" field in the mutation.
-func (m *ActivityMutation) Route() (r []activity.TrackPoint, exists bool) {
+func (m *ActivityMutation) Route() (r []*activity.TrackPoint, exists bool) {
 	v := m.route
 	if v == nil {
 		return
@@ -529,7 +603,7 @@ func (m *ActivityMutation) Route() (r []activity.TrackPoint, exists bool) {
 // OldRoute returns the old "route" field's value of the Activity entity.
 // If the Activity object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ActivityMutation) OldRoute(ctx context.Context) (v []activity.TrackPoint, err error) {
+func (m *ActivityMutation) OldRoute(ctx context.Context) (v []*activity.TrackPoint, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRoute is only allowed on UpdateOne operations")
 	}
@@ -544,12 +618,12 @@ func (m *ActivityMutation) OldRoute(ctx context.Context) (v []activity.TrackPoin
 }
 
 // AppendRoute adds ap to the "route" field.
-func (m *ActivityMutation) AppendRoute(ap []activity.TrackPoint) {
+func (m *ActivityMutation) AppendRoute(ap []*activity.TrackPoint) {
 	m.appendroute = append(m.appendroute, ap...)
 }
 
 // AppendedRoute returns the list of values that were appended to the "route" field in this mutation.
-func (m *ActivityMutation) AppendedRoute() ([]activity.TrackPoint, bool) {
+func (m *ActivityMutation) AppendedRoute() ([]*activity.TrackPoint, bool) {
 	if len(m.appendroute) == 0 {
 		return nil, false
 	}
@@ -617,7 +691,13 @@ func (m *ActivityMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ActivityMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 11)
+	if m.activity_name != nil {
+		fields = append(fields, entactivity.FieldActivityName)
+	}
+	if m.activity_note != nil {
+		fields = append(fields, entactivity.FieldActivityNote)
+	}
 	if m.user_id != nil {
 		fields = append(fields, entactivity.FieldUserID)
 	}
@@ -653,6 +733,10 @@ func (m *ActivityMutation) Fields() []string {
 // schema.
 func (m *ActivityMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case entactivity.FieldActivityName:
+		return m.ActivityName()
+	case entactivity.FieldActivityNote:
+		return m.ActivityNote()
 	case entactivity.FieldUserID:
 		return m.UserID()
 	case entactivity.FieldType:
@@ -680,6 +764,10 @@ func (m *ActivityMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ActivityMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case entactivity.FieldActivityName:
+		return m.OldActivityName(ctx)
+	case entactivity.FieldActivityNote:
+		return m.OldActivityNote(ctx)
 	case entactivity.FieldUserID:
 		return m.OldUserID(ctx)
 	case entactivity.FieldType:
@@ -707,6 +795,20 @@ func (m *ActivityMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *ActivityMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case entactivity.FieldActivityName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActivityName(v)
+		return nil
+	case entactivity.FieldActivityNote:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActivityNote(v)
+		return nil
 	case entactivity.FieldUserID:
 		v, ok := value.(int64)
 		if !ok {
@@ -757,7 +859,7 @@ func (m *ActivityMutation) SetField(name string, value ent.Value) error {
 		m.SetDuration(v)
 		return nil
 	case entactivity.FieldRoute:
-		v, ok := value.([]activity.TrackPoint)
+		v, ok := value.([]*activity.TrackPoint)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -882,6 +984,12 @@ func (m *ActivityMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ActivityMutation) ResetField(name string) error {
 	switch name {
+	case entactivity.FieldActivityName:
+		m.ResetActivityName()
+		return nil
+	case entactivity.FieldActivityNote:
+		m.ResetActivityNote()
+		return nil
 	case entactivity.FieldUserID:
 		m.ResetUserID()
 		return nil

@@ -19,6 +19,10 @@ type Activity struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// ActivityName holds the value of the "activity_name" field.
+	ActivityName string `json:"activity_name,omitempty"`
+	// ActivityNote holds the value of the "activity_note" field.
+	ActivityNote string `json:"activity_note,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int64 `json:"user_id,omitempty"`
 	// Type holds the value of the "type" field.
@@ -34,7 +38,7 @@ type Activity struct {
 	// Duration holds the value of the "duration" field.
 	Duration uint64 `json:"duration,omitempty"`
 	// Route holds the value of the "route" field.
-	Route []activity.TrackPoint `json:"route,omitempty"`
+	Route []*activity.TrackPoint `json:"route,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
@@ -50,6 +54,8 @@ func (*Activity) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case entactivity.FieldID, entactivity.FieldUserID, entactivity.FieldType, entactivity.FieldDuration:
 			values[i] = new(sql.NullInt64)
+		case entactivity.FieldActivityName, entactivity.FieldActivityNote:
+			values[i] = new(sql.NullString)
 		case entactivity.FieldStartTime, entactivity.FieldEndTime, entactivity.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		default:
@@ -73,6 +79,18 @@ func (a *Activity) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int64(value.Int64)
+		case entactivity.FieldActivityName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field activity_name", values[i])
+			} else if value.Valid {
+				a.ActivityName = value.String
+			}
+		case entactivity.FieldActivityNote:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field activity_note", values[i])
+			} else if value.Valid {
+				a.ActivityNote = value.String
+			}
 		case entactivity.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
@@ -157,6 +175,12 @@ func (a *Activity) String() string {
 	var builder strings.Builder
 	builder.WriteString("Activity(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString("activity_name=")
+	builder.WriteString(a.ActivityName)
+	builder.WriteString(", ")
+	builder.WriteString("activity_note=")
+	builder.WriteString(a.ActivityNote)
+	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", a.UserID))
 	builder.WriteString(", ")
