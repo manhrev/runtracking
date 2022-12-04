@@ -845,6 +845,20 @@ func HeightLTE(v int32) predicate.User {
 	})
 }
 
+// HeightIsNil applies the IsNil predicate on the "height" field.
+func HeightIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldHeight)))
+	})
+}
+
+// HeightNotNil applies the NotNil predicate on the "height" field.
+func HeightNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldHeight)))
+	})
+}
+
 // WeightEQ applies the EQ predicate on the "weight" field.
 func WeightEQ(v int32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -906,6 +920,20 @@ func WeightLT(v int32) predicate.User {
 func WeightLTE(v int32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldWeight), v))
+	})
+}
+
+// WeightIsNil applies the IsNil predicate on the "weight" field.
+func WeightIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldWeight)))
+	})
+}
+
+// WeightNotNil applies the NotNil predicate on the "weight" field.
+func WeightNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldWeight)))
 	})
 }
 

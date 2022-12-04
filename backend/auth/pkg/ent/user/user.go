@@ -73,6 +73,18 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultDisplayName holds the default value on creation for the "display_name" field.
+	DefaultDisplayName string
+	// DefaultEmail holds the default value on creation for the "email" field.
+	DefaultEmail string
+	// DefaultPhone holds the default value on creation for the "phone" field.
+	DefaultPhone string
+	// DefaultRole holds the default value on creation for the "role" field.
+	DefaultRole int32
+	// DefaultAge holds the default value on creation for the "age" field.
+	DefaultAge int32
+	// DefaultProfilePicture holds the default value on creation for the "profile_picture" field.
+	DefaultProfilePicture string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt time.Time
 )

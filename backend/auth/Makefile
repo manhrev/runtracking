@@ -11,6 +11,10 @@ generate-ts:
 	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth.proto
 	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth_code.proto
 
+enerate-cache:
+	mkdir -p ./pkg/data
+	protoc --go_out=./pkg/data --go-grpc_out=./pkg/data  ./api/auth_cache.proto
+
 generate-ent:
 	mkdir -p ./pkg/ent
 	cp -R ./schema ./pkg/ent/schema
@@ -18,7 +22,7 @@ generate-ent:
 
 #rm -r ./pkg/ent/schema
 generate:
-	make generate-proto generate-code generate-ent
+	make generate-proto generate-code generate-ent generate-cache
 
 run:
 	go run ./cmd/.

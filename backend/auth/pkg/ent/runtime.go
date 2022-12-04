@@ -16,6 +16,30 @@ import (
 func init() {
 	userFields := schema.User{}.Fields()
 	_ = userFields
+	// userDescDisplayName is the schema descriptor for display_name field.
+	userDescDisplayName := userFields[3].Descriptor()
+	// user.DefaultDisplayName holds the default value on creation for the display_name field.
+	user.DefaultDisplayName = userDescDisplayName.Default.(string)
+	// userDescEmail is the schema descriptor for email field.
+	userDescEmail := userFields[4].Descriptor()
+	// user.DefaultEmail holds the default value on creation for the email field.
+	user.DefaultEmail = userDescEmail.Default.(string)
+	// userDescPhone is the schema descriptor for phone field.
+	userDescPhone := userFields[5].Descriptor()
+	// user.DefaultPhone holds the default value on creation for the phone field.
+	user.DefaultPhone = userDescPhone.Default.(string)
+	// userDescRole is the schema descriptor for role field.
+	userDescRole := userFields[6].Descriptor()
+	// user.DefaultRole holds the default value on creation for the role field.
+	user.DefaultRole = userDescRole.Default.(int32)
+	// userDescAge is the schema descriptor for age field.
+	userDescAge := userFields[7].Descriptor()
+	// user.DefaultAge holds the default value on creation for the age field.
+	user.DefaultAge = userDescAge.Default.(int32)
+	// userDescProfilePicture is the schema descriptor for profile_picture field.
+	userDescProfilePicture := userFields[10].Descriptor()
+	// user.DefaultProfilePicture holds the default value on creation for the profile_picture field.
+	user.DefaultProfilePicture = userDescProfilePicture.Default.(string)
 	// userDescCreatedAt is the schema descriptor for created_at field.
 	userDescCreatedAt := userFields[11].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.

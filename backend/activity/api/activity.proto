@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package activity;
+
+option go_package = "github.com/manhrev/runtracking/backend/activity/pkg/api;activity";
+
+import "google/protobuf/timestamp.proto";
+
+service Activity {
+    rpc CreateActivityInfo(CreateActivityInfoRequest) returns (CreateActivityInfoReply);
+    rpc ListActivityInfo(ListActivityInfoRequest) returns (ListActivityInfoReply);
+    rpc DeleteActivityInfo(DeleteActivityInfoRequest) returns (DeleteActivityInfoReply);
+}
+
+enum ActivityType {
+    ACTIVITY_TYPE_UNSPECIFIED = 0;
+    ACTIVITY_TYPE_RUNNING = 1;
+    ACTIVITY_TYPE_CYCLING = 2;
+    ACTIVITY_TYPE_WALKING = 3;
+}
+
+message TrackPoint {
+    double longtitude = 1;
+    double latitude = 2;
+    double altitude = 3;
+    google.protobuf.Timestamp created_at = 4;
+    bool is_stop_point = 5;
+}
+
+message ActivityInfo {
+    int64 id = 11;
+    ActivityType type = 1;
+    double total_distance = 2; // meters
+    float kcal = 3; // kcal
+    google.protobuf.Timestamp start_time = 4;
+    google.protobuf.Timestamp end_time = 6;
+    uint64 duration = 7; // seconds
+    repeated TrackPoint route = 8;
+    string activity_name = 9;
+    string activity_note = 10;
+}
+
+message CreateActivityInfoRequest {
+    ActivityInfo activity_info = 1;
+}
+
+message CreateActivityInfoReply {}
+
+message ListActivityInfoRequest {
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    ActivitySortBy sort_by = 4;
+    ActivityType activity_type = 5; // only get activity with this type, to get all, pass ACTIVITY_TYPE_UNSPECIFIED
+    google.protobuf.Timestamp from = 6;
+    google.protobuf.Timestamp to = 7;
+}
+
+message ListActivityInfoReply {
+    repeated ActivityInfo activity_list = 1;
+    int64 total = 2;
+}
+
+enum ActivitySortBy {
+    ACTIVITY_SORT_BY_UNSPECIFIED = 0;
+    ACTIVITY_SORT_BY_END_TIME = 1; // Same as Date created
+    ACTIVITY_SORT_BY_TOTAL_DISTANCE = 2;
+    ACTIVITY_SORT_BY_ENERGY = 3;
+    ACTIVITY_SORT_BY_DURATION = 4;
+}
+
+message DeleteActivityInfoRequest { //check if user owns this activity before delete
+    repeated int64 ids_to_delete = 1;
+}
+
+message DeleteActivityInfoReply {}
