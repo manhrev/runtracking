@@ -34,24 +34,22 @@ static_resources:
                         max_age: "1728000"
                         expose_headers: grpc-status,grpc-message
                       routes:
-                        - match: { prefix: "/auth.Auth" }
-                          route: { cluster: auth_cluster }
+                        - match:
+                            prefix: "/auth.Auth"
+                          route:
+                            cluster: auth_cluster
                           typed_per_filter_config:
                             envoy.filters.http.ext_authz:
                               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                               disabled: true
                         - match:
-                            prefix: /caller.Caller/CallSample
-                          route:
-                            cluster: caller_cluster
-                        - match:
-                            prefix: /sample.Sample
-                          route:
-                            cluster: sample_cluster
-                        - match: 
                             prefix: /group.Group
                           route:
                             cluster: group_cluster
+                        - match:
+                            prefix: /activity.Activity
+                          route:
+                            cluster: activity_cluster
 
                 http_filters:
                   - name: envoy.filters.http.grpc_web
@@ -74,36 +72,6 @@ static_resources:
                   - name: envoy.filters.http.router
 
   clusters:
-    - name: caller_cluster
-      connect_timeout: 1s
-      type: logical_dns
-      http2_protocol_options: {}
-      lb_policy: round_robin
-      load_assignment:
-        cluster_name: caller_cluster
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: caller
-                      port_value: 8080
-
-    - name: sample_cluster
-      connect_timeout: 1s
-      type: logical_dns
-      http2_protocol_options: {}
-      lb_policy: round_robin
-      load_assignment:
-        cluster_name: sample_cluster
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: sample
-                      port_value: 8080
-
     - name: auth_cluster
       connect_timeout: 1s
       type: logical_dns
@@ -132,4 +100,19 @@ static_resources:
                   address:
                     socket_address:
                       address: group
+                      port_value: 8080
+
+    - name: activity_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: activity_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: activity
                       port_value: 8080

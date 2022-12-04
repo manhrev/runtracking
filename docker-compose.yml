@@ -1,29 +1,6 @@
 version: '3.7'
 
 services:
-  sample:
-    build:
-      context: backend/sample
-      dockerfile: build/Dockerfile
-    container_name: sample
-    ports:
-      - 8081:8080
-    depends_on:
-      - sample_db
-
-  sample_db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password@1
-      MYSQL_DATABASE: sample
-
-  caller:
-    build:
-      context: backend/caller
-      dockerfile: build/Dockerfile
-    container_name: caller
-    depends_on:
-      - sample
 
   gateway:
     build:
@@ -32,7 +9,7 @@ services:
     container_name: gateway
     ports:
       - 8080:8080
-  
+
   auth:
     build:
       context: backend/auth
@@ -54,11 +31,11 @@ services:
       - "./tmp/db/auth:/var/lib/mysql"
     ports:
       - 33306:3306
-  
+
   redis:
     image: redis:latest
     container_name: redis
-    ports: 
+    ports:
       - "6379:6379"
     restart: always
 
@@ -80,5 +57,22 @@ services:
       - "./tmp/db/group:/var/lib/mysql"
     ports:
       - 33307:3306
-  
 
+  activity:
+    build:
+      context: backend/activity
+      dockerfile: build/Dockerfile
+    container_name: activity
+    depends_on:
+      - activity_db
+
+  activity_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: activity
+    container_name: 'db-activity'
+    volumes:
+      - "./tmp/db/activity:/var/lib/mysql"
+    ports:
+      - 33308:3306
