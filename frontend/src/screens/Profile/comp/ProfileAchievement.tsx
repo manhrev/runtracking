@@ -83,6 +83,43 @@ export default function ProfileAchievement() {
             </View>
           </View>
         </View>
+        <View style={styles(theme).achievementSection}>
+          <Text
+            variant="titleMedium"
+            style={{
+              fontWeight: "bold",
+              color: theme.colors.primary,
+              marginVertical: 12,
+            }}
+          >
+            Platinum level cyclist
+          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+            }}
+          >
+            <View style={styles(theme).achievementBoxLeft}>
+              <Text
+                variant="displayMedium"
+                style={{ fontStyle: "italic", fontWeight: "bold" }}
+              >
+                1034
+              </Text>
+              <Text variant="bodyLarge">Total kilometers</Text>
+            </View>
+            <View style={styles(theme).achievementBoxRight}>
+              <Text
+                variant="displayMedium"
+                style={{ fontStyle: "italic", fontWeight: "bold" }}
+              >
+                1920k
+              </Text>
+              <Text variant="bodyLarge">Total calories burned</Text>
+            </View>
+          </View>
+        </View>
       </View>
     </View>
   );

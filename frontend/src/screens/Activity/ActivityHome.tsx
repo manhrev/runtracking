@@ -28,7 +28,7 @@ export default function Activity({
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles(theme).analyticContainer}>
               <Text
-                variant="bodyLarge"
+                variant="headlineSmall"
                 style={{ fontWeight: "bold", textAlignVertical: "center" }}
               >
                 General statistics
@@ -131,7 +131,7 @@ export default function Activity({
             </View>
 
             <View style={styles(theme).recentActivityContainer}>
-              <Text variant="bodyLarge" style={{ fontWeight: "bold" }}>
+              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
                 Recent activities
               </Text>
               {ids.map((id) => {

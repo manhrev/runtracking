@@ -11,46 +11,52 @@ export default function AppSetting({
   const theme = useAppTheme();
   return (
     <View style={styles(theme).container}>
-      <View style={styles(theme).settingGroup}>
-        <SettingItem
-          left="Profile"
-          topDivider
-          onPress={() => {
-            navigation.navigate("ProfileSetting");
-          }}
-        />
-        <SettingItem left="Units of Measure" onPress={() => {}} />
-      </View>
-      <View style={styles(theme).settingGroup}>
-        <SettingItem left="Notification" topDivider onPress={() => {}} />
-        <SettingItem left="Privacy" onPress={() => {}} />
-      </View>
-      <View style={styles(theme).settingGroup}>
-        <SettingItem left="Country/Region" topDivider onPress={() => {}} />
-        <SettingItem left="Language" onPress={() => {}} />
-      </View>
-      <View style={styles(theme).settingGroup}>
-        <SettingItem left="About this Version" topDivider onPress={() => {}} />
-        <SettingItem left="Terms of Use" onPress={() => {}} />
-        <SettingItem left="Privacy Policy" onPress={() => {}} />
-        <SettingItem left="Contact Us" onPress={() => {}} />
-      </View>
-      <View style={styles(theme).settingGroup}>
-        <SettingItem
-          left="Delete Account"
-          topDivider
-          color={theme.colors.error}
-          onPress={() => {}}
-        />
-      </View>
-      <View style={styles(theme).settingGroup}>
-        <SettingItem
-          left="Log Out"
-          topDivider
-          color={theme.colors.error}
-          onPress={() => {}}
-        />
-      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles(theme).settingGroup}>
+          <SettingItem
+            left="Profile"
+            topDivider
+            onPress={() => {
+              navigation.navigate("ProfileSetting");
+            }}
+          />
+          <SettingItem left="Units of Measure" onPress={() => {}} />
+        </View>
+        <View style={styles(theme).settingGroup}>
+          <SettingItem left="Notification" topDivider onPress={() => {}} />
+          <SettingItem left="Privacy" onPress={() => {}} />
+        </View>
+        <View style={styles(theme).settingGroup}>
+          <SettingItem left="Country/Region" topDivider onPress={() => {}} />
+          <SettingItem left="Language" onPress={() => {}} />
+        </View>
+        <View style={styles(theme).settingGroup}>
+          <SettingItem
+            left="About this Version"
+            topDivider
+            onPress={() => {}}
+          />
+          <SettingItem left="Terms of Use" onPress={() => {}} />
+          <SettingItem left="Privacy Policy" onPress={() => {}} />
+          <SettingItem left="Contact Us" onPress={() => {}} />
+        </View>
+        <View style={styles(theme).settingGroup}>
+          <SettingItem
+            left="Delete Account"
+            topDivider
+            color={theme.colors.error}
+            onPress={() => {}}
+          />
+        </View>
+        <View style={styles(theme).settingGroup}>
+          <SettingItem
+            left="Log Out"
+            topDivider
+            color={theme.colors.error}
+            onPress={() => {}}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 }

@@ -10,8 +10,13 @@ import {
   selectToggleSlice,
   switchNightMode,
 } from "../redux/features/toggle/slice";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootBaseStackParamList } from "../navigators/BaseStack";
 
-export default function ExampleScreen() {
+export default function ExampleScreen({
+  navigation,
+  route,
+}: NativeStackScreenProps<RootBaseStackParamList>) {
   const dispatch = useAppDispatch();
   const theme = useAppTheme();
   const isFocused = useIsFocused();
@@ -61,6 +66,15 @@ export default function ExampleScreen() {
       </Button>
       <Button mode="outlined" onPress={handleChangeNightMode}>
         {isNightMode ? "Switch to normal" : "Switch to night mode"}
+      </Button>
+      <Button mode="contained" onPress={() => navigation.navigate("Intro")}>
+        Go to landing page
+      </Button>
+      <Button mode="contained" onPress={() => navigation.navigate("Login")}>
+        Go to login page
+      </Button>
+      <Button mode="contained" onPress={() => navigation.navigate("Signup")}>
+        Go to signup page
       </Button>
     </View>
   );

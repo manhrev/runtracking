@@ -6,6 +6,10 @@ import ActivityList from "../screens/Activity/ActivityList";
 import AppSetting from "../screens/Profile/AppSetting";
 import ProfileSetting from "../screens/Profile/ProfileSetting";
 import HomeTabs from "./HomeTab";
+import Login from "../screens/Authentication/Login";
+import Signup from "../screens/Authentication/Signup";
+import Intro from "../screens/Authentication/Intro";
+import GetInfo from "../screens/Authentication/GetInfo";
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -23,6 +27,12 @@ export type RootBaseStackParamList = {
 
   // Notification
   NotificationList: undefined;
+
+  // Auth
+  Login: undefined;
+  Signup: undefined;
+  Intro: undefined;
+  GetInfo: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootBaseStackParamList>();
@@ -74,6 +84,38 @@ export const BaseStack = () => {
           headerBackVisible: true,
         }}
         component={ExampleScreen}
+      />
+      <Stack.Screen
+        name="Intro"
+        options={{
+          title: "Intro",
+          headerShown: false,
+        }}
+        component={Intro}
+      />
+      <Stack.Screen
+        name="Login"
+        options={{
+          title: "Login",
+          headerShown: false,
+        }}
+        component={Login}
+      />
+      <Stack.Screen
+        name="Signup"
+        options={{
+          title: "Create new account",
+          headerShown: false,
+        }}
+        component={Signup}
+      />
+      <Stack.Screen
+        name="GetInfo"
+        options={{
+          title: "Info",
+          headerShown: false,
+        }}
+        component={GetInfo}
       />
     </Stack.Navigator>
   );
