@@ -5,7 +5,7 @@ import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
@@ -28,10 +28,10 @@ export default function Run({
         longitude: 0,
     });
 
-
     // some info
     const [totalDistance, setTotalDistance] = useState(0);
     const [totalTime, setTotalTime] = useState(0); // seconds
+    const [userState, setUserState] = useState("ready"); // ready, running, paused, stopped
     const [pace, setPace] = useState(0); // seconds per km
 
 
@@ -40,29 +40,35 @@ export default function Run({
             // set location as first coordinate
             setCoordinates([location]);
         }
-        else setCoordinates([...coordinates, location]);
+        else if(userState == "running") {
+            setCoordinates([...coordinates, location]);
 
-        // calculate distance from 2 points
-        if(coordinates.length > 1) {
-            const distance = getDistance(coordinates[coordinates.length - 2], coordinates[coordinates.length - 1]);
-            setTotalDistance(totalDistance + distance);
-            console.log('=>>>> Distance: ', totalDistance);
+            // calculate distance from 2 points
+            if(coordinates.length > 1) {
+                const distance = getDistance(coordinates[coordinates.length - 2], coordinates[coordinates.length - 1]);
+                setTotalDistance(totalDistance + distance);
+            }
         }
+
+        console.log('=>>>> Distance: ', totalDistance);
+        console.log('State: ', userState);
 
     }, [location]);
 
     // time calculation every 1 second
     useEffect(() => {
-        // calculate pace
-        const pace = (totalTime / totalDistance) * 1000;
-        setPace(Math.floor(pace)); // seconds per km
-        
         const interval = setInterval(() => {
-            setTotalTime(totalTime + 1);
+            if(userState == "running") {
+                // calculate pace
+                const pace = (totalTime / totalDistance) * 1000;
+                setPace(Math.floor(pace)); // seconds per km
+
+                setTotalTime(totalTime + 1);
+            }
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [totalTime]);
+    }, [totalTime, userState]);
 
     useEffect(() => {
         (async () => {
@@ -88,48 +94,106 @@ export default function Run({
         })();
     }, []);
 
+    // center map to current location
+    const mapRef = useRef<MapView>(null);
+
+    const getLocation = () => {
+        if(mapRef.current) {
+            mapRef.current.animateToRegion({
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            });
+        }
+    }
+
+    // state control
+    const startOrPause = () => {
+        if(userState == "ready") {
+            setUserState("running");
+        }
+        else if(userState == "running") {
+            setUserState("paused");
+        }
+        else if(userState == "paused") {
+            setUserState("running");
+        }
+    }
+
+    const stopRun = () => {
+        setUserState("paused");
+        console.log('Run stopped !!!');
+    }
+
     return (
         <View style={styles(theme).container}>
-        <Monitor
-            userState="Running"
-            timeMin={Math.floor(totalTime / 60) < 10 ? '0' + Math.floor(totalTime / 60) : Math.floor(totalTime / 60)}
-            timeSec={('0' + (totalTime % 60)).slice(-2)}
-            distance = {(totalDistance / 1000) < 10 ? '0' + (totalDistance / 1000).toFixed(2).replace('.', ':') : (totalDistance / 1000).toFixed(2).replace('.', ':')}
-            paceMin={Math.floor(pace / 60) < 10 ? '0' + Math.floor(pace / 60) : Math.floor(pace / 60)}
-            paceSec={('0' + (pace % 60)).slice(-2)}
-        />
-        <MapView
-            style={styles(theme).map}
-            initialRegion={{
-            latitude: 10.87839,
-            longitude: 106.80632,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-            }}
-            >
-            <Marker
-            coordinate={location}
-            title="Your Location"
-            pinColor='purple'
+            <Monitor
+                userState="Running"
+                timeMin={Math.floor(totalTime / 60) < 10 ? '0' + Math.floor(totalTime / 60) : Math.floor(totalTime / 60)}
+                timeSec={('0' + (totalTime % 60)).slice(-2)}
+                distance = {(totalDistance / 1000) < 10 ? '0' + (totalDistance / 1000).toFixed(2).replace('.', ':') : (totalDistance / 1000).toFixed(2).replace('.', ':')}
+                paceMin={Math.floor(pace / 60) < 10 ? '0' + Math.floor(pace / 60) : Math.floor(pace / 60)}
+                paceSec={('0' + (pace % 60)).slice(-2)}
             />
-            <Polyline
-            coordinates={coordinates}
-            // red
-            strokeColor="#f00"
-            // width
-            strokeWidth={4}
+            <MapView
+                ref={mapRef}
+                style={styles(theme).map}
+                initialRegion={{
+                    latitude: 10.87839,
+                    longitude: 106.80632,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+                >
+                <Marker
+                    coordinate={location}
+                    title="Your Location"
+                    pinColor='purple'
+                    
+                />
+                <Polyline
+                    coordinates={coordinates}
+                    strokeColor="#f00"
+                    strokeWidth={4}
+                />
+            </MapView>
+
+            <IconButton // get location button
+                style={styles(theme).getLocationBtn}
+                icon="crosshairs-gps"
+                mode="outlined"
+                size={26}
+                iconColor="black"
+                containerColor="white"
+                onPress={() => getLocation()}
             />
-        </MapView>
-        <View
-            style={{
-                position: 'absolute',//use absolute position to show button on top of the map
-                bottom: '0%', //for center align
-                alignSelf: 'flex-end' //for align to right
-            }}
-        >
-            {/* <Button onPress={() => getLocation()} title="Get Location" /> */}
-        </View>
-        
+
+            <IconButton // start button
+                style={styles(theme).startBtn}
+                icon={(userState == "ready" || userState == "paused") ? "arrow-right-drop-circle" : "pause-circle"}
+                mode="outlined"
+                size={36}
+                iconColor="green"
+                containerColor="white"
+                onPress={() => startOrPause()}
+            />
+            {
+                userState == "paused" ? (
+                    <IconButton // paused button
+                        style={styles(theme).stopBtn}
+                        icon="stop"
+                        mode="outlined"
+                        size={36}
+                        iconColor="red"
+                        containerColor="white"
+                        onPress={() => stopRun()}
+                    />
+                ) : null
+            }
+            
+            
+
         
         </View>
     );
@@ -143,4 +207,22 @@ const styles = (theme: AppTheme) =>
     map: {
         flex: 1,
     },
-  });
+    getLocationBtn: {
+        position: 'absolute',
+        bottom: '10%',
+        right: '1%',
+        alignSelf: 'flex-end' // for align to right
+    },
+    startBtn: {
+        position: 'absolute',
+        bottom: '10%',
+        left: '1%',
+        alignSelf: 'flex-start' // for align to left
+    },
+    stopBtn: {
+        position: 'absolute',
+        bottom: '10%',
+        left: '15%',
+        alignSelf: 'flex-start' // for align to left
+    },
+});
