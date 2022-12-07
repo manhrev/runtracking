@@ -8,6 +8,7 @@ import {
   ActivityInfo,
   ActivityType,
   CreateActivityInfoRequest,
+  TrackPoint,
 } from "../../lib/activity/activity_pb";
 import React, { useState, useEffect, useRef } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
@@ -102,6 +103,8 @@ export default function Run({
         }
       );
     })();
+
+    const route: Array<TrackPoint.AsObject> = [];
 
     const activityInfo: ActivityInfo.AsObject = {
       activityName: "abcasdff",
