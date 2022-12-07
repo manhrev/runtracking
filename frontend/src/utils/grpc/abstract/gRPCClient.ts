@@ -38,6 +38,10 @@ class gRPCClientAbstract {
     } catch (e) {
       console.log("Cannot connect to async storage");
     }
+
+    access_token =
+      "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE2NzA0OTE0ODIsImp0aSI6IjkxOTdjYWE1LTE1NDUtNDNkNS04NWQ3LWY0MTIxMWUzZTNkNCIsImlhdCI6MTY3MDQwNTQ4MiwiaXNzIjoiTXlJZCIsIm5iZiI6MTY3MDQwNTQ4Mn0.U0EBOuVAQu-yKOEUnjCiZVwUwAoW3kRiOjgMJdsTR-mCgjuh9Hhk8U_gxdkvp2OrUyp20yaK3aEm_r2Zq9i_DQ";
+
     try {
       option = { ...option, Authorization: `Bearer ${access_token}` };
 

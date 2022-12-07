@@ -15,6 +15,7 @@
     "@react-navigation/native": "^6.0.14",
     "@react-navigation/native-stack": "^6.9.2",
     "@reduxjs/toolkit": "^1.9.0",
+    "@types/google-protobuf": "^3.15.6",
     "deepmerge": "^4.2.2",
     "expo": "~47.0.8",
     "expo-location": "~15.0.1",
