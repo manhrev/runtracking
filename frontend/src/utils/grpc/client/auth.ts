@@ -26,7 +26,7 @@ class rpcAuthClient extends gRPCClientAbstract {
     const req = new LoginRequest();
     req.setUserName(username);
     req.setPassword(password);
-    return await this.gRPCClientRequest<LoginRequest.AsObject>("login", req);
+    return await this.gRPCClientRequest<LoginReply.AsObject>("login", req);
   }
 }
 

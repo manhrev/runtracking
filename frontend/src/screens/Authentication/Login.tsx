@@ -1,9 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { Button, IconButton, Text, TextInput } from "react-native-paper";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
 import { AppTheme, useAppTheme } from "../../theme";
+import { authClient, KEY_ACCESS_TOKEN } from "../../utils/grpc";
 import { baseStyles } from "../baseStyle";
 
 export default function Login({
@@ -13,7 +15,18 @@ export default function Login({
   const theme = useAppTheme();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const handleLogin = async () => {
+    const res = await authClient.login(username, password);
+    if (!res.error) {
+      alert("login success");
+      const token = res.response?.accessToken || "";
+      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token);
 
+      navigation.goBack();
+    } else {
+      alert("dcm sai roi");
+    }
+  };
   return (
     <View style={baseStyles(theme).homeContainer}>
       <View style={baseStyles(theme).innerWrapper}>
@@ -74,7 +87,7 @@ export default function Login({
         </View>
         <Button
           mode="contained"
-          onPress={() => {}}
+          onPress={handleLogin}
           style={{
             marginTop: 30,
             marginBottom: 5,
