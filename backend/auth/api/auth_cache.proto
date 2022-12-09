@@ -15,6 +15,9 @@ message User {
   // in VN phone number format
   string phone_number = 5;
   string metadata = 6;
+  float height = 11;
+  float weight = 12;
+  
   google.protobuf.Timestamp last_signed_in = 8;
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp updated_at = 10;

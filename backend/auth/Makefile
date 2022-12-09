@@ -11,7 +11,7 @@ generate-ts:
 	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth.proto
 	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth_code.proto
 
-enerate-cache:
+generate-cache:
 	mkdir -p ./pkg/data
 	protoc --go_out=./pkg/data --go-grpc_out=./pkg/data  ./api/auth_cache.proto
 

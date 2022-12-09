@@ -18,8 +18,8 @@ var (
 		{Name: "phone", Type: field.TypeString, Default: ""},
 		{Name: "role", Type: field.TypeInt32, Default: 1},
 		{Name: "age", Type: field.TypeInt32, Default: 0},
-		{Name: "height", Type: field.TypeInt32, Nullable: true},
-		{Name: "weight", Type: field.TypeInt32, Nullable: true},
+		{Name: "height", Type: field.TypeFloat32, Nullable: true},
+		{Name: "weight", Type: field.TypeFloat32, Nullable: true},
 		{Name: "profile_picture", Type: field.TypeString, Default: ""},
 		{Name: "created_at", Type: field.TypeTime},
 	}
