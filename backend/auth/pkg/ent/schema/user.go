@@ -29,9 +29,9 @@ func (User) Fields() []ent.Field {
 			Default(1),
 		field.Int32("age").
 			Default(0),
-		field.Int32("height").
+		field.Float32("height").
 			Optional(),
-		field.Int32("weight").
+		field.Float32("weight").
 			Optional(),
 		field.String("profile_picture").
 			Default(""),

@@ -44,10 +44,10 @@ type UserMutation struct {
 	addrole             *int32
 	age                 *int32
 	addage              *int32
-	height              *int32
-	addheight           *int32
-	weight              *int32
-	addweight           *int32
+	height              *float32
+	addheight           *float32
+	weight              *float32
+	addweight           *float32
 	profile_picture     *string
 	created_at          *time.Time
 	clearedFields       map[string]struct{}
@@ -455,13 +455,13 @@ func (m *UserMutation) ResetAge() {
 }
 
 // SetHeight sets the "height" field.
-func (m *UserMutation) SetHeight(i int32) {
-	m.height = &i
+func (m *UserMutation) SetHeight(f float32) {
+	m.height = &f
 	m.addheight = nil
 }
 
 // Height returns the value of the "height" field in the mutation.
-func (m *UserMutation) Height() (r int32, exists bool) {
+func (m *UserMutation) Height() (r float32, exists bool) {
 	v := m.height
 	if v == nil {
 		return
@@ -472,7 +472,7 @@ func (m *UserMutation) Height() (r int32, exists bool) {
 // OldHeight returns the old "height" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldHeight(ctx context.Context) (v int32, err error) {
+func (m *UserMutation) OldHeight(ctx context.Context) (v float32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldHeight is only allowed on UpdateOne operations")
 	}
@@ -486,17 +486,17 @@ func (m *UserMutation) OldHeight(ctx context.Context) (v int32, err error) {
 	return oldValue.Height, nil
 }
 
-// AddHeight adds i to the "height" field.
-func (m *UserMutation) AddHeight(i int32) {
+// AddHeight adds f to the "height" field.
+func (m *UserMutation) AddHeight(f float32) {
 	if m.addheight != nil {
-		*m.addheight += i
+		*m.addheight += f
 	} else {
-		m.addheight = &i
+		m.addheight = &f
 	}
 }
 
 // AddedHeight returns the value that was added to the "height" field in this mutation.
-func (m *UserMutation) AddedHeight() (r int32, exists bool) {
+func (m *UserMutation) AddedHeight() (r float32, exists bool) {
 	v := m.addheight
 	if v == nil {
 		return
@@ -525,13 +525,13 @@ func (m *UserMutation) ResetHeight() {
 }
 
 // SetWeight sets the "weight" field.
-func (m *UserMutation) SetWeight(i int32) {
-	m.weight = &i
+func (m *UserMutation) SetWeight(f float32) {
+	m.weight = &f
 	m.addweight = nil
 }
 
 // Weight returns the value of the "weight" field in the mutation.
-func (m *UserMutation) Weight() (r int32, exists bool) {
+func (m *UserMutation) Weight() (r float32, exists bool) {
 	v := m.weight
 	if v == nil {
 		return
@@ -542,7 +542,7 @@ func (m *UserMutation) Weight() (r int32, exists bool) {
 // OldWeight returns the old "weight" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldWeight(ctx context.Context) (v int32, err error) {
+func (m *UserMutation) OldWeight(ctx context.Context) (v float32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldWeight is only allowed on UpdateOne operations")
 	}
@@ -556,17 +556,17 @@ func (m *UserMutation) OldWeight(ctx context.Context) (v int32, err error) {
 	return oldValue.Weight, nil
 }
 
-// AddWeight adds i to the "weight" field.
-func (m *UserMutation) AddWeight(i int32) {
+// AddWeight adds f to the "weight" field.
+func (m *UserMutation) AddWeight(f float32) {
 	if m.addweight != nil {
-		*m.addweight += i
+		*m.addweight += f
 	} else {
-		m.addweight = &i
+		m.addweight = &f
 	}
 }
 
 // AddedWeight returns the value that was added to the "weight" field in this mutation.
-func (m *UserMutation) AddedWeight() (r int32, exists bool) {
+func (m *UserMutation) AddedWeight() (r float32, exists bool) {
 	v := m.addweight
 	if v == nil {
 		return
@@ -878,14 +878,14 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetAge(v)
 		return nil
 	case user.FieldHeight:
-		v, ok := value.(int32)
+		v, ok := value.(float32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetHeight(v)
 		return nil
 	case user.FieldWeight:
-		v, ok := value.(int32)
+		v, ok := value.(float32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -965,14 +965,14 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 		m.AddAge(v)
 		return nil
 	case user.FieldHeight:
-		v, ok := value.(int32)
+		v, ok := value.(float32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddHeight(v)
 		return nil
 	case user.FieldWeight:
-		v, ok := value.(int32)
+		v, ok := value.(float32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

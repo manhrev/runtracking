@@ -126,23 +126,23 @@ func (uu *UserUpdate) AddAge(i int32) *UserUpdate {
 }
 
 // SetHeight sets the "height" field.
-func (uu *UserUpdate) SetHeight(i int32) *UserUpdate {
+func (uu *UserUpdate) SetHeight(f float32) *UserUpdate {
 	uu.mutation.ResetHeight()
-	uu.mutation.SetHeight(i)
+	uu.mutation.SetHeight(f)
 	return uu
 }
 
 // SetNillableHeight sets the "height" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableHeight(i *int32) *UserUpdate {
-	if i != nil {
-		uu.SetHeight(*i)
+func (uu *UserUpdate) SetNillableHeight(f *float32) *UserUpdate {
+	if f != nil {
+		uu.SetHeight(*f)
 	}
 	return uu
 }
 
-// AddHeight adds i to the "height" field.
-func (uu *UserUpdate) AddHeight(i int32) *UserUpdate {
-	uu.mutation.AddHeight(i)
+// AddHeight adds f to the "height" field.
+func (uu *UserUpdate) AddHeight(f float32) *UserUpdate {
+	uu.mutation.AddHeight(f)
 	return uu
 }
 
@@ -153,23 +153,23 @@ func (uu *UserUpdate) ClearHeight() *UserUpdate {
 }
 
 // SetWeight sets the "weight" field.
-func (uu *UserUpdate) SetWeight(i int32) *UserUpdate {
+func (uu *UserUpdate) SetWeight(f float32) *UserUpdate {
 	uu.mutation.ResetWeight()
-	uu.mutation.SetWeight(i)
+	uu.mutation.SetWeight(f)
 	return uu
 }
 
 // SetNillableWeight sets the "weight" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableWeight(i *int32) *UserUpdate {
-	if i != nil {
-		uu.SetWeight(*i)
+func (uu *UserUpdate) SetNillableWeight(f *float32) *UserUpdate {
+	if f != nil {
+		uu.SetWeight(*f)
 	}
 	return uu
 }
 
-// AddWeight adds i to the "weight" field.
-func (uu *UserUpdate) AddWeight(i int32) *UserUpdate {
-	uu.mutation.AddWeight(i)
+// AddWeight adds f to the "weight" field.
+func (uu *UserUpdate) AddWeight(f float32) *UserUpdate {
+	uu.mutation.AddWeight(f)
 	return uu
 }
 
@@ -337,22 +337,22 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(user.FieldAge, field.TypeInt32, value)
 	}
 	if value, ok := uu.mutation.Height(); ok {
-		_spec.SetField(user.FieldHeight, field.TypeInt32, value)
+		_spec.SetField(user.FieldHeight, field.TypeFloat32, value)
 	}
 	if value, ok := uu.mutation.AddedHeight(); ok {
-		_spec.AddField(user.FieldHeight, field.TypeInt32, value)
+		_spec.AddField(user.FieldHeight, field.TypeFloat32, value)
 	}
 	if uu.mutation.HeightCleared() {
-		_spec.ClearField(user.FieldHeight, field.TypeInt32)
+		_spec.ClearField(user.FieldHeight, field.TypeFloat32)
 	}
 	if value, ok := uu.mutation.Weight(); ok {
-		_spec.SetField(user.FieldWeight, field.TypeInt32, value)
+		_spec.SetField(user.FieldWeight, field.TypeFloat32, value)
 	}
 	if value, ok := uu.mutation.AddedWeight(); ok {
-		_spec.AddField(user.FieldWeight, field.TypeInt32, value)
+		_spec.AddField(user.FieldWeight, field.TypeFloat32, value)
 	}
 	if uu.mutation.WeightCleared() {
-		_spec.ClearField(user.FieldWeight, field.TypeInt32)
+		_spec.ClearField(user.FieldWeight, field.TypeFloat32)
 	}
 	if value, ok := uu.mutation.ProfilePicture(); ok {
 		_spec.SetField(user.FieldProfilePicture, field.TypeString, value)
@@ -511,23 +511,23 @@ func (uuo *UserUpdateOne) AddAge(i int32) *UserUpdateOne {
 }
 
 // SetHeight sets the "height" field.
-func (uuo *UserUpdateOne) SetHeight(i int32) *UserUpdateOne {
+func (uuo *UserUpdateOne) SetHeight(f float32) *UserUpdateOne {
 	uuo.mutation.ResetHeight()
-	uuo.mutation.SetHeight(i)
+	uuo.mutation.SetHeight(f)
 	return uuo
 }
 
 // SetNillableHeight sets the "height" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableHeight(i *int32) *UserUpdateOne {
-	if i != nil {
-		uuo.SetHeight(*i)
+func (uuo *UserUpdateOne) SetNillableHeight(f *float32) *UserUpdateOne {
+	if f != nil {
+		uuo.SetHeight(*f)
 	}
 	return uuo
 }
 
-// AddHeight adds i to the "height" field.
-func (uuo *UserUpdateOne) AddHeight(i int32) *UserUpdateOne {
-	uuo.mutation.AddHeight(i)
+// AddHeight adds f to the "height" field.
+func (uuo *UserUpdateOne) AddHeight(f float32) *UserUpdateOne {
+	uuo.mutation.AddHeight(f)
 	return uuo
 }
 
@@ -538,23 +538,23 @@ func (uuo *UserUpdateOne) ClearHeight() *UserUpdateOne {
 }
 
 // SetWeight sets the "weight" field.
-func (uuo *UserUpdateOne) SetWeight(i int32) *UserUpdateOne {
+func (uuo *UserUpdateOne) SetWeight(f float32) *UserUpdateOne {
 	uuo.mutation.ResetWeight()
-	uuo.mutation.SetWeight(i)
+	uuo.mutation.SetWeight(f)
 	return uuo
 }
 
 // SetNillableWeight sets the "weight" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableWeight(i *int32) *UserUpdateOne {
-	if i != nil {
-		uuo.SetWeight(*i)
+func (uuo *UserUpdateOne) SetNillableWeight(f *float32) *UserUpdateOne {
+	if f != nil {
+		uuo.SetWeight(*f)
 	}
 	return uuo
 }
 
-// AddWeight adds i to the "weight" field.
-func (uuo *UserUpdateOne) AddWeight(i int32) *UserUpdateOne {
-	uuo.mutation.AddWeight(i)
+// AddWeight adds f to the "weight" field.
+func (uuo *UserUpdateOne) AddWeight(f float32) *UserUpdateOne {
+	uuo.mutation.AddWeight(f)
 	return uuo
 }
 
@@ -752,22 +752,22 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.AddField(user.FieldAge, field.TypeInt32, value)
 	}
 	if value, ok := uuo.mutation.Height(); ok {
-		_spec.SetField(user.FieldHeight, field.TypeInt32, value)
+		_spec.SetField(user.FieldHeight, field.TypeFloat32, value)
 	}
 	if value, ok := uuo.mutation.AddedHeight(); ok {
-		_spec.AddField(user.FieldHeight, field.TypeInt32, value)
+		_spec.AddField(user.FieldHeight, field.TypeFloat32, value)
 	}
 	if uuo.mutation.HeightCleared() {
-		_spec.ClearField(user.FieldHeight, field.TypeInt32)
+		_spec.ClearField(user.FieldHeight, field.TypeFloat32)
 	}
 	if value, ok := uuo.mutation.Weight(); ok {
-		_spec.SetField(user.FieldWeight, field.TypeInt32, value)
+		_spec.SetField(user.FieldWeight, field.TypeFloat32, value)
 	}
 	if value, ok := uuo.mutation.AddedWeight(); ok {
-		_spec.AddField(user.FieldWeight, field.TypeInt32, value)
+		_spec.AddField(user.FieldWeight, field.TypeFloat32, value)
 	}
 	if uuo.mutation.WeightCleared() {
-		_spec.ClearField(user.FieldWeight, field.TypeInt32)
+		_spec.ClearField(user.FieldWeight, field.TypeFloat32)
 	}
 	if value, ok := uuo.mutation.ProfilePicture(); ok {
 		_spec.SetField(user.FieldProfilePicture, field.TypeString, value)

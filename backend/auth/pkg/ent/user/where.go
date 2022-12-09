@@ -131,14 +131,14 @@ func Age(v int32) predicate.User {
 }
 
 // Height applies equality check predicate on the "height" field. It's identical to HeightEQ.
-func Height(v int32) predicate.User {
+func Height(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldHeight), v))
 	})
 }
 
 // Weight applies equality check predicate on the "weight" field. It's identical to WeightEQ.
-func Weight(v int32) predicate.User {
+func Weight(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldWeight), v))
 	})
@@ -782,21 +782,21 @@ func AgeLTE(v int32) predicate.User {
 }
 
 // HeightEQ applies the EQ predicate on the "height" field.
-func HeightEQ(v int32) predicate.User {
+func HeightEQ(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldHeight), v))
 	})
 }
 
 // HeightNEQ applies the NEQ predicate on the "height" field.
-func HeightNEQ(v int32) predicate.User {
+func HeightNEQ(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldHeight), v))
 	})
 }
 
 // HeightIn applies the In predicate on the "height" field.
-func HeightIn(vs ...int32) predicate.User {
+func HeightIn(vs ...float32) predicate.User {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -807,7 +807,7 @@ func HeightIn(vs ...int32) predicate.User {
 }
 
 // HeightNotIn applies the NotIn predicate on the "height" field.
-func HeightNotIn(vs ...int32) predicate.User {
+func HeightNotIn(vs ...float32) predicate.User {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -818,28 +818,28 @@ func HeightNotIn(vs ...int32) predicate.User {
 }
 
 // HeightGT applies the GT predicate on the "height" field.
-func HeightGT(v int32) predicate.User {
+func HeightGT(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldHeight), v))
 	})
 }
 
 // HeightGTE applies the GTE predicate on the "height" field.
-func HeightGTE(v int32) predicate.User {
+func HeightGTE(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldHeight), v))
 	})
 }
 
 // HeightLT applies the LT predicate on the "height" field.
-func HeightLT(v int32) predicate.User {
+func HeightLT(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldHeight), v))
 	})
 }
 
 // HeightLTE applies the LTE predicate on the "height" field.
-func HeightLTE(v int32) predicate.User {
+func HeightLTE(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldHeight), v))
 	})
@@ -860,21 +860,21 @@ func HeightNotNil() predicate.User {
 }
 
 // WeightEQ applies the EQ predicate on the "weight" field.
-func WeightEQ(v int32) predicate.User {
+func WeightEQ(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldWeight), v))
 	})
 }
 
 // WeightNEQ applies the NEQ predicate on the "weight" field.
-func WeightNEQ(v int32) predicate.User {
+func WeightNEQ(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldWeight), v))
 	})
 }
 
 // WeightIn applies the In predicate on the "weight" field.
-func WeightIn(vs ...int32) predicate.User {
+func WeightIn(vs ...float32) predicate.User {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -885,7 +885,7 @@ func WeightIn(vs ...int32) predicate.User {
 }
 
 // WeightNotIn applies the NotIn predicate on the "weight" field.
-func WeightNotIn(vs ...int32) predicate.User {
+func WeightNotIn(vs ...float32) predicate.User {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -896,28 +896,28 @@ func WeightNotIn(vs ...int32) predicate.User {
 }
 
 // WeightGT applies the GT predicate on the "weight" field.
-func WeightGT(v int32) predicate.User {
+func WeightGT(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldWeight), v))
 	})
 }
 
 // WeightGTE applies the GTE predicate on the "weight" field.
-func WeightGTE(v int32) predicate.User {
+func WeightGTE(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldWeight), v))
 	})
 }
 
 // WeightLT applies the LT predicate on the "weight" field.
-func WeightLT(v int32) predicate.User {
+func WeightLT(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldWeight), v))
 	})
 }
 
 // WeightLTE applies the LTE predicate on the "weight" field.
-func WeightLTE(v int32) predicate.User {
+func WeightLTE(v float32) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldWeight), v))
 	})
