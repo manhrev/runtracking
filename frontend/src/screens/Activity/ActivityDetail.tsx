@@ -5,6 +5,14 @@ import { Divider, Text } from "react-native-paper";
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
+import { useAppSelector } from "../../redux/store";
+import { selectActivityList } from "../../redux/features/activityList/slice";
+import {
+  formatDate,
+  getNameWithActivityType,
+  minutesPerKilometer,
+  secondsToMinutes,
+} from "../../utils/helpers";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -13,15 +21,41 @@ export default function ActivityDetail({
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, "ActivityDetail">) {
   const theme = useAppTheme();
+  const { activityId } = route.params;
+  const { activityList } = useAppSelector(selectActivityList);
+
+  const activity = activityList.find((activity) => {
+    return activity.id == activityId;
+  });
+
+  console.log(activity);
+
+  if (!activity) {
+    return <></>;
+  }
+  const {
+    activityName,
+    activityNote,
+    duration,
+    id,
+    kcal,
+    routeList,
+    totalDistance,
+    type,
+    endTime,
+    startTime,
+  } = activity;
   return (
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
         <View style={{ marginVertical: 10 }}>
           <Text variant="bodyMedium">
-            22/09/2022 - 15:30{"\n"}Running activity
+            {formatDate(endTime)}
+            {"\n"}
+            {getNameWithActivityType(type)} activity
           </Text>
           <Text variant="titleLarge" style={{ fontWeight: "700" }}>
-            Afternoon run
+            {activityName}
           </Text>
         </View>
 
@@ -42,7 +76,7 @@ export default function ActivityDetail({
                 marginBottom: -6,
               }}
             >
-              3.04
+              {(totalDistance / 1000.0).toFixed(2)}
             </Text>
             <Text variant="bodyLarge" style={styles(theme).unit}>
               Kilometers
@@ -52,7 +86,7 @@ export default function ActivityDetail({
             <View style={styles(theme).valueContainer}>
               <View style={styles(theme).valueBox}>
                 <Text variant="titleLarge" style={styles(theme).value}>
-                  12'5'''
+                  {minutesPerKilometer(duration, totalDistance)}
                 </Text>
                 <Text variant="bodyLarge" style={styles(theme).unit}>
                   Pace
@@ -60,7 +94,7 @@ export default function ActivityDetail({
               </View>
               <View style={styles(theme).valueBox}>
                 <Text variant="titleLarge" style={styles(theme).value}>
-                  20:33
+                  {secondsToMinutes(duration)}
                 </Text>
                 <Text variant="bodyLarge" style={styles(theme).unit}>
                   Time
@@ -68,10 +102,10 @@ export default function ActivityDetail({
               </View>
               <View style={styles(theme).valueBox}>
                 <Text variant="titleLarge" style={styles(theme).value}>
-                  433
+                  {kcal.toFixed(2)}
                 </Text>
                 <Text variant="bodyLarge" style={styles(theme).unit}>
-                  Calories
+                  KCalories
                 </Text>
               </View>
             </View>
@@ -103,9 +137,7 @@ export default function ActivityDetail({
         </View>
         <Divider />
         <Text variant="bodyLarge" style={styles(theme).unit}>
-          Pace Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim
+          {activityNote}
         </Text>
       </View>
     </View>

@@ -1,14 +1,33 @@
 import { StyleSheet, View } from "react-native";
 import { Avatar, Divider, Text, TouchableRipple } from "react-native-paper";
+import { ActivityInfo, ActivityType } from "../../../lib/activity/activity_pb";
 import { AppTheme, useAppTheme } from "../../../theme";
+import {
+  formatDate,
+  getIconWithActivityType,
+  getNameWithActivityType,
+  minutesPerKilometer,
+  secondsToMinutes,
+} from "../../../utils/helpers";
 
 interface ActivityListItemProps {
-  id: number;
+  activityInfo: ActivityInfo.AsObject;
   onPress: Function;
 }
 
 export default function ActivityListItem(props: ActivityListItemProps) {
-  const { id, onPress } = props;
+  const { activityInfo, onPress } = props;
+  const {
+    id,
+    activityName,
+    activityNote,
+    duration,
+    kcal,
+    totalDistance,
+    startTime,
+    endTime,
+    type,
+  } = activityInfo;
   const theme = useAppTheme();
 
   return (
@@ -17,7 +36,7 @@ export default function ActivityListItem(props: ActivityListItemProps) {
       <TouchableRipple key={id} onPress={() => onPress()}>
         <View style={styles(theme).listItemContainer}>
           <View style={styles(theme).listItemTilte}>
-            <Avatar.Icon size={40} icon="run" />
+            <Avatar.Icon size={40} icon={getIconWithActivityType(type)} />
             <View
               style={{
                 display: "flex",
@@ -27,9 +46,9 @@ export default function ActivityListItem(props: ActivityListItemProps) {
             >
               <View style={{ marginLeft: 12 }}>
                 <Text variant="titleMedium" style={{ fontWeight: "700" }}>
-                  Afternoon run
+                  {activityName}
                 </Text>
-                <Text variant="bodyMedium">22/09/2022 15:30</Text>
+                <Text variant="bodyMedium">{formatDate(endTime)}</Text>
               </View>
               <View
                 style={{
@@ -38,7 +57,7 @@ export default function ActivityListItem(props: ActivityListItemProps) {
                 }}
               >
                 <Text variant="bodyMedium" style={{ alignSelf: "flex-end" }}>
-                  Running activity
+                  {getNameWithActivityType(type)}
                 </Text>
               </View>
             </View>
@@ -52,7 +71,7 @@ export default function ActivityListItem(props: ActivityListItemProps) {
                   color: theme.colors.secondary,
                 }}
               >
-                2.01
+                {(totalDistance / 1000.0).toFixed(2)}
               </Text>
               <Text variant="bodyMedium" style={{ textAlign: "center" }}>
                 Kilometers
@@ -66,7 +85,7 @@ export default function ActivityListItem(props: ActivityListItemProps) {
                   color: theme.colors.secondary,
                 }}
               >
-                3'33"
+                {minutesPerKilometer(duration, totalDistance)}
               </Text>
               <Text variant="bodyMedium" style={{ textAlign: "center" }}>
                 Avg Pace
@@ -80,7 +99,7 @@ export default function ActivityListItem(props: ActivityListItemProps) {
                   color: theme.colors.secondary,
                 }}
               >
-                20:12
+                {secondsToMinutes(duration)}
               </Text>
               <Text variant="bodyMedium" style={{ textAlign: "center" }}>
                 Minutes

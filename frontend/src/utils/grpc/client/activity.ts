@@ -3,9 +3,12 @@ import { ActivityClient } from "../../../lib/activity/ActivityServiceClientPb";
 import {
   CreateActivityInfoRequest,
   CreateActivityInfoReply,
+  ListActivityInfoRequest,
+  ListActivityInfoReply,
   ActivityInfo,
   TrackPoint,
 } from "../../../lib/activity/activity_pb";
+import { GRPCClientResponse } from "../abstract/types";
 
 import { GRPCClientConfig } from "../abstract/types";
 import gRPCClientAbstract from "../abstract/gRPCClient";
@@ -16,13 +19,6 @@ class rpcActivityClient extends gRPCClientAbstract {
     config.serviceName = "ACTIVITY";
     super(ActivityClient, config);
   }
-
-  //   async signUp(username: string, password: string) {
-  //     const req = new SignUpRequest();
-  //     req.setUserName(username);
-  //     req.setPassword(password);
-  //     return await this.gRPCClientRequest<SignUpReply.AsObject>("signUp", req);
-  //   }
 
   async createActivityInfo(activityInfoObj: ActivityInfo.AsObject) {
     const route: Array<TrackPoint> = [];
@@ -59,6 +55,26 @@ class rpcActivityClient extends gRPCClientAbstract {
     req.setActivityInfo(activityInfo);
     return await this.gRPCClientRequest<CreateActivityInfoReply.AsObject>(
       "createActivityInfo",
+      req
+    );
+  }
+
+  async listActivityInfo(params: ListActivityInfoRequest.AsObject) {
+    const { activityType, ascending, limit, offset, sortBy, from, to } = params;
+    const req = new ListActivityInfoRequest();
+    req
+      .setLimit(limit)
+      .setOffset(offset)
+      .setActivityType(activityType)
+      .setAscending(ascending)
+      .setLimit(limit)
+      .setSortBy(sortBy)
+      .setFrom(
+        from ? new Timestamp().setSeconds(from?.seconds || 0) : undefined
+      )
+      .setTo(to ? new Timestamp().setSeconds(to?.seconds || 0) : undefined);
+    return await this.gRPCClientRequest<ListActivityInfoReply.AsObject>(
+      "listActivityInfo",
       req
     );
   }
