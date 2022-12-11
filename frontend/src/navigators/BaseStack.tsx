@@ -10,6 +10,7 @@ import Login from "../screens/Authentication/Login";
 import Signup from "../screens/Authentication/Signup";
 import Intro from "../screens/Authentication/Intro";
 import GetInfo from "../screens/Authentication/GetInfo";
+import RunResult from "../screens/Run/RunResult";
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -20,6 +21,17 @@ export type RootBaseStackParamList = {
     activityId: number;
   };
   ActivityList: {};
+
+  // Run
+  RunResult: {
+    display : {
+      distance: string;
+      time: string;
+      pace: string;
+      kcal: string;
+    }
+    
+  };
 
   // Profile
   ProfileSetting: undefined;
@@ -60,6 +72,14 @@ export const BaseStack = () => {
           headerBackVisible: true,
         }}
         component={ActivityDetail}
+      />
+      <Stack.Screen
+        name="RunResult"
+        options={{
+          title: "Run Result",
+          headerBackVisible: true,
+        }}
+        component={RunResult}
       />
       <Stack.Screen
         name="AppSetting"
