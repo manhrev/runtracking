@@ -38,6 +38,7 @@ class gRPCClientAbstract {
     } catch (e) {
       console.log("Cannot connect to async storage");
     }
+
     try {
       option = { ...option, Authorization: `Bearer ${access_token}` };
 

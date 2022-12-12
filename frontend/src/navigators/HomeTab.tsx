@@ -3,6 +3,7 @@ import React from "react";
 import ExampleScreen from "../screens/ExampleScreen";
 import Activity from "../screens/Activity/ActivityHome";
 import ProfileHome from "../screens/Profile/ProfileHome";
+import RunHome from "../screens/Run/RunHome";
 import { RootBaseStackParamList } from "./BaseStack";
 
 export type RootHomeTabsParamList = {
@@ -34,7 +35,7 @@ export default function HomeTabs() {
       />
       <Tab.Screen
         name="RunHome"
-        component={ExampleScreen}
+        component={RunHome}
         options={{ tabBarIcon: "run" }}
       />
       <Tab.Screen

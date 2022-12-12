@@ -10,6 +10,15 @@ import Login from "../screens/Authentication/Login";
 import Signup from "../screens/Authentication/Signup";
 import Intro from "../screens/Authentication/Intro";
 import GetInfo from "../screens/Authentication/GetInfo";
+import RunResult from "../screens/Run/RunResult";
+import RunHome from "../screens/Run/RunHome";
+import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
+import {
+  CreateActivityInfoRequest,
+  CreateActivityInfoReply,
+  ActivityInfo,
+  TrackPoint,
+} from "../lib/activity/activity_pb";
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -20,6 +29,26 @@ export type RootBaseStackParamList = {
     activityId: number;
   };
   ActivityList: {};
+
+  // Run
+  RunResult: {
+    display : {
+      distance: string;
+      time: string;
+      pace: string;
+      kcal: string;
+    },
+    savingInfo: {
+      duration: number;
+      kcal: number;
+      totalDistance: number;
+      routeList: Array<TrackPoint.AsObject>,
+      startTime: google_protobuf_timestamp_pb.Timestamp.AsObject,
+      endTime: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    }
+  };
+
+  
 
   // Profile
   ProfileSetting: undefined;
@@ -60,6 +89,14 @@ export const BaseStack = () => {
           headerBackVisible: true,
         }}
         component={ActivityDetail}
+      />
+      <Stack.Screen
+        name="RunResult"
+        options={{
+          title: "Run Result",
+          headerBackVisible: true,
+        }}
+        component={RunResult}
       />
       <Stack.Screen
         name="AppSetting"
