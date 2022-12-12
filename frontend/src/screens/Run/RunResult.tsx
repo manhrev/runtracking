@@ -1,4 +1,4 @@
-import { StyleSheet, View, Dimensions } from "react-native";
+import { StyleSheet, View, Dimensions, LogBox } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Divider, Text, List, TextInput, RadioButton, Button } from "react-native-paper";
 
@@ -6,6 +6,13 @@ import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
 import React, { useState } from "react";
+import {
+  ActivityInfo,
+  ActivityType,
+  CreateActivityInfoRequest,
+  TrackPoint,
+} from "../../lib/activity/activity_pb";
+import { activityClient } from "../../utils/grpc";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -14,8 +21,39 @@ export default function RunResult({
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, "RunResult">) {
   const theme = useAppTheme();
-  const [title, setTitle] = useState("Sample");
-  const [checked, setChecked] = useState("running");
+  const [activityName, setActivityName] = useState("Sample");
+  const [activityNote, setActivityNote] = useState("Sample Note");
+  const [activityType, setActivityType] = useState<ActivityType>(ActivityType.ACTIVITY_TYPE_RUNNING);
+
+  // console.log(route.params.savingInfo);
+
+  const saveActivity = () => {
+    const activityInfo: ActivityInfo.AsObject = {
+      activityName: activityName,
+      activityNote: activityNote,
+      duration: route.params.savingInfo.duration,
+      kcal: route.params.savingInfo.kcal,
+      routeList: route.params.savingInfo.routeList,
+      totalDistance: route.params.savingInfo.totalDistance,
+      type: activityType,
+      startTime: route.params.savingInfo.startTime,
+      endTime: route.params.savingInfo.endTime,
+      id: 0,
+    };
+    // console.log(activityInfo);
+    activityClient.createActivityInfo(activityInfo).then((res) => {
+      if(!res.error){
+        alert("Activity saved successfully!");
+        navigation.goBack();
+      }
+      else alert("Failed!");
+    });
+
+  };
+
+  const deleteActivity = () => {
+    navigation.goBack();
+  };
 
   return (
     <View style={baseStyles(theme).container}>
@@ -26,7 +64,7 @@ export default function RunResult({
           right={props => <Text>{route.params.display.distance}</Text>}
         />
         <List.Item
-          title="Time"
+          title="Duration"
           description=""
           left={props => <List.Icon {...props} icon="timer" />}
           right={props => <Text>{route.params.display.time}</Text>}
@@ -47,10 +85,10 @@ export default function RunResult({
 
         <TextInput
           style={styles(theme).titleInput}
-          label="Activity Title"
+          label="Activity Name"
           mode="outlined"
-          value={title}
-          onChangeText={text => setTitle(text)}
+          value={activityName}
+          onChangeText={text => setActivityName(text)}
         />
 
         
@@ -59,41 +97,51 @@ export default function RunResult({
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <RadioButton
               value="running"
-              status={checked === "running" ? "checked" : "unchecked"}
-              onPress={() => setChecked("running")}
+              status={activityType === ActivityType.ACTIVITY_TYPE_RUNNING ? "checked" : "unchecked"}
+              onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)}
             />
             <Text>Running</Text>
 
             <RadioButton
               value="walking"
-              status={checked === "walking" ? "checked" : "unchecked"}
-              onPress={() => setChecked("walking")}
+              status={activityType === ActivityType.ACTIVITY_TYPE_WALKING ? "checked" : "unchecked"}
+              onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)}
             />
             <Text>Walking</Text>
 
             <RadioButton
               value="cycling"
-              status={checked === "cycling" ? "checked" : "unchecked"}
-              onPress={() => setChecked("cycling")}
+              status={activityType === ActivityType.ACTIVITY_TYPE_CYCLING ? "checked" : "unchecked"}
+              onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)}
             />
             <Text>Cycling</Text>
           </View>
         </View>
+
+        <TextInput
+          style={styles(theme).noteInput}
+          multiline={true}
+          numberOfLines={4}
+          label="Note"
+          mode="outlined"
+          value={activityNote}
+          onChangeText={text => setActivityNote(text)}
+        />
 
 
         <View style={styles(theme).btnContainer}>
             <Button
               mode="contained"
               buttonColor="#e82525"
-              onPress={() => alert("Deleted")}
+              onPress={() => deleteActivity()}
               style={styles(theme).button}
             >
-              Delete
+              Cancel
             </Button>
 
             <Button
               mode="contained"
-              onPress={() => alert("Saved")}
+              onPress={() => saveActivity()}
               style={styles(theme).button}
             >
               Save
@@ -125,5 +173,13 @@ const styles = (theme: AppTheme) =>
       justifyContent: 'center',
       position: 'absolute',
       bottom: 15,
+    },
+    noteInput: {
+      width: windowWidth * 0.9,
+      marginTop: 10,
+      // center
+      marginLeft: "auto",
+      marginRight: "auto",
+      maxHeight: 100,
     },
   });

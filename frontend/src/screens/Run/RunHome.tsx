@@ -1,5 +1,5 @@
 import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
-import { Button, Divider, IconButton, SegmentedButtons, Text } from "react-native-paper";
+import { Button, Divider, IconButton, SegmentedButtons, Text, Dialog, Portal, Paragraph } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
@@ -11,6 +11,11 @@ import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import Monitor from './comp/Monitor';
 
+import {
+    TrackPoint,
+} from "../../lib/activity/activity_pb";
+import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
+
 
 export default function Run({
   navigation,
@@ -18,16 +23,26 @@ export default function Run({
 }: NativeStackScreenProps<RootHomeTabsParamList, "RunHome">) {
     const theme = useAppTheme();
 
-    const [coordinates, setCoordinates] = useState([{
+    const [coordinates, setCoordinates] = useState<Array<TrackPoint.AsObject>>([{
         latitude: 0,
-        longitude: 0,
-        isStop: 0,
+        longtitude: 0,
+        isStopPoint: false,
+        altitude: 0,
+        createdAt: {
+            seconds: 0,
+            nanos: 0
+        }
     }]);
 
-    const [location, setLocation] = useState({
+    const [location, setLocation] = useState<TrackPoint.AsObject>({
         latitude: 0,
-        longitude: 0,
-        isStop: 0,
+        longtitude: 0,
+        isStopPoint: false,
+        altitude: 0,
+        createdAt: {
+            seconds: 0,
+            nanos: 0
+        }
     });
 
     // focus mode
@@ -38,23 +53,48 @@ export default function Run({
     const [totalTime, setTotalTime] = useState(0); // seconds
     const [userState, setUserState] = useState("ready"); // ready, running, paused, stopped
     const [pace, setPace] = useState(0); // seconds per km
+    const [startTime, setStartTime] = useState<google_protobuf_timestamp_pb.Timestamp.AsObject>({
+        seconds: 0,
+        nanos: 0
+    });
 
+    // dialog
+    const [visible, setVisible] = useState(false);
+
+    const showDialog = () => {
+        setVisible(true);
+    };
+  
+    const hideDialog = () => {
+        setVisible(false);
+    };
 
     useEffect(() => {
-        if(coordinates.length == 1 && coordinates[0].latitude == 0 && coordinates[0].longitude == 0) {
+        if(coordinates.length == 1 && coordinates[0].latitude == 0 && coordinates[0].longtitude == 0) {
             // set location as first coordinate
             setCoordinates([{
                 latitude: location.latitude,
-                longitude: location.longitude,
-                isStop: 1,
+                longtitude: location.longtitude,
+                isStopPoint: true,
+                altitude: 0,
+                createdAt: location.createdAt
             }]);
         }
         else if(userState == "running") {
             setCoordinates([...coordinates, location]);
 
             // calculate distance from 2 points
-            if(coordinates.length > 1 && coordinates[coordinates.length - 2].isStop != 1) {
-                const distance = getDistance(coordinates[coordinates.length - 2], coordinates[coordinates.length - 1]);
+            if(coordinates.length > 1 && !coordinates[coordinates.length - 2].isStopPoint) {
+                const pointA = {
+                    latitude: coordinates[coordinates.length - 2].latitude,
+                    longitude: coordinates[coordinates.length - 2].longtitude
+                };
+                const pointB = {
+                    latitude: coordinates[coordinates.length - 1].latitude,
+                    longitude: coordinates[coordinates.length - 1].longtitude
+                };
+
+                const distance = getDistance(pointA, pointB);
                 setTotalDistance(totalDistance + distance);
             }
         }
@@ -101,10 +141,18 @@ export default function Run({
             accuracy: Location.Accuracy.High,
             distanceInterval: 1,
         }, (location) => {
+            const timeNow = new google_protobuf_timestamp_pb.Timestamp();
+            timeNow.fromDate(new Date());
+
             setLocation({
                 latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                isStop: 0,
+                longtitude: location.coords.longitude,
+                isStopPoint: false,
+                altitude: 0,
+                createdAt: {
+                    seconds: timeNow.getSeconds(),
+                    nanos: timeNow.getNanos()
+                }
             });
         });
 
@@ -119,7 +167,7 @@ export default function Run({
         if(mapRef.current) {
             mapRef.current.animateToRegion({
                 latitude: location.latitude,
-                longitude: location.longitude,
+                longitude: location.longtitude,
                 latitudeDelta: 0.002,
                 longitudeDelta: 0.003,
             });
@@ -130,14 +178,24 @@ export default function Run({
     const startOrPause = () => {
         if(userState == "ready") {
             setUserState("running");
+
+            // save start time
+            const timeNow = new google_protobuf_timestamp_pb.Timestamp();
+            timeNow.fromDate(new Date());
+            setStartTime({
+                seconds: timeNow.getSeconds(),
+                nanos: timeNow.getNanos()
+            });
         }
         else if(userState == "running") {
             setUserState("paused");
             // set last coordinate as stop point
-            let lastCoordinate = {
+            let lastCoordinate: TrackPoint.AsObject = {
                 latitude: coordinates[coordinates.length - 1].latitude,
-                longitude: coordinates[coordinates.length - 1].longitude,
-                isStop: 1,
+                longtitude: coordinates[coordinates.length - 1].longtitude,
+                isStopPoint: true,
+                altitude: 0,
+                createdAt: coordinates[coordinates.length - 1].createdAt
             }
             setCoordinates([...coordinates, lastCoordinate]);
         }
@@ -148,14 +206,31 @@ export default function Run({
 
     const stopRun = () => {
         setUserState("paused");
+        // get end time first
+        const timeNow = new google_protobuf_timestamp_pb.Timestamp();
+        timeNow.fromDate(new Date());
+        
         navigation.navigate("RunResult", {
             display :{
                 distance: formatForDisplay("distance-km", totalDistance),
                 time: formatForDisplay("time", totalTime),
                 pace: formatForDisplay("pace", pace),
                 kcal: "525",
+            },
+            savingInfo: {
+                duration: totalTime,
+                kcal: 525,
+                totalDistance: totalDistance,
+                routeList: coordinates,
+                startTime: {
+                    seconds: startTime.seconds,
+                    nanos: startTime.nanos
+                },
+                endTime: {
+                    seconds: timeNow.getSeconds(),
+                    nanos: timeNow.getNanos()
+                }
             }
-            
         });
     }
 
@@ -165,10 +240,10 @@ export default function Run({
         const multiPolyline = [];
         let polyline:any = [];
         coordinates.forEach((coordinate: any) => {
-            if(coordinate.isStop == 0) {
+            if(!coordinate.isStopPoint) {
                 polyline.push({
                     latitude: coordinate.latitude,
-                    longitude: coordinate.longitude,
+                    longitude: coordinate.longtitude,
                 });
             }
             else {
@@ -201,8 +276,35 @@ export default function Run({
         return "Wrong type";
     }
 
+    // reset
+    const resetRunInfo = () => {
+        setTotalTime(0);
+        setTotalDistance(0);
+        setPace(0);
+        setCoordinates([]);
+        setUserState("ready");
+        setStartTime({
+            seconds: 0,
+            nanos: 0
+        });
+        setFocusMode(false);
+        setVisible(false);
+    }
+
     return (
         <View style={styles(theme).container}>
+            <Portal>
+                <Dialog visible={visible} onDismiss={hideDialog}>
+                    <Dialog.Title>Alert</Dialog.Title>
+                    <Dialog.Content>
+                        <Text>Do you want to restart your activity ?</Text>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={resetRunInfo}> Yes </Button>
+                        <Button onPress={hideDialog}> No </Button>
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
             <Monitor
                 userState={userState == "ready" ? "Ready" : userState == "running" ? "Running" : "Paused"}
                 displayTime={formatForDisplay("time", totalTime)}
@@ -222,7 +324,12 @@ export default function Run({
                 }}
                 >
                 <Marker
-                    coordinate={location}
+                    coordinate={
+                        {
+                            latitude: location.latitude,
+                            longitude: location.longtitude,
+                        }
+                    }
                     title="Your Location"
                     pinColor='purple'
                     
@@ -238,6 +345,17 @@ export default function Run({
                     ))
                 }
             </MapView>
+
+            <IconButton // reset button
+                style={styles(theme).resetBtn}
+                disabled={userState == "ready"}
+                icon={userState == "ready" ? "restart-off" : "restart"}
+                mode="outlined"
+                size={26}
+                iconColor={"black"}
+                containerColor="white"
+                onPress={() => showDialog()}
+            />
             
             <IconButton // focus button
                 style={styles(theme).focusBtn}
@@ -314,6 +432,12 @@ const styles = (theme: AppTheme) =>
     focusBtn: {
         position: 'absolute',
         bottom: '20%',
+        right: '1%',
+        alignSelf: 'flex-end' // for align to right
+    },
+    resetBtn: {
+        position: 'absolute',
+        bottom: '50%',
         right: '1%',
         alignSelf: 'flex-end' // for align to right
     }
