@@ -1,4 +1,4 @@
-import { StyleSheet, View, Dimensions, LogBox } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Divider, Text, List, TextInput, RadioButton, Button } from "react-native-paper";
 
@@ -171,8 +171,6 @@ const styles = (theme: AppTheme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      position: 'absolute',
-      bottom: 15,
     },
     noteInput: {
       width: windowWidth * 0.9,
