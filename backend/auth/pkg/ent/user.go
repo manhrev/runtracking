@@ -32,9 +32,9 @@ type User struct {
 	// Age holds the value of the "age" field.
 	Age int32 `json:"age,omitempty"`
 	// Height holds the value of the "height" field.
-	Height int32 `json:"height,omitempty"`
+	Height float32 `json:"height,omitempty"`
 	// Weight holds the value of the "weight" field.
-	Weight int32 `json:"weight,omitempty"`
+	Weight float32 `json:"weight,omitempty"`
 	// ProfilePicture holds the value of the "profile_picture" field.
 	ProfilePicture string `json:"profile_picture,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -71,7 +71,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldRole, user.FieldAge, user.FieldHeight, user.FieldWeight:
+		case user.FieldHeight, user.FieldWeight:
+			values[i] = new(sql.NullFloat64)
+		case user.FieldID, user.FieldRole, user.FieldAge:
 			values[i] = new(sql.NullInt64)
 		case user.FieldUsername, user.FieldPassword, user.FieldDisplayName, user.FieldEmail, user.FieldPhone, user.FieldProfilePicture:
 			values[i] = new(sql.NullString)
@@ -141,16 +143,16 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.Age = int32(value.Int64)
 			}
 		case user.FieldHeight:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field height", values[i])
 			} else if value.Valid {
-				u.Height = int32(value.Int64)
+				u.Height = float32(value.Float64)
 			}
 		case user.FieldWeight:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field weight", values[i])
 			} else if value.Valid {
-				u.Weight = int32(value.Int64)
+				u.Weight = float32(value.Float64)
 			}
 		case user.FieldProfilePicture:
 			if value, ok := values[i].(*sql.NullString); !ok {

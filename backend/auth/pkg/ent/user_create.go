@@ -104,29 +104,29 @@ func (uc *UserCreate) SetNillableAge(i *int32) *UserCreate {
 }
 
 // SetHeight sets the "height" field.
-func (uc *UserCreate) SetHeight(i int32) *UserCreate {
-	uc.mutation.SetHeight(i)
+func (uc *UserCreate) SetHeight(f float32) *UserCreate {
+	uc.mutation.SetHeight(f)
 	return uc
 }
 
 // SetNillableHeight sets the "height" field if the given value is not nil.
-func (uc *UserCreate) SetNillableHeight(i *int32) *UserCreate {
-	if i != nil {
-		uc.SetHeight(*i)
+func (uc *UserCreate) SetNillableHeight(f *float32) *UserCreate {
+	if f != nil {
+		uc.SetHeight(*f)
 	}
 	return uc
 }
 
 // SetWeight sets the "weight" field.
-func (uc *UserCreate) SetWeight(i int32) *UserCreate {
-	uc.mutation.SetWeight(i)
+func (uc *UserCreate) SetWeight(f float32) *UserCreate {
+	uc.mutation.SetWeight(f)
 	return uc
 }
 
 // SetNillableWeight sets the "weight" field if the given value is not nil.
-func (uc *UserCreate) SetNillableWeight(i *int32) *UserCreate {
-	if i != nil {
-		uc.SetWeight(*i)
+func (uc *UserCreate) SetNillableWeight(f *float32) *UserCreate {
+	if f != nil {
+		uc.SetWeight(*f)
 	}
 	return uc
 }
@@ -382,11 +382,11 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.Age = value
 	}
 	if value, ok := uc.mutation.Height(); ok {
-		_spec.SetField(user.FieldHeight, field.TypeInt32, value)
+		_spec.SetField(user.FieldHeight, field.TypeFloat32, value)
 		_node.Height = value
 	}
 	if value, ok := uc.mutation.Weight(); ok {
-		_spec.SetField(user.FieldWeight, field.TypeInt32, value)
+		_spec.SetField(user.FieldWeight, field.TypeFloat32, value)
 		_node.Weight = value
 	}
 	if value, ok := uc.mutation.ProfilePicture(); ok {

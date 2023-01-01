@@ -13,6 +13,7 @@ import (
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signup"
 	"github.com/manhrev/runtracking/backend/auth/internal/server/auth"
 	authz "github.com/manhrev/runtracking/backend/auth/internal/server/authz"
+	"github.com/manhrev/runtracking/backend/auth/internal/server/user"
 	"github.com/manhrev/runtracking/backend/auth/internal/service/token"
 	pb "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent"
@@ -86,7 +87,10 @@ func Serve(server *grpc.Server) {
 		logger.Fatal("can not create cache", zap.Error(err))
 	}
 
+	// Register Auth Server
 	pb.RegisterAuthServer(server, auth.NewServer(entClient, tokenService, featureSignIn, featureSignUp, cacheService, extractorService))
+	// Register User Server
+	pb.RegisterUserServer(server, user.NewServer(entClient, extractorService))
 
 	lis, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {

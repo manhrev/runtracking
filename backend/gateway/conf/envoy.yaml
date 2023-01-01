@@ -35,13 +35,25 @@ static_resources:
                         expose_headers: grpc-status,grpc-message
                       routes:
                         - match:
-                            prefix: "/auth.Auth"
+                            prefix: /auth.Auth/Login
                           route:
                             cluster: auth_cluster
                           typed_per_filter_config:
                             envoy.filters.http.ext_authz:
                               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                               disabled: true
+                        - match:
+                            prefix: /auth.Auth/SignUp
+                          route:
+                            cluster: auth_cluster
+                          typed_per_filter_config:
+                            envoy.filters.http.ext_authz:
+                              "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                              disabled: true
+                        - match:
+                            prefix: /auth.
+                          route:
+                            cluster: auth_cluster
                         - match:
                             prefix: /group.Group
                           route:

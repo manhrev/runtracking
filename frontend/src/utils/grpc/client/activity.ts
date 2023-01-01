@@ -20,6 +20,13 @@ class rpcActivityClient extends gRPCClientAbstract {
     super(ActivityClient, config);
   }
 
+  //   async signUp(username: string, password: string) {
+  //     const req = new SignUpRequest();
+  //     req.setUserName(username);
+  //     req.setPassword(password);
+  //     return await this.gRPCClientRequest<SignUpReply.AsObject>("signUp", req);
+  //   }
+
   async createActivityInfo(activityInfoObj: ActivityInfo.AsObject) {
     const route: Array<TrackPoint> = [];
     activityInfoObj?.routeList.forEach((pointObject) => {
