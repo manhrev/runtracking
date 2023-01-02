@@ -2,9 +2,11 @@ package activity
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/activity/internal/status"
 	activitypb "github.com/manhrev/runtracking/backend/activity/pkg/api"
 	"github.com/manhrev/runtracking/backend/activity/pkg/code"
@@ -13,6 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const sqlTimeFormat = "2006-01-02 15:04:05" //"Jan 2, 2006 at 3:04pm (MST)"
 type Activity interface {
 	Create(
 		ctx context.Context,
@@ -31,6 +34,15 @@ type Activity interface {
 		offset uint64,
 	) (records []*ent.Activity, total int64, err error)
 	Delete(ctx context.Context, userId int64, activityIdList []int64) error
+	GetStatistic(
+		ctx context.Context,
+		userId int64,
+		activityType activitypb.ActivityType,
+		from *timestamppb.Timestamp,
+		to *timestamppb.Timestamp,
+		groupBy activitypb.GetActivityStatisticRequest_GroupBy,
+		tz uint32,
+	) ([]*ActivityStatisticData, error)
 }
 
 type activityImpl struct {
@@ -161,4 +173,88 @@ func (m *activityImpl) Delete(ctx context.Context, userId int64, activityIdList 
 	}
 
 	return nil
+}
+
+type ActivityStatisticData struct {
+	activitypb.ActivityStatisticData
+	Datetime time.Time `json:"date_time"`
+}
+
+func (m *activityImpl) GetStatistic(
+	ctx context.Context,
+	userId int64,
+	activityType activitypb.ActivityType,
+	from *timestamppb.Timestamp,
+	to *timestamppb.Timestamp,
+	groupBy activitypb.GetActivityStatisticRequest_GroupBy,
+	tz uint32,
+) ([]*ActivityStatisticData, error) {
+	var sliceOfPointers []*ActivityStatisticData
+
+	err := m.entClient.Debug().Activity.Query().Modify(func(s *sql.Selector) {
+		activityTable := sql.Table(activity.Table)
+
+		// check groupby here!
+		groupByStr := fmt.Sprintf(`
+			CAST(CAST(CONVERT_TZ(%s, "+00:00", "%s") as DATE) as DATETIME)
+		`, "end_time", GetTimeZoneStr(int32(tz)))
+
+		s.Select(
+			sql.As(groupByStr, "date_time"),
+			sql.As(sql.Count(activityTable.C(activity.FieldID)), "number_of_activities"),
+			sql.As(sql.Sum(activityTable.C(activity.FieldTotalDistance)), "total_distance"),
+			sql.As(sql.Sum(activityTable.C(activity.FieldDuration)), "total_duration"),
+		)
+
+		// User id
+		s.Where(
+			sql.EQ(activityTable.C(activity.FieldUserID), userId),
+		)
+
+		// Activity type
+		if activityType == activitypb.ActivityType_ACTIVITY_TYPE_UNSPECIFIED {
+			activityType = activitypb.ActivityType_ACTIVITY_TYPE_RUNNING
+		} else {
+			s.Where(
+				sql.EQ(activityTable.C(activity.FieldType), activityType),
+			)
+		}
+
+		// time range
+		if from != nil && to != nil {
+			s.Where(
+				sql.And(
+					sql.GTE(
+						activityTable.C(activity.FieldEndTime),
+						from.AsTime().Format(sqlTimeFormat),
+					),
+					sql.LTE(
+						activityTable.C(activity.FieldEndTime),
+						to.AsTime().Format(sqlTimeFormat),
+					),
+				),
+			)
+		}
+
+		s.From(activityTable).
+			GroupBy(
+				groupByStr,
+			)
+	}).Scan(ctx, &sliceOfPointers)
+
+	if err != nil {
+		log.Printf("error while listactivity statistic %v", err.Error())
+		return nil, status.Internal(err.Error())
+	}
+	log.Println(sliceOfPointers)
+
+	return sliceOfPointers, nil
+}
+
+func GetTimeZoneStr(tz int32) string {
+	if tz < 0 {
+		return fmt.Sprintf("-%02d:00", -tz)
+	}
+
+	return fmt.Sprintf("+%02d:00", tz)
 }
