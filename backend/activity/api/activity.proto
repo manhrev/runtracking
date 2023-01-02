@@ -80,7 +80,6 @@ message GetActivityStatisticRequest{
     ActivityType type = 5;
     google.protobuf.Timestamp from = 1; // from day a
     google.protobuf.Timestamp to = 2;   // to day b
-    int32 timezone = 3;
     GroupBy group_by = 4;
     uint32 tz = 6; // timezone
 
