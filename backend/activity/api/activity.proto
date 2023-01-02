@@ -10,6 +10,7 @@ service Activity {
     rpc CreateActivityInfo(CreateActivityInfoRequest) returns (CreateActivityInfoReply);
     rpc ListActivityInfo(ListActivityInfoRequest) returns (ListActivityInfoReply);
     rpc DeleteActivityInfo(DeleteActivityInfoRequest) returns (DeleteActivityInfoReply);
+    rpc GetActivityStatistic(GetActivityStatisticRequest) returns (GetActivityStatisticReply);
 }
 
 enum ActivityType {
@@ -74,3 +75,31 @@ message DeleteActivityInfoRequest { //check if user owns this activity before de
 }
 
 message DeleteActivityInfoReply {}
+
+message GetActivityStatisticRequest{
+    ActivityType type = 5;
+    google.protobuf.Timestamp from = 1; // from day a
+    google.protobuf.Timestamp to = 2;   // to day b
+    GroupBy group_by = 4;
+    uint32 tz = 6; // timezone
+
+    enum GroupBy {
+        GROUP_BY_UNSPECIFIED = 0;
+        GROUP_BY_DAY = 1; // show each day in week (mon, tues,...), show each day in month (1,2,...30)
+        GROUP_BY_WEEK = 2; // show each week in quater (week1.Aug ...)
+        GORUP_BY_MONTH = 3; // show each month in year (jan, feb, march ...) 
+        GORUP_BY_YEAR = 5; // show each year (2022, 2023...)
+    }
+}
+
+message GetActivityStatisticReply {
+    repeated ActivityStatisticData data = 1;
+}
+
+// data for each week/month/year
+message ActivityStatisticData {
+    google.protobuf.Timestamp datetime = 1;
+    uint64 total_distance = 2; // meters
+    uint64 total_duration = 3; // seconds
+    uint32 number_of_activities = 4;
+}

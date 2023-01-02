@@ -2,25 +2,52 @@ import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import { Button, IconButton, SegmentedButtons, Text } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UpperRightMenu from "../../comp/UpperRightMenu";
-import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
 import { baseStyles } from "../baseStyle";
 import { BarChart } from "react-native-chart-kit";
 import ActivityListItem from "./comp/ActivityListItem";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { listActivityInfoThunk } from "../../redux/features/activityList/thunk";
+import { ActivitySortBy, ActivityType } from "../../lib/activity/activity_pb";
+import {
+  isActivityListLoading,
+  selectActivityList,
+} from "../../redux/features/activityList/slice";
+import { useSelector } from "react-redux";
 
 const windowWidth = Dimensions.get("window").width;
-const ids = [...Array(3 + 1).keys()].slice(1);
 
 export default function Activity({
   navigation,
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, "ActivityHome">) {
+  const dispatch = useAppDispatch();
   const theme = useAppTheme();
   const isFocused = useIsFocused();
   const [filterByValue, setFilterByValue] = useState("week");
+  const { activityList } = useAppSelector(selectActivityList);
+  const isLoading = useSelector(isActivityListLoading);
+  const fetchListActivity = async () => {
+    const { payload } = await dispatch(
+      listActivityInfoThunk({
+        activityType: ActivityType.ACTIVITY_TYPE_UNSPECIFIED,
+        ascending: false,
+        limit: 10,
+        offset: 0,
+        sortBy: ActivitySortBy.ACTIVITY_SORT_BY_END_TIME,
+      })
+    );
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchListActivity();
+    }, [])
+  );
   return (
     <>
       <View style={baseStyles(theme).homeContainer}>
@@ -134,14 +161,16 @@ export default function Activity({
               <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
                 Recent activities
               </Text>
-              {ids.map((id) => {
+              {activityList.slice(0, 3).map((activity) => {
                 return (
                   <ActivityListItem
-                    id={id}
+                    key={activity.id}
                     onPress={() =>
-                      navigation.navigate("ActivityDetail", { activityId: id })
+                      navigation.navigate("ActivityDetail", {
+                        activityId: activity.id,
+                      })
                     }
-                    key={id}
+                    activityInfo={activity}
                   />
                 );
               })}
@@ -149,6 +178,7 @@ export default function Activity({
                 mode="contained"
                 onPress={() => navigation.navigate("ActivityList", {})}
                 style={{ marginTop: 10 }}
+                loading={isLoading}
               >
                 View all activities
               </Button>
