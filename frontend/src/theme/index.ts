@@ -38,7 +38,7 @@ const ExtendedDarkTheme = {
     onError: "rgb(255, 255, 255)",
     errorContainer: "rgb(255, 218, 214)",
     onErrorContainer: "rgb(65, 0, 2)",
-    background: "rgb(252, 253, 246)",
+    background: "rgb(255, 255, 255)",
     onBackground: "rgb(26, 28, 24)",
     surface: "rgb(252, 253, 246)",
     onSurface: "rgb(26, 28, 24)",

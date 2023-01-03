@@ -33,6 +33,12 @@ export function secondsToMinutes(seconds: number): string {
   return min + "'" + sec + '"';
 }
 
+export function secondsToHours(seconds: number): string {
+  var hours = Math.floor(seconds / (60 * 60));
+  var min = Math.floor((seconds - hours * 60 * 60) / 60);
+  return hours + ":" + min;
+}
+
 export function minutesPerKilometer(seconds: number, meters: number): string {
   const min = seconds / 60;
   const km = meters / 1000;

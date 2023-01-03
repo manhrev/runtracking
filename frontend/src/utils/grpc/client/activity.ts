@@ -7,8 +7,9 @@ import {
   ListActivityInfoReply,
   ActivityInfo,
   TrackPoint,
+  GetActivityStatisticRequest,
+  GetActivityStatisticReply,
 } from "../../../lib/activity/activity_pb";
-import { GRPCClientResponse } from "../abstract/types";
 
 import { GRPCClientConfig } from "../abstract/types";
 import gRPCClientAbstract from "../abstract/gRPCClient";
@@ -82,6 +83,24 @@ class rpcActivityClient extends gRPCClientAbstract {
       .setTo(to ? new Timestamp().setSeconds(to?.seconds || 0) : undefined);
     return await this.gRPCClientRequest<ListActivityInfoReply.AsObject>(
       "listActivityInfo",
+      req
+    );
+  }
+
+  async getActivityStatistic(param: GetActivityStatisticRequest.AsObject) {
+    const { groupBy, type, tz, from, to } = param;
+    const req = new GetActivityStatisticRequest();
+    req
+      .setGroupBy(groupBy)
+      .setType(type)
+      .setTz(tz)
+      .setFrom(
+        from ? new Timestamp().setSeconds(from?.seconds || 0) : undefined
+      )
+      .setTo(to ? new Timestamp().setSeconds(to?.seconds || 0) : undefined);
+
+    return await this.gRPCClientRequest<GetActivityStatisticReply.AsObject>(
+      "getActivityStatistic",
       req
     );
   }

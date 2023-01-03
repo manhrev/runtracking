@@ -164,5 +164,48 @@ export class ActivityClient {
     this.methodDescriptorDeleteActivityInfo);
   }
 
+  methodDescriptorGetActivityStatistic = new grpcWeb.MethodDescriptor(
+    '/activity.Activity/GetActivityStatistic',
+    grpcWeb.MethodType.UNARY,
+    activity_pb.GetActivityStatisticRequest,
+    activity_pb.GetActivityStatisticReply,
+    (request: activity_pb.GetActivityStatisticRequest) => {
+      return request.serializeBinary();
+    },
+    activity_pb.GetActivityStatisticReply.deserializeBinary
+  );
+
+  getActivityStatistic(
+    request: activity_pb.GetActivityStatisticRequest,
+    metadata: grpcWeb.Metadata | null): Promise<activity_pb.GetActivityStatisticReply>;
+
+  getActivityStatistic(
+    request: activity_pb.GetActivityStatisticRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: activity_pb.GetActivityStatisticReply) => void): grpcWeb.ClientReadableStream<activity_pb.GetActivityStatisticReply>;
+
+  getActivityStatistic(
+    request: activity_pb.GetActivityStatisticRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: activity_pb.GetActivityStatisticReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/activity.Activity/GetActivityStatistic',
+        request,
+        metadata || {},
+        this.methodDescriptorGetActivityStatistic,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/activity.Activity/GetActivityStatistic',
+    request,
+    metadata || {},
+    this.methodDescriptorGetActivityStatistic);
+  }
+
 }
 

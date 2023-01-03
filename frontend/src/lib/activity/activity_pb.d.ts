@@ -237,6 +237,104 @@ export namespace DeleteActivityInfoReply {
   }
 }
 
+export class GetActivityStatisticRequest extends jspb.Message {
+  getType(): ActivityType;
+  setType(value: ActivityType): GetActivityStatisticRequest;
+
+  getFrom(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setFrom(value?: google_protobuf_timestamp_pb.Timestamp): GetActivityStatisticRequest;
+  hasFrom(): boolean;
+  clearFrom(): GetActivityStatisticRequest;
+
+  getTo(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setTo(value?: google_protobuf_timestamp_pb.Timestamp): GetActivityStatisticRequest;
+  hasTo(): boolean;
+  clearTo(): GetActivityStatisticRequest;
+
+  getGroupBy(): GetActivityStatisticRequest.GroupBy;
+  setGroupBy(value: GetActivityStatisticRequest.GroupBy): GetActivityStatisticRequest;
+
+  getTz(): number;
+  setTz(value: number): GetActivityStatisticRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetActivityStatisticRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetActivityStatisticRequest): GetActivityStatisticRequest.AsObject;
+  static serializeBinaryToWriter(message: GetActivityStatisticRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetActivityStatisticRequest;
+  static deserializeBinaryFromReader(message: GetActivityStatisticRequest, reader: jspb.BinaryReader): GetActivityStatisticRequest;
+}
+
+export namespace GetActivityStatisticRequest {
+  export type AsObject = {
+    type: ActivityType,
+    from?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    to?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    groupBy: GetActivityStatisticRequest.GroupBy,
+    tz: number,
+  }
+
+  export enum GroupBy { 
+    GROUP_BY_UNSPECIFIED = 0,
+    GROUP_BY_DAY = 1,
+    GROUP_BY_WEEK = 2,
+    GORUP_BY_MONTH = 3,
+    GORUP_BY_YEAR = 5,
+  }
+}
+
+export class GetActivityStatisticReply extends jspb.Message {
+  getDataList(): Array<ActivityStatisticData>;
+  setDataList(value: Array<ActivityStatisticData>): GetActivityStatisticReply;
+  clearDataList(): GetActivityStatisticReply;
+  addData(value?: ActivityStatisticData, index?: number): ActivityStatisticData;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetActivityStatisticReply.AsObject;
+  static toObject(includeInstance: boolean, msg: GetActivityStatisticReply): GetActivityStatisticReply.AsObject;
+  static serializeBinaryToWriter(message: GetActivityStatisticReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetActivityStatisticReply;
+  static deserializeBinaryFromReader(message: GetActivityStatisticReply, reader: jspb.BinaryReader): GetActivityStatisticReply;
+}
+
+export namespace GetActivityStatisticReply {
+  export type AsObject = {
+    dataList: Array<ActivityStatisticData.AsObject>,
+  }
+}
+
+export class ActivityStatisticData extends jspb.Message {
+  getDatetime(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setDatetime(value?: google_protobuf_timestamp_pb.Timestamp): ActivityStatisticData;
+  hasDatetime(): boolean;
+  clearDatetime(): ActivityStatisticData;
+
+  getTotalDistance(): number;
+  setTotalDistance(value: number): ActivityStatisticData;
+
+  getTotalDuration(): number;
+  setTotalDuration(value: number): ActivityStatisticData;
+
+  getNumberOfActivities(): number;
+  setNumberOfActivities(value: number): ActivityStatisticData;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ActivityStatisticData.AsObject;
+  static toObject(includeInstance: boolean, msg: ActivityStatisticData): ActivityStatisticData.AsObject;
+  static serializeBinaryToWriter(message: ActivityStatisticData, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ActivityStatisticData;
+  static deserializeBinaryFromReader(message: ActivityStatisticData, reader: jspb.BinaryReader): ActivityStatisticData;
+}
+
+export namespace ActivityStatisticData {
+  export type AsObject = {
+    datetime?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    totalDistance: number,
+    totalDuration: number,
+    numberOfActivities: number,
+  }
+}
+
 export enum ActivityType { 
   ACTIVITY_TYPE_UNSPECIFIED = 0,
   ACTIVITY_TYPE_RUNNING = 1,
