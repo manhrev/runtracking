@@ -2,10 +2,12 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
 	v8 "github.com/go-redis/redis/v8"
+	"github.com/manhrev/runtracking/backend/auth/config"
 	"github.com/manhrev/runtracking/backend/auth/internal/cache/token"
 	u "github.com/manhrev/runtracking/backend/auth/internal/cache/user"
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent"
@@ -18,19 +20,18 @@ type Cache struct {
 	user        u.User
 }
 
-func New(ent *ent.Client) (*Cache, error) {
+func New(ent *ent.Client, config *config.Configuration) (*Cache, error) {
 	var (
 		r   *v8.Client
 		ttl = _defaultTTL
 	)
 
+	conf := config.Cache
 	r = v8.NewClient(&v8.Options{
-		Addr:     "redis:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     fmt.Sprintf("%s:%s", conf.Host, conf.Port),
+		Password: conf.Password, // no password set
+		DB:       conf.Db,       // use default DB
 	})
-
-	r.Set(context.Background(), "started", "123", 800000)
 
 	log.Printf("Redis was created : %v", r)
 
