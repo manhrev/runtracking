@@ -37,7 +37,7 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    restart: always
+    # restart: always
 
   group:
     build:
