@@ -8,6 +8,7 @@ import (
 
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/manhrev/runtracking/backend/auth/config"
 	"github.com/manhrev/runtracking/backend/auth/internal/cache"
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signin"
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signup"
@@ -22,14 +23,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	db_user_name string = "root"
-	db_password  string = "password@1"
-	db_domain    string = "auth_db"
-	db_port      string = "3306"
-	db_name      string = "auth"
-)
-
 func Run() {
 	server := newServer()
 	Serve(server)
@@ -41,8 +34,13 @@ func newServer() *grpc.Server {
 }
 
 func Serve(server *grpc.Server) {
+	configuration, err := config.NewConfig()
+	if err != nil {
+		log.Fatalf("cannot read values from yml config file: %v", err)
+	}
 	// init other services client connections, database driver and pass to server
-	entClient, err := ent.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", db_user_name, db_password, db_domain, db_port, db_name))
+	db := configuration.Database
+	entClient, err := ent.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", db.Username, db.Password, db.Domain, db.Port, db.Name))
 	if err != nil {
 		log.Fatalf("cannot create database connection: %v", err)
 	}
@@ -72,7 +70,7 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("cannot create featureSignUp: %v", err)
 	}
 
-	cacheService, err := cache.New(entClient)
+	cacheService, err := cache.New(entClient, configuration)
 
 	if err != nil {
 		log.Fatalf("cannot create cacheService: %v", err)
@@ -92,7 +90,8 @@ func Serve(server *grpc.Server) {
 	// Register User Server
 	pb.RegisterUserServer(server, user.NewServer(entClient, extractorService))
 
-	lis, err := net.Listen("tcp", "0.0.0.0:8080")
+	grpc := configuration.Grpc
+	lis, err := net.Listen(grpc.Network, fmt.Sprintf("%s:%s", grpc.Host, grpc.Port))
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)
 	}
