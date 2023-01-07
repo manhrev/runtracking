@@ -25,7 +25,8 @@ const slice = createSlice({
     builder.addCase(
       getActivityStatisticThunk.fulfilled,
       (state, { payload }) => {
-        const { response } = payload;
+        const { response, error } = payload;
+        if (error) return;
         state.status = StatusEnum.SUCCEEDED;
         state.activityStatisticList = response?.dataList || [];
       }

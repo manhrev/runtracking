@@ -12,6 +12,7 @@ import {
 } from "../redux/features/toggle/slice";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootBaseStackParamList } from "../navigators/BaseStack";
+import { logoutThunk } from "../redux/features/user/thunk";
 
 export default function ExampleScreen({
   navigation,
@@ -23,8 +24,8 @@ export default function ExampleScreen({
   const { data } = useAppSelector(selectCommonSlice);
   const { isNightMode } = useAppSelector(selectToggleSlice);
 
-  const login = async () => {
-    const res = await authClient.login("manhagent", "manhagent");
+  const logout = async () => {
+    dispatch(logoutThunk());
   };
 
   const handleCommon = () => {
@@ -56,8 +57,8 @@ export default function ExampleScreen({
       )}
 
       <Text>ExampleScreen</Text>
-      <Button mode="contained" onPress={login}>
-        Send login req to localhost:8080
+      <Button mode="contained" onPress={logout}>
+        Logout
       </Button>
       <Text>Current redux comment value: {data}</Text>
 

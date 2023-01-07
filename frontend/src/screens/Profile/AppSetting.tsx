@@ -1,6 +1,8 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
+import { logoutThunk } from "../../redux/features/user/thunk";
+import { useAppDispatch } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
 import SettingItem from "./comp/SettingItem";
 
@@ -9,6 +11,10 @@ export default function AppSetting({
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, "AppSetting">) {
   const theme = useAppTheme();
+  const dispatch = useAppDispatch();
+  const handleLogout = async () => {
+    dispatch(logoutThunk());
+  };
   return (
     <View style={styles(theme).container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -53,7 +59,7 @@ export default function AppSetting({
             left="Log Out"
             topDivider
             color={theme.colors.error}
-            onPress={() => {}}
+            onPress={handleLogout}
           />
         </View>
       </ScrollView>

@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
@@ -9,7 +10,10 @@ import {
   TextInput,
 } from "react-native-paper";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
+
+import { useAppDispatch } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
+import { authClient, KEY_ACCESS_TOKEN } from "../../utils/grpc";
 import { baseStyles } from "../baseStyle";
 
 export default function Signup({
@@ -18,10 +22,40 @@ export default function Signup({
 }: NativeStackScreenProps<RootBaseStackParamList, "Signup">) {
   const theme = useAppTheme();
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [checked, setChecked] = useState(false);
+  const handleContinue = async () => {
+    if (
+      displayName == "" ||
+      password == "" ||
+      confirmPassword == "" ||
+      displayName == ""
+    ) {
+      alert("Please input");
+      return;
+    }
+
+    if (password != confirmPassword) {
+      alert("Password confirm mismatch!");
+      return;
+    }
+
+    const { error, response } = await authClient.signUp({
+      displayName: displayName,
+      password: password,
+      userName: username,
+    });
+
+    if (error) {
+      alert("An error occurred, please try again");
+    } else {
+      const token = response?.tokenInfo?.accessToken || "";
+      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token);
+      navigation.navigate("GetInfo");
+    }
+  };
   return (
     <>
       <View style={baseStyles(theme).homeContainer}>
@@ -69,9 +103,9 @@ export default function Signup({
             />
             <TextInput
               mode="outlined"
-              label="Email"
-              value={email}
-              onChangeText={(text) => setEmail(text)}
+              label="Display name"
+              value={displayName}
+              onChangeText={(text) => setDisplayName(text)}
               selectionColor={theme.colors.backdrop}
               style={styles(theme).inputStyle}
             />
@@ -111,9 +145,7 @@ export default function Signup({
           </View>
           <Button
             mode="elevated"
-            onPress={() => {
-              navigation.navigate("GetInfo");
-            }}
+            onPress={handleContinue}
             style={{ marginTop: 30, borderRadius: 50 }}
             contentStyle={{ paddingVertical: 5, borderRadius: 100 }}
           >

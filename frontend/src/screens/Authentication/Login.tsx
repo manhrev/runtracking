@@ -1,11 +1,11 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { Button, IconButton, Text, TextInput } from "react-native-paper";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
+import { loginThunk } from "../../redux/features/user/thunk";
+import { useAppDispatch } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
-import { authClient, KEY_ACCESS_TOKEN } from "../../utils/grpc";
 import { baseStyles } from "../baseStyle";
 
 export default function Login({
@@ -13,18 +13,19 @@ export default function Login({
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, "Login">) {
   const theme = useAppTheme();
+  const dispatch = useAppDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const handleLogin = async () => {
-    const res = await authClient.login(username, password);
-    if (!res.error) {
-      alert("login success");
-      const token = res.response?.accessToken || "";
-      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token);
+    const { error } = await dispatch(
+      loginThunk({
+        password,
+        userName: username,
+      })
+    ).unwrap();
 
-      navigation.goBack();
-    } else {
-      alert("dcm sai roi");
+    if (error) {
+      alert("Cannot login, please try again");
     }
   };
   return (
@@ -78,7 +79,7 @@ export default function Login({
           />
           <TextInput
             mode="outlined"
-            label="Email"
+            label="Password"
             value={password}
             onChangeText={(text) => setPassword(text)}
             selectionColor={theme.colors.backdrop}

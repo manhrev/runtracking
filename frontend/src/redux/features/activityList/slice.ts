@@ -28,7 +28,8 @@ const slice = createSlice({
       state.status = StatusEnum.LOADING;
     });
     builder.addCase(listActivityInfoThunk.fulfilled, (state, { payload }) => {
-      const { response } = payload;
+      const { response, error } = payload;
+      if (error) return;
       state.status = StatusEnum.SUCCEEDED;
       state.activityList = response?.activityListList || [];
       state.total = response?.total || 0;

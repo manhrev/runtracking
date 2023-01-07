@@ -19,7 +19,7 @@ const Tab = createMaterialBottomTabNavigator<RootHomeTabsParamList>();
 export default function HomeTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="ActivityHome"
+      initialRouteName="RunHome"
       backBehavior="initialRoute"
       shifting
     >

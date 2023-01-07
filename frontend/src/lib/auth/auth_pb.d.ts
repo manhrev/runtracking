@@ -3,6 +3,32 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 
 
+export class HealthRecordRequest extends jspb.Message {
+  getAge(): number;
+  setAge(value: number): HealthRecordRequest;
+
+  getHeight(): number;
+  setHeight(value: number): HealthRecordRequest;
+
+  getWeight(): number;
+  setWeight(value: number): HealthRecordRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): HealthRecordRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: HealthRecordRequest): HealthRecordRequest.AsObject;
+  static serializeBinaryToWriter(message: HealthRecordRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): HealthRecordRequest;
+  static deserializeBinaryFromReader(message: HealthRecordRequest, reader: jspb.BinaryReader): HealthRecordRequest;
+}
+
+export namespace HealthRecordRequest {
+  export type AsObject = {
+    age: number,
+    height: number,
+    weight: number,
+  }
+}
+
 export class LoginRequest extends jspb.Message {
   getUserName(): string;
   setUserName(value: string): LoginRequest;
@@ -58,6 +84,9 @@ export class SignUpRequest extends jspb.Message {
   getPassword(): string;
   setPassword(value: string): SignUpRequest;
 
+  getDisplayName(): string;
+  setDisplayName(value: string): SignUpRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SignUpRequest.AsObject;
   static toObject(includeInstance: boolean, msg: SignUpRequest): SignUpRequest.AsObject;
@@ -70,6 +99,7 @@ export namespace SignUpRequest {
   export type AsObject = {
     userName: string,
     password: string,
+    displayName: string,
   }
 }
 
@@ -120,6 +150,72 @@ export namespace TokenInfo {
     userName: string,
     idToken: string,
     accessToken: string,
+  }
+}
+
+export class MeReply extends jspb.Message {
+  getUser(): UserInfo | undefined;
+  setUser(value?: UserInfo): MeReply;
+  hasUser(): boolean;
+  clearUser(): MeReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): MeReply.AsObject;
+  static toObject(includeInstance: boolean, msg: MeReply): MeReply.AsObject;
+  static serializeBinaryToWriter(message: MeReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): MeReply;
+  static deserializeBinaryFromReader(message: MeReply, reader: jspb.BinaryReader): MeReply;
+}
+
+export namespace MeReply {
+  export type AsObject = {
+    user?: UserInfo.AsObject,
+  }
+}
+
+export class UserInfo extends jspb.Message {
+  getUserId(): number;
+  setUserId(value: number): UserInfo;
+
+  getDisplayName(): string;
+  setDisplayName(value: string): UserInfo;
+
+  getUsername(): string;
+  setUsername(value: string): UserInfo;
+
+  getEmail(): string;
+  setEmail(value: string): UserInfo;
+
+  getPhoneNumber(): string;
+  setPhoneNumber(value: string): UserInfo;
+
+  getHeight(): number;
+  setHeight(value: number): UserInfo;
+
+  getWeight(): number;
+  setWeight(value: number): UserInfo;
+
+  getAge(): number;
+  setAge(value: number): UserInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: UserInfo): UserInfo.AsObject;
+  static serializeBinaryToWriter(message: UserInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserInfo;
+  static deserializeBinaryFromReader(message: UserInfo, reader: jspb.BinaryReader): UserInfo;
+}
+
+export namespace UserInfo {
+  export type AsObject = {
+    userId: number,
+    displayName: string,
+    username: string,
+    email: string,
+    phoneNumber: string,
+    height: number,
+    weight: number,
+    age: number,
   }
 }
 

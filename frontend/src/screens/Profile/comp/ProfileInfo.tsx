@@ -1,10 +1,14 @@
 import { StyleSheet, View } from "react-native";
 import { Divider, Text } from "react-native-paper";
+import { selectUserSlice } from "../../../redux/features/user/slice";
+import { useAppSelector } from "../../../redux/store";
 import { AppTheme, useAppTheme } from "../../../theme";
 import { baseStyles } from "../../baseStyle";
 
 export default function ProfileInfo() {
   const theme = useAppTheme();
+  const { email, height, phoneNumber, username, weight } =
+    useAppSelector(selectUserSlice);
   return (
     <View style={styles(theme).extendedBaseContainer}>
       <View style={baseStyles(theme).innerWrapper}>
@@ -16,7 +20,7 @@ export default function ProfileInfo() {
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text variant="titleMedium">Tuannguyen</Text>
+              <Text variant="titleMedium">{username}</Text>
             </View>
           </View>
           <View style={styles(theme).infoValueListItem}>
@@ -26,7 +30,7 @@ export default function ProfileInfo() {
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text variant="titleMedium">tuannguyen@gmail.com</Text>
+              <Text variant="titleMedium">{email}</Text>
             </View>
           </View>
           <View style={styles(theme).infoValueListItem}>
@@ -36,7 +40,7 @@ export default function ProfileInfo() {
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text variant="titleMedium">1231235435</Text>
+              <Text variant="titleMedium">{phoneNumber}</Text>
             </View>
           </View>
           <View style={styles(theme).infoValueListItem}>
@@ -46,7 +50,7 @@ export default function ProfileInfo() {
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text variant="titleMedium">10 groups</Text>
+              <Text variant="titleMedium">2 groups</Text>
             </View>
           </View>
           <Divider style={{ marginVertical: 10 }} />
@@ -57,7 +61,7 @@ export default function ProfileInfo() {
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text variant="titleMedium">69 kg</Text>
+              <Text variant="titleMedium">{weight}</Text>
             </View>
           </View>
           <View style={styles(theme).infoValueListItem}>
@@ -67,7 +71,7 @@ export default function ProfileInfo() {
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text variant="titleMedium">172 cm</Text>
+              <Text variant="titleMedium">{height}</Text>
             </View>
           </View>
         </View>

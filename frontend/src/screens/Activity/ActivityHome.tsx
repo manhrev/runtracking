@@ -19,6 +19,7 @@ import {
 } from "../../redux/features/activityList/slice";
 import { useSelector } from "react-redux";
 import StatisticSection from "./comp/StatisticSection";
+import { getMeThunk } from "../../redux/features/user/thunk";
 
 const windowWidth = Dimensions.get("window").width;
 

@@ -1,6 +1,8 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StyleSheet, View } from "react-native";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
+import { selectUserSlice } from "../../redux/features/user/slice";
+import { useAppSelector } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
 import SettingItem from "./comp/SettingItem";
 
@@ -9,35 +11,37 @@ export default function ProfileSetting({
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, "ProfileSetting">) {
   const theme = useAppTheme();
+  const { displayName, email, height, phoneNumber, username, weight } =
+    useAppSelector(selectUserSlice);
   return (
     <View style={styles(theme).container}>
       <View style={styles(theme).settingGroup}>
         <SettingItem
           left="Fullname"
-          right="Tuan nguyen"
+          right={displayName}
           topDivider
           onPress={() => {}}
         />
-        <SettingItem left="Username" right="tuancutoa" onPress={() => {}} />
+        <SettingItem left="Username" right={username} onPress={() => {}} />
         <SettingItem
           left="Phone number"
-          right="0123654789"
+          right={phoneNumber}
           onPress={() => {}}
         />
-        <SettingItem
-          left="Email"
-          right="tuanguyen@gmail.com"
-          onPress={() => {}}
-        />
+        <SettingItem left="Email" right={email} onPress={() => {}} />
       </View>
       <View style={styles(theme).settingGroup}>
         <SettingItem
           left="Height"
-          right="173 cm"
+          right={height.toString() + " cm"}
           topDivider={true}
           onPress={() => {}}
         />
-        <SettingItem left="Weight" right="69 kg" onPress={() => {}} />
+        <SettingItem
+          left="Weight"
+          right={weight.toString() + " kg"}
+          onPress={() => {}}
+        />
       </View>
     </View>
   );
