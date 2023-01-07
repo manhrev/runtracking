@@ -10,6 +10,7 @@ import {
 } from "react-native-paper";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
 import { AppTheme, useAppTheme } from "../../theme";
+import { authClient } from "../../utils/grpc";
 import { baseStyles } from "../baseStyle";
 
 export default function GetInfo({
@@ -17,10 +18,29 @@ export default function GetInfo({
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, "GetInfo">) {
   const theme = useAppTheme();
-  const [displayName, setDisplayName] = useState("");
   const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
+
+  const handleContinue = async () => {
+    if (age == "" || height == "" || weight == "") {
+      alert("Please input");
+      return;
+    }
+
+    const { error } = await authClient.updateHealthInfo({
+      age: parseInt(age),
+      height: parseInt(height),
+      weight: parseInt(weight),
+    });
+
+    if (error) {
+      alert("An error occurred, please try again");
+    } else {
+      navigation.navigate("Login");
+    }
+  };
+
   return (
     <>
       <View style={baseStyles(theme).homeContainer}>
@@ -64,14 +84,6 @@ export default function GetInfo({
           <View style={{ marginTop: 20 }}>
             <TextInput
               mode="outlined"
-              label="Display name"
-              value={displayName}
-              onChangeText={(text) => setDisplayName(text)}
-              selectionColor={theme.colors.backdrop}
-              style={styles(theme).inputStyle}
-            />
-            <TextInput
-              mode="outlined"
               label="Age"
               value={age}
               onChangeText={(text) => setAge(text)}
@@ -80,7 +92,7 @@ export default function GetInfo({
             />
             <TextInput
               mode="outlined"
-              label="Height"
+              label="Height (cm)"
               value={height}
               onChangeText={(text) => setHeight(text)}
               selectionColor={theme.colors.backdrop}
@@ -88,7 +100,7 @@ export default function GetInfo({
             />
             <TextInput
               mode="outlined"
-              label="Weight"
+              label="Weight (kg)"
               value={weight}
               onChangeText={(text) => setWeight(text)}
               selectionColor={theme.colors.backdrop}
@@ -97,7 +109,7 @@ export default function GetInfo({
           </View>
           <Button
             mode="contained"
-            onPress={() => {}}
+            onPress={handleContinue}
             style={{ marginTop: 30, borderRadius: 50 }}
             contentStyle={{ paddingVertical: 5, borderRadius: 100 }}
           >

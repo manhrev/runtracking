@@ -4,10 +4,13 @@ import {
   LoginReply,
   SignUpRequest,
   SignUpReply,
+  MeReply,
+  HealthRecordRequest,
 } from "../../../lib/auth/auth_pb";
 
 import { GRPCClientConfig } from "../abstract/types";
 import gRPCClientAbstract from "../abstract/gRPCClient";
+import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 
 class rpcAuthClient extends gRPCClientAbstract {
   constructor(config: GRPCClientConfig) {
@@ -15,18 +18,38 @@ class rpcAuthClient extends gRPCClientAbstract {
     super(AuthClient, config);
   }
 
-  async signUp(username: string, password: string) {
+  async signUp(param: SignUpRequest.AsObject) {
     const req = new SignUpRequest();
-    req.setUserName(username);
-    req.setPassword(password);
+    req.setUserName(param.userName);
+    req.setPassword(param.password);
+    req.setDisplayName(param.displayName);
+
     return await this.gRPCClientRequest<SignUpReply.AsObject>("signUp", req);
   }
 
-  async login(username: string, password: string) {
+  async logIn(param: LoginRequest.AsObject) {
     const req = new LoginRequest();
-    req.setUserName(username);
-    req.setPassword(password);
+    req.setUserName(param.userName);
+    req.setPassword(param.password);
     return await this.gRPCClientRequest<LoginReply.AsObject>("login", req);
+  }
+
+  async logOut() {
+    const req = new Empty();
+    return await this.gRPCClientRequest<Empty.AsObject>("logOut", req);
+  }
+
+  async getMe() {
+    const req = new Empty();
+    return await this.gRPCClientRequest<MeReply.AsObject>("me", req);
+  }
+
+  async updateHealthInfo(param: HealthRecordRequest.AsObject) {
+    const req = new HealthRecordRequest();
+    req.setAge(param.age);
+    req.setHeight(param.height);
+    req.setWeight(param.weight);
+    return await this.gRPCClientRequest<Empty.AsObject>("setHealthRecord", req);
   }
 }
 

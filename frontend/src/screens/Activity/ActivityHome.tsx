@@ -18,6 +18,8 @@ import {
   selectActivityList,
 } from "../../redux/features/activityList/slice";
 import { useSelector } from "react-redux";
+import StatisticSection from "./comp/StatisticSection";
+import { getMeThunk } from "../../redux/features/user/thunk";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -53,110 +55,7 @@ export default function Activity({
       <View style={baseStyles(theme).homeContainer}>
         <View style={baseStyles(theme).innerWrapper}>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={styles(theme).analyticContainer}>
-              <Text
-                variant="headlineSmall"
-                style={{ fontWeight: "bold", textAlignVertical: "center" }}
-              >
-                General statistics
-              </Text>
-              <SegmentedButtons
-                style={{ marginTop: 10, alignSelf: "center" }}
-                value={filterByValue}
-                onValueChange={setFilterByValue}
-                density="medium"
-                buttons={[
-                  {
-                    value: "week",
-                    label: "Week",
-                  },
-                  {
-                    value: "month",
-                    label: "Month",
-                  },
-                  {
-                    value: "year",
-                    label: "Year",
-                  },
-                  { value: "all", label: "All" },
-                ]}
-              />
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  variant="bodyLarge"
-                  style={{
-                    fontWeight: "bold",
-                    textAlignVertical: "center",
-                    color: theme.colors.secondary,
-                  }}
-                >
-                  Activity type: Running
-                </Text>
-                <IconButton
-                  icon="cog"
-                  iconColor={theme.colors.primary}
-                  size={18}
-                  onPress={() => console.log("Pressed")}
-                />
-              </View>
-              <View style={styles(theme).generalInfoContainter}>
-                <View style={{ justifyContent: "center" }}>
-                  <Text variant="displayMedium">32 km</Text>
-                  <Text
-                    variant="bodyMedium"
-                    style={{ marginTop: -5, alignSelf: "center" }}
-                  >
-                    Total distance
-                  </Text>
-                </View>
-                <View style={{ alignItems: "flex-end" }}>
-                  <Text variant="bodyLarge">4</Text>
-                  <Text variant="bodyLarge">12'33''</Text>
-                  <Text variant="bodyLarge">2:33</Text>
-                </View>
-                <View>
-                  <Text variant="bodyLarge">Runs</Text>
-                  <Text variant="bodyLarge">Avg. pace</Text>
-                  <Text variant="bodyLarge">Hours</Text>
-                </View>
-              </View>
-
-              <BarChart
-                yAxisSuffix=""
-                data={{
-                  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-                  datasets: [
-                    {
-                      data: [20, 45, 28, 80, 99, 43],
-                    },
-                  ],
-                }}
-                width={windowWidth - 20}
-                height={200}
-                yAxisLabel={""}
-                chartConfig={{
-                  backgroundColor: theme.colors.elevation.level4,
-                  backgroundGradientFrom: theme.colors.secondaryContainer,
-                  backgroundGradientTo: theme.colors.tertiaryContainer,
-                  decimalPlaces: 2,
-                  color: () => theme.colors.primary,
-                  style: {
-                    borderRadius: 16,
-                  },
-                }}
-                style={{
-                  borderRadius: 16,
-                  alignSelf: "center",
-                }}
-              />
-            </View>
-
+            <StatisticSection />
             <View style={styles(theme).recentActivityContainer}>
               <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
                 Recent activities
@@ -213,18 +112,6 @@ export default function Activity({
 
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
-    analyticContainer: {
-      paddingTop: 20,
-    },
-    generalInfoContainter: {
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-around",
-      backgroundColor: theme.colors.elevation.level1,
-      marginBottom: 14,
-      borderRadius: 40,
-      paddingVertical: 10,
-    },
     recentActivityContainer: {
       paddingVertical: 20,
     },

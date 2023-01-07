@@ -44,6 +44,7 @@ func (s auth) SignUp(ctx context.Context, request *pb.SignUpRequest) (*pb.SignUp
 	newUser, err = s.ent.User.Create().
 		SetUsername(username).
 		SetPassword(pwd).
+		SetDisplayName(request.DisplayName).
 		Save(ctx)
 
 	if err != nil {

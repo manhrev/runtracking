@@ -1,8 +1,11 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, View, StatusBar, ScrollView } from "react-native";
 import { Avatar, Button, Divider, IconButton, Text } from "react-native-paper";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
+import { selectUserSlice } from "../../redux/features/user/slice";
+import { getMeThunk } from "../../redux/features/user/thunk";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 import ProfileAchievement from "./comp/ProfileAchievement";
@@ -13,6 +16,8 @@ export default function ProfileHome({
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, "ProfileHome">) {
   const theme = useAppTheme();
+  const dispatch = useAppDispatch();
+  const { displayName } = useAppSelector(selectUserSlice);
   const [isInfoSelected, setIsInfoSelected] = useState(true);
   const handleEditYourProfile = () => {
     navigation.navigate("ProfileSetting");
@@ -23,6 +28,9 @@ export default function ProfileHome({
   const handleViewNofification = () => {
     navigation.navigate("NotificationList");
   };
+  useEffect(() => {
+    dispatch(getMeThunk());
+  }, []);
   return (
     <>
       <ScrollView
@@ -32,7 +40,7 @@ export default function ProfileHome({
         <View style={styles(theme).profileBackgroundContainer}>
           <Avatar.Text
             size={170}
-            label="DT"
+            label={displayName[0]}
             style={styles(theme).profilePicture}
           />
           <View style={styles(theme).profilePictureBack}></View>
@@ -43,7 +51,7 @@ export default function ProfileHome({
               variant="headlineMedium"
               style={{ fontWeight: "bold", marginBottom: 15 }}
             >
-              Duy Tuan
+              {displayName}
             </Text>
             <View style={{ display: "flex", flexDirection: "row" }}>
               <View style={{ justifyContent: "center", flex: 1 }}>

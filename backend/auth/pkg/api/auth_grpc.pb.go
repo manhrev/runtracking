@@ -27,6 +27,7 @@ type AuthClient interface {
 	SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpReply, error)
 	LogOut(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MeReply, error)
+	SetHealthRecord(ctx context.Context, in *HealthRecordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type authClient struct {
@@ -73,6 +74,15 @@ func (c *authClient) Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.Cal
 	return out, nil
 }
 
+func (c *authClient) SetHealthRecord(ctx context.Context, in *HealthRecordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/auth.Auth/SetHealthRecord", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -81,6 +91,7 @@ type AuthServer interface {
 	SignUp(context.Context, *SignUpRequest) (*SignUpReply, error)
 	LogOut(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	Me(context.Context, *emptypb.Empty) (*MeReply, error)
+	SetHealthRecord(context.Context, *HealthRecordRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -99,6 +110,9 @@ func (UnimplementedAuthServer) LogOut(context.Context, *emptypb.Empty) (*emptypb
 }
 func (UnimplementedAuthServer) Me(context.Context, *emptypb.Empty) (*MeReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Me not implemented")
+}
+func (UnimplementedAuthServer) SetHealthRecord(context.Context, *HealthRecordRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetHealthRecord not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -185,6 +199,24 @@ func _Auth_Me_Handler(srv interface{}, ctx context.Context, dec func(interface{}
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_SetHealthRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthRecordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).SetHealthRecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/SetHealthRecord",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).SetHealthRecord(ctx, req.(*HealthRecordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -207,6 +239,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Me",
 			Handler:    _Auth_Me_Handler,
+		},
+		{
+			MethodName: "SetHealthRecord",
+			Handler:    _Auth_SetHealthRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

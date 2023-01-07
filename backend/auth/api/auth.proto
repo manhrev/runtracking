@@ -10,14 +10,16 @@ service Auth {
     rpc SignUp(SignUpRequest) returns (SignUpReply);
     rpc LogOut(google.protobuf.Empty) returns (google.protobuf.Empty) {};
     rpc Me(google.protobuf.Empty) returns (MeReply) {};
+    rpc SetHealthRecord(HealthRecordRequest) returns (google.protobuf.Empty) {};
 }
 
-service User{
+service User {
     rpc SetHealthRecord(HealthRecordRequest) returns (google.protobuf.Empty) {};
     rpc Me(google.protobuf.Empty) returns (MeReply) {};
 }
 
 message HealthRecordRequest{
+    int32 age = 3;
     float height = 1;
     float weight = 2;
 }
@@ -36,6 +38,7 @@ message LoginReply {
 message SignUpRequest {
     string user_name = 1;
     string password = 2;
+    string display_name = 3;
 }
 
 message SignUpReply {
@@ -55,9 +58,11 @@ message MeReply{
 
 message UserInfo{
     int64 user_id = 1;
+    string display_name = 7;
     string username = 2;
     string email = 3;
     string phone_number = 4;
     float height = 5;
     float weight = 6;
+    int32 age = 8;
 }

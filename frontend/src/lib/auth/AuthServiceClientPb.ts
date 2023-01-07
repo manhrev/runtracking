@@ -165,5 +165,198 @@ export class AuthClient {
     this.methodDescriptorLogOut);
   }
 
+  methodDescriptorMe = new grpcWeb.MethodDescriptor(
+    '/auth.Auth/Me',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_empty_pb.Empty,
+    auth_pb.MeReply,
+    (request: google_protobuf_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    auth_pb.MeReply.deserializeBinary
+  );
+
+  me(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<auth_pb.MeReply>;
+
+  me(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: auth_pb.MeReply) => void): grpcWeb.ClientReadableStream<auth_pb.MeReply>;
+
+  me(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: auth_pb.MeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.Auth/Me',
+        request,
+        metadata || {},
+        this.methodDescriptorMe,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.Auth/Me',
+    request,
+    metadata || {},
+    this.methodDescriptorMe);
+  }
+
+  methodDescriptorSetHealthRecord = new grpcWeb.MethodDescriptor(
+    '/auth.Auth/SetHealthRecord',
+    grpcWeb.MethodType.UNARY,
+    auth_pb.HealthRecordRequest,
+    google_protobuf_empty_pb.Empty,
+    (request: auth_pb.HealthRecordRequest) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_empty_pb.Empty.deserializeBinary
+  );
+
+  setHealthRecord(
+    request: auth_pb.HealthRecordRequest,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+
+  setHealthRecord(
+    request: auth_pb.HealthRecordRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  setHealthRecord(
+    request: auth_pb.HealthRecordRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.Auth/SetHealthRecord',
+        request,
+        metadata || {},
+        this.methodDescriptorSetHealthRecord,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.Auth/SetHealthRecord',
+    request,
+    metadata || {},
+    this.methodDescriptorSetHealthRecord);
+  }
+
+}
+
+export class UserClient {
+  client_: grpcWeb.AbstractClientBase;
+  hostname_: string;
+  credentials_: null | { [index: string]: string; };
+  options_: null | { [index: string]: any; };
+
+  constructor (hostname: string,
+               credentials?: null | { [index: string]: string; },
+               options?: null | { [index: string]: any; }) {
+    if (!options) options = {};
+    if (!credentials) credentials = {};
+    options['format'] = 'text';
+
+    this.client_ = new grpcWeb.GrpcWebClientBase(options);
+    this.hostname_ = hostname;
+    this.credentials_ = credentials;
+    this.options_ = options;
+  }
+
+  methodDescriptorSetHealthRecord = new grpcWeb.MethodDescriptor(
+    '/auth.User/SetHealthRecord',
+    grpcWeb.MethodType.UNARY,
+    auth_pb.HealthRecordRequest,
+    google_protobuf_empty_pb.Empty,
+    (request: auth_pb.HealthRecordRequest) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_empty_pb.Empty.deserializeBinary
+  );
+
+  setHealthRecord(
+    request: auth_pb.HealthRecordRequest,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+
+  setHealthRecord(
+    request: auth_pb.HealthRecordRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  setHealthRecord(
+    request: auth_pb.HealthRecordRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.User/SetHealthRecord',
+        request,
+        metadata || {},
+        this.methodDescriptorSetHealthRecord,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.User/SetHealthRecord',
+    request,
+    metadata || {},
+    this.methodDescriptorSetHealthRecord);
+  }
+
+  methodDescriptorMe = new grpcWeb.MethodDescriptor(
+    '/auth.User/Me',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_empty_pb.Empty,
+    auth_pb.MeReply,
+    (request: google_protobuf_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    auth_pb.MeReply.deserializeBinary
+  );
+
+  me(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<auth_pb.MeReply>;
+
+  me(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: auth_pb.MeReply) => void): grpcWeb.ClientReadableStream<auth_pb.MeReply>;
+
+  me(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: auth_pb.MeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.User/Me',
+        request,
+        metadata || {},
+        this.methodDescriptorMe,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.User/Me',
+    request,
+    metadata || {},
+    this.methodDescriptorMe);
+  }
+
 }
 

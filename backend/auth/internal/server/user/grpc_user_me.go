@@ -31,6 +31,8 @@ func (s *userServer) Me(ctx context.Context, _ *emptypb.Empty) (*auth.MeReply, e
 			PhoneNumber: user.Phone,
 			Height:      user.Height,
 			Weight:      user.Weight,
+			DisplayName: user.DisplayName,
+			Age:         int32(user.Height),
 		},
 	}, nil
 

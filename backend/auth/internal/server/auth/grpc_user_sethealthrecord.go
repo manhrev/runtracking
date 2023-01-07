@@ -1,4 +1,4 @@
-package user
+package auth
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *userServer) SetHealthRecord(ctx context.Context, request *auth.HealthRecordRequest) (*emptypb.Empty, error) {
+func (s *authServer) SetHealthRecord(ctx context.Context, request *auth.HealthRecordRequest) (*emptypb.Empty, error) {
 	userID, err := s.extractor.GetUserID(ctx)
 	if err != nil {
 		return nil, status.Unauthenticated
