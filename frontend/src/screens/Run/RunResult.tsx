@@ -13,6 +13,11 @@ import {
   TrackPoint,
 } from "../../lib/activity/activity_pb";
 import { activityClient } from "../../utils/grpc";
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -44,6 +49,7 @@ export default function RunResult({
     activityClient.createActivityInfo(activityInfo).then((res) => {
       if(!res.error){
         alert("Activity saved successfully!");
+        route.params.resetRunInfo();
         navigation.goBack();
       }
       else alert("Failed!");

@@ -55,6 +55,8 @@ export type RootBaseStackParamList = {
       startTime: google_protobuf_timestamp_pb.Timestamp.AsObject;
       endTime: google_protobuf_timestamp_pb.Timestamp.AsObject;
     };
+    // pass function to reset
+    resetRunInfo: () => void;
   };
 
   // Profile

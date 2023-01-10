@@ -202,15 +202,18 @@ export default function Run({
       });
     } else if (userState == "running") {
       setUserState("paused");
-      // set last coordinate as stop point
-      let lastCoordinate: TrackPoint.AsObject = {
-        latitude: coordinates[coordinates.length - 1].latitude,
-        longtitude: coordinates[coordinates.length - 1].longtitude,
-        isStopPoint: true,
-        altitude: 0,
-        createdAt: coordinates[coordinates.length - 1].createdAt,
-      };
-      setCoordinates([...coordinates, lastCoordinate]);
+
+      if(coordinates.length > 0) {
+        // set last coordinate as stop point
+        let lastCoordinate: TrackPoint.AsObject = {
+          latitude: coordinates[coordinates.length - 1].latitude,
+          longtitude: coordinates[coordinates.length - 1].longtitude,
+          isStopPoint: true,
+          altitude: 0,
+          createdAt: coordinates[coordinates.length - 1].createdAt,
+        };
+        setCoordinates([...coordinates, lastCoordinate]);
+      }
     } else if (userState == "paused") {
       setUserState("running");
     }
@@ -227,11 +230,11 @@ export default function Run({
         distance: formatForDisplay("distance-km", totalDistance),
         time: formatForDisplay("time", totalTime),
         pace: formatForDisplay("pace", pace),
-        kcal: "525",
+        kcal: "0",
       },
       savingInfo: {
         duration: totalTime,
-        kcal: 525,
+        kcal: 0,
         totalDistance: totalDistance,
         routeList: coordinates,
         startTime: {
@@ -243,6 +246,7 @@ export default function Run({
           nanos: timeNow.getNanos(),
         },
       },
+      resetRunInfo: resetRunInfo,
     });
   };
 
@@ -281,6 +285,8 @@ export default function Run({
     } else if (type == "distance-km") {
       return (value / 1000).toFixed(2);
     } else if (type == "pace") {
+      if(value == 0) return "00:00";
+
       const paceMin =
         Math.floor(value / 60) < 10
           ? "0" + Math.floor(value / 60)
@@ -331,7 +337,7 @@ export default function Run({
         displayTime={formatForDisplay("time", totalTime)}
         displayDistance={formatForDisplay("distance", totalDistance)}
         displayPace={formatForDisplay("pace", pace)}
-        displayKcal={525}
+        displayKcal={0}
       />
       <Divider style={{ height: 1 }} />
       <MapView
