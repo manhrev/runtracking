@@ -5,6 +5,7 @@ import Activity from "../screens/Activity/ActivityHome";
 import ProfileHome from "../screens/Profile/ProfileHome";
 import RunHome from "../screens/Run/RunHome";
 import { RootBaseStackParamList } from "./BaseStack";
+import ComingSoon from "../screens/ComingSoon";
 
 export type RootHomeTabsParamList = {
   ActivityHome: undefined;
@@ -25,7 +26,7 @@ export default function HomeTabs() {
     >
       <Tab.Screen
         name="GroupHome"
-        component={ExampleScreen}
+        component={ComingSoon}
         options={{ tabBarIcon: "account-group" }}
       />
       <Tab.Screen
@@ -40,7 +41,7 @@ export default function HomeTabs() {
       />
       <Tab.Screen
         name="PlanHome"
-        component={ExampleScreen}
+        component={ComingSoon}
         options={{ tabBarIcon: "file-document-edit" }}
       />
       <Tab.Screen

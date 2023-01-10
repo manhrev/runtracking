@@ -1,8 +1,12 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
+import {
+  selectToggleSlice,
+  switchNightMode,
+} from "../../redux/features/toggle/slice";
 import { logoutThunk } from "../../redux/features/user/thunk";
-import { useAppDispatch } from "../../redux/store";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
 import SettingItem from "./comp/SettingItem";
 
@@ -14,6 +18,12 @@ export default function AppSetting({
   const dispatch = useAppDispatch();
   const handleLogout = async () => {
     dispatch(logoutThunk());
+    alert("Logged out!");
+  };
+  const { isNightMode } = useAppSelector(selectToggleSlice);
+
+  const handleChangeNightMode = () => {
+    dispatch(switchNightMode());
   };
   return (
     <View style={styles(theme).container}>
@@ -27,6 +37,11 @@ export default function AppSetting({
             }}
           />
           <SettingItem left="Units of Measure" onPress={() => {}} />
+          <SettingItem
+            left="Night mode"
+            right={isNightMode ? "Yes" : "No"}
+            onPress={handleChangeNightMode}
+          />
         </View>
         <View style={styles(theme).settingGroup}>
           <SettingItem left="Notification" topDivider onPress={() => {}} />

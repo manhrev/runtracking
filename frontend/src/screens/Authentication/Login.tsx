@@ -26,7 +26,7 @@ export default function Login({
 
     if (error) {
       alert("Cannot login, please try again");
-    }
+    } else alert("Logged in!");
   };
   return (
     <View style={baseStyles(theme).homeContainer}>

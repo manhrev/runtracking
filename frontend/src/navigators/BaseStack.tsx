@@ -28,6 +28,7 @@ import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { useEffect } from "react";
 import { getMeThunk } from "../redux/features/user/thunk";
+import ComingSoon from "../screens/ComingSoon";
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -80,8 +81,15 @@ export const BaseStack = () => {
   // const loading = useAppSelector(isUserSliceLoading);
   const { isSignedIn } = useAppSelector(selectUserSlice);
 
+  const getMe = async () => {
+    const { error } = await dispatch(getMeThunk()).unwrap();
+    if (error) {
+      alert("Un authenticated!");
+    }
+  };
+
   useEffect(() => {
-    dispatch(getMeThunk());
+    getMe();
   }, []);
 
   // if (loading) {
@@ -147,7 +155,7 @@ export const BaseStack = () => {
               title: "Notifications",
               headerBackVisible: true,
             }}
-            component={ExampleScreen}
+            component={ComingSoon}
           />
         </>
       ) : (
