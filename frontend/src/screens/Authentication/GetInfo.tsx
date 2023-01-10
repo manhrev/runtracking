@@ -37,6 +37,7 @@ export default function GetInfo({
     if (error) {
       alert("An error occurred, please try again");
     } else {
+      alert("Create account successfully, please login");
       navigation.navigate("Login");
     }
   };
