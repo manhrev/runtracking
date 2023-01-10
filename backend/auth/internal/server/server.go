@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	_ "github.com/go-sql-driver/mysql"
@@ -23,6 +24,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+const (
+	ENVIRONMENT_MODE = "ENVIRONMENT_MODE"
+)
+
 func Run() {
 	server := newServer()
 	Serve(server)
@@ -34,10 +39,12 @@ func newServer() *grpc.Server {
 }
 
 func Serve(server *grpc.Server) {
-	configuration, err := config.NewConfig()
+	conf := config.GetConfig(os.Getenv(ENVIRONMENT_MODE))
+	configuration, err := conf.New()
 	if err != nil {
 		log.Fatalf("cannot read values from yml config file: %v", err)
 	}
+
 	// init other services client connections, database driver and pass to server
 	db := configuration.Database
 	entClient, err := ent.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", db.Username, db.Password, db.Domain, db.Port, db.Name))
