@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package notification;
+
+option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;notification";
+import "google/protobuf/timestamp.proto";
+
+service Notification {
+    rpc PushNoti2AllUsers(PushNoti2AllUsersRequest) returns (PushNoti2AllUsersReply){};
+    rpc PushNoti2MembersOfGroup(PushNoti2MembersOfGroupRequest) returns (PushNoti2MembersOfGroupReply){};
+    rpc PushNoti2User(PushNoti2UserReply) returns (PushNoti2UserReply) {};
+}
+
+message Notify{
+    string messeage = 1;
+    google.protobuf.Timestamp scheduled_time = 2;
+}
+
+message PushNoti2AllUsersRequest{
+    Notify notify = 1;
+}
+
+message PushNoti2AllUsersReply{
+    
+}
+
+message PushNoti2MembersOfGroupRequest{
+
+}
+
+message PushNoti2MembersOfGroupReply{
+    
+}
+
+message PushNoti2UserRequest{
+
+}
+
+message PushNoti2UserReply{
+
+}
+
+
+

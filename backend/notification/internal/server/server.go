@@ -9,18 +9,18 @@ import (
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/manhrev/runtracking/backend/group/internal/server/group"
-	pb "github.com/manhrev/runtracking/backend/group/pkg/api"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent"
+	"github.com/manhrev/runtracking/backend/notification/internal/server/notification"
+	pb "github.com/manhrev/runtracking/backend/notification/pkg/api"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
 	"google.golang.org/grpc"
 )
 
 const (
 	db_user_name string = "root"
 	db_password  string = "password@1"
-	db_domain    string = "group_db"
+	db_domain    string = "notification_db"
 	db_port      string = "3306"
-	db_name      string = "group"
+	db_name      string = "notification"
 )
 
 func Run() {
@@ -48,7 +48,7 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	http.HandleFunc("/group", getRoot)
+	http.HandleFunc("/notification", getRoot)
 	go func() {
 		err = http.ListenAndServe(":8000", nil)
 		if err != nil {
@@ -57,7 +57,7 @@ func Serve(server *grpc.Server) {
 	}()
 
 	// register main and other server servers
-	pb.RegisterGroupServer(server, group.NewServer(entClient))
+	pb.RegisterNotificationServer(server, notification.NewServer(entClient))
 
 	lis, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {
@@ -73,5 +73,5 @@ func Serve(server *grpc.Server) {
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("got / request\n")
-	io.WriteString(w, "This is my website for group test!\n")
+	io.WriteString(w, "This is my website for notification test!\n")
 }

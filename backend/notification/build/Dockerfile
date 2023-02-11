@@ -8,4 +8,4 @@ RUN chmod +x /wait-for-it.sh
 RUN apk add --no-cache bash
 EXPOSE 8080
 EXPOSE 8000
-CMD ["/wait-for-it.sh","group_db:3306", "--","/server"]
+CMD ["/wait-for-it.sh","notification_db:3306", "--","/server"]

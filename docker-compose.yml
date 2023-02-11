@@ -44,8 +44,11 @@ services:
       context: backend/group
       dockerfile: build/Dockerfile
     container_name: group
+    ports:
+      - 8000:8000
     depends_on:
       - group_db
+    
 
   group_db:
     image: mysql
@@ -76,3 +79,23 @@ services:
       - "./tmp/db/activity:/var/lib/mysql"
     ports:
       - 33308:3306
+
+  notification:
+    build:
+      context: backend/notification
+      dockerfile: build/Dockerfile
+    container_name: notification
+    depends_on:
+      - notification_db
+    
+  notification_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: notification
+    container_name: 'db-notification'
+    volumes:
+      - "./tmp/db/notification:/var/lib/mysql"
+    ports:
+      - 33309:3306
+  
