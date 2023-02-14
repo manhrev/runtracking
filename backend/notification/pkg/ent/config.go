@@ -27,10 +27,16 @@ type config struct {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Notification []ent.Hook
+		Notification     []ent.Hook
+		NotificationType []ent.Hook
+		NotificationUser []ent.Hook
+		UserDevice       []ent.Hook
 	}
 	inters struct {
-		Notification []ent.Interceptor
+		Notification     []ent.Interceptor
+		NotificationType []ent.Interceptor
+		NotificationUser []ent.Interceptor
+		UserDevice       []ent.Interceptor
 	}
 )
 

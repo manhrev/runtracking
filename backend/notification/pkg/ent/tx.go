@@ -14,6 +14,12 @@ type Tx struct {
 	config
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
+	// NotificationType is the client for interacting with the NotificationType builders.
+	NotificationType *NotificationTypeClient
+	// NotificationUser is the client for interacting with the NotificationUser builders.
+	NotificationUser *NotificationUserClient
+	// UserDevice is the client for interacting with the UserDevice builders.
+	UserDevice *UserDeviceClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +152,9 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Notification = NewNotificationClient(tx.config)
+	tx.NotificationType = NewNotificationTypeClient(tx.config)
+	tx.NotificationUser = NewNotificationUserClient(tx.config)
+	tx.UserDevice = NewUserDeviceClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

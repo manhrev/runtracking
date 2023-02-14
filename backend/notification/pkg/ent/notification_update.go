@@ -6,20 +6,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/predicate"
 )
 
 // NotificationUpdate is the builder for updating Notification entities.
 type NotificationUpdate struct {
 	config
-	hooks     []Hook
-	mutation  *NotificationMutation
-	modifiers []func(*sql.UpdateBuilder)
+	hooks    []Hook
+	mutation *NotificationMutation
 }
 
 // Where appends a list predicates to the NotificationUpdate builder.
@@ -28,9 +29,87 @@ func (nu *NotificationUpdate) Where(ps ...predicate.Notification) *NotificationU
 	return nu
 }
 
+// SetMessage sets the "message" field.
+func (nu *NotificationUpdate) SetMessage(s string) *NotificationUpdate {
+	nu.mutation.SetMessage(s)
+	return nu
+}
+
+// SetNillableMessage sets the "message" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableMessage(s *string) *NotificationUpdate {
+	if s != nil {
+		nu.SetMessage(*s)
+	}
+	return nu
+}
+
+// ClearMessage clears the value of the "message" field.
+func (nu *NotificationUpdate) ClearMessage() *NotificationUpdate {
+	nu.mutation.ClearMessage()
+	return nu
+}
+
+// SetTypeID sets the "type_id" field.
+func (nu *NotificationUpdate) SetTypeID(i int64) *NotificationUpdate {
+	nu.mutation.ResetTypeID()
+	nu.mutation.SetTypeID(i)
+	return nu
+}
+
+// AddTypeID adds i to the "type_id" field.
+func (nu *NotificationUpdate) AddTypeID(i int64) *NotificationUpdate {
+	nu.mutation.AddTypeID(i)
+	return nu
+}
+
+// SetScheduledTime sets the "scheduled_time" field.
+func (nu *NotificationUpdate) SetScheduledTime(t time.Time) *NotificationUpdate {
+	nu.mutation.SetScheduledTime(t)
+	return nu
+}
+
+// SetNillableScheduledTime sets the "scheduled_time" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableScheduledTime(t *time.Time) *NotificationUpdate {
+	if t != nil {
+		nu.SetScheduledTime(*t)
+	}
+	return nu
+}
+
+// ClearScheduledTime clears the value of the "scheduled_time" field.
+func (nu *NotificationUpdate) ClearScheduledTime() *NotificationUpdate {
+	nu.mutation.ClearScheduledTime()
+	return nu
+}
+
+// SetNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID.
+func (nu *NotificationUpdate) SetNotificationTypeID(id int64) *NotificationUpdate {
+	nu.mutation.SetNotificationTypeID(id)
+	return nu
+}
+
+// SetNillableNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableNotificationTypeID(id *int64) *NotificationUpdate {
+	if id != nil {
+		nu = nu.SetNotificationTypeID(*id)
+	}
+	return nu
+}
+
+// SetNotificationType sets the "notification_type" edge to the NotificationType entity.
+func (nu *NotificationUpdate) SetNotificationType(n *NotificationType) *NotificationUpdate {
+	return nu.SetNotificationTypeID(n.ID)
+}
+
 // Mutation returns the NotificationMutation object of the builder.
 func (nu *NotificationUpdate) Mutation() *NotificationMutation {
 	return nu.mutation
+}
+
+// ClearNotificationType clears the "notification_type" edge to the NotificationType entity.
+func (nu *NotificationUpdate) ClearNotificationType() *NotificationUpdate {
+	nu.mutation.ClearNotificationType()
+	return nu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -60,19 +139,13 @@ func (nu *NotificationUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (nu *NotificationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUpdate {
-	nu.modifiers = append(nu.modifiers, modifiers...)
-	return nu
-}
-
 func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt64,
 				Column: notification.FieldID,
 			},
 		},
@@ -84,7 +157,59 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	_spec.AddModifiers(nu.modifiers...)
+	if value, ok := nu.mutation.Message(); ok {
+		_spec.SetField(notification.FieldMessage, field.TypeString, value)
+	}
+	if nu.mutation.MessageCleared() {
+		_spec.ClearField(notification.FieldMessage, field.TypeString)
+	}
+	if value, ok := nu.mutation.TypeID(); ok {
+		_spec.SetField(notification.FieldTypeID, field.TypeInt64, value)
+	}
+	if value, ok := nu.mutation.AddedTypeID(); ok {
+		_spec.AddField(notification.FieldTypeID, field.TypeInt64, value)
+	}
+	if value, ok := nu.mutation.ScheduledTime(); ok {
+		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
+	}
+	if nu.mutation.ScheduledTimeCleared() {
+		_spec.ClearField(notification.FieldScheduledTime, field.TypeTime)
+	}
+	if nu.mutation.NotificationTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.NotificationTypeTable,
+			Columns: []string{notification.NotificationTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: notificationtype.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.NotificationTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.NotificationTypeTable,
+			Columns: []string{notification.NotificationTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: notificationtype.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{notification.Label}
@@ -100,15 +225,92 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 // NotificationUpdateOne is the builder for updating a single Notification entity.
 type NotificationUpdateOne struct {
 	config
-	fields    []string
-	hooks     []Hook
-	mutation  *NotificationMutation
-	modifiers []func(*sql.UpdateBuilder)
+	fields   []string
+	hooks    []Hook
+	mutation *NotificationMutation
+}
+
+// SetMessage sets the "message" field.
+func (nuo *NotificationUpdateOne) SetMessage(s string) *NotificationUpdateOne {
+	nuo.mutation.SetMessage(s)
+	return nuo
+}
+
+// SetNillableMessage sets the "message" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableMessage(s *string) *NotificationUpdateOne {
+	if s != nil {
+		nuo.SetMessage(*s)
+	}
+	return nuo
+}
+
+// ClearMessage clears the value of the "message" field.
+func (nuo *NotificationUpdateOne) ClearMessage() *NotificationUpdateOne {
+	nuo.mutation.ClearMessage()
+	return nuo
+}
+
+// SetTypeID sets the "type_id" field.
+func (nuo *NotificationUpdateOne) SetTypeID(i int64) *NotificationUpdateOne {
+	nuo.mutation.ResetTypeID()
+	nuo.mutation.SetTypeID(i)
+	return nuo
+}
+
+// AddTypeID adds i to the "type_id" field.
+func (nuo *NotificationUpdateOne) AddTypeID(i int64) *NotificationUpdateOne {
+	nuo.mutation.AddTypeID(i)
+	return nuo
+}
+
+// SetScheduledTime sets the "scheduled_time" field.
+func (nuo *NotificationUpdateOne) SetScheduledTime(t time.Time) *NotificationUpdateOne {
+	nuo.mutation.SetScheduledTime(t)
+	return nuo
+}
+
+// SetNillableScheduledTime sets the "scheduled_time" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableScheduledTime(t *time.Time) *NotificationUpdateOne {
+	if t != nil {
+		nuo.SetScheduledTime(*t)
+	}
+	return nuo
+}
+
+// ClearScheduledTime clears the value of the "scheduled_time" field.
+func (nuo *NotificationUpdateOne) ClearScheduledTime() *NotificationUpdateOne {
+	nuo.mutation.ClearScheduledTime()
+	return nuo
+}
+
+// SetNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID.
+func (nuo *NotificationUpdateOne) SetNotificationTypeID(id int64) *NotificationUpdateOne {
+	nuo.mutation.SetNotificationTypeID(id)
+	return nuo
+}
+
+// SetNillableNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableNotificationTypeID(id *int64) *NotificationUpdateOne {
+	if id != nil {
+		nuo = nuo.SetNotificationTypeID(*id)
+	}
+	return nuo
+}
+
+// SetNotificationType sets the "notification_type" edge to the NotificationType entity.
+func (nuo *NotificationUpdateOne) SetNotificationType(n *NotificationType) *NotificationUpdateOne {
+	return nuo.SetNotificationTypeID(n.ID)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
 func (nuo *NotificationUpdateOne) Mutation() *NotificationMutation {
 	return nuo.mutation
+}
+
+// ClearNotificationType clears the "notification_type" edge to the NotificationType entity.
+func (nuo *NotificationUpdateOne) ClearNotificationType() *NotificationUpdateOne {
+	nuo.mutation.ClearNotificationType()
+	return nuo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -145,19 +347,13 @@ func (nuo *NotificationUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (nuo *NotificationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUpdateOne {
-	nuo.modifiers = append(nuo.modifiers, modifiers...)
-	return nuo
-}
-
 func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notification, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt64,
 				Column: notification.FieldID,
 			},
 		},
@@ -186,7 +382,59 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			}
 		}
 	}
-	_spec.AddModifiers(nuo.modifiers...)
+	if value, ok := nuo.mutation.Message(); ok {
+		_spec.SetField(notification.FieldMessage, field.TypeString, value)
+	}
+	if nuo.mutation.MessageCleared() {
+		_spec.ClearField(notification.FieldMessage, field.TypeString)
+	}
+	if value, ok := nuo.mutation.TypeID(); ok {
+		_spec.SetField(notification.FieldTypeID, field.TypeInt64, value)
+	}
+	if value, ok := nuo.mutation.AddedTypeID(); ok {
+		_spec.AddField(notification.FieldTypeID, field.TypeInt64, value)
+	}
+	if value, ok := nuo.mutation.ScheduledTime(); ok {
+		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
+	}
+	if nuo.mutation.ScheduledTimeCleared() {
+		_spec.ClearField(notification.FieldScheduledTime, field.TypeTime)
+	}
+	if nuo.mutation.NotificationTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.NotificationTypeTable,
+			Columns: []string{notification.NotificationTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: notificationtype.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.NotificationTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.NotificationTypeTable,
+			Columns: []string{notification.NotificationTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: notificationtype.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_node = &Notification{config: nuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

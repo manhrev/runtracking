@@ -44,8 +44,6 @@ services:
       context: backend/group
       dockerfile: build/Dockerfile
     container_name: group
-    ports:
-      - 8000:8000
     depends_on:
       - group_db
     
@@ -87,6 +85,8 @@ services:
     container_name: notification
     depends_on:
       - notification_db
+    ports:
+      - 8000:8000
     
   notification_db:
     image: mysql
@@ -98,4 +98,12 @@ services:
       - "./tmp/db/notification:/var/lib/mysql"
     ports:
       - 33309:3306
-  
+
+  gcloud-tasks-emulator:
+    image: ghcr.io/aertje/cloud-tasks-emulator:latest
+    command: -host 0.0.0.0 -port 8123 -queue "projects/daring-acumen-370401/locations/asia-southeast2/queues/test-queue1"
+    ports:
+      - "${TASKS_PORT:-8123}:8123"
+    environment:
+      APP_ENGINE_EMULATOR_HOST: http://localhost:8080
+    

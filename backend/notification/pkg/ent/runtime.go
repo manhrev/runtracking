@@ -2,8 +2,21 @@
 
 package ent
 
+import (
+	"time"
+
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/schema"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	notificationuserFields := schema.NotificationUser{}.Fields()
+	_ = notificationuserFields
+	// notificationuserDescCreatedAt is the schema descriptor for created_at field.
+	notificationuserDescCreatedAt := notificationuserFields[3].Descriptor()
+	// notificationuser.DefaultCreatedAt holds the default value on creation for the created_at field.
+	notificationuser.DefaultCreatedAt = notificationuserDescCreatedAt.Default.(func() time.Time)
 }

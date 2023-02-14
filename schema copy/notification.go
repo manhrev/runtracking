@@ -1,0 +1,31 @@
+package schema
+
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
+)
+
+type Notification struct {
+	ent.Schema
+}
+
+// Fields of the Agent
+func (Notification) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int64("id").
+			Unique(),
+		field.String("message").
+			Optional(),
+		field.Int64("type_notification_id"),
+		field.Int64("type_id"),
+		field.Time("scheduled_time").
+			Optional(),
+	}
+}
+
+func (Notification) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("notification_type", NotificationType.Type),
+	}
+}

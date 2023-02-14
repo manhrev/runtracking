@@ -3,10 +3,11 @@ package server
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"net/http"
+
+	"github.com/gorilla/mux"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/notification/internal/server/notification"
@@ -48,9 +49,12 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	http.HandleFunc("/notification", getRoot)
+	// http.HandleFunc("/notification/pushnoti2allusers", notification.PushNoti2AllUsers)
+	r := mux.NewRouter()
+	notification.RegisterRouteHttpServer(entClient, r)
+
 	go func() {
-		err = http.ListenAndServe(":8000", nil)
+		err = http.ListenAndServe(":8000", r)
 		if err != nil {
 			log.Fatalf("Failed to serve http server: %v", err)
 		}
@@ -69,9 +73,4 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("Failed to serve: %v", err)
 	}
 
-}
-
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got / request\n")
-	io.WriteString(w, "This is my website for notification test!\n")
 }

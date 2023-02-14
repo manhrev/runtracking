@@ -22,8 +22,13 @@ generate-ts:
 generate-ent:
 	mkdir -p ./pkg/ent
 	cp -R ./schema ./pkg/ent/schema
-	go run -mod=mod entgo.io/ent/cmd/ent generate ./pkg/ent/schema --feature sql/modifier
+	go run -mod=mod entgo.io/ent/cmd/ent generate ./pkg/ent/schema --feature sql/versioned-migration
 # rm -r ./pkg/ent/schema
+
+migrate: 
+	atlas migrate apply --dir "file://pkg/ent/migrate/migrations" \
+  	-u "mysql://root:password@1@localhost:33309/notification" \
+   	--allow-dirty
 	
 generate:
 	make generate-proto generate-code generate-ent

@@ -7,19 +7,48 @@ const (
 	Label = "notification"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldMessage holds the string denoting the message field in the database.
+	FieldMessage = "message"
+	// FieldTypeID holds the string denoting the type_id field in the database.
+	FieldTypeID = "type_id"
+	// FieldScheduledTime holds the string denoting the scheduled_time field in the database.
+	FieldScheduledTime = "scheduled_time"
+	// EdgeNotificationType holds the string denoting the notification_type edge name in mutations.
+	EdgeNotificationType = "notification_type"
 	// Table holds the table name of the notification in the database.
 	Table = "notifications"
+	// NotificationTypeTable is the table that holds the notification_type relation/edge.
+	NotificationTypeTable = "notifications"
+	// NotificationTypeInverseTable is the table name for the NotificationType entity.
+	// It exists in this package in order to avoid circular dependency with the "notificationtype" package.
+	NotificationTypeInverseTable = "notification_types"
+	// NotificationTypeColumn is the table column denoting the notification_type relation/edge.
+	NotificationTypeColumn = "notification_type_notifications"
 )
 
 // Columns holds all SQL columns for notification fields.
 var Columns = []string{
 	FieldID,
+	FieldMessage,
+	FieldTypeID,
+	FieldScheduledTime,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "notifications"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"notification_type_notifications",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
