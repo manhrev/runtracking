@@ -46,15 +46,15 @@ export default function ProfileInfo() {
           <View style={styles(theme).infoValueListItem}>
             <View>
               <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
-                Participated in
+                Groups joined
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text variant="titleMedium">2 groups</Text>
+              <Text variant="titleMedium">0 groups</Text>
             </View>
           </View>
           <Divider style={{ marginVertical: 10 }} />
-          <View style={styles(theme).infoValueListItem}>
+          {/* <View style={styles(theme).infoValueListItem}>
             <View>
               <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
                 Weight
@@ -73,7 +73,7 @@ export default function ProfileInfo() {
             <View style={{ flex: 1, alignItems: "flex-end" }}>
               <Text variant="titleMedium">{height}</Text>
             </View>
-          </View>
+          </View> */}
         </View>
       </View>
     </View>

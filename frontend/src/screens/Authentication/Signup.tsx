@@ -110,6 +110,7 @@ export default function Signup({
               style={styles(theme).inputStyle}
             />
             <TextInput
+              secureTextEntry={true}
               mode="outlined"
               label="Password"
               value={password}
@@ -118,6 +119,7 @@ export default function Signup({
               style={styles(theme).inputStyle}
             />
             <TextInput
+              secureTextEntry={true}
               mode="outlined"
               label="Confirm password"
               value={confirmPassword}
