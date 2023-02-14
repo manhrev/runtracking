@@ -1,12 +1,17 @@
 package notification
 
 import (
-	"fmt"
-	"io"
+	"log"
 	"net/http"
+
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *notificationHttpServer) PushNoti2AllUsers(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got / request\n")
-	io.WriteString(w, "This is my website for notification test!\n")
+	log.Println("router is called")
+	user, err := s.authClient.GetAllUsers(r.Context(), &emptypb.Empty{})
+	if err != nil {
+		log.Fatalf("failed querying users: %v", err)
+	}
+	log.Println(user)
 }

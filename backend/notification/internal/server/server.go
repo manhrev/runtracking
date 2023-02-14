@@ -10,10 +10,12 @@ import (
 	"github.com/gorilla/mux"
 
 	_ "github.com/go-sql-driver/mysql"
+	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/internal/server/notification"
 	pb "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -22,6 +24,9 @@ const (
 	db_domain    string = "notification_db"
 	db_port      string = "3306"
 	db_name      string = "notification"
+
+	auth_service string = "auth"
+	auth_port    string = "8080"
 )
 
 func Run() {
@@ -49,9 +54,15 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", auth_service, auth_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("error while create connect to sample service: %v", err)
+	}
+	authClient := auth.NewAuthClient(conn)
+
 	// http.HandleFunc("/notification/pushnoti2allusers", notification.PushNoti2AllUsers)
 	r := mux.NewRouter()
-	notification.RegisterRouteHttpServer(entClient, r)
+	notification.RegisterRouteHttpServer(entClient, r, authClient)
 
 	go func() {
 		err = http.ListenAndServe(":8000", r)
