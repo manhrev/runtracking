@@ -78,6 +78,7 @@ export default function Login({
             style={styles(theme).inputStyle}
           />
           <TextInput
+            secureTextEntry={true}
             mode="outlined"
             label="Password"
             value={password}

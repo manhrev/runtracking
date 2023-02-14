@@ -17,7 +17,7 @@ export default function ProfileAchievement() {
               marginVertical: 12,
             }}
           >
-            Golden level runner
+            Beginer level runner
           </Text>
           <View
             style={{
@@ -30,7 +30,7 @@ export default function ProfileAchievement() {
                 variant="displayMedium"
                 style={{ fontStyle: "italic", fontWeight: "bold" }}
               >
-                312
+                0
               </Text>
               <Text variant="bodyLarge">Total kilometers</Text>
             </View>
@@ -39,13 +39,13 @@ export default function ProfileAchievement() {
                 variant="displayMedium"
                 style={{ fontStyle: "italic", fontWeight: "bold" }}
               >
-                122k
+                0
               </Text>
               <Text variant="bodyLarge">Total calories burned</Text>
             </View>
           </View>
         </View>
-        <Divider />
+        {/* <Divider />
         <View style={styles(theme).achievementSection}>
           <Text
             variant="titleMedium"
@@ -119,7 +119,7 @@ export default function ProfileAchievement() {
               <Text variant="bodyLarge">Total calories burned</Text>
             </View>
           </View>
-        </View>
+        </View>*/}
       </View>
     </View>
   );
