@@ -1,12 +1,14 @@
 version: '3.7'
 
 services:
-
   gateway:
     build:
       context: backend/gateway
       dockerfile: Dockerfile
     container_name: gateway
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 8080:8080
 
@@ -17,6 +19,8 @@ services:
     container_name: auth
     volumes:
       - ./backend/auth:/app
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - auth_db
       - redis
@@ -29,12 +33,17 @@ services:
     container_name: 'db-auth'
     volumes:
       - "./tmp/db/auth:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33306:3306
 
   redis:
     image: redis:latest
     container_name: redis
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - "6379:6379"
     # restart: always
@@ -44,6 +53,9 @@ services:
       context: backend/group
       dockerfile: build/Dockerfile
     container_name: group
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - group_db
     
@@ -56,6 +68,8 @@ services:
     container_name: 'db-group'
     volumes:
       - "./tmp/db/group:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33307:3306
 
@@ -64,6 +78,9 @@ services:
       context: backend/activity
       dockerfile: build/Dockerfile
     container_name: activity
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - activity_db
 
@@ -75,6 +92,8 @@ services:
     container_name: 'db-activity'
     volumes:
       - "./tmp/db/activity:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33308:3306
 
@@ -83,6 +102,9 @@ services:
       context: backend/notification
       dockerfile: build/Dockerfile
     container_name: notification
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - notification_db
     ports:
@@ -96,6 +118,8 @@ services:
     container_name: 'db-notification'
     volumes:
       - "./tmp/db/notification:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33309:3306
 
@@ -106,4 +130,7 @@ services:
       - "${TASKS_PORT:-8123}:8123"
     environment:
       APP_ENGINE_EMULATOR_HOST: http://localhost:8080
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     

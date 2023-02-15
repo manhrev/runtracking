@@ -21,18 +21,6 @@ func (f NotificationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NotificationMutation", m)
 }
 
-// The NotificationTypeFunc type is an adapter to allow the use of ordinary
-// function as NotificationType mutator.
-type NotificationTypeFunc func(context.Context, *ent.NotificationTypeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f NotificationTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.NotificationTypeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NotificationTypeMutation", m)
-}
-
 // The NotificationUserFunc type is an adapter to allow the use of ordinary
 // function as NotificationUser mutator.
 type NotificationUserFunc func(context.Context, *ent.NotificationUserMutation) (ent.Value, error)

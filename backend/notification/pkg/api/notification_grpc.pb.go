@@ -23,9 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NotificationClient interface {
-	PushNoti2AllUsers(ctx context.Context, in *PushNoti2AllUsersRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	PushNoti2MembersOfGroup(ctx context.Context, in *PushNoti2MembersOfGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	PushNoti2User(ctx context.Context, in *PushNoti2UserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	PushNotification(ctx context.Context, in *PushNotiRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type notificationClient struct {
@@ -36,27 +34,9 @@ func NewNotificationClient(cc grpc.ClientConnInterface) NotificationClient {
 	return &notificationClient{cc}
 }
 
-func (c *notificationClient) PushNoti2AllUsers(ctx context.Context, in *PushNoti2AllUsersRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *notificationClient) PushNotification(ctx context.Context, in *PushNotiRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/notification.Notification/PushNoti2AllUsers", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *notificationClient) PushNoti2MembersOfGroup(ctx context.Context, in *PushNoti2MembersOfGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/notification.Notification/PushNoti2MembersOfGroup", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *notificationClient) PushNoti2User(ctx context.Context, in *PushNoti2UserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/notification.Notification/PushNoti2User", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/notification.Notification/PushNotification", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +47,7 @@ func (c *notificationClient) PushNoti2User(ctx context.Context, in *PushNoti2Use
 // All implementations must embed UnimplementedNotificationServer
 // for forward compatibility
 type NotificationServer interface {
-	PushNoti2AllUsers(context.Context, *PushNoti2AllUsersRequest) (*emptypb.Empty, error)
-	PushNoti2MembersOfGroup(context.Context, *PushNoti2MembersOfGroupRequest) (*emptypb.Empty, error)
-	PushNoti2User(context.Context, *PushNoti2UserRequest) (*emptypb.Empty, error)
+	PushNotification(context.Context, *PushNotiRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNotificationServer()
 }
 
@@ -77,14 +55,8 @@ type NotificationServer interface {
 type UnimplementedNotificationServer struct {
 }
 
-func (UnimplementedNotificationServer) PushNoti2AllUsers(context.Context, *PushNoti2AllUsersRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PushNoti2AllUsers not implemented")
-}
-func (UnimplementedNotificationServer) PushNoti2MembersOfGroup(context.Context, *PushNoti2MembersOfGroupRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PushNoti2MembersOfGroup not implemented")
-}
-func (UnimplementedNotificationServer) PushNoti2User(context.Context, *PushNoti2UserRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PushNoti2User not implemented")
+func (UnimplementedNotificationServer) PushNotification(context.Context, *PushNotiRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PushNotification not implemented")
 }
 func (UnimplementedNotificationServer) mustEmbedUnimplementedNotificationServer() {}
 
@@ -99,56 +71,20 @@ func RegisterNotificationServer(s grpc.ServiceRegistrar, srv NotificationServer)
 	s.RegisterService(&Notification_ServiceDesc, srv)
 }
 
-func _Notification_PushNoti2AllUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PushNoti2AllUsersRequest)
+func _Notification_PushNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PushNotiRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NotificationServer).PushNoti2AllUsers(ctx, in)
+		return srv.(NotificationServer).PushNotification(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/notification.Notification/PushNoti2AllUsers",
+		FullMethod: "/notification.Notification/PushNotification",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServer).PushNoti2AllUsers(ctx, req.(*PushNoti2AllUsersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Notification_PushNoti2MembersOfGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PushNoti2MembersOfGroupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotificationServer).PushNoti2MembersOfGroup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/notification.Notification/PushNoti2MembersOfGroup",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServer).PushNoti2MembersOfGroup(ctx, req.(*PushNoti2MembersOfGroupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Notification_PushNoti2User_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PushNoti2UserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotificationServer).PushNoti2User(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/notification.Notification/PushNoti2User",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServer).PushNoti2User(ctx, req.(*PushNoti2UserRequest))
+		return srv.(NotificationServer).PushNotification(ctx, req.(*PushNotiRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -161,16 +97,8 @@ var Notification_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*NotificationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PushNoti2AllUsers",
-			Handler:    _Notification_PushNoti2AllUsers_Handler,
-		},
-		{
-			MethodName: "PushNoti2MembersOfGroup",
-			Handler:    _Notification_PushNoti2MembersOfGroup_Handler,
-		},
-		{
-			MethodName: "PushNoti2User",
-			Handler:    _Notification_PushNoti2User_Handler,
+			MethodName: "PushNotification",
+			Handler:    _Notification_PushNotification_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

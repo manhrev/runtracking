@@ -18,7 +18,7 @@ func NewHttpServer(entClient *ent.Client, router *mux.Router, authClient auth.Au
 
 func RegisterRouteHttpServer(entClient *ent.Client, router *mux.Router, authClient auth.AuthClient) {
 	s := NewHttpServer(entClient, router, authClient)
-	s.router.HandleFunc("/notification/pushnoti2allusers", s.PushNoti2AllUsers).Methods(http.MethodGet)
+	s.router.HandleFunc("/notification/pushnotification", s.PushNotification).Methods(http.MethodPost)
 }
 
 type notificationHttpServer struct {

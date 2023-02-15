@@ -17,17 +17,17 @@ const (
 	FieldIsSeen = "is_seen"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
-	EdgeNotifications = "notifications"
+	// EdgeNotification holds the string denoting the notification edge name in mutations.
+	EdgeNotification = "notification"
 	// Table holds the table name of the notificationuser in the database.
 	Table = "notification_users"
-	// NotificationsTable is the table that holds the notifications relation/edge.
-	NotificationsTable = "notification_types"
-	// NotificationsInverseTable is the table name for the NotificationType entity.
-	// It exists in this package in order to avoid circular dependency with the "notificationtype" package.
-	NotificationsInverseTable = "notification_types"
-	// NotificationsColumn is the table column denoting the notifications relation/edge.
-	NotificationsColumn = "notification_user_notifications"
+	// NotificationTable is the table that holds the notification relation/edge.
+	NotificationTable = "notification_users"
+	// NotificationInverseTable is the table name for the Notification entity.
+	// It exists in this package in order to avoid circular dependency with the "notification" package.
+	NotificationInverseTable = "notifications"
+	// NotificationColumn is the table column denoting the notification relation/edge.
+	NotificationColumn = "notification_notification_users"
 )
 
 // Columns holds all SQL columns for notificationuser fields.
@@ -38,10 +38,21 @@ var Columns = []string{
 	FieldCreatedAt,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "notification_users"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"notification_notification_users",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

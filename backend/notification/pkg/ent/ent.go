@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/userdevice"
 )
@@ -43,7 +42,6 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		notification.Table:     notification.ValidColumn,
-		notificationtype.Table: notificationtype.ValidColumn,
 		notificationuser.Table: notificationuser.ValidColumn,
 		userdevice.Table:       userdevice.ValidColumn,
 	}

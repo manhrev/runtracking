@@ -4,14 +4,13 @@ package ent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 )
 
 // NotificationCreate is the builder for creating a Notification entity.
@@ -35,9 +34,31 @@ func (nc *NotificationCreate) SetNillableMessage(s *string) *NotificationCreate 
 	return nc
 }
 
-// SetTypeID sets the "type_id" field.
-func (nc *NotificationCreate) SetTypeID(i int64) *NotificationCreate {
-	nc.mutation.SetTypeID(i)
+// SetType sets the "type" field.
+func (nc *NotificationCreate) SetType(i int64) *NotificationCreate {
+	nc.mutation.SetType(i)
+	return nc
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableType(i *int64) *NotificationCreate {
+	if i != nil {
+		nc.SetType(*i)
+	}
+	return nc
+}
+
+// SetReceivedID sets the "received_id" field.
+func (nc *NotificationCreate) SetReceivedID(i int64) *NotificationCreate {
+	nc.mutation.SetReceivedID(i)
+	return nc
+}
+
+// SetNillableReceivedID sets the "received_id" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableReceivedID(i *int64) *NotificationCreate {
+	if i != nil {
+		nc.SetReceivedID(*i)
+	}
 	return nc
 }
 
@@ -61,23 +82,19 @@ func (nc *NotificationCreate) SetID(i int64) *NotificationCreate {
 	return nc
 }
 
-// SetNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID.
-func (nc *NotificationCreate) SetNotificationTypeID(id int64) *NotificationCreate {
-	nc.mutation.SetNotificationTypeID(id)
+// AddNotificationUserIDs adds the "notification_users" edge to the NotificationUser entity by IDs.
+func (nc *NotificationCreate) AddNotificationUserIDs(ids ...int64) *NotificationCreate {
+	nc.mutation.AddNotificationUserIDs(ids...)
 	return nc
 }
 
-// SetNillableNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID if the given value is not nil.
-func (nc *NotificationCreate) SetNillableNotificationTypeID(id *int64) *NotificationCreate {
-	if id != nil {
-		nc = nc.SetNotificationTypeID(*id)
+// AddNotificationUsers adds the "notification_users" edges to the NotificationUser entity.
+func (nc *NotificationCreate) AddNotificationUsers(n ...*NotificationUser) *NotificationCreate {
+	ids := make([]int64, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return nc
-}
-
-// SetNotificationType sets the "notification_type" edge to the NotificationType entity.
-func (nc *NotificationCreate) SetNotificationType(n *NotificationType) *NotificationCreate {
-	return nc.SetNotificationTypeID(n.ID)
+	return nc.AddNotificationUserIDs(ids...)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -114,9 +131,6 @@ func (nc *NotificationCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (nc *NotificationCreate) check() error {
-	if _, ok := nc.mutation.TypeID(); !ok {
-		return &ValidationError{Name: "type_id", err: errors.New(`ent: missing required field "Notification.type_id"`)}
-	}
 	return nil
 }
 
@@ -159,32 +173,35 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec.SetField(notification.FieldMessage, field.TypeString, value)
 		_node.Message = value
 	}
-	if value, ok := nc.mutation.TypeID(); ok {
-		_spec.SetField(notification.FieldTypeID, field.TypeInt64, value)
-		_node.TypeID = value
+	if value, ok := nc.mutation.GetType(); ok {
+		_spec.SetField(notification.FieldType, field.TypeInt64, value)
+		_node.Type = value
+	}
+	if value, ok := nc.mutation.ReceivedID(); ok {
+		_spec.SetField(notification.FieldReceivedID, field.TypeInt64, value)
+		_node.ReceivedID = value
 	}
 	if value, ok := nc.mutation.ScheduledTime(); ok {
 		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
 		_node.ScheduledTime = value
 	}
-	if nodes := nc.mutation.NotificationTypeIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.NotificationUsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   notification.NotificationTypeTable,
-			Columns: []string{notification.NotificationTypeColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   notification.NotificationUsersTable,
+			Columns: []string{notification.NotificationUsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notificationuser.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.notification_type_notifications = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

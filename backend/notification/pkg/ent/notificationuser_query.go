@@ -4,14 +4,13 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/predicate"
 )
@@ -19,11 +18,12 @@ import (
 // NotificationUserQuery is the builder for querying NotificationUser entities.
 type NotificationUserQuery struct {
 	config
-	ctx               *QueryContext
-	order             []OrderFunc
-	inters            []Interceptor
-	predicates        []predicate.NotificationUser
-	withNotifications *NotificationTypeQuery
+	ctx              *QueryContext
+	order            []OrderFunc
+	inters           []Interceptor
+	predicates       []predicate.NotificationUser
+	withNotification *NotificationQuery
+	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,9 +60,9 @@ func (nuq *NotificationUserQuery) Order(o ...OrderFunc) *NotificationUserQuery {
 	return nuq
 }
 
-// QueryNotifications chains the current query on the "notifications" edge.
-func (nuq *NotificationUserQuery) QueryNotifications() *NotificationTypeQuery {
-	query := (&NotificationTypeClient{config: nuq.config}).Query()
+// QueryNotification chains the current query on the "notification" edge.
+func (nuq *NotificationUserQuery) QueryNotification() *NotificationQuery {
+	query := (&NotificationClient{config: nuq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nuq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,8 +73,8 @@ func (nuq *NotificationUserQuery) QueryNotifications() *NotificationTypeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(notificationuser.Table, notificationuser.FieldID, selector),
-			sqlgraph.To(notificationtype.Table, notificationtype.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, notificationuser.NotificationsTable, notificationuser.NotificationsColumn),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notificationuser.NotificationTable, notificationuser.NotificationColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nuq.driver.Dialect(), step)
 		return fromU, nil
@@ -267,26 +267,26 @@ func (nuq *NotificationUserQuery) Clone() *NotificationUserQuery {
 		return nil
 	}
 	return &NotificationUserQuery{
-		config:            nuq.config,
-		ctx:               nuq.ctx.Clone(),
-		order:             append([]OrderFunc{}, nuq.order...),
-		inters:            append([]Interceptor{}, nuq.inters...),
-		predicates:        append([]predicate.NotificationUser{}, nuq.predicates...),
-		withNotifications: nuq.withNotifications.Clone(),
+		config:           nuq.config,
+		ctx:              nuq.ctx.Clone(),
+		order:            append([]OrderFunc{}, nuq.order...),
+		inters:           append([]Interceptor{}, nuq.inters...),
+		predicates:       append([]predicate.NotificationUser{}, nuq.predicates...),
+		withNotification: nuq.withNotification.Clone(),
 		// clone intermediate query.
 		sql:  nuq.sql.Clone(),
 		path: nuq.path,
 	}
 }
 
-// WithNotifications tells the query-builder to eager-load the nodes that are connected to
-// the "notifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (nuq *NotificationUserQuery) WithNotifications(opts ...func(*NotificationTypeQuery)) *NotificationUserQuery {
-	query := (&NotificationTypeClient{config: nuq.config}).Query()
+// WithNotification tells the query-builder to eager-load the nodes that are connected to
+// the "notification" edge. The optional arguments are used to configure the query builder of the edge.
+func (nuq *NotificationUserQuery) WithNotification(opts ...func(*NotificationQuery)) *NotificationUserQuery {
+	query := (&NotificationClient{config: nuq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nuq.withNotifications = query
+	nuq.withNotification = query
 	return nuq
 }
 
@@ -369,11 +369,18 @@ func (nuq *NotificationUserQuery) prepareQuery(ctx context.Context) error {
 func (nuq *NotificationUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*NotificationUser, error) {
 	var (
 		nodes       = []*NotificationUser{}
+		withFKs     = nuq.withFKs
 		_spec       = nuq.querySpec()
 		loadedTypes = [1]bool{
-			nuq.withNotifications != nil,
+			nuq.withNotification != nil,
 		}
 	)
+	if nuq.withNotification != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, notificationuser.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*NotificationUser).scanValues(nil, columns)
 	}
@@ -392,46 +399,44 @@ func (nuq *NotificationUserQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := nuq.withNotifications; query != nil {
-		if err := nuq.loadNotifications(ctx, query, nodes,
-			func(n *NotificationUser) { n.Edges.Notifications = []*NotificationType{} },
-			func(n *NotificationUser, e *NotificationType) {
-				n.Edges.Notifications = append(n.Edges.Notifications, e)
-			}); err != nil {
+	if query := nuq.withNotification; query != nil {
+		if err := nuq.loadNotification(ctx, query, nodes, nil,
+			func(n *NotificationUser, e *Notification) { n.Edges.Notification = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (nuq *NotificationUserQuery) loadNotifications(ctx context.Context, query *NotificationTypeQuery, nodes []*NotificationUser, init func(*NotificationUser), assign func(*NotificationUser, *NotificationType)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int64]*NotificationUser)
+func (nuq *NotificationUserQuery) loadNotification(ctx context.Context, query *NotificationQuery, nodes []*NotificationUser, init func(*NotificationUser), assign func(*NotificationUser, *Notification)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*NotificationUser)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].notification_notification_users == nil {
+			continue
 		}
+		fk := *nodes[i].notification_notification_users
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.NotificationType(func(s *sql.Selector) {
-		s.Where(sql.InValues(notificationuser.NotificationsColumn, fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(notification.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.notification_user_notifications
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "notification_user_notifications" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "notification_user_notifications" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "notification_notification_users" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

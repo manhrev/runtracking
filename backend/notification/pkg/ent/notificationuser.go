@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 )
 
@@ -24,25 +25,30 @@ type NotificationUser struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NotificationUserQuery when eager-loading is set.
-	Edges NotificationUserEdges `json:"edges"`
+	Edges                           NotificationUserEdges `json:"edges"`
+	notification_notification_users *int64
 }
 
 // NotificationUserEdges holds the relations/edges for other nodes in the graph.
 type NotificationUserEdges struct {
-	// Notifications holds the value of the notifications edge.
-	Notifications []*NotificationType `json:"notifications,omitempty"`
+	// Notification holds the value of the notification edge.
+	Notification *Notification `json:"notification,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// NotificationsOrErr returns the Notifications value or an error if the edge
-// was not loaded in eager-loading.
-func (e NotificationUserEdges) NotificationsOrErr() ([]*NotificationType, error) {
+// NotificationOrErr returns the Notification value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NotificationUserEdges) NotificationOrErr() (*Notification, error) {
 	if e.loadedTypes[0] {
-		return e.Notifications, nil
+		if e.Notification == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: notification.Label}
+		}
+		return e.Notification, nil
 	}
-	return nil, &NotLoadedError{edge: "notifications"}
+	return nil, &NotLoadedError{edge: "notification"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -56,6 +62,8 @@ func (*NotificationUser) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case notificationuser.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
+		case notificationuser.ForeignKeys[0]: // notification_notification_users
+			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type NotificationUser", columns[i])
 		}
@@ -95,14 +103,21 @@ func (nu *NotificationUser) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				nu.CreatedAt = value.Time
 			}
+		case notificationuser.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field notification_notification_users", value)
+			} else if value.Valid {
+				nu.notification_notification_users = new(int64)
+				*nu.notification_notification_users = int64(value.Int64)
+			}
 		}
 	}
 	return nil
 }
 
-// QueryNotifications queries the "notifications" edge of the NotificationUser entity.
-func (nu *NotificationUser) QueryNotifications() *NotificationTypeQuery {
-	return NewNotificationUserClient(nu.config).QueryNotifications(nu)
+// QueryNotification queries the "notification" edge of the NotificationUser entity.
+func (nu *NotificationUser) QueryNotification() *NotificationQuery {
+	return NewNotificationUserClient(nu.config).QueryNotification(nu)
 }
 
 // Update returns a builder for updating this NotificationUser.

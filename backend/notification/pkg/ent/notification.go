@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
 )
 
 // Notification is the model entity for the Notification schema.
@@ -19,36 +18,33 @@ type Notification struct {
 	ID int64 `json:"id,omitempty"`
 	// Message holds the value of the "message" field.
 	Message string `json:"message,omitempty"`
-	// TypeID holds the value of the "type_id" field.
-	TypeID int64 `json:"type_id,omitempty"`
+	// Type holds the value of the "type" field.
+	Type int64 `json:"type,omitempty"`
+	// ReceivedID holds the value of the "received_id" field.
+	ReceivedID int64 `json:"received_id,omitempty"`
 	// ScheduledTime holds the value of the "scheduled_time" field.
 	ScheduledTime time.Time `json:"scheduled_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NotificationQuery when eager-loading is set.
-	Edges                           NotificationEdges `json:"edges"`
-	notification_type_notifications *int64
+	Edges NotificationEdges `json:"edges"`
 }
 
 // NotificationEdges holds the relations/edges for other nodes in the graph.
 type NotificationEdges struct {
-	// NotificationType holds the value of the notification_type edge.
-	NotificationType *NotificationType `json:"notification_type,omitempty"`
+	// NotificationUsers holds the value of the notification_users edge.
+	NotificationUsers []*NotificationUser `json:"notification_users,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// NotificationTypeOrErr returns the NotificationType value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e NotificationEdges) NotificationTypeOrErr() (*NotificationType, error) {
+// NotificationUsersOrErr returns the NotificationUsers value or an error if the edge
+// was not loaded in eager-loading.
+func (e NotificationEdges) NotificationUsersOrErr() ([]*NotificationUser, error) {
 	if e.loadedTypes[0] {
-		if e.NotificationType == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: notificationtype.Label}
-		}
-		return e.NotificationType, nil
+		return e.NotificationUsers, nil
 	}
-	return nil, &NotLoadedError{edge: "notification_type"}
+	return nil, &NotLoadedError{edge: "notification_users"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -56,14 +52,12 @@ func (*Notification) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case notification.FieldID, notification.FieldTypeID:
+		case notification.FieldID, notification.FieldType, notification.FieldReceivedID:
 			values[i] = new(sql.NullInt64)
 		case notification.FieldMessage:
 			values[i] = new(sql.NullString)
 		case notification.FieldScheduledTime:
 			values[i] = new(sql.NullTime)
-		case notification.ForeignKeys[0]: // notification_type_notifications
-			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Notification", columns[i])
 		}
@@ -91,11 +85,17 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.Message = value.String
 			}
-		case notification.FieldTypeID:
+		case notification.FieldType:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field type_id", values[i])
+				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				n.TypeID = value.Int64
+				n.Type = value.Int64
+			}
+		case notification.FieldReceivedID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field received_id", values[i])
+			} else if value.Valid {
+				n.ReceivedID = value.Int64
 			}
 		case notification.FieldScheduledTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -103,21 +103,14 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.ScheduledTime = value.Time
 			}
-		case notification.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field notification_type_notifications", value)
-			} else if value.Valid {
-				n.notification_type_notifications = new(int64)
-				*n.notification_type_notifications = int64(value.Int64)
-			}
 		}
 	}
 	return nil
 }
 
-// QueryNotificationType queries the "notification_type" edge of the Notification entity.
-func (n *Notification) QueryNotificationType() *NotificationTypeQuery {
-	return NewNotificationClient(n.config).QueryNotificationType(n)
+// QueryNotificationUsers queries the "notification_users" edge of the Notification entity.
+func (n *Notification) QueryNotificationUsers() *NotificationUserQuery {
+	return NewNotificationClient(n.config).QueryNotificationUsers(n)
 }
 
 // Update returns a builder for updating this Notification.
@@ -146,8 +139,11 @@ func (n *Notification) String() string {
 	builder.WriteString("message=")
 	builder.WriteString(n.Message)
 	builder.WriteString(", ")
-	builder.WriteString("type_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.TypeID))
+	builder.WriteString("type=")
+	builder.WriteString(fmt.Sprintf("%v", n.Type))
+	builder.WriteString(", ")
+	builder.WriteString("received_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.ReceivedID))
 	builder.WriteString(", ")
 	builder.WriteString("scheduled_time=")
 	builder.WriteString(n.ScheduledTime.Format(time.ANSIC))

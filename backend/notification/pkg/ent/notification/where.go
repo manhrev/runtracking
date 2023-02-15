@@ -60,9 +60,14 @@ func Message(v string) predicate.Notification {
 	return predicate.Notification(sql.FieldEQ(FieldMessage, v))
 }
 
-// TypeID applies equality check predicate on the "type_id" field. It's identical to TypeIDEQ.
-func TypeID(v int64) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldTypeID, v))
+// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
+func Type(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldType, v))
+}
+
+// ReceivedID applies equality check predicate on the "received_id" field. It's identical to ReceivedIDEQ.
+func ReceivedID(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldReceivedID, v))
 }
 
 // ScheduledTime applies equality check predicate on the "scheduled_time" field. It's identical to ScheduledTimeEQ.
@@ -145,44 +150,104 @@ func MessageContainsFold(v string) predicate.Notification {
 	return predicate.Notification(sql.FieldContainsFold(FieldMessage, v))
 }
 
-// TypeIDEQ applies the EQ predicate on the "type_id" field.
-func TypeIDEQ(v int64) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldTypeID, v))
+// TypeEQ applies the EQ predicate on the "type" field.
+func TypeEQ(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldType, v))
 }
 
-// TypeIDNEQ applies the NEQ predicate on the "type_id" field.
-func TypeIDNEQ(v int64) predicate.Notification {
-	return predicate.Notification(sql.FieldNEQ(FieldTypeID, v))
+// TypeNEQ applies the NEQ predicate on the "type" field.
+func TypeNEQ(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldType, v))
 }
 
-// TypeIDIn applies the In predicate on the "type_id" field.
-func TypeIDIn(vs ...int64) predicate.Notification {
-	return predicate.Notification(sql.FieldIn(FieldTypeID, vs...))
+// TypeIn applies the In predicate on the "type" field.
+func TypeIn(vs ...int64) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldType, vs...))
 }
 
-// TypeIDNotIn applies the NotIn predicate on the "type_id" field.
-func TypeIDNotIn(vs ...int64) predicate.Notification {
-	return predicate.Notification(sql.FieldNotIn(FieldTypeID, vs...))
+// TypeNotIn applies the NotIn predicate on the "type" field.
+func TypeNotIn(vs ...int64) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldType, vs...))
 }
 
-// TypeIDGT applies the GT predicate on the "type_id" field.
-func TypeIDGT(v int64) predicate.Notification {
-	return predicate.Notification(sql.FieldGT(FieldTypeID, v))
+// TypeGT applies the GT predicate on the "type" field.
+func TypeGT(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldType, v))
 }
 
-// TypeIDGTE applies the GTE predicate on the "type_id" field.
-func TypeIDGTE(v int64) predicate.Notification {
-	return predicate.Notification(sql.FieldGTE(FieldTypeID, v))
+// TypeGTE applies the GTE predicate on the "type" field.
+func TypeGTE(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldType, v))
 }
 
-// TypeIDLT applies the LT predicate on the "type_id" field.
-func TypeIDLT(v int64) predicate.Notification {
-	return predicate.Notification(sql.FieldLT(FieldTypeID, v))
+// TypeLT applies the LT predicate on the "type" field.
+func TypeLT(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldType, v))
 }
 
-// TypeIDLTE applies the LTE predicate on the "type_id" field.
-func TypeIDLTE(v int64) predicate.Notification {
-	return predicate.Notification(sql.FieldLTE(FieldTypeID, v))
+// TypeLTE applies the LTE predicate on the "type" field.
+func TypeLTE(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldType, v))
+}
+
+// TypeIsNil applies the IsNil predicate on the "type" field.
+func TypeIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldType))
+}
+
+// TypeNotNil applies the NotNil predicate on the "type" field.
+func TypeNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldType))
+}
+
+// ReceivedIDEQ applies the EQ predicate on the "received_id" field.
+func ReceivedIDEQ(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldReceivedID, v))
+}
+
+// ReceivedIDNEQ applies the NEQ predicate on the "received_id" field.
+func ReceivedIDNEQ(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldReceivedID, v))
+}
+
+// ReceivedIDIn applies the In predicate on the "received_id" field.
+func ReceivedIDIn(vs ...int64) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldReceivedID, vs...))
+}
+
+// ReceivedIDNotIn applies the NotIn predicate on the "received_id" field.
+func ReceivedIDNotIn(vs ...int64) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldReceivedID, vs...))
+}
+
+// ReceivedIDGT applies the GT predicate on the "received_id" field.
+func ReceivedIDGT(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldReceivedID, v))
+}
+
+// ReceivedIDGTE applies the GTE predicate on the "received_id" field.
+func ReceivedIDGTE(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldReceivedID, v))
+}
+
+// ReceivedIDLT applies the LT predicate on the "received_id" field.
+func ReceivedIDLT(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldReceivedID, v))
+}
+
+// ReceivedIDLTE applies the LTE predicate on the "received_id" field.
+func ReceivedIDLTE(v int64) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldReceivedID, v))
+}
+
+// ReceivedIDIsNil applies the IsNil predicate on the "received_id" field.
+func ReceivedIDIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldReceivedID))
+}
+
+// ReceivedIDNotNil applies the NotNil predicate on the "received_id" field.
+func ReceivedIDNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldReceivedID))
 }
 
 // ScheduledTimeEQ applies the EQ predicate on the "scheduled_time" field.
@@ -235,24 +300,24 @@ func ScheduledTimeNotNil() predicate.Notification {
 	return predicate.Notification(sql.FieldNotNull(FieldScheduledTime))
 }
 
-// HasNotificationType applies the HasEdge predicate on the "notification_type" edge.
-func HasNotificationType() predicate.Notification {
+// HasNotificationUsers applies the HasEdge predicate on the "notification_users" edge.
+func HasNotificationUsers() predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, NotificationTypeTable, NotificationTypeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NotificationUsersTable, NotificationUsersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasNotificationTypeWith applies the HasEdge predicate on the "notification_type" edge with a given conditions (other predicates).
-func HasNotificationTypeWith(preds ...predicate.NotificationType) predicate.Notification {
+// HasNotificationUsersWith applies the HasEdge predicate on the "notification_users" edge with a given conditions (other predicates).
+func HasNotificationUsersWith(preds ...predicate.NotificationUser) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(NotificationTypeInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, NotificationTypeTable, NotificationTypeColumn),
+			sqlgraph.To(NotificationUsersInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, NotificationUsersTable, NotificationUsersColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

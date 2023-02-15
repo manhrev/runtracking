@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/predicate"
 )
@@ -76,19 +76,23 @@ func (nuu *NotificationUserUpdate) SetNillableCreatedAt(t *time.Time) *Notificat
 	return nuu
 }
 
-// AddNotificationIDs adds the "notifications" edge to the NotificationType entity by IDs.
-func (nuu *NotificationUserUpdate) AddNotificationIDs(ids ...int64) *NotificationUserUpdate {
-	nuu.mutation.AddNotificationIDs(ids...)
+// SetNotificationID sets the "notification" edge to the Notification entity by ID.
+func (nuu *NotificationUserUpdate) SetNotificationID(id int64) *NotificationUserUpdate {
+	nuu.mutation.SetNotificationID(id)
 	return nuu
 }
 
-// AddNotifications adds the "notifications" edges to the NotificationType entity.
-func (nuu *NotificationUserUpdate) AddNotifications(n ...*NotificationType) *NotificationUserUpdate {
-	ids := make([]int64, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+// SetNillableNotificationID sets the "notification" edge to the Notification entity by ID if the given value is not nil.
+func (nuu *NotificationUserUpdate) SetNillableNotificationID(id *int64) *NotificationUserUpdate {
+	if id != nil {
+		nuu = nuu.SetNotificationID(*id)
 	}
-	return nuu.AddNotificationIDs(ids...)
+	return nuu
+}
+
+// SetNotification sets the "notification" edge to the Notification entity.
+func (nuu *NotificationUserUpdate) SetNotification(n *Notification) *NotificationUserUpdate {
+	return nuu.SetNotificationID(n.ID)
 }
 
 // Mutation returns the NotificationUserMutation object of the builder.
@@ -96,25 +100,10 @@ func (nuu *NotificationUserUpdate) Mutation() *NotificationUserMutation {
 	return nuu.mutation
 }
 
-// ClearNotifications clears all "notifications" edges to the NotificationType entity.
-func (nuu *NotificationUserUpdate) ClearNotifications() *NotificationUserUpdate {
-	nuu.mutation.ClearNotifications()
+// ClearNotification clears the "notification" edge to the Notification entity.
+func (nuu *NotificationUserUpdate) ClearNotification() *NotificationUserUpdate {
+	nuu.mutation.ClearNotification()
 	return nuu
-}
-
-// RemoveNotificationIDs removes the "notifications" edge to NotificationType entities by IDs.
-func (nuu *NotificationUserUpdate) RemoveNotificationIDs(ids ...int64) *NotificationUserUpdate {
-	nuu.mutation.RemoveNotificationIDs(ids...)
-	return nuu
-}
-
-// RemoveNotifications removes "notifications" edges to NotificationType entities.
-func (nuu *NotificationUserUpdate) RemoveNotifications(n ...*NotificationType) *NotificationUserUpdate {
-	ids := make([]int64, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
-	}
-	return nuu.RemoveNotificationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -177,52 +166,33 @@ func (nuu *NotificationUserUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if value, ok := nuu.mutation.CreatedAt(); ok {
 		_spec.SetField(notificationuser.FieldCreatedAt, field.TypeTime, value)
 	}
-	if nuu.mutation.NotificationsCleared() {
+	if nuu.mutation.NotificationCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notificationuser.NotificationsTable,
-			Columns: []string{notificationuser.NotificationsColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notificationuser.NotificationTable,
+			Columns: []string{notificationuser.NotificationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notification.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuu.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !nuu.mutation.NotificationsCleared() {
+	if nodes := nuu.mutation.NotificationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notificationuser.NotificationsTable,
-			Columns: []string{notificationuser.NotificationsColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notificationuser.NotificationTable,
+			Columns: []string{notificationuser.NotificationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuu.mutation.NotificationsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notificationuser.NotificationsTable,
-			Columns: []string{notificationuser.NotificationsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notification.FieldID,
 				},
 			},
 		}
@@ -298,19 +268,23 @@ func (nuuo *NotificationUserUpdateOne) SetNillableCreatedAt(t *time.Time) *Notif
 	return nuuo
 }
 
-// AddNotificationIDs adds the "notifications" edge to the NotificationType entity by IDs.
-func (nuuo *NotificationUserUpdateOne) AddNotificationIDs(ids ...int64) *NotificationUserUpdateOne {
-	nuuo.mutation.AddNotificationIDs(ids...)
+// SetNotificationID sets the "notification" edge to the Notification entity by ID.
+func (nuuo *NotificationUserUpdateOne) SetNotificationID(id int64) *NotificationUserUpdateOne {
+	nuuo.mutation.SetNotificationID(id)
 	return nuuo
 }
 
-// AddNotifications adds the "notifications" edges to the NotificationType entity.
-func (nuuo *NotificationUserUpdateOne) AddNotifications(n ...*NotificationType) *NotificationUserUpdateOne {
-	ids := make([]int64, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+// SetNillableNotificationID sets the "notification" edge to the Notification entity by ID if the given value is not nil.
+func (nuuo *NotificationUserUpdateOne) SetNillableNotificationID(id *int64) *NotificationUserUpdateOne {
+	if id != nil {
+		nuuo = nuuo.SetNotificationID(*id)
 	}
-	return nuuo.AddNotificationIDs(ids...)
+	return nuuo
+}
+
+// SetNotification sets the "notification" edge to the Notification entity.
+func (nuuo *NotificationUserUpdateOne) SetNotification(n *Notification) *NotificationUserUpdateOne {
+	return nuuo.SetNotificationID(n.ID)
 }
 
 // Mutation returns the NotificationUserMutation object of the builder.
@@ -318,25 +292,10 @@ func (nuuo *NotificationUserUpdateOne) Mutation() *NotificationUserMutation {
 	return nuuo.mutation
 }
 
-// ClearNotifications clears all "notifications" edges to the NotificationType entity.
-func (nuuo *NotificationUserUpdateOne) ClearNotifications() *NotificationUserUpdateOne {
-	nuuo.mutation.ClearNotifications()
+// ClearNotification clears the "notification" edge to the Notification entity.
+func (nuuo *NotificationUserUpdateOne) ClearNotification() *NotificationUserUpdateOne {
+	nuuo.mutation.ClearNotification()
 	return nuuo
-}
-
-// RemoveNotificationIDs removes the "notifications" edge to NotificationType entities by IDs.
-func (nuuo *NotificationUserUpdateOne) RemoveNotificationIDs(ids ...int64) *NotificationUserUpdateOne {
-	nuuo.mutation.RemoveNotificationIDs(ids...)
-	return nuuo
-}
-
-// RemoveNotifications removes "notifications" edges to NotificationType entities.
-func (nuuo *NotificationUserUpdateOne) RemoveNotifications(n ...*NotificationType) *NotificationUserUpdateOne {
-	ids := make([]int64, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
-	}
-	return nuuo.RemoveNotificationIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -423,52 +382,33 @@ func (nuuo *NotificationUserUpdateOne) sqlSave(ctx context.Context) (_node *Noti
 	if value, ok := nuuo.mutation.CreatedAt(); ok {
 		_spec.SetField(notificationuser.FieldCreatedAt, field.TypeTime, value)
 	}
-	if nuuo.mutation.NotificationsCleared() {
+	if nuuo.mutation.NotificationCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notificationuser.NotificationsTable,
-			Columns: []string{notificationuser.NotificationsColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notificationuser.NotificationTable,
+			Columns: []string{notificationuser.NotificationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notification.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuuo.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !nuuo.mutation.NotificationsCleared() {
+	if nodes := nuuo.mutation.NotificationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notificationuser.NotificationsTable,
-			Columns: []string{notificationuser.NotificationsColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notificationuser.NotificationTable,
+			Columns: []string{notificationuser.NotificationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuuo.mutation.NotificationsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notificationuser.NotificationsTable,
-			Columns: []string{notificationuser.NotificationsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notification.FieldID,
 				},
 			},
 		}

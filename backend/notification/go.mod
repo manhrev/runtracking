@@ -5,7 +5,6 @@ replace github.com/manhrev/runtracking/backend/auth => ../auth
 go 1.18
 
 require (
-	ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb
 	cloud.google.com/go/cloudtasks v1.8.0
 	entgo.io/ent v0.11.7
 	github.com/go-sql-driver/mysql v1.7.0
@@ -14,6 +13,7 @@ require (
 )
 
 require (
+	ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb // indirect
 	cloud.google.com/go/compute v1.15.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.8.0 // indirect
@@ -36,6 +36,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/manhrev/runtracking/backend/auth v0.0.0-20230110154219-a1319857ec66
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
+	github.com/oliveroneill/exponent-server-sdk-golang v0.0.0-20210823140141-d050598be512
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect

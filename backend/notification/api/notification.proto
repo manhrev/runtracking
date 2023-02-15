@@ -7,31 +7,23 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 service Notification {
-    rpc PushNoti2AllUsers(PushNoti2AllUsersRequest) returns (google.protobuf.Empty){};
-    rpc PushNoti2MembersOfGroup(PushNoti2MembersOfGroupRequest) returns (google.protobuf.Empty){};
-    rpc PushNoti2User(PushNoti2UserRequest) returns (google.protobuf.Empty) {};
+    rpc PushNotification(PushNotiRequest) returns (google.protobuf.Empty){};
 }
 
-message Notify{
+message PushNotiRequest{
     string messeage = 1;
     google.protobuf.Timestamp scheduled_time = 2;
+    enum NOTIFICATION_TYPE{
+        ALLUSERS = 0;
+        MEMBERS_OF_GROUP = 1;
+        GROUPS_OF_EVENT = 2;
+        ONLYUSER = 3;
+    }
+    NOTIFICATION_TYPE type = 3;
+    int64 received_id = 4;
 }
 
-message PushNoti2AllUsersRequest{
-    Notify notify = 1;
-}
 
-
-
-message PushNoti2MembersOfGroupRequest{
-
-}
-
-
-
-message PushNoti2UserRequest{
-
-}
 
 
 

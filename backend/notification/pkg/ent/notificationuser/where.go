@@ -170,24 +170,24 @@ func CreatedAtLTE(v time.Time) predicate.NotificationUser {
 	return predicate.NotificationUser(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// HasNotifications applies the HasEdge predicate on the "notifications" edge.
-func HasNotifications() predicate.NotificationUser {
+// HasNotification applies the HasEdge predicate on the "notification" edge.
+func HasNotification() predicate.NotificationUser {
 	return predicate.NotificationUser(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, NotificationsTable, NotificationsColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, NotificationTable, NotificationColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasNotificationsWith applies the HasEdge predicate on the "notifications" edge with a given conditions (other predicates).
-func HasNotificationsWith(preds ...predicate.NotificationType) predicate.NotificationUser {
+// HasNotificationWith applies the HasEdge predicate on the "notification" edge with a given conditions (other predicates).
+func HasNotificationWith(preds ...predicate.Notification) predicate.NotificationUser {
 	return predicate.NotificationUser(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(NotificationsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, NotificationsTable, NotificationsColumn),
+			sqlgraph.To(NotificationInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, NotificationTable, NotificationColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

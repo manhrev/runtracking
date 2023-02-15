@@ -9,46 +9,38 @@ const (
 	FieldID = "id"
 	// FieldMessage holds the string denoting the message field in the database.
 	FieldMessage = "message"
-	// FieldTypeID holds the string denoting the type_id field in the database.
-	FieldTypeID = "type_id"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
+	// FieldReceivedID holds the string denoting the received_id field in the database.
+	FieldReceivedID = "received_id"
 	// FieldScheduledTime holds the string denoting the scheduled_time field in the database.
 	FieldScheduledTime = "scheduled_time"
-	// EdgeNotificationType holds the string denoting the notification_type edge name in mutations.
-	EdgeNotificationType = "notification_type"
+	// EdgeNotificationUsers holds the string denoting the notification_users edge name in mutations.
+	EdgeNotificationUsers = "notification_users"
 	// Table holds the table name of the notification in the database.
 	Table = "notifications"
-	// NotificationTypeTable is the table that holds the notification_type relation/edge.
-	NotificationTypeTable = "notifications"
-	// NotificationTypeInverseTable is the table name for the NotificationType entity.
-	// It exists in this package in order to avoid circular dependency with the "notificationtype" package.
-	NotificationTypeInverseTable = "notification_types"
-	// NotificationTypeColumn is the table column denoting the notification_type relation/edge.
-	NotificationTypeColumn = "notification_type_notifications"
+	// NotificationUsersTable is the table that holds the notification_users relation/edge.
+	NotificationUsersTable = "notification_users"
+	// NotificationUsersInverseTable is the table name for the NotificationUser entity.
+	// It exists in this package in order to avoid circular dependency with the "notificationuser" package.
+	NotificationUsersInverseTable = "notification_users"
+	// NotificationUsersColumn is the table column denoting the notification_users relation/edge.
+	NotificationUsersColumn = "notification_notification_users"
 )
 
 // Columns holds all SQL columns for notification fields.
 var Columns = []string{
 	FieldID,
 	FieldMessage,
-	FieldTypeID,
+	FieldType,
+	FieldReceivedID,
 	FieldScheduledTime,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "notifications"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"notification_type_notifications",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

@@ -9,9 +9,6 @@ import (
 // Notification is the predicate function for notification builders.
 type Notification func(*sql.Selector)
 
-// NotificationType is the predicate function for notificationtype builders.
-type NotificationType func(*sql.Selector)
-
 // NotificationUser is the predicate function for notificationuser builders.
 type NotificationUser func(*sql.Selector)
 

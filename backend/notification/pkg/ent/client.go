@@ -11,7 +11,6 @@ import (
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/migrate"
 
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/userdevice"
 
@@ -27,8 +26,6 @@ type Client struct {
 	Schema *migrate.Schema
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
-	// NotificationType is the client for interacting with the NotificationType builders.
-	NotificationType *NotificationTypeClient
 	// NotificationUser is the client for interacting with the NotificationUser builders.
 	NotificationUser *NotificationUserClient
 	// UserDevice is the client for interacting with the UserDevice builders.
@@ -47,7 +44,6 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Notification = NewNotificationClient(c.config)
-	c.NotificationType = NewNotificationTypeClient(c.config)
 	c.NotificationUser = NewNotificationUserClient(c.config)
 	c.UserDevice = NewUserDeviceClient(c.config)
 }
@@ -84,7 +80,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:              ctx,
 		config:           cfg,
 		Notification:     NewNotificationClient(cfg),
-		NotificationType: NewNotificationTypeClient(cfg),
 		NotificationUser: NewNotificationUserClient(cfg),
 		UserDevice:       NewUserDeviceClient(cfg),
 	}, nil
@@ -107,7 +102,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:              ctx,
 		config:           cfg,
 		Notification:     NewNotificationClient(cfg),
-		NotificationType: NewNotificationTypeClient(cfg),
 		NotificationUser: NewNotificationUserClient(cfg),
 		UserDevice:       NewUserDeviceClient(cfg),
 	}, nil
@@ -140,7 +134,6 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Notification.Use(hooks...)
-	c.NotificationType.Use(hooks...)
 	c.NotificationUser.Use(hooks...)
 	c.UserDevice.Use(hooks...)
 }
@@ -149,7 +142,6 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Notification.Intercept(interceptors...)
-	c.NotificationType.Intercept(interceptors...)
 	c.NotificationUser.Intercept(interceptors...)
 	c.UserDevice.Intercept(interceptors...)
 }
@@ -159,8 +151,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *NotificationMutation:
 		return c.Notification.mutate(ctx, m)
-	case *NotificationTypeMutation:
-		return c.NotificationType.mutate(ctx, m)
 	case *NotificationUserMutation:
 		return c.NotificationUser.mutate(ctx, m)
 	case *UserDeviceMutation:
@@ -263,15 +253,15 @@ func (c *NotificationClient) GetX(ctx context.Context, id int64) *Notification {
 	return obj
 }
 
-// QueryNotificationType queries the notification_type edge of a Notification.
-func (c *NotificationClient) QueryNotificationType(n *Notification) *NotificationTypeQuery {
-	query := (&NotificationTypeClient{config: c.config}).Query()
+// QueryNotificationUsers queries the notification_users edge of a Notification.
+func (c *NotificationClient) QueryNotificationUsers(n *Notification) *NotificationUserQuery {
+	query := (&NotificationUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(notification.Table, notification.FieldID, id),
-			sqlgraph.To(notificationtype.Table, notificationtype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, notification.NotificationTypeTable, notification.NotificationTypeColumn),
+			sqlgraph.To(notificationuser.Table, notificationuser.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, notification.NotificationUsersTable, notification.NotificationUsersColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -301,140 +291,6 @@ func (c *NotificationClient) mutate(ctx context.Context, m *NotificationMutation
 		return (&NotificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Notification mutation op: %q", m.Op())
-	}
-}
-
-// NotificationTypeClient is a client for the NotificationType schema.
-type NotificationTypeClient struct {
-	config
-}
-
-// NewNotificationTypeClient returns a client for the NotificationType from the given config.
-func NewNotificationTypeClient(c config) *NotificationTypeClient {
-	return &NotificationTypeClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `notificationtype.Hooks(f(g(h())))`.
-func (c *NotificationTypeClient) Use(hooks ...Hook) {
-	c.hooks.NotificationType = append(c.hooks.NotificationType, hooks...)
-}
-
-// Use adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `notificationtype.Intercept(f(g(h())))`.
-func (c *NotificationTypeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.NotificationType = append(c.inters.NotificationType, interceptors...)
-}
-
-// Create returns a builder for creating a NotificationType entity.
-func (c *NotificationTypeClient) Create() *NotificationTypeCreate {
-	mutation := newNotificationTypeMutation(c.config, OpCreate)
-	return &NotificationTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of NotificationType entities.
-func (c *NotificationTypeClient) CreateBulk(builders ...*NotificationTypeCreate) *NotificationTypeCreateBulk {
-	return &NotificationTypeCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for NotificationType.
-func (c *NotificationTypeClient) Update() *NotificationTypeUpdate {
-	mutation := newNotificationTypeMutation(c.config, OpUpdate)
-	return &NotificationTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *NotificationTypeClient) UpdateOne(nt *NotificationType) *NotificationTypeUpdateOne {
-	mutation := newNotificationTypeMutation(c.config, OpUpdateOne, withNotificationType(nt))
-	return &NotificationTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *NotificationTypeClient) UpdateOneID(id int64) *NotificationTypeUpdateOne {
-	mutation := newNotificationTypeMutation(c.config, OpUpdateOne, withNotificationTypeID(id))
-	return &NotificationTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for NotificationType.
-func (c *NotificationTypeClient) Delete() *NotificationTypeDelete {
-	mutation := newNotificationTypeMutation(c.config, OpDelete)
-	return &NotificationTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *NotificationTypeClient) DeleteOne(nt *NotificationType) *NotificationTypeDeleteOne {
-	return c.DeleteOneID(nt.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *NotificationTypeClient) DeleteOneID(id int64) *NotificationTypeDeleteOne {
-	builder := c.Delete().Where(notificationtype.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &NotificationTypeDeleteOne{builder}
-}
-
-// Query returns a query builder for NotificationType.
-func (c *NotificationTypeClient) Query() *NotificationTypeQuery {
-	return &NotificationTypeQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeNotificationType},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a NotificationType entity by its id.
-func (c *NotificationTypeClient) Get(ctx context.Context, id int64) (*NotificationType, error) {
-	return c.Query().Where(notificationtype.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *NotificationTypeClient) GetX(ctx context.Context, id int64) *NotificationType {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryNotifications queries the notifications edge of a NotificationType.
-func (c *NotificationTypeClient) QueryNotifications(nt *NotificationType) *NotificationQuery {
-	query := (&NotificationClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := nt.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(notificationtype.Table, notificationtype.FieldID, id),
-			sqlgraph.To(notification.Table, notification.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, notificationtype.NotificationsTable, notificationtype.NotificationsColumn),
-		)
-		fromV = sqlgraph.Neighbors(nt.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *NotificationTypeClient) Hooks() []Hook {
-	return c.hooks.NotificationType
-}
-
-// Interceptors returns the client interceptors.
-func (c *NotificationTypeClient) Interceptors() []Interceptor {
-	return c.inters.NotificationType
-}
-
-func (c *NotificationTypeClient) mutate(ctx context.Context, m *NotificationTypeMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&NotificationTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&NotificationTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&NotificationTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&NotificationTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown NotificationType mutation op: %q", m.Op())
 	}
 }
 
@@ -531,15 +387,15 @@ func (c *NotificationUserClient) GetX(ctx context.Context, id int64) *Notificati
 	return obj
 }
 
-// QueryNotifications queries the notifications edge of a NotificationUser.
-func (c *NotificationUserClient) QueryNotifications(nu *NotificationUser) *NotificationTypeQuery {
-	query := (&NotificationTypeClient{config: c.config}).Query()
+// QueryNotification queries the notification edge of a NotificationUser.
+func (c *NotificationUserClient) QueryNotification(nu *NotificationUser) *NotificationQuery {
+	query := (&NotificationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := nu.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(notificationuser.Table, notificationuser.FieldID, id),
-			sqlgraph.To(notificationtype.Table, notificationtype.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, notificationuser.NotificationsTable, notificationuser.NotificationsColumn),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notificationuser.NotificationTable, notificationuser.NotificationColumn),
 		)
 		fromV = sqlgraph.Neighbors(nu.driver.Dialect(), step)
 		return fromV, nil

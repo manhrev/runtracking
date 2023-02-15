@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 )
 
@@ -61,19 +61,23 @@ func (nuc *NotificationUserCreate) SetID(i int64) *NotificationUserCreate {
 	return nuc
 }
 
-// AddNotificationIDs adds the "notifications" edge to the NotificationType entity by IDs.
-func (nuc *NotificationUserCreate) AddNotificationIDs(ids ...int64) *NotificationUserCreate {
-	nuc.mutation.AddNotificationIDs(ids...)
+// SetNotificationID sets the "notification" edge to the Notification entity by ID.
+func (nuc *NotificationUserCreate) SetNotificationID(id int64) *NotificationUserCreate {
+	nuc.mutation.SetNotificationID(id)
 	return nuc
 }
 
-// AddNotifications adds the "notifications" edges to the NotificationType entity.
-func (nuc *NotificationUserCreate) AddNotifications(n ...*NotificationType) *NotificationUserCreate {
-	ids := make([]int64, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+// SetNillableNotificationID sets the "notification" edge to the Notification entity by ID if the given value is not nil.
+func (nuc *NotificationUserCreate) SetNillableNotificationID(id *int64) *NotificationUserCreate {
+	if id != nil {
+		nuc = nuc.SetNotificationID(*id)
 	}
-	return nuc.AddNotificationIDs(ids...)
+	return nuc
+}
+
+// SetNotification sets the "notification" edge to the Notification entity.
+func (nuc *NotificationUserCreate) SetNotification(n *Notification) *NotificationUserCreate {
+	return nuc.SetNotificationID(n.ID)
 }
 
 // Mutation returns the NotificationUserMutation object of the builder.
@@ -175,23 +179,24 @@ func (nuc *NotificationUserCreate) createSpec() (*NotificationUser, *sqlgraph.Cr
 		_spec.SetField(notificationuser.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := nuc.mutation.NotificationsIDs(); len(nodes) > 0 {
+	if nodes := nuc.mutation.NotificationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notificationuser.NotificationsTable,
-			Columns: []string{notificationuser.NotificationsColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notificationuser.NotificationTable,
+			Columns: []string{notificationuser.NotificationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notification.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.notification_notification_users = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

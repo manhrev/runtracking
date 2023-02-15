@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
-	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationtype"
+	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/predicate"
 )
 
@@ -49,16 +49,57 @@ func (nu *NotificationUpdate) ClearMessage() *NotificationUpdate {
 	return nu
 }
 
-// SetTypeID sets the "type_id" field.
-func (nu *NotificationUpdate) SetTypeID(i int64) *NotificationUpdate {
-	nu.mutation.ResetTypeID()
-	nu.mutation.SetTypeID(i)
+// SetType sets the "type" field.
+func (nu *NotificationUpdate) SetType(i int64) *NotificationUpdate {
+	nu.mutation.ResetType()
+	nu.mutation.SetType(i)
 	return nu
 }
 
-// AddTypeID adds i to the "type_id" field.
-func (nu *NotificationUpdate) AddTypeID(i int64) *NotificationUpdate {
-	nu.mutation.AddTypeID(i)
+// SetNillableType sets the "type" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableType(i *int64) *NotificationUpdate {
+	if i != nil {
+		nu.SetType(*i)
+	}
+	return nu
+}
+
+// AddType adds i to the "type" field.
+func (nu *NotificationUpdate) AddType(i int64) *NotificationUpdate {
+	nu.mutation.AddType(i)
+	return nu
+}
+
+// ClearType clears the value of the "type" field.
+func (nu *NotificationUpdate) ClearType() *NotificationUpdate {
+	nu.mutation.ClearType()
+	return nu
+}
+
+// SetReceivedID sets the "received_id" field.
+func (nu *NotificationUpdate) SetReceivedID(i int64) *NotificationUpdate {
+	nu.mutation.ResetReceivedID()
+	nu.mutation.SetReceivedID(i)
+	return nu
+}
+
+// SetNillableReceivedID sets the "received_id" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableReceivedID(i *int64) *NotificationUpdate {
+	if i != nil {
+		nu.SetReceivedID(*i)
+	}
+	return nu
+}
+
+// AddReceivedID adds i to the "received_id" field.
+func (nu *NotificationUpdate) AddReceivedID(i int64) *NotificationUpdate {
+	nu.mutation.AddReceivedID(i)
+	return nu
+}
+
+// ClearReceivedID clears the value of the "received_id" field.
+func (nu *NotificationUpdate) ClearReceivedID() *NotificationUpdate {
+	nu.mutation.ClearReceivedID()
 	return nu
 }
 
@@ -82,23 +123,19 @@ func (nu *NotificationUpdate) ClearScheduledTime() *NotificationUpdate {
 	return nu
 }
 
-// SetNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID.
-func (nu *NotificationUpdate) SetNotificationTypeID(id int64) *NotificationUpdate {
-	nu.mutation.SetNotificationTypeID(id)
+// AddNotificationUserIDs adds the "notification_users" edge to the NotificationUser entity by IDs.
+func (nu *NotificationUpdate) AddNotificationUserIDs(ids ...int64) *NotificationUpdate {
+	nu.mutation.AddNotificationUserIDs(ids...)
 	return nu
 }
 
-// SetNillableNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableNotificationTypeID(id *int64) *NotificationUpdate {
-	if id != nil {
-		nu = nu.SetNotificationTypeID(*id)
+// AddNotificationUsers adds the "notification_users" edges to the NotificationUser entity.
+func (nu *NotificationUpdate) AddNotificationUsers(n ...*NotificationUser) *NotificationUpdate {
+	ids := make([]int64, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return nu
-}
-
-// SetNotificationType sets the "notification_type" edge to the NotificationType entity.
-func (nu *NotificationUpdate) SetNotificationType(n *NotificationType) *NotificationUpdate {
-	return nu.SetNotificationTypeID(n.ID)
+	return nu.AddNotificationUserIDs(ids...)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -106,10 +143,25 @@ func (nu *NotificationUpdate) Mutation() *NotificationMutation {
 	return nu.mutation
 }
 
-// ClearNotificationType clears the "notification_type" edge to the NotificationType entity.
-func (nu *NotificationUpdate) ClearNotificationType() *NotificationUpdate {
-	nu.mutation.ClearNotificationType()
+// ClearNotificationUsers clears all "notification_users" edges to the NotificationUser entity.
+func (nu *NotificationUpdate) ClearNotificationUsers() *NotificationUpdate {
+	nu.mutation.ClearNotificationUsers()
 	return nu
+}
+
+// RemoveNotificationUserIDs removes the "notification_users" edge to NotificationUser entities by IDs.
+func (nu *NotificationUpdate) RemoveNotificationUserIDs(ids ...int64) *NotificationUpdate {
+	nu.mutation.RemoveNotificationUserIDs(ids...)
+	return nu
+}
+
+// RemoveNotificationUsers removes "notification_users" edges to NotificationUser entities.
+func (nu *NotificationUpdate) RemoveNotificationUsers(n ...*NotificationUser) *NotificationUpdate {
+	ids := make([]int64, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return nu.RemoveNotificationUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -163,11 +215,23 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nu.mutation.MessageCleared() {
 		_spec.ClearField(notification.FieldMessage, field.TypeString)
 	}
-	if value, ok := nu.mutation.TypeID(); ok {
-		_spec.SetField(notification.FieldTypeID, field.TypeInt64, value)
+	if value, ok := nu.mutation.GetType(); ok {
+		_spec.SetField(notification.FieldType, field.TypeInt64, value)
 	}
-	if value, ok := nu.mutation.AddedTypeID(); ok {
-		_spec.AddField(notification.FieldTypeID, field.TypeInt64, value)
+	if value, ok := nu.mutation.AddedType(); ok {
+		_spec.AddField(notification.FieldType, field.TypeInt64, value)
+	}
+	if nu.mutation.TypeCleared() {
+		_spec.ClearField(notification.FieldType, field.TypeInt64)
+	}
+	if value, ok := nu.mutation.ReceivedID(); ok {
+		_spec.SetField(notification.FieldReceivedID, field.TypeInt64, value)
+	}
+	if value, ok := nu.mutation.AddedReceivedID(); ok {
+		_spec.AddField(notification.FieldReceivedID, field.TypeInt64, value)
+	}
+	if nu.mutation.ReceivedIDCleared() {
+		_spec.ClearField(notification.FieldReceivedID, field.TypeInt64)
 	}
 	if value, ok := nu.mutation.ScheduledTime(); ok {
 		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
@@ -175,33 +239,52 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nu.mutation.ScheduledTimeCleared() {
 		_spec.ClearField(notification.FieldScheduledTime, field.TypeTime)
 	}
-	if nu.mutation.NotificationTypeCleared() {
+	if nu.mutation.NotificationUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   notification.NotificationTypeTable,
-			Columns: []string{notification.NotificationTypeColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   notification.NotificationUsersTable,
+			Columns: []string{notification.NotificationUsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notificationuser.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.NotificationTypeIDs(); len(nodes) > 0 {
+	if nodes := nu.mutation.RemovedNotificationUsersIDs(); len(nodes) > 0 && !nu.mutation.NotificationUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   notification.NotificationTypeTable,
-			Columns: []string{notification.NotificationTypeColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   notification.NotificationUsersTable,
+			Columns: []string{notification.NotificationUsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notificationuser.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.NotificationUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   notification.NotificationUsersTable,
+			Columns: []string{notification.NotificationUsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: notificationuser.FieldID,
 				},
 			},
 		}
@@ -250,16 +333,57 @@ func (nuo *NotificationUpdateOne) ClearMessage() *NotificationUpdateOne {
 	return nuo
 }
 
-// SetTypeID sets the "type_id" field.
-func (nuo *NotificationUpdateOne) SetTypeID(i int64) *NotificationUpdateOne {
-	nuo.mutation.ResetTypeID()
-	nuo.mutation.SetTypeID(i)
+// SetType sets the "type" field.
+func (nuo *NotificationUpdateOne) SetType(i int64) *NotificationUpdateOne {
+	nuo.mutation.ResetType()
+	nuo.mutation.SetType(i)
 	return nuo
 }
 
-// AddTypeID adds i to the "type_id" field.
-func (nuo *NotificationUpdateOne) AddTypeID(i int64) *NotificationUpdateOne {
-	nuo.mutation.AddTypeID(i)
+// SetNillableType sets the "type" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableType(i *int64) *NotificationUpdateOne {
+	if i != nil {
+		nuo.SetType(*i)
+	}
+	return nuo
+}
+
+// AddType adds i to the "type" field.
+func (nuo *NotificationUpdateOne) AddType(i int64) *NotificationUpdateOne {
+	nuo.mutation.AddType(i)
+	return nuo
+}
+
+// ClearType clears the value of the "type" field.
+func (nuo *NotificationUpdateOne) ClearType() *NotificationUpdateOne {
+	nuo.mutation.ClearType()
+	return nuo
+}
+
+// SetReceivedID sets the "received_id" field.
+func (nuo *NotificationUpdateOne) SetReceivedID(i int64) *NotificationUpdateOne {
+	nuo.mutation.ResetReceivedID()
+	nuo.mutation.SetReceivedID(i)
+	return nuo
+}
+
+// SetNillableReceivedID sets the "received_id" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableReceivedID(i *int64) *NotificationUpdateOne {
+	if i != nil {
+		nuo.SetReceivedID(*i)
+	}
+	return nuo
+}
+
+// AddReceivedID adds i to the "received_id" field.
+func (nuo *NotificationUpdateOne) AddReceivedID(i int64) *NotificationUpdateOne {
+	nuo.mutation.AddReceivedID(i)
+	return nuo
+}
+
+// ClearReceivedID clears the value of the "received_id" field.
+func (nuo *NotificationUpdateOne) ClearReceivedID() *NotificationUpdateOne {
+	nuo.mutation.ClearReceivedID()
 	return nuo
 }
 
@@ -283,23 +407,19 @@ func (nuo *NotificationUpdateOne) ClearScheduledTime() *NotificationUpdateOne {
 	return nuo
 }
 
-// SetNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID.
-func (nuo *NotificationUpdateOne) SetNotificationTypeID(id int64) *NotificationUpdateOne {
-	nuo.mutation.SetNotificationTypeID(id)
+// AddNotificationUserIDs adds the "notification_users" edge to the NotificationUser entity by IDs.
+func (nuo *NotificationUpdateOne) AddNotificationUserIDs(ids ...int64) *NotificationUpdateOne {
+	nuo.mutation.AddNotificationUserIDs(ids...)
 	return nuo
 }
 
-// SetNillableNotificationTypeID sets the "notification_type" edge to the NotificationType entity by ID if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableNotificationTypeID(id *int64) *NotificationUpdateOne {
-	if id != nil {
-		nuo = nuo.SetNotificationTypeID(*id)
+// AddNotificationUsers adds the "notification_users" edges to the NotificationUser entity.
+func (nuo *NotificationUpdateOne) AddNotificationUsers(n ...*NotificationUser) *NotificationUpdateOne {
+	ids := make([]int64, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return nuo
-}
-
-// SetNotificationType sets the "notification_type" edge to the NotificationType entity.
-func (nuo *NotificationUpdateOne) SetNotificationType(n *NotificationType) *NotificationUpdateOne {
-	return nuo.SetNotificationTypeID(n.ID)
+	return nuo.AddNotificationUserIDs(ids...)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -307,10 +427,25 @@ func (nuo *NotificationUpdateOne) Mutation() *NotificationMutation {
 	return nuo.mutation
 }
 
-// ClearNotificationType clears the "notification_type" edge to the NotificationType entity.
-func (nuo *NotificationUpdateOne) ClearNotificationType() *NotificationUpdateOne {
-	nuo.mutation.ClearNotificationType()
+// ClearNotificationUsers clears all "notification_users" edges to the NotificationUser entity.
+func (nuo *NotificationUpdateOne) ClearNotificationUsers() *NotificationUpdateOne {
+	nuo.mutation.ClearNotificationUsers()
 	return nuo
+}
+
+// RemoveNotificationUserIDs removes the "notification_users" edge to NotificationUser entities by IDs.
+func (nuo *NotificationUpdateOne) RemoveNotificationUserIDs(ids ...int64) *NotificationUpdateOne {
+	nuo.mutation.RemoveNotificationUserIDs(ids...)
+	return nuo
+}
+
+// RemoveNotificationUsers removes "notification_users" edges to NotificationUser entities.
+func (nuo *NotificationUpdateOne) RemoveNotificationUsers(n ...*NotificationUser) *NotificationUpdateOne {
+	ids := make([]int64, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return nuo.RemoveNotificationUserIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -388,11 +523,23 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 	if nuo.mutation.MessageCleared() {
 		_spec.ClearField(notification.FieldMessage, field.TypeString)
 	}
-	if value, ok := nuo.mutation.TypeID(); ok {
-		_spec.SetField(notification.FieldTypeID, field.TypeInt64, value)
+	if value, ok := nuo.mutation.GetType(); ok {
+		_spec.SetField(notification.FieldType, field.TypeInt64, value)
 	}
-	if value, ok := nuo.mutation.AddedTypeID(); ok {
-		_spec.AddField(notification.FieldTypeID, field.TypeInt64, value)
+	if value, ok := nuo.mutation.AddedType(); ok {
+		_spec.AddField(notification.FieldType, field.TypeInt64, value)
+	}
+	if nuo.mutation.TypeCleared() {
+		_spec.ClearField(notification.FieldType, field.TypeInt64)
+	}
+	if value, ok := nuo.mutation.ReceivedID(); ok {
+		_spec.SetField(notification.FieldReceivedID, field.TypeInt64, value)
+	}
+	if value, ok := nuo.mutation.AddedReceivedID(); ok {
+		_spec.AddField(notification.FieldReceivedID, field.TypeInt64, value)
+	}
+	if nuo.mutation.ReceivedIDCleared() {
+		_spec.ClearField(notification.FieldReceivedID, field.TypeInt64)
 	}
 	if value, ok := nuo.mutation.ScheduledTime(); ok {
 		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
@@ -400,33 +547,52 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 	if nuo.mutation.ScheduledTimeCleared() {
 		_spec.ClearField(notification.FieldScheduledTime, field.TypeTime)
 	}
-	if nuo.mutation.NotificationTypeCleared() {
+	if nuo.mutation.NotificationUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   notification.NotificationTypeTable,
-			Columns: []string{notification.NotificationTypeColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   notification.NotificationUsersTable,
+			Columns: []string{notification.NotificationUsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notificationuser.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.NotificationTypeIDs(); len(nodes) > 0 {
+	if nodes := nuo.mutation.RemovedNotificationUsersIDs(); len(nodes) > 0 && !nuo.mutation.NotificationUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   notification.NotificationTypeTable,
-			Columns: []string{notification.NotificationTypeColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   notification.NotificationUsersTable,
+			Columns: []string{notification.NotificationUsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: notificationtype.FieldID,
+					Column: notificationuser.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.NotificationUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   notification.NotificationUsersTable,
+			Columns: []string{notification.NotificationUsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: notificationuser.FieldID,
 				},
 			},
 		}

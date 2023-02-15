@@ -17,7 +17,9 @@ func (Notification) Fields() []ent.Field {
 			Unique(),
 		field.String("message").
 			Optional(),
-		field.Int64("type_id").
+		field.Int64("type").
+			Optional(),
+		field.Int64("received_id").
 			Optional(),
 		field.Time("scheduled_time").
 			Optional(),
@@ -26,8 +28,6 @@ func (Notification) Fields() []ent.Field {
 
 func (Notification) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("notification_type", NotificationType.Type).
-			Ref("notifications").
-			Unique(),
+		edge.To("notification_users", NotificationUser.Type),
 	}
 }
