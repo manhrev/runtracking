@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/internal/server/notification"
+	"github.com/manhrev/runtracking/backend/notification/internal/service/expopush"
 	pb "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
 	"google.golang.org/grpc"
@@ -54,6 +55,8 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
+	expoPushService := expopush.NewExpoPushService(entClient)
+
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", auth_service, auth_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("error while create connect to sample service: %v", err)
@@ -62,7 +65,7 @@ func Serve(server *grpc.Server) {
 
 	// http.HandleFunc("/notification/pushnoti2allusers", notification.PushNoti2AllUsers)
 	r := mux.NewRouter()
-	notification.RegisterRouteHttpServer(entClient, r, authClient)
+	notification.RegisterRouteHttpServer(entClient, r, authClient, expoPushService)
 
 	go func() {
 		err = http.ListenAndServe(":8000", r)
