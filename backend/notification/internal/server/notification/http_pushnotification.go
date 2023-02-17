@@ -28,6 +28,7 @@ func (s *notificationHttpServer) PushNotification(w http.ResponseWriter, r *http
 	}
 
 	userInfos, err := q.GetAllUsers(r.Context(), int64(message.ReceivedId))
+	log.Println(userInfos)
 	if err != nil {
 		panic(err)
 	}

@@ -48,6 +48,7 @@ func (s *authServer) Me(ctx context.Context, _ *emptypb.Empty) (*auth.MeReply, e
 
 	return &auth.MeReply{
 		User: &auth.UserInfo{
+			UserId:      user.ID,
 			Username:    user.Username,
 			Email:       user.Email,
 			PhoneNumber: user.Phone,

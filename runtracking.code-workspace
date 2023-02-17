@@ -4,10 +4,10 @@
 			"path": "."
 		},
 		{
-			"path": "backend/notification"
+			"path": "backend/auth"
 		},
 		{
-			"path": "backend/auth"
+			"path": "backend/notification"
 		}
 	],
 	"settings": {}

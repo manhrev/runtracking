@@ -44,7 +44,6 @@ func (e *expoPush) PushBulkNotification(ctx context.Context, userIds []int64, me
 		if err != nil {
 			return nil, errors.New("Fail when convert push token")
 		}
-		log.Println(messages)
 		messages = append(messages, expo.PushMessage{
 			To:       []expo.ExponentPushToken{pushToken},
 			Body:     message.Message,
@@ -53,6 +52,7 @@ func (e *expoPush) PushBulkNotification(ctx context.Context, userIds []int64, me
 			Title:    "Go Tracker Notification",
 			Priority: expo.DefaultPriority,
 		})
+		log.Println(messages)
 	}
 
 	response, err := e.expoPushClient.PublishMultiple(messages)

@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NotificationClient interface {
 	PushNotification(ctx context.Context, in *PushNotiRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CheckIfExistOrSaveExpoPushToken(ctx context.Context, in *ExpoPushTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RemoveExpoPushToken(ctx context.Context, in *ExpoPushTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type notificationClient struct {
@@ -43,11 +45,31 @@ func (c *notificationClient) PushNotification(ctx context.Context, in *PushNotiR
 	return out, nil
 }
 
+func (c *notificationClient) CheckIfExistOrSaveExpoPushToken(ctx context.Context, in *ExpoPushTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/notification.Notification/CheckIfExistOrSaveExpoPushToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationClient) RemoveExpoPushToken(ctx context.Context, in *ExpoPushTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/notification.Notification/RemoveExpoPushToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServer is the server API for Notification service.
 // All implementations must embed UnimplementedNotificationServer
 // for forward compatibility
 type NotificationServer interface {
 	PushNotification(context.Context, *PushNotiRequest) (*emptypb.Empty, error)
+	CheckIfExistOrSaveExpoPushToken(context.Context, *ExpoPushTokenRequest) (*emptypb.Empty, error)
+	RemoveExpoPushToken(context.Context, *ExpoPushTokenRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNotificationServer()
 }
 
@@ -57,6 +79,12 @@ type UnimplementedNotificationServer struct {
 
 func (UnimplementedNotificationServer) PushNotification(context.Context, *PushNotiRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PushNotification not implemented")
+}
+func (UnimplementedNotificationServer) CheckIfExistOrSaveExpoPushToken(context.Context, *ExpoPushTokenRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckIfExistOrSaveExpoPushToken not implemented")
+}
+func (UnimplementedNotificationServer) RemoveExpoPushToken(context.Context, *ExpoPushTokenRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveExpoPushToken not implemented")
 }
 func (UnimplementedNotificationServer) mustEmbedUnimplementedNotificationServer() {}
 
@@ -89,6 +117,42 @@ func _Notification_PushNotification_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Notification_CheckIfExistOrSaveExpoPushToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExpoPushTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServer).CheckIfExistOrSaveExpoPushToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/notification.Notification/CheckIfExistOrSaveExpoPushToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServer).CheckIfExistOrSaveExpoPushToken(ctx, req.(*ExpoPushTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Notification_RemoveExpoPushToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExpoPushTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServer).RemoveExpoPushToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/notification.Notification/RemoveExpoPushToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServer).RemoveExpoPushToken(ctx, req.(*ExpoPushTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Notification_ServiceDesc is the grpc.ServiceDesc for Notification service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -99,6 +163,14 @@ var Notification_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PushNotification",
 			Handler:    _Notification_PushNotification_Handler,
+		},
+		{
+			MethodName: "CheckIfExistOrSaveExpoPushToken",
+			Handler:    _Notification_CheckIfExistOrSaveExpoPushToken_Handler,
+		},
+		{
+			MethodName: "RemoveExpoPushToken",
+			Handler:    _Notification_RemoveExpoPushToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

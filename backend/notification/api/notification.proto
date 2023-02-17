@@ -8,7 +8,14 @@ import "google/protobuf/empty.proto";
 
 service Notification {
     rpc PushNotification(PushNotiRequest) returns (google.protobuf.Empty){};
+    rpc CheckIfExistOrSaveExpoPushToken(ExpoPushTokenRequest) returns (google.protobuf.Empty) {};
+    rpc RemoveExpoPushToken(ExpoPushTokenRequest) returns (google.protobuf.Empty) {};
 }
+message ExpoPushTokenRequest{
+    int64 user_id = 1;
+    string expo_push_token = 2;
+}
+
 
 message PushNotiRequest{
     string messeage = 1;

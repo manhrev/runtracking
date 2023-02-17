@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { LoginRequest } from "../../../lib/auth/auth_pb";
-import { authClient } from "../../../utils/grpc";
+import { authClient, notificationClient } from "../../../utils/grpc";
 
 export const getMeThunk = createAsyncThunk("auth/getMe", async () => {
   return await authClient.getMe();
@@ -14,5 +14,6 @@ export const loginThunk = createAsyncThunk(
 );
 
 export const logoutThunk = createAsyncThunk("auth/logout", async () => {
+  // await notificationClient
   return await authClient.logOut();
 });
