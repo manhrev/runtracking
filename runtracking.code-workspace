@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "backend/auth"
+		},
+		{
+			"path": "backend/notification"
+		},
+		{
+			"path": "backend/activity"
+		}
+	],
+	"settings": {}
+}

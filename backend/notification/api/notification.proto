@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package notification;
+
+option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;notification";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service Notification {
+    rpc PushNotification(PushNotiRequest) returns (google.protobuf.Empty){};
+    rpc CheckIfExistOrSaveExpoPushToken(ExpoPushTokenRequest) returns (google.protobuf.Empty) {};
+    rpc RemoveExpoPushToken(ExpoPushTokenRequest) returns (google.protobuf.Empty) {};
+    rpc ListNotificationInfo(ListNotificationInfoRequest) returns(ListNotificationInfoReply) {};
+    rpc DeleteNotificationInfo(IdRequest) returns(google.protobuf.Empty) {};
+}
+
+message IdRequest{
+    int64 id = 1;
+}
+message ExpoPushTokenRequest{
+    int64 user_id = 1;
+    string expo_push_token = 2;
+}
+
+message ListNotificationInfoReply{
+    repeated NotificationInfo notification_list = 1;
+    int64 total = 2;
+}
+
+message PushNotiRequest{
+    string messeage = 1;
+    google.protobuf.Timestamp scheduled_time = 2;
+    NOTIFICATION_TYPE type = 3;
+    int64 received_id = 4;
+}
+
+message ListNotificationInfoRequest{
+    uint32 limit = 1;
+    uint64 offset = 2;
+}
+
+message NotificationInfo{
+    int64 id = 1;
+    string message = 2;
+    NOTIFICATION_TYPE type = 3;
+    int64 reference_id = 6;
+    string image = 7;
+    bool is_seen = 4;
+    google.protobuf.Timestamp time = 5;
+}
+
+enum NOTIFICATION_TYPE{
+        ALLUSERS = 0;
+        MEMBERS_OF_GROUP = 1;
+        GROUPS_OF_EVENT = 2;
+        ONLYUSER = 3;
+    }
+
+
+
+
+

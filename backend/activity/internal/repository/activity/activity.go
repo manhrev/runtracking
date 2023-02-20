@@ -102,9 +102,10 @@ func (m *activityImpl) List(
 
 	// sort by type
 	switch sortBy {
-	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_DURATION:
-		byField = activity.FieldDuration
-	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_END_TIME:
+	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_DURATION:type ActivityStatisticData struct {
+		// 	activitypb.ActivityStatisticData
+		// 	Datetime time.Time `json:"date_time"`
+		// }
 		byField = activity.FieldEndTime
 	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_ENERGY:
 		byField = activity.FieldKcal

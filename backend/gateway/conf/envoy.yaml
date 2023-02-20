@@ -59,6 +59,15 @@ static_resources:
                           route:
                             cluster: group_cluster
                         - match:
+                            prefix: /notification.Notification
+                          route:
+                            cluster: notification_cluster
+                        - match:
+                            prefix: /notification
+                          route:
+                            cluster: notification_http_cluster
+                         
+                        - match:
                             prefix: /activity.Activity
                           route:
                             cluster: activity_cluster
@@ -113,6 +122,43 @@ static_resources:
                     socket_address:
                       address: group
                       port_value: 8080
+    - name: notification_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: notification_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: notification
+                      port_value: 8080
+
+    - name: notification_http_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http_protocol_options:
+              header_key_format:
+                stateful_formatter:
+                  name: notification_http_cluster
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.http.header_formatters.preserve_case.v3.PreserveCaseFormatterConfig
+      load_assignment:
+        cluster_name: notification_http_cluster
+        endpoints:
+        - lb_endpoints:
+          - endpoint:
+              address:
+                socket_address:
+                  address: notification
+                  port_value: 8000
 
     - name: activity_cluster
       connect_timeout: 1s

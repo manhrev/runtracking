@@ -28,6 +28,8 @@ type AuthClient interface {
 	LogOut(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MeReply, error)
 	SetHealthRecord(ctx context.Context, in *HealthRecordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetAllUsers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllUsersReply, error)
+	GetUserById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*UserInfo, error)
 }
 
 type authClient struct {
@@ -83,6 +85,24 @@ func (c *authClient) SetHealthRecord(ctx context.Context, in *HealthRecordReques
 	return out, nil
 }
 
+func (c *authClient) GetAllUsers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllUsersReply, error) {
+	out := new(GetAllUsersReply)
+	err := c.cc.Invoke(ctx, "/auth.Auth/GetAllUsers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) GetUserById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*UserInfo, error) {
+	out := new(UserInfo)
+	err := c.cc.Invoke(ctx, "/auth.Auth/GetUserById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -92,6 +112,8 @@ type AuthServer interface {
 	LogOut(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	Me(context.Context, *emptypb.Empty) (*MeReply, error)
 	SetHealthRecord(context.Context, *HealthRecordRequest) (*emptypb.Empty, error)
+	GetAllUsers(context.Context, *emptypb.Empty) (*GetAllUsersReply, error)
+	GetUserById(context.Context, *GetByIdRequest) (*UserInfo, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -113,6 +135,12 @@ func (UnimplementedAuthServer) Me(context.Context, *emptypb.Empty) (*MeReply, er
 }
 func (UnimplementedAuthServer) SetHealthRecord(context.Context, *HealthRecordRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetHealthRecord not implemented")
+}
+func (UnimplementedAuthServer) GetAllUsers(context.Context, *emptypb.Empty) (*GetAllUsersReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllUsers not implemented")
+}
+func (UnimplementedAuthServer) GetUserById(context.Context, *GetByIdRequest) (*UserInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -217,6 +245,42 @@ func _Auth_SetHealthRecord_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_GetAllUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).GetAllUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/GetAllUsers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).GetAllUsers(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).GetUserById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/GetUserById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).GetUserById(ctx, req.(*GetByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -243,6 +307,14 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetHealthRecord",
 			Handler:    _Auth_SetHealthRecord_Handler,
+		},
+		{
+			MethodName: "GetAllUsers",
+			Handler:    _Auth_GetAllUsers_Handler,
+		},
+		{
+			MethodName: "GetUserById",
+			Handler:    _Auth_GetUserById_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
