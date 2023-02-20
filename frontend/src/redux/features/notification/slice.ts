@@ -4,18 +4,25 @@ import { EXPO_PUSH_TOKEN, KEY_ACCESS_TOKEN } from "../../../utils/grpc";
 import { CommonState } from "../../common/types";
 import { StatusEnum } from "../../constant";
 import { RootState } from "../../reducers";
-import { checkIfExistOrSaveExpoPushTokenThunk,removeExpoPushTokenThunk } from "./thunk";
+import { NotificationInfo } from "../../../lib/notification/notification_pb";
+import { checkIfExistOrSaveExpoPushTokenThunk,
+          removeExpoPushTokenThunk,
+          listMoreNotificationInfoThunk,
+        listNotificationInfoThunk } from "./thunk";
 
 type NotificationState = {
-
+  notificationList: Array<NotificationInfo.AsObject>;
+  total: number
 } & CommonState;
 
 export const initialState: NotificationState = {
+  notificationList: [],
   status: StatusEnum.LOADING,
+  total: 0,
 };
 
 const slice = createSlice({
-  name: "user",
+  name: "notification",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -33,12 +40,38 @@ const slice = createSlice({
       AsyncStorage.removeItem(EXPO_PUSH_TOKEN);
       return;
     });
+
+    builder.addCase(listNotificationInfoThunk.pending, (state) => {
+        state.status = StatusEnum.LOADING;
+    });
+    builder.addCase(listMoreNotificationInfoThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING;
+    });
+
+    builder.addCase(listNotificationInfoThunk.fulfilled, (state, {payload}) => {
+      state.status = StatusEnum.LOADING;
+      const { response, error } = payload;
+      if (error) return;
+      state.status = StatusEnum.SUCCEEDED;
+      state.notificationList= response?.notificationListList || [];
+      state.total = response?.total || 0;
+  });
+
+  builder.addCase(listMoreNotificationInfoThunk.fulfilled, (state, {payload}) => {
+    state.status = StatusEnum.LOADING;
+    const { response, error } = payload;
+    if (error) return;
+    state.status = StatusEnum.SUCCEEDED;
+    state.notificationList= state.notificationList.concat(
+                         response?.notificationListList || []);
+    state.total += response?.total || 0;
+});
   
   },
 });
 
-export const selectUserSlice = (state: RootState) => state.user;
-export const isUserSliceLoading = (state: RootState) =>
-  state.user.status === StatusEnum.LOADING;
+export const selectNotificationList = (state: RootState) => state.notificationList
+export const isNotificationListLoading = (state: RootState) =>
+  state.activityList.status === StatusEnum.LOADING;
 
 export default slice.reducer;

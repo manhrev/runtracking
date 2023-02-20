@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "backend/notification"
+		},
+		{
+			"path": "backend/activity"
 		}
 	],
 	"settings": {}

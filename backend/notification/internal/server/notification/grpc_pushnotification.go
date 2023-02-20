@@ -11,7 +11,7 @@ import (
 
 func (s *notificationServer) PushNotification(ctx context.Context, request *noti.PushNotiRequest) (*emptypb.Empty, error) {
 
-	_, err := s.entClient.Notification.Create().
+	notification, err := s.entClient.Notification.Create().
 		SetMessage(request.GetMesseage()).
 		SetScheduledTime(request.GetScheduledTime().AsTime()).
 		SetReceivedID(request.GetReceivedId()).
@@ -19,10 +19,11 @@ func (s *notificationServer) PushNotification(ctx context.Context, request *noti
 		Save(ctx)
 
 	if err != nil {
-		return nil, errors.New("fail when save data to notification database")
+		return nil, errors.New("fail when save data to notification database " + err.Error())
 	}
 
 	message := cloudtask.NotificationTransfer{
+		Id:               int(notification.ID),
 		Message:          request.GetMesseage(),
 		ReceivedId:       int(request.GetReceivedId()),
 		NotificationType: int(request.GetType()),

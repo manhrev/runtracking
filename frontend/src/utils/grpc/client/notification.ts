@@ -1,33 +1,21 @@
 import { NotificationClient } from "../../../lib/notification/NotificationServiceClientPb";
 import {
  PushNotiRequest,
- ExpoPushTokenRequest
+ ExpoPushTokenRequest,
+ ListNotificationInfoRequest,
+ ListNotificationInfoReply
 } from "../../../lib/notification/notification_pb";
 
 import { GRPCClientConfig } from "../abstract/types";
 import gRPCClientAbstract from "../abstract/gRPCClient";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
+import { ListActivityInfoReply } from "../../../lib/activity/activity_pb";
 
 class rpcNotificationClient extends gRPCClientAbstract {
   constructor(config: GRPCClientConfig) {
     config.serviceName = "NOTIFICATION";
     super(NotificationClient, config);
   }
-
-//   async signUp(param: SignUpRequest.AsObject) {
-//     const req = new SignUpRequest();
-//     req.setUserName(param.userName);
-//     req.setPassword(param.password);
-//     req.setDisplayName(param.displayName);
-
-//     return await this.gRPCClientRequest<SignUpReply.AsObject>("signUp", req);
-//   }
-
-//   async pushNotification(param: PushNotiRequest.AsObject) {
-//     const req = new PushNotiRequest()
-//     req.
-//     return await this.gRPCClientRequest<Empty.AsObject>("pushNotification", req);
-//   }
 
   async checkIfExistOrSaveExpoPushToken(param: ExpoPushTokenRequest.AsObject) {
     const req = new ExpoPushTokenRequest()
@@ -41,6 +29,15 @@ class rpcNotificationClient extends gRPCClientAbstract {
     req.setExpoPushToken(param.expoPushToken)
     req.setUserId(param.userId)
     return await this.gRPCClientRequest<Empty.AsObject>("removeExpoPushToken", req);
+  }
+
+  async listNotificationInfo(param: ListNotificationInfoRequest.AsObject) {
+    const{limit, offset, } = param
+    const req = new ListNotificationInfoRequest()
+    req.setLimit(limit)
+      .setOffset(offset)
+
+    return await this.gRPCClientRequest<ListNotificationInfoReply.AsObject>("listNotificationInfo", req);
   }
 
 //   async logOut() {

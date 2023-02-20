@@ -123,7 +123,7 @@ const styles = (theme: AppTheme) =>
       alignItems: "center",
       flexDirection: "row",
     },
-    listItemValue: {
+    listItemValue:{
       marginTop: 10,
       display: "flex",
       flexDirection: "row",

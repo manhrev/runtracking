@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
+	"github.com/manhrev/runtracking/backend/notification/internal/repository"
 	"github.com/manhrev/runtracking/backend/notification/internal/service/expopush"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
 )
@@ -18,10 +19,14 @@ func NewHttpServer(entClient *ent.Client,
 		router:     router,
 		authClient: authClient,
 		expoPush:   expopush,
+		repository: repository.New(entClient),
 	}
 }
 
-func RegisterRouteHttpServer(entClient *ent.Client, router *mux.Router, authClient auth.AuthClient, expoPush expopush.ExpoPush) {
+func RegisterRouteHttpServer(entClient *ent.Client,
+	router *mux.Router,
+	authClient auth.AuthClient,
+	expoPush expopush.ExpoPush) {
 	s := NewHttpServer(entClient, router, authClient, expoPush)
 	s.router.HandleFunc("/notification/pushnotification", s.PushNotification).Methods(http.MethodPost)
 }
@@ -32,4 +37,5 @@ type notificationHttpServer struct {
 	router     *mux.Router
 	authClient auth.AuthClient
 	expoPush   expopush.ExpoPush
+	repository *repository.Repository
 }

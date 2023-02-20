@@ -34,6 +34,8 @@ import { useEffect, useRef, useState } from "react";
 import { getMeThunk } from "../redux/features/user/thunk";
 import ComingSoon from "../screens/ComingSoon";
 import { ExpoPushTokenRequest } from "../lib/notification/notification_pb";
+import NotificationList from "../screens/Profile/NotificationList";
+import SwipeGesture from "../screens/Profile/SwipeGesture";
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -70,7 +72,7 @@ export type RootBaseStackParamList = {
   AppSetting: undefined;
 
   // Notification
-  NotificationList: undefined;
+  NotificationList: {};
 
   // Auth
   Login: undefined;
@@ -83,7 +85,7 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge: false,
+    shouldSetBadge: true,
   }),
 });
 
@@ -91,6 +93,7 @@ Notifications.setNotificationHandler({
 const Stack = createNativeStackNavigator<RootBaseStackParamList>();
 
 export const BaseStack = () => {
+  
   const dispatch = useAppDispatch();
   // const loading = useAppSelector(isUserSliceLoading);
   const { isSignedIn } = useAppSelector(selectUserSlice);
@@ -187,7 +190,7 @@ export const BaseStack = () => {
               title: "Notifications",
               headerBackVisible: true,
             }}
-            component={ComingSoon}
+            component={NotificationList}
           />
         </>
       ) : (

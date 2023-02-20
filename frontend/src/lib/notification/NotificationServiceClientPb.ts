@@ -165,5 +165,91 @@ export class NotificationClient {
     this.methodDescriptorRemoveExpoPushToken);
   }
 
+  methodDescriptorListNotificationInfo = new grpcWeb.MethodDescriptor(
+    '/notification.Notification/ListNotificationInfo',
+    grpcWeb.MethodType.UNARY,
+    notification_pb.ListNotificationInfoRequest,
+    notification_pb.ListNotificationInfoReply,
+    (request: notification_pb.ListNotificationInfoRequest) => {
+      return request.serializeBinary();
+    },
+    notification_pb.ListNotificationInfoReply.deserializeBinary
+  );
+
+  listNotificationInfo(
+    request: notification_pb.ListNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null): Promise<notification_pb.ListNotificationInfoReply>;
+
+  listNotificationInfo(
+    request: notification_pb.ListNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: notification_pb.ListNotificationInfoReply) => void): grpcWeb.ClientReadableStream<notification_pb.ListNotificationInfoReply>;
+
+  listNotificationInfo(
+    request: notification_pb.ListNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: notification_pb.ListNotificationInfoReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/notification.Notification/ListNotificationInfo',
+        request,
+        metadata || {},
+        this.methodDescriptorListNotificationInfo,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/notification.Notification/ListNotificationInfo',
+    request,
+    metadata || {},
+    this.methodDescriptorListNotificationInfo);
+  }
+
+  methodDescriptorDeleteNotificationInfo = new grpcWeb.MethodDescriptor(
+    '/notification.Notification/DeleteNotificationInfo',
+    grpcWeb.MethodType.UNARY,
+    notification_pb.IdRequest,
+    google_protobuf_empty_pb.Empty,
+    (request: notification_pb.IdRequest) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_empty_pb.Empty.deserializeBinary
+  );
+
+  deleteNotificationInfo(
+    request: notification_pb.IdRequest,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+
+  deleteNotificationInfo(
+    request: notification_pb.IdRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  deleteNotificationInfo(
+    request: notification_pb.IdRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/notification.Notification/DeleteNotificationInfo',
+        request,
+        metadata || {},
+        this.methodDescriptorDeleteNotificationInfo,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/notification.Notification/DeleteNotificationInfo',
+    request,
+    metadata || {},
+    this.methodDescriptorDeleteNotificationInfo);
+  }
+
 }
 

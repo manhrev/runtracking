@@ -8,6 +8,7 @@ import (
 
 	"github.com/manhrev/runtracking/backend/notification/helper/query"
 	"github.com/manhrev/runtracking/backend/notification/internal/service/cloudtask"
+	"github.com/manhrev/runtracking/backend/notification/internal/status"
 	noti "github.com/manhrev/runtracking/backend/notification/pkg/api"
 )
 
@@ -19,9 +20,9 @@ func (s *notificationHttpServer) PushNotification(w http.ResponseWriter, r *http
 	var q query.Query
 
 	switch message.NotificationType {
-	case int(noti.PushNotiRequest_ALLUSERS):
+	case int(noti.NOTIFICATION_TYPE_ALLUSERS):
 		q = query.AllUsersQuery(s.authClient)
-	case int(noti.PushNotiRequest_ONLYUSER):
+	case int(noti.NOTIFICATION_TYPE_ONLYUSER):
 		q = query.OnlyUserQuery(s.authClient)
 	default:
 		q = query.AllUsersQuery(s.authClient)
@@ -38,9 +39,16 @@ func (s *notificationHttpServer) PushNotification(w http.ResponseWriter, r *http
 		userIds = append(userIds, userInfo.GetUserId())
 	}
 
-	responses, _ := s.expoPush.PushBulkNotification(r.Context(), userIds, message)
+	responses, err := s.expoPush.PushBulkNotification(r.Context(), userIds, message)
 	if err != nil {
 		panic(err)
+	}
+
+	// save ent
+
+	_, err = s.repository.Notification.Create(r.Context(), userIds, false, int64(message.Id))
+	if err != nil {
+		panic(status.Internal(err.Error()))
 	}
 
 	// Validate responses
