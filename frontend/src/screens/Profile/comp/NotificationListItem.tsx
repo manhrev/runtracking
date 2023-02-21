@@ -12,7 +12,7 @@ import {
   minutesPerKilometer,
   secondsToMinutes,
 } from "../../../utils/helpers";
-import { deleteNotificationInfoThunk } from "../../../redux/features/notification/thunk";
+import { deleteNotificationInfoThunk, updateNotificationInfoThunk } from "../../../redux/features/notification/thunk";
 import { useAppDispatch } from "../../../redux/store";
 
 interface NotificationListItemProps {
@@ -44,12 +44,17 @@ export default function NotificationListItem(props: NotificationListItemProps) {
      <Swipeable 
         renderRightActions={rightSwipeActions}
      >
-        <TouchableRipple onPress={() => {console.log("on press")}}>
+        <TouchableRipple onPress={() => {
+          dispatch(updateNotificationInfoThunk({id: id, isSeen: true}))
+        }}>
                 <View style={styles(theme).listItemContainer}>
                 <Avatar.Image  size={60} source={require('../../../../assets/icon.png')} />
                         <View style={styles(theme).listItemContent}>
                             
-                            <Text variant="bodyMedium" style={styles(theme).listItemValue}>
+                            <Text variant="bodyMedium"  style={[styles(theme).listItemValue,
+                            {fontWeight: (isSeen) ? "500" : "bold"}
+                            
+                            ]}>
                                 {message} 
                             </Text>
                             <Text
@@ -57,6 +62,7 @@ export default function NotificationListItem(props: NotificationListItemProps) {
                                 style={{
                                     // textAlign: "right",
                                     color: theme.colors.secondary,
+                                    fontWeight: (isSeen) ? "500" : "bold"
                                 }}>
                                 {formatDateNotification(time)}
                             </Text>

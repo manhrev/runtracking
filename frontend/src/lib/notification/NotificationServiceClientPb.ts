@@ -208,5 +208,48 @@ export class NotificationClient {
     this.methodDescriptorDeleteNotificationInfo);
   }
 
+  methodDescriptorUpdateNotificationInfo = new grpcWeb.MethodDescriptor(
+    '/notification.Notification/UpdateNotificationInfo',
+    grpcWeb.MethodType.UNARY,
+    notification_pb.UpdateNotificationInfoRequest,
+    notification_pb.UpdateNotificationInfoReply,
+    (request: notification_pb.UpdateNotificationInfoRequest) => {
+      return request.serializeBinary();
+    },
+    notification_pb.UpdateNotificationInfoReply.deserializeBinary
+  );
+
+  updateNotificationInfo(
+    request: notification_pb.UpdateNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null): Promise<notification_pb.UpdateNotificationInfoReply>;
+
+  updateNotificationInfo(
+    request: notification_pb.UpdateNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: notification_pb.UpdateNotificationInfoReply) => void): grpcWeb.ClientReadableStream<notification_pb.UpdateNotificationInfoReply>;
+
+  updateNotificationInfo(
+    request: notification_pb.UpdateNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: notification_pb.UpdateNotificationInfoReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/notification.Notification/UpdateNotificationInfo',
+        request,
+        metadata || {},
+        this.methodDescriptorUpdateNotificationInfo,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/notification.Notification/UpdateNotificationInfo',
+    request,
+    metadata || {},
+    this.methodDescriptorUpdateNotificationInfo);
+  }
+
 }
 

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ExpoPushTokenRequest, IdRequest, ListNotificationInfoRequest } from "../../../lib/notification/notification_pb";
+import { ExpoPushTokenRequest, IdRequest, ListNotificationInfoRequest, UpdateNotificationInfoRequest } from "../../../lib/notification/notification_pb";
 import {  notificationClient } from "../../../utils/grpc";
 
 export const checkIfExistOrSaveExpoPushTokenThunk = createAsyncThunk(
@@ -34,6 +34,13 @@ export const deleteNotificationInfoThunk = createAsyncThunk(
   "notification/deleteNotificationInfoThunk",
   async (param: IdRequest.AsObject) => {
     return await notificationClient.deleteNotificationInfo(param)
+  }
+);
+
+export const updateNotificationInfoThunk = createAsyncThunk(
+  "notification/updateNotificationInfoThunk",
+  async (param: UpdateNotificationInfoRequest.AsObject) => {
+    return await notificationClient.updateNotificationInfo(param)
   }
 );
 

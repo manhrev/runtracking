@@ -5,7 +5,9 @@ import {
  ListNotificationInfoRequest,
  ListNotificationInfoReply,
  IdRequest,
- IdReply
+ IdReply,
+ UpdateNotificationInfoRequest,
+ UpdateNotificationInfoReply
 } from "../../../lib/notification/notification_pb";
 
 import { GRPCClientConfig } from "../abstract/types";
@@ -48,6 +50,14 @@ class rpcNotificationClient extends gRPCClientAbstract {
     req.setId(id)
 
     return await this.gRPCClientRequest<IdReply.AsObject>("deleteNotificationInfo", req);
+  }
+
+  async updateNotificationInfo(param: UpdateNotificationInfoRequest.AsObject) {
+    const{id, isSeen} = param
+    const req = new UpdateNotificationInfoRequest()
+    req.setId(id).setIsSeen(isSeen)
+
+    return await this.gRPCClientRequest<UpdateNotificationInfoReply.AsObject>("updateNotificationInfo", req);
   }
 
 
