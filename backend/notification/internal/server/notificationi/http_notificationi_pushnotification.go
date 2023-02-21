@@ -1,4 +1,4 @@
-package notification
+package notificationi
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	noti "github.com/manhrev/runtracking/backend/notification/pkg/api"
 )
 
-func (s *notificationHttpServer) PushNotification(w http.ResponseWriter, r *http.Request) {
+func (s *notificationIHttpServer) PushNotification(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var message cloudtask.NotificationTransfer
 	err := json.Unmarshal(reqBody, &message)

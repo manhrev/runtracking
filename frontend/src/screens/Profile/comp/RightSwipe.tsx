@@ -1,8 +1,11 @@
 import { View , StyleSheet} from "react-native";
 import {  Button, Text} from "react-native-paper";
 import { useAppTheme, AppTheme } from "../../../theme";
+// interface RightSwipeProps {
+//   onPressDelete: (id: number) => void;
+// }
 
-export default function RightSwipe(theme : AppTheme){
+export default function RightSwipe(theme : AppTheme, onPress: () => void){
 
     return (
         <View
@@ -13,7 +16,7 @@ export default function RightSwipe(theme : AppTheme){
             
           }}
         >
-          <Button icon="delete-outline">
+          <Button icon="delete-outline" onPress={onPress}>
           </Button>
         </View>
       );

@@ -4,6 +4,16 @@ import { useAppTheme, AppTheme } from "../../../theme";
 import {Swipeable, GestureHandlerRootView} from 'react-native-gesture-handler';
 import RightSwipe from "./RightSwipe";
 import { NotificationInfo } from "../../../lib/notification/notification_pb";
+import {
+  formatDate,
+  formatDateNotification,
+  getIconWithActivityType,
+  getNameWithActivityType,
+  minutesPerKilometer,
+  secondsToMinutes,
+} from "../../../utils/helpers";
+import { deleteNotificationInfoThunk } from "../../../redux/features/notification/thunk";
+import { useAppDispatch } from "../../../redux/store";
 
 interface NotificationListItemProps {
   notificationInfo: NotificationInfo.AsObject;
@@ -15,9 +25,16 @@ export default function NotificationListItem(props: NotificationListItemProps) {
 //   const { left, right, topDivider, color, onPress } = props;
   
 
-  const rightSwipeActions = () => RightSwipe(theme)
+  
   const { notificationInfo } = props
-  const {image, isSeen, message,referenceId, type, time} = notificationInfo
+  const {id, image, isSeen, message,referenceId, type, time} = notificationInfo
+  const dispatch = useAppDispatch()
+  
+  const onPressDelete = async (id: number) => {
+    await dispatch(deleteNotificationInfoThunk({id: id}))
+  }
+
+  const rightSwipeActions = () => RightSwipe(theme, () => {onPressDelete(id)})
 
   return (
     <>
@@ -31,8 +48,9 @@ export default function NotificationListItem(props: NotificationListItemProps) {
                 <View style={styles(theme).listItemContainer}>
                 <Avatar.Image  size={60} source={require('../../../../assets/icon.png')} />
                         <View style={styles(theme).listItemContent}>
+                            
                             <Text variant="bodyMedium" style={styles(theme).listItemValue}>
-                                {message}
+                                {message} 
                             </Text>
                             <Text
                                 variant="labelSmall"
@@ -40,7 +58,7 @@ export default function NotificationListItem(props: NotificationListItemProps) {
                                     // textAlign: "right",
                                     color: theme.colors.secondary,
                                 }}>
-                                18 minutes
+                                {formatDateNotification(time)}
                             </Text>
                         </View>
                 </View>
