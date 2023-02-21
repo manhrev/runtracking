@@ -11,6 +11,16 @@ service Notification {
     rpc RemoveExpoPushToken(ExpoPushTokenRequest) returns (google.protobuf.Empty) {};
     rpc ListNotificationInfo(ListNotificationInfoRequest) returns(ListNotificationInfoReply) {};
     rpc DeleteNotificationInfo(IdRequest) returns(IdReply) {};
+    rpc UpdateNotificationInfo(UpdateNotificationInfoRequest) returns (UpdateNotificationInfoReply) {};
+}
+
+message UpdateNotificationInfoRequest{
+    int64 id = 1;
+    bool is_seen = 2;
+}
+
+message UpdateNotificationInfoReply{
+    int64 id_updated = 1;
 }
 
 message IdRequest{

@@ -27,6 +27,7 @@ type NotificationClient interface {
 	RemoveExpoPushToken(ctx context.Context, in *ExpoPushTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListNotificationInfo(ctx context.Context, in *ListNotificationInfoRequest, opts ...grpc.CallOption) (*ListNotificationInfoReply, error)
 	DeleteNotificationInfo(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*IdReply, error)
+	UpdateNotificationInfo(ctx context.Context, in *UpdateNotificationInfoRequest, opts ...grpc.CallOption) (*UpdateNotificationInfoReply, error)
 }
 
 type notificationClient struct {
@@ -73,6 +74,15 @@ func (c *notificationClient) DeleteNotificationInfo(ctx context.Context, in *IdR
 	return out, nil
 }
 
+func (c *notificationClient) UpdateNotificationInfo(ctx context.Context, in *UpdateNotificationInfoRequest, opts ...grpc.CallOption) (*UpdateNotificationInfoReply, error) {
+	out := new(UpdateNotificationInfoReply)
+	err := c.cc.Invoke(ctx, "/notification.Notification/UpdateNotificationInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServer is the server API for Notification service.
 // All implementations must embed UnimplementedNotificationServer
 // for forward compatibility
@@ -81,6 +91,7 @@ type NotificationServer interface {
 	RemoveExpoPushToken(context.Context, *ExpoPushTokenRequest) (*emptypb.Empty, error)
 	ListNotificationInfo(context.Context, *ListNotificationInfoRequest) (*ListNotificationInfoReply, error)
 	DeleteNotificationInfo(context.Context, *IdRequest) (*IdReply, error)
+	UpdateNotificationInfo(context.Context, *UpdateNotificationInfoRequest) (*UpdateNotificationInfoReply, error)
 	mustEmbedUnimplementedNotificationServer()
 }
 
@@ -99,6 +110,9 @@ func (UnimplementedNotificationServer) ListNotificationInfo(context.Context, *Li
 }
 func (UnimplementedNotificationServer) DeleteNotificationInfo(context.Context, *IdRequest) (*IdReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteNotificationInfo not implemented")
+}
+func (UnimplementedNotificationServer) UpdateNotificationInfo(context.Context, *UpdateNotificationInfoRequest) (*UpdateNotificationInfoReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNotificationInfo not implemented")
 }
 func (UnimplementedNotificationServer) mustEmbedUnimplementedNotificationServer() {}
 
@@ -185,6 +199,24 @@ func _Notification_DeleteNotificationInfo_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Notification_UpdateNotificationInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNotificationInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServer).UpdateNotificationInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/notification.Notification/UpdateNotificationInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServer).UpdateNotificationInfo(ctx, req.(*UpdateNotificationInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Notification_ServiceDesc is the grpc.ServiceDesc for Notification service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -207,6 +239,10 @@ var Notification_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteNotificationInfo",
 			Handler:    _Notification_DeleteNotificationInfo_Handler,
+		},
+		{
+			MethodName: "UpdateNotificationInfo",
+			Handler:    _Notification_UpdateNotificationInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

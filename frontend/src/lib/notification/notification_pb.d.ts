@@ -4,6 +4,46 @@ import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/t
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 
 
+export class UpdateNotificationInfoRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): UpdateNotificationInfoRequest;
+
+  getIsSeen(): boolean;
+  setIsSeen(value: boolean): UpdateNotificationInfoRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateNotificationInfoRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateNotificationInfoRequest): UpdateNotificationInfoRequest.AsObject;
+  static serializeBinaryToWriter(message: UpdateNotificationInfoRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateNotificationInfoRequest;
+  static deserializeBinaryFromReader(message: UpdateNotificationInfoRequest, reader: jspb.BinaryReader): UpdateNotificationInfoRequest;
+}
+
+export namespace UpdateNotificationInfoRequest {
+  export type AsObject = {
+    id: number,
+    isSeen: boolean,
+  }
+}
+
+export class UpdateNotificationInfoReply extends jspb.Message {
+  getIdUpdated(): number;
+  setIdUpdated(value: number): UpdateNotificationInfoReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateNotificationInfoReply.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateNotificationInfoReply): UpdateNotificationInfoReply.AsObject;
+  static serializeBinaryToWriter(message: UpdateNotificationInfoReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateNotificationInfoReply;
+  static deserializeBinaryFromReader(message: UpdateNotificationInfoReply, reader: jspb.BinaryReader): UpdateNotificationInfoReply;
+}
+
+export namespace UpdateNotificationInfoReply {
+  export type AsObject = {
+    idUpdated: number,
+  }
+}
+
 export class IdRequest extends jspb.Message {
   getId(): number;
   setId(value: number): IdRequest;
