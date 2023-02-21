@@ -8,7 +8,8 @@ import { NotificationInfo } from "../../../lib/notification/notification_pb";
 import { checkIfExistOrSaveExpoPushTokenThunk,
           removeExpoPushTokenThunk,
           listMoreNotificationInfoThunk,
-        listNotificationInfoThunk } from "./thunk";
+        listNotificationInfoThunk, 
+        deleteNotificationInfoThunk} from "./thunk";
 
 type NotificationState = {
   notificationList: Array<NotificationInfo.AsObject>;
@@ -66,6 +67,25 @@ const slice = createSlice({
                          response?.notificationListList || []);
     state.total += response?.total || 0;
 });
+
+  builder.addCase(deleteNotificationInfoThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING;
+  });
+
+  builder.addCase(deleteNotificationInfoThunk.fulfilled, (state, {payload}) => {
+    state.status = StatusEnum.LOADING;
+
+    const { response, error } = payload;
+    if (error) return;
+    state.status = StatusEnum.SUCCEEDED;
+
+    state.notificationList = state.notificationList.
+                                filter(noti => noti.id != response?.id)
+                                console.log(response?.id + "  ")
+                                // console.log(state.notificationList)
+    state.total -=1 
+
+})
   
   },
 });

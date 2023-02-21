@@ -1,4 +1,4 @@
-package notification
+package notificationi
 
 import (
 	"net/http"
@@ -13,8 +13,8 @@ import (
 func NewHttpServer(entClient *ent.Client,
 	router *mux.Router,
 	authClient auth.AuthClient,
-	expopush expopush.ExpoPush) *notificationHttpServer {
-	return &notificationHttpServer{
+	expopush expopush.ExpoPush) *notificationIHttpServer {
+	return &notificationIHttpServer{
 		entClient:  entClient,
 		router:     router,
 		authClient: authClient,
@@ -31,7 +31,7 @@ func RegisterRouteHttpServer(entClient *ent.Client,
 	s.router.HandleFunc("/notification/pushnotification", s.PushNotification).Methods(http.MethodPost)
 }
 
-type notificationHttpServer struct {
+type notificationIHttpServer struct {
 	entClient *ent.Client
 	// Other service client connection, db adapter go here
 	router     *mux.Router

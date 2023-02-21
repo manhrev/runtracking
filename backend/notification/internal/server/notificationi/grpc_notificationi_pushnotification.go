@@ -1,4 +1,4 @@
-package notification
+package notificationi
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *notificationServer) PushNotification(ctx context.Context, request *noti.PushNotiRequest) (*emptypb.Empty, error) {
+func (s *notificationIServer) PushNotification(ctx context.Context, request *noti.PushNotiRequest) (*emptypb.Empty, error) {
 
 	notification, err := s.entClient.Notification.Create().
 		SetMessage(request.GetMesseage()).

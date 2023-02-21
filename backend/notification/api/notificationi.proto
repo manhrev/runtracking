@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package notification;
+
+option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;notification";
+import "google/protobuf/empty.proto";
+import "api/notification.proto";
+
+service NotificationI{
+    rpc PushNotification(PushNotiRequest) returns (google.protobuf.Empty){};
+}

@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/internal/server/notification"
+	"github.com/manhrev/runtracking/backend/notification/internal/server/notificationi"
 	"github.com/manhrev/runtracking/backend/notification/internal/service/expopush"
 	pb "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
@@ -65,7 +66,7 @@ func Serve(server *grpc.Server) {
 
 	// http.HandleFunc("/notification/pushnoti2allusers", notification.PushNoti2AllUsers)
 	r := mux.NewRouter()
-	notification.RegisterRouteHttpServer(entClient, r, authClient, expoPushService)
+	notificationi.RegisterRouteHttpServer(entClient, r, authClient, expoPushService)
 
 	go func() {
 		err = http.ListenAndServe(":8000", r)
@@ -76,7 +77,7 @@ func Serve(server *grpc.Server) {
 
 	// register main and other server servers
 	pb.RegisterNotificationServer(server, notification.NewServer(entClient))
-
+	pb.RegisterNotificationIServer(server, notificationi.NewServer(entClient))
 	lis, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)
