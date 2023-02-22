@@ -66,11 +66,16 @@ static_resources:
                             prefix: /notification
                           route:
                             cluster: notification_http_cluster
-                         
+
                         - match:
                             prefix: /activity.Activity
                           route:
                             cluster: activity_cluster
+
+                        - match:
+                            prefix: /plan.Plan
+                          route:
+                            cluster: plan_cluster
 
                 http_filters:
                   - name: envoy.filters.http.grpc_web
@@ -153,12 +158,12 @@ static_resources:
       load_assignment:
         cluster_name: notification_http_cluster
         endpoints:
-        - lb_endpoints:
-          - endpoint:
-              address:
-                socket_address:
-                  address: notification
-                  port_value: 8000
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: notification
+                      port_value: 8000
 
     - name: activity_cluster
       connect_timeout: 1s
@@ -173,4 +178,19 @@ static_resources:
                   address:
                     socket_address:
                       address: activity
+                      port_value: 8080
+
+    - name: plan_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: plan_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: plan
                       port_value: 8080
