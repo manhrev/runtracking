@@ -30,6 +30,13 @@ export const listMoreNotificationInfoThunk = createAsyncThunk(
   }
 );
 
+export const listLastNotificationInfoThunk = createAsyncThunk(
+  "notification/listLastNotificationInfoThunk",
+  async (param: ListNotificationInfoRequest.AsObject) => {
+    return await notificationClient.listNotificationInfo(param)
+  }
+);
+
 export const deleteNotificationInfoThunk = createAsyncThunk(
   "notification/deleteNotificationInfoThunk",
   async (param: IdRequest.AsObject) => {

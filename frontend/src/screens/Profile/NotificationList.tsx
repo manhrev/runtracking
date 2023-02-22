@@ -1,16 +1,17 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {  ScrollView, StyleSheet, View } from "react-native";
 import { Card, List, TouchableRipple, Text, Button } from "react-native-paper";
 import { RootBaseStackParamList } from "../../navigators/BaseStack";
 import { isNotificationListLoading, selectNotificationList } from "../../redux/features/notification/slice";
-import { listMoreNotificationInfoThunk, listNotificationInfoThunk } from "../../redux/features/notification/thunk";
+import { listLastNotificationInfoThunk, listMoreNotificationInfoThunk, listNotificationInfoThunk } from "../../redux/features/notification/thunk";
 import { selectUserSlice } from "../../redux/features/user/slice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
 import NotificationListItem from "./comp/NotificationListItem";
 import * as Notifications from "expo-notifications";
 import { Subscription } from 'expo-modules-core';
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function NotificationList({
     navigation,
@@ -18,14 +19,10 @@ export default function NotificationList({
 }: NativeStackScreenProps<RootBaseStackParamList, "NotificationList">) {
     const theme = useAppTheme();
     const dispatch = useAppDispatch()
-    const {notificationList} = useAppSelector(selectNotificationList)
+    const {notificationList, offset} = useAppSelector(selectNotificationList)
     const isLoading = useAppSelector(isNotificationListLoading)
-    const [currentOffset, setCurrentOffset] = useState(0);
+  
     const [canLoadmore, setCanLoadmore] = useState(true);
-
-    const notificationListener = useRef<Subscription>();
-    const responseListener = useRef<Subscription>();
-    const [notification, setNotification] = useState<Notifications.Notification>();
 
     const fetchNotificationList = async () => {
         const { response } = await dispatch(
@@ -45,25 +42,20 @@ export default function NotificationList({
         const res: any = await dispatch(
           listMoreNotificationInfoThunk({
             limit: 10,
-            offset: currentOffset + 10,
+            offset: offset + 10,
           })
         );
         
         if (!res.payload.error) {
-            if (currentOffset + 20 > notificationList.length) {
+            if (offset + 10 > notificationList.length) {
               setCanLoadmore(false);
             }
-            setCurrentOffset(currentOffset + 10);
           }
     }
 
-    useEffect(() => {
+    useFocusEffect(useCallback(() => {
         fetchNotificationList()
-
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            fetchNotificationList()
-          });
-    }, [])
+    }, []))
     
 
     return (
