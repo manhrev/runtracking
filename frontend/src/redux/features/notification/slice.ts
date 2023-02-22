@@ -10,15 +10,18 @@ import { checkIfExistOrSaveExpoPushTokenThunk,
           listMoreNotificationInfoThunk,
         listNotificationInfoThunk, 
         deleteNotificationInfoThunk,
-        updateNotificationInfoThunk} from "./thunk";
+        updateNotificationInfoThunk,
+        listLastNotificationInfoThunk} from "./thunk";
 
 type NotificationState = {
   notificationList: Array<NotificationInfo.AsObject>;
+  offset: number
   total: number
 } & CommonState;
 
 export const initialState: NotificationState = {
   notificationList: [],
+  offset: 0,
   status: StatusEnum.LOADING,
   total: 0,
 };
@@ -57,6 +60,7 @@ const slice = createSlice({
       state.status = StatusEnum.SUCCEEDED;
       state.notificationList= response?.notificationListList || [];
       state.total = response?.total || 0;
+      state.offset = 0
   });
 
   builder.addCase(listMoreNotificationInfoThunk.fulfilled, (state, {payload}) => {
@@ -67,6 +71,7 @@ const slice = createSlice({
     state.notificationList= state.notificationList.concat(
                          response?.notificationListList || []);
     state.total += response?.total || 0;
+    state.offset += 10
 });
 
   builder.addCase(deleteNotificationInfoThunk.pending, (state) => {
@@ -83,6 +88,7 @@ const slice = createSlice({
     state.notificationList = state.notificationList.
                                 filter(noti => noti.id != response?.id)
     state.total -=1 
+    state.offset -=1
 })
 
   builder.addCase(updateNotificationInfoThunk.pending, (state) => {
@@ -98,6 +104,21 @@ const slice = createSlice({
 
     state.notificationList.forEach(noti => noti.isSeen =  (noti.id == response?.idUpdated) ? true : noti.isSeen)
 })
+
+  builder.addCase(listLastNotificationInfoThunk.pending, (state) => {
+    state.status = StatusEnum.LOADING;
+  });
+
+  builder.addCase(listLastNotificationInfoThunk.fulfilled, (state, {payload}) => {
+    state.status = StatusEnum.LOADING;
+    const { response, error } = payload;
+    if (error) return;
+    state.status = StatusEnum.SUCCEEDED
+    if(response && response.notificationListList){
+      state.notificationList.unshift(...response.notificationListList.reverse())
+    }
+    state.offset += 1
+  });
   
   },
 });

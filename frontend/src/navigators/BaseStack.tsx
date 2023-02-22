@@ -35,7 +35,6 @@ import { getMeThunk } from "../redux/features/user/thunk";
 import ComingSoon from "../screens/ComingSoon";
 import { ExpoPushTokenRequest } from "../lib/notification/notification_pb";
 import NotificationList from "../screens/Profile/NotificationList";
-import SwipeGesture from "../screens/Profile/SwipeGesture";
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -81,13 +80,6 @@ export type RootBaseStackParamList = {
   GetInfo: undefined;
 };
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
 
 
 const Stack = createNativeStackNavigator<RootBaseStackParamList>();
@@ -97,12 +89,6 @@ export const BaseStack = () => {
   const dispatch = useAppDispatch();
   // const loading = useAppSelector(isUserSliceLoading);
   const { isSignedIn } = useAppSelector(selectUserSlice);
-  
-  const [notification, setNotification] = useState<Notifications.Notification>();
-  const notificationListener = useRef<Subscription>();                  
-  const responseListener =useRef<Subscription>();
-
- 
 
   const getMe = async () => {
     const { response ,error } = await dispatch(getMeThunk()).unwrap();
@@ -113,27 +99,10 @@ export const BaseStack = () => {
 
   useEffect(() => {
     getMe();
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
-    });
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
-
-    return () => {
-      // Notifications.removeNotificationSubscription(notificationListener.current);
-      // Notifications.removeNotificationSubscription(responseListener.current);
-    };
   }, []);
 
-  // if (loading) {
-  //   return (
-  //     <View>
-  //       <Text>Loading</Text>
-  //     </View>
-  //   );
-  // }
+  
 
   return (
     <Stack.Navigator screenOptions={{ header: CustomNavBar }}>
