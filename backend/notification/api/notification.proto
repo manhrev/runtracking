@@ -7,16 +7,30 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 service Notification {
-    rpc PushNotification(PushNotiRequest) returns (google.protobuf.Empty){};
     rpc CheckIfExistOrSaveExpoPushToken(ExpoPushTokenRequest) returns (google.protobuf.Empty) {};
     rpc RemoveExpoPushToken(ExpoPushTokenRequest) returns (google.protobuf.Empty) {};
     rpc ListNotificationInfo(ListNotificationInfoRequest) returns(ListNotificationInfoReply) {};
-    rpc DeleteNotificationInfo(IdRequest) returns(google.protobuf.Empty) {};
+    rpc DeleteNotificationInfo(IdRequest) returns(IdReply) {};
+    rpc UpdateNotificationInfo(UpdateNotificationInfoRequest) returns (UpdateNotificationInfoReply) {};
+}
+
+message UpdateNotificationInfoRequest{
+    int64 id = 1;
+    bool is_seen = 2;
+}
+
+message UpdateNotificationInfoReply{
+    int64 id_updated = 1;
 }
 
 message IdRequest{
     int64 id = 1;
 }
+
+message IdReply{
+    int64 id = 1;
+}
+
 message ExpoPushTokenRequest{
     int64 user_id = 1;
     string expo_push_token = 2;

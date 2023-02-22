@@ -10,6 +10,7 @@ import (
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent"
 	"github.com/manhrev/runtracking/backend/auth/pkg/extractor"
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,24 +19,27 @@ func NewServer(entClient *ent.Client,
 	signIn signin.SignIn,
 	signUp signup.SignUp,
 	cache *cache.Cache,
-	extractor extractor.Extractor) auth.AuthServer {
+	extractor extractor.Extractor,
+	notificationClient notification.NotificationIClient) auth.AuthServer {
 	return &authServer{
-		entClient: entClient,
-		token:     token,
-		signIn:    signIn,
-		signUp:    signUp,
-		cache:     cache,
-		extractor: extractor,
+		entClient:          entClient,
+		token:              token,
+		signIn:             signIn,
+		signUp:             signUp,
+		cache:              cache,
+		extractor:          extractor,
+		notificationClient: notificationClient,
 	}
 }
 
 type authServer struct {
-	entClient *ent.Client
-	token     token.Token
-	signIn    signin.SignIn
-	signUp    signup.SignUp
-	cache     *cache.Cache
-	extractor extractor.Extractor
+	entClient          *ent.Client
+	token              token.Token
+	signIn             signin.SignIn
+	signUp             signup.SignUp
+	cache              *cache.Cache
+	extractor          extractor.Extractor
+	notificationClient notification.NotificationIClient
 
 	auth.UnimplementedAuthServer
 }

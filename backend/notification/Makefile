@@ -5,7 +5,7 @@ generate-proto:
 		--go_opt=paths=source_relative \
 		--go-grpc_out=./pkg \
 		--go-grpc_opt=paths=source_relative \
-		./api/notification.proto
+		./api/notification.proto ./api/notificationi.proto
 
 generate-code:
 	mkdir -p ./pkg/code

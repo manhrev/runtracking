@@ -36,49 +36,6 @@ export class NotificationClient {
     this.options_ = options;
   }
 
-  methodDescriptorPushNotification = new grpcWeb.MethodDescriptor(
-    '/notification.Notification/PushNotification',
-    grpcWeb.MethodType.UNARY,
-    notification_pb.PushNotiRequest,
-    google_protobuf_empty_pb.Empty,
-    (request: notification_pb.PushNotiRequest) => {
-      return request.serializeBinary();
-    },
-    google_protobuf_empty_pb.Empty.deserializeBinary
-  );
-
-  pushNotification(
-    request: notification_pb.PushNotiRequest,
-    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
-
-  pushNotification(
-    request: notification_pb.PushNotiRequest,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.RpcError,
-               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
-
-  pushNotification(
-    request: notification_pb.PushNotiRequest,
-    metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.RpcError,
-               response: google_protobuf_empty_pb.Empty) => void) {
-    if (callback !== undefined) {
-      return this.client_.rpcCall(
-        this.hostname_ +
-          '/notification.Notification/PushNotification',
-        request,
-        metadata || {},
-        this.methodDescriptorPushNotification,
-        callback);
-    }
-    return this.client_.unaryCall(
-    this.hostname_ +
-      '/notification.Notification/PushNotification',
-    request,
-    metadata || {},
-    this.methodDescriptorPushNotification);
-  }
-
   methodDescriptorCheckIfExistOrSaveExpoPushToken = new grpcWeb.MethodDescriptor(
     '/notification.Notification/CheckIfExistOrSaveExpoPushToken',
     grpcWeb.MethodType.UNARY,
@@ -212,28 +169,28 @@ export class NotificationClient {
     '/notification.Notification/DeleteNotificationInfo',
     grpcWeb.MethodType.UNARY,
     notification_pb.IdRequest,
-    google_protobuf_empty_pb.Empty,
+    notification_pb.IdReply,
     (request: notification_pb.IdRequest) => {
       return request.serializeBinary();
     },
-    google_protobuf_empty_pb.Empty.deserializeBinary
+    notification_pb.IdReply.deserializeBinary
   );
 
   deleteNotificationInfo(
     request: notification_pb.IdRequest,
-    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+    metadata: grpcWeb.Metadata | null): Promise<notification_pb.IdReply>;
 
   deleteNotificationInfo(
     request: notification_pb.IdRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
-               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+               response: notification_pb.IdReply) => void): grpcWeb.ClientReadableStream<notification_pb.IdReply>;
 
   deleteNotificationInfo(
     request: notification_pb.IdRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
-               response: google_protobuf_empty_pb.Empty) => void) {
+               response: notification_pb.IdReply) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -249,6 +206,49 @@ export class NotificationClient {
     request,
     metadata || {},
     this.methodDescriptorDeleteNotificationInfo);
+  }
+
+  methodDescriptorUpdateNotificationInfo = new grpcWeb.MethodDescriptor(
+    '/notification.Notification/UpdateNotificationInfo',
+    grpcWeb.MethodType.UNARY,
+    notification_pb.UpdateNotificationInfoRequest,
+    notification_pb.UpdateNotificationInfoReply,
+    (request: notification_pb.UpdateNotificationInfoRequest) => {
+      return request.serializeBinary();
+    },
+    notification_pb.UpdateNotificationInfoReply.deserializeBinary
+  );
+
+  updateNotificationInfo(
+    request: notification_pb.UpdateNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null): Promise<notification_pb.UpdateNotificationInfoReply>;
+
+  updateNotificationInfo(
+    request: notification_pb.UpdateNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: notification_pb.UpdateNotificationInfoReply) => void): grpcWeb.ClientReadableStream<notification_pb.UpdateNotificationInfoReply>;
+
+  updateNotificationInfo(
+    request: notification_pb.UpdateNotificationInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: notification_pb.UpdateNotificationInfoReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/notification.Notification/UpdateNotificationInfo',
+        request,
+        metadata || {},
+        this.methodDescriptorUpdateNotificationInfo,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/notification.Notification/UpdateNotificationInfo',
+    request,
+    metadata || {},
+    this.methodDescriptorUpdateNotificationInfo);
   }
 
 }
