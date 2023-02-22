@@ -11,7 +11,6 @@ import Signup from "../screens/Authentication/Signup";
 import Intro from "../screens/Authentication/Intro";
 import GetInfo from "../screens/Authentication/GetInfo";
 import RunResult from "../screens/Run/RunResult";
-import PlanType from "../screens/Plan/PlanType";
 import PlanDetail from "../screens/Plan/PlanDetail";
 import PlanAdd from "../screens/Plan/PlanAdd";
 import RunHome from "../screens/Run/RunHome";
@@ -63,15 +62,11 @@ export type RootBaseStackParamList = {
     resetRunInfo: () => void;
   };
 
-  PlanType : undefined;
-
   PlanDetail : {
     planId: number;
   };
 
-  PlanAdd: {
-    planTypeId: number;
-  }
+  PlanAdd: undefined;
 
   // Profile
   ProfileSetting: undefined;
@@ -145,14 +140,6 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={RunResult}
-          />
-          <Stack.Screen
-            name="PlanType"
-            options={{
-              title: "Choose Plan Type",
-              headerBackVisible: true,
-            }}
-            component={PlanType}
           />
           <Stack.Screen
             name="PlanDetail"

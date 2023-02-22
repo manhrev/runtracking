@@ -48,6 +48,34 @@ const fdata = [ // completed, failed, doing
         goal: 150,
         status: "completed",
     },
+    {
+        id: 5,
+        name: "Fifth Item",
+        start_date: "2021-07-01",
+        end_date: "2021-07-31",
+        total: 100,
+        goal: 150,
+        status: "doing",
+    },
+    {
+        id: 6,
+        name: "Sixth Item",
+        start_date: "2021-07-01",
+        end_date: "2021-07-31",
+        total: 100,
+        goal: 150,
+        status: "doing",
+    },
+    {
+        id: 7,
+        name: "Seventh Item",
+        start_date: "2021-07-01",
+        end_date: "2021-07-31",
+        total: 100,
+        goal: 150,
+        status: "doing",
+    },
+
 ];
 
 
@@ -61,44 +89,45 @@ export default function Plan({
     return (
         <>
             <View style={styles(theme).container}>
+                <ScrollView showsVerticalScrollIndicator={false}>
                 
-                {/* <Text style={styles(theme).title}>Current Plan</Text> */}
-                <Button mode="text" onPress={() => navigation.navigate("PlanType")} style={styles(theme).addPlanBtn} labelStyle={{fontSize: 16}}>
-                    ADD NEW PLAN
-                </Button>
+                    <Button mode="text" onPress={() => navigation.navigate("PlanAdd")} style={styles(theme).addPlanBtn} labelStyle={{fontSize: 16}}>
+                        ADD NEW PLAN
+                    </Button>
 
-                <SegmentedButtons
-                    style={styles(theme).segmentedBtn}
-                    value={tabState}
-                    onValueChange={setTabState}
-                    density="regular"
-                    buttons={[
-                    {
-                        value: 'current',
-                        label: '      Current      ',
-                    },
-                    {
-                        value: 'history',
-                        label: '      History      ',
-                    }
-                    ]}
-                />
+                    <SegmentedButtons
+                        style={styles(theme).segmentedBtn}
+                        value={tabState}
+                        onValueChange={setTabState}
+                        density="regular"
+                        buttons={[
+                        {
+                            value: 'current',
+                            label: '      Current      ',
+                        },
+                        {
+                            value: 'history',
+                            label: '      History      ',
+                        }
+                        ]}
+                    />
 
-                {fdata.map((item, index) => (
-                    ((item.status === "doing" && tabState === "current") || (item.status !== "doing" && tabState === "history")) ? 
-                        <List.Item
-                            style={styles(theme).curPlan}
-                            key={item.id}
-                            title={item.name}
-                            titleStyle={styles(theme).planName}
-                            description={`Start: ${item.start_date}    -    End: ${item.end_date}\nProgress: ${item.total}/${item.goal}`}
-                            left={props => <List.Icon {...props} icon="run" />}
-                            // enter bracket icon
-                            right={props => <IconButton {...props} icon="chevron-right" />}
-                            onPress={() => navigation.navigate("PlanDetail", {planId: item.id})}
-                        />
-                    : null
-                ))}
+                    {fdata.map((item, index) => (
+                        ((item.status === "doing" && tabState === "current") || (item.status !== "doing" && tabState === "history")) ? 
+                            <List.Item
+                                style={styles(theme).curPlan}
+                                key={item.id}
+                                title={item.name}
+                                titleStyle={styles(theme).planName}
+                                description={`Start: ${item.start_date}    -    End: ${item.end_date}\nProgress: ${item.total}/${item.goal}`}
+                                left={props => <List.Icon {...props} icon="run" />}
+                                // enter bracket icon
+                                right={props => <IconButton {...props} icon="chevron-right" />}
+                                onPress={() => navigation.navigate("PlanDetail", {planId: item.id})}
+                            />
+                        : null
+                    ))}
+                </ScrollView>
             </View>
         </>
     );
