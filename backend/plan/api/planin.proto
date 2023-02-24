@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package plan;
+
+option go_package = "github.com/manhrev/runtracking/backend/plan/pkg/api;plan";
+
+import "google/protobuf/timestamp.proto";
+
+service PlanIn {
+    rpc UpdatePlanProgress(UpdatePlanProgressRequest) returns (UpdatePlanProgressReply);
+}
+
+message UpdatePlanProgressRequest {
+    int64 id = 1;
+    int64 increased_value = 2;
+    google.protobuf.Timestamp time = 3;
+}
+
+message UpdatePlanProgressReply {
+}

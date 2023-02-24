@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package plan;
+
+option go_package = "github.com/manhrev/runtracking/backend/plan/pkg/api;plan";
+
+import "google/protobuf/timestamp.proto";
+
+service Plan {
+    // plan
+    rpc CreatePlan(CreatePlanRequest) returns (CreatePlanReply);
+    rpc ListPlan(ListPlanRequest) returns (ListPlanReply);
+    rpc DeletePlans(DeletePlansRequest) returns (DeletePlansReply);
+    rpc UpdatePlan(UpdatePlanRequest) returns (UpdatePlanReply);
+}
+
+enum ActivityType {
+    ACTIVITY_TYPE_UNSPECIFIED = 0;
+    ACTIVITY_TYPE_RUNNING = 1;
+    ACTIVITY_TYPE_CYCLING = 2;
+    ACTIVITY_TYPE_WALKING = 3;
+}
+
+enum Rule {
+    RULE_UNSPECIFIED = 0;
+    RULE_TOTAL_DISTANCE = 1;
+    RULE_TOTAL_DISTANCE_DAILY = 2;
+    RULE_TOTAL_TIME = 3;
+    RULE_TOTAL_TIME_DAILY = 4;
+    RULE_TOTAL_ACTIVITY = 5;
+    RULE_TOTAL_ACTIVITY_DAILY = 6;
+    RULE_TOTAL_CALORIES = 7;
+    RULE_TOTAL_CALORIES_DAILY = 8;
+}
+
+enum RuleStatus {
+    RULE_STATUS_UNSPECIFIED = 0;
+    RULE_STATUS_FAILED = 1;
+    RULE_STATUS_COMPLETED = 2;
+    RULE_STATUS_INPROGRESS = 3;
+}
+
+message CreatePlanRequest {
+    Rule rule = 1;
+    ActivityType activity_type = 2;
+    google.protobuf.Timestamp start_time = 3;
+    google.protobuf.Timestamp end_time = 4;
+    int64 goal = 5;
+    string name = 6;
+    string note = 7;
+}
+
+message CreatePlanReply {
+}
+
+enum PlanSortBy {
+    PLAN_SORT_BY_UNSPECIFIED = 0;
+    PLAN_SORT_BY_CREATED_TIME = 1; // Same as Date created
+    PLAN_SORT_BY_PROGESS = 2;
+}
+
+message PlanProgress {
+    google.protobuf.Timestamp timestamp = 1;
+    int64 value = 2;
+}
+
+message PlanInfo {
+    int64 id = 1;
+    ActivityType activity_type = 2;
+    google.protobuf.Timestamp start_time = 3;
+    google.protobuf.Timestamp end_time = 4;
+    int64 goal = 5;
+    int64 total = 6;
+    string name = 8;
+    string note = 9;
+    Rule rule = 10;
+    repeated PlanProgress progress = 11;
+
+}
+
+message ListPlanRequest {
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    PlanSortBy sort_by = 4;
+    ActivityType activity_type = 5; // only get activity with this type, to get all, pass ACTIVITY_TYPE_UNSPECIFIED
+    google.protobuf.Timestamp from = 6;
+    google.protobuf.Timestamp to = 7;
+}
+
+message ListPlanReply {
+    repeated PlanInfo plans = 1;
+    int64 total = 2;
+}
+
+message DeletePlansRequest {
+    repeated int64 ids = 1;
+}
+
+message DeletePlansReply {
+}
+
+message UpdatePlanRequest { // only update when status is IN_PROGRESS
+    int64 id = 1;
+    google.protobuf.Timestamp end_time = 4; // only ra sau
+    int64 goal = 5;
+    string name = 6;
+    string note = 7;
+}
+
+message UpdatePlanReply {
+}
