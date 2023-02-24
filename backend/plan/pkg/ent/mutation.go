@@ -51,6 +51,8 @@ type PlanMutation struct {
 	addstatus        *int64
 	progess          **schema.Progress
 	created_at       *time.Time
+	name             *string
+	note             *string
 	clearedFields    map[string]struct{}
 	done             bool
 	oldValue         func(context.Context) (*Plan, error)
@@ -600,9 +602,22 @@ func (m *PlanMutation) OldProgess(ctx context.Context) (v *schema.Progress, err 
 	return oldValue.Progess, nil
 }
 
+// ClearProgess clears the value of the "progess" field.
+func (m *PlanMutation) ClearProgess() {
+	m.progess = nil
+	m.clearedFields[plan.FieldProgess] = struct{}{}
+}
+
+// ProgessCleared returns if the "progess" field was cleared in this mutation.
+func (m *PlanMutation) ProgessCleared() bool {
+	_, ok := m.clearedFields[plan.FieldProgess]
+	return ok
+}
+
 // ResetProgess resets all changes to the "progess" field.
 func (m *PlanMutation) ResetProgess() {
 	m.progess = nil
+	delete(m.clearedFields, plan.FieldProgess)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -641,6 +656,91 @@ func (m *PlanMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
+// SetName sets the "name" field.
+func (m *PlanMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *PlanMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Plan entity.
+// If the Plan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlanMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *PlanMutation) ResetName() {
+	m.name = nil
+}
+
+// SetNote sets the "note" field.
+func (m *PlanMutation) SetNote(s string) {
+	m.note = &s
+}
+
+// Note returns the value of the "note" field in the mutation.
+func (m *PlanMutation) Note() (r string, exists bool) {
+	v := m.note
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNote returns the old "note" field's value of the Plan entity.
+// If the Plan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlanMutation) OldNote(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNote is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNote requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNote: %w", err)
+	}
+	return oldValue.Note, nil
+}
+
+// ClearNote clears the value of the "note" field.
+func (m *PlanMutation) ClearNote() {
+	m.note = nil
+	m.clearedFields[plan.FieldNote] = struct{}{}
+}
+
+// NoteCleared returns if the "note" field was cleared in this mutation.
+func (m *PlanMutation) NoteCleared() bool {
+	_, ok := m.clearedFields[plan.FieldNote]
+	return ok
+}
+
+// ResetNote resets all changes to the "note" field.
+func (m *PlanMutation) ResetNote() {
+	m.note = nil
+	delete(m.clearedFields, plan.FieldNote)
+}
+
 // Where appends a list predicates to the PlanMutation builder.
 func (m *PlanMutation) Where(ps ...predicate.Plan) {
 	m.predicates = append(m.predicates, ps...)
@@ -675,7 +775,7 @@ func (m *PlanMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PlanMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.user_id != nil {
 		fields = append(fields, plan.FieldUserID)
 	}
@@ -706,6 +806,12 @@ func (m *PlanMutation) Fields() []string {
 	if m.created_at != nil {
 		fields = append(fields, plan.FieldCreatedAt)
 	}
+	if m.name != nil {
+		fields = append(fields, plan.FieldName)
+	}
+	if m.note != nil {
+		fields = append(fields, plan.FieldNote)
+	}
 	return fields
 }
 
@@ -734,6 +840,10 @@ func (m *PlanMutation) Field(name string) (ent.Value, bool) {
 		return m.Progess()
 	case plan.FieldCreatedAt:
 		return m.CreatedAt()
+	case plan.FieldName:
+		return m.Name()
+	case plan.FieldNote:
+		return m.Note()
 	}
 	return nil, false
 }
@@ -763,6 +873,10 @@ func (m *PlanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldProgess(ctx)
 	case plan.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case plan.FieldName:
+		return m.OldName(ctx)
+	case plan.FieldNote:
+		return m.OldNote(ctx)
 	}
 	return nil, fmt.Errorf("unknown Plan field %s", name)
 }
@@ -841,6 +955,20 @@ func (m *PlanMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case plan.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case plan.FieldNote:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNote(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Plan field %s", name)
@@ -946,7 +1074,14 @@ func (m *PlanMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *PlanMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(plan.FieldProgess) {
+		fields = append(fields, plan.FieldProgess)
+	}
+	if m.FieldCleared(plan.FieldNote) {
+		fields = append(fields, plan.FieldNote)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -959,6 +1094,14 @@ func (m *PlanMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *PlanMutation) ClearField(name string) error {
+	switch name {
+	case plan.FieldProgess:
+		m.ClearProgess()
+		return nil
+	case plan.FieldNote:
+		m.ClearNote()
+		return nil
+	}
 	return fmt.Errorf("unknown Plan nullable field %s", name)
 }
 
@@ -995,6 +1138,12 @@ func (m *PlanMutation) ResetField(name string) error {
 		return nil
 	case plan.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case plan.FieldName:
+		m.ResetName()
+		return nil
+	case plan.FieldNote:
+		m.ResetNote()
 		return nil
 	}
 	return fmt.Errorf("unknown Plan field %s", name)

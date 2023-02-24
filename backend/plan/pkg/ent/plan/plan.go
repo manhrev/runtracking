@@ -31,6 +31,10 @@ const (
 	FieldProgess = "progess"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldNote holds the string denoting the note field in the database.
+	FieldNote = "note"
 	// Table holds the table name of the plan in the database.
 	Table = "plans"
 )
@@ -48,6 +52,8 @@ var Columns = []string{
 	FieldStatus,
 	FieldProgess,
 	FieldCreatedAt,
+	FieldName,
+	FieldNote,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

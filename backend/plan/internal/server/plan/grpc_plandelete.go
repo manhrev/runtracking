@@ -13,7 +13,11 @@ func (s *planServer) DeletePlans(ctx context.Context, request *plan.DeletePlansR
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}
-	println(userId)
+
+	err = s.repository.Plan.Delete(ctx, userId, request.GetIds())
+	if err != nil {
+		return nil, err
+	}
 
 	return &plan.DeletePlansReply{}, nil
 }

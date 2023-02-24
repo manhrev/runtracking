@@ -99,6 +99,16 @@ func CreatedAt(v time.Time) predicate.Plan {
 	return predicate.Plan(sql.FieldEQ(FieldCreatedAt, v))
 }
 
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldName, v))
+}
+
+// Note applies equality check predicate on the "note" field. It's identical to NoteEQ.
+func Note(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldNote, v))
+}
+
 // UserIDEQ applies the EQ predicate on the "user_id" field.
 func UserIDEQ(v int64) predicate.Plan {
 	return predicate.Plan(sql.FieldEQ(FieldUserID, v))
@@ -419,6 +429,16 @@ func StatusLTE(v int64) predicate.Plan {
 	return predicate.Plan(sql.FieldLTE(FieldStatus, v))
 }
 
+// ProgessIsNil applies the IsNil predicate on the "progess" field.
+func ProgessIsNil() predicate.Plan {
+	return predicate.Plan(sql.FieldIsNull(FieldProgess))
+}
+
+// ProgessNotNil applies the NotNil predicate on the "progess" field.
+func ProgessNotNil() predicate.Plan {
+	return predicate.Plan(sql.FieldNotNull(FieldProgess))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Plan {
 	return predicate.Plan(sql.FieldEQ(FieldCreatedAt, v))
@@ -457,6 +477,146 @@ func CreatedAtLT(v time.Time) predicate.Plan {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Plan {
 	return predicate.Plan(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldName, v))
+}
+
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldNEQ(FieldName, v))
+}
+
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Plan {
+	return predicate.Plan(sql.FieldIn(FieldName, vs...))
+}
+
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Plan {
+	return predicate.Plan(sql.FieldNotIn(FieldName, vs...))
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldGT(FieldName, v))
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldGTE(FieldName, v))
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldLT(FieldName, v))
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldLTE(FieldName, v))
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldContains(FieldName, v))
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldHasPrefix(FieldName, v))
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldHasSuffix(FieldName, v))
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldContainsFold(FieldName, v))
+}
+
+// NoteEQ applies the EQ predicate on the "note" field.
+func NoteEQ(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldNote, v))
+}
+
+// NoteNEQ applies the NEQ predicate on the "note" field.
+func NoteNEQ(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldNEQ(FieldNote, v))
+}
+
+// NoteIn applies the In predicate on the "note" field.
+func NoteIn(vs ...string) predicate.Plan {
+	return predicate.Plan(sql.FieldIn(FieldNote, vs...))
+}
+
+// NoteNotIn applies the NotIn predicate on the "note" field.
+func NoteNotIn(vs ...string) predicate.Plan {
+	return predicate.Plan(sql.FieldNotIn(FieldNote, vs...))
+}
+
+// NoteGT applies the GT predicate on the "note" field.
+func NoteGT(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldGT(FieldNote, v))
+}
+
+// NoteGTE applies the GTE predicate on the "note" field.
+func NoteGTE(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldGTE(FieldNote, v))
+}
+
+// NoteLT applies the LT predicate on the "note" field.
+func NoteLT(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldLT(FieldNote, v))
+}
+
+// NoteLTE applies the LTE predicate on the "note" field.
+func NoteLTE(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldLTE(FieldNote, v))
+}
+
+// NoteContains applies the Contains predicate on the "note" field.
+func NoteContains(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldContains(FieldNote, v))
+}
+
+// NoteHasPrefix applies the HasPrefix predicate on the "note" field.
+func NoteHasPrefix(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldHasPrefix(FieldNote, v))
+}
+
+// NoteHasSuffix applies the HasSuffix predicate on the "note" field.
+func NoteHasSuffix(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldHasSuffix(FieldNote, v))
+}
+
+// NoteIsNil applies the IsNil predicate on the "note" field.
+func NoteIsNil() predicate.Plan {
+	return predicate.Plan(sql.FieldIsNull(FieldNote))
+}
+
+// NoteNotNil applies the NotNil predicate on the "note" field.
+func NoteNotNil() predicate.Plan {
+	return predicate.Plan(sql.FieldNotNull(FieldNote))
+}
+
+// NoteEqualFold applies the EqualFold predicate on the "note" field.
+func NoteEqualFold(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldEqualFold(FieldNote, v))
+}
+
+// NoteContainsFold applies the ContainsFold predicate on the "note" field.
+func NoteContainsFold(v string) predicate.Plan {
+	return predicate.Plan(sql.FieldContainsFold(FieldNote, v))
 }
 
 // And groups predicates with the AND operator between them.

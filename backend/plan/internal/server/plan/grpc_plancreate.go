@@ -13,7 +13,22 @@ func (s *planServer) CreatePlan(ctx context.Context, request *plan.CreatePlanReq
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}
-	println(userId)
+
+	err = s.repository.Plan.Create(
+		ctx,
+		userId,
+		request.GetRule(),
+		request.GetActivityType(),
+		request.GetGoal(),
+		request.GetName(),
+		request.GetNote(),
+		request.GetStartTime(),
+		request.GetEndTime(),
+	)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return &plan.CreatePlanReply{}, nil
 }

@@ -13,7 +13,19 @@ func (s *planServer) UpdatePlan(ctx context.Context, request *plan.UpdatePlanReq
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}
-	println(userId)
+
+	err = s.repository.Plan.Update(
+		ctx,
+		userId,
+		request.GetId(),
+		request.GetEndTime(),
+		request.GetGoal(),
+		request.GetName(),
+		request.GetNote(),
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &plan.UpdatePlanReply{}, nil
 }

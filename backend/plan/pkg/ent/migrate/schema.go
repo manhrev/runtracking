@@ -19,8 +19,10 @@ var (
 		{Name: "total", Type: field.TypeInt64, Default: 0},
 		{Name: "goal", Type: field.TypeInt64},
 		{Name: "status", Type: field.TypeInt64, Default: 3},
-		{Name: "progess", Type: field.TypeJSON},
+		{Name: "progess", Type: field.TypeJSON, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "note", Type: field.TypeString, Nullable: true},
 	}
 	// PlansTable holds the schema information for the "plans" table.
 	PlansTable = &schema.Table{

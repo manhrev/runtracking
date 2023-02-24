@@ -1,27 +1,42 @@
 package transformer
 
 import (
-	activity "github.com/manhrev/runtracking/backend/activity/pkg/api"
-	"github.com/manhrev/runtracking/backend/activity/pkg/ent"
+	plan "github.com/manhrev/runtracking/backend/plan/pkg/api"
+	"github.com/manhrev/runtracking/backend/plan/pkg/ent"
+	"github.com/manhrev/runtracking/backend/plan/pkg/ent/schema"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func TransformActivityListEntToActivityList(activityList []*ent.Activity) []*activity.ActivityInfo {
-	activityInfoList := []*activity.ActivityInfo{}
-	for _, activityEnt := range activityList {
-		activityInfo := &activity.ActivityInfo{
-			Id:            activityEnt.ID,
-			Type:          activity.ActivityType(activityEnt.Type),
-			TotalDistance: activityEnt.TotalDistance,
-			Kcal:          activityEnt.Kcal,
-			StartTime:     timestamppb.New(activityEnt.StartTime),
-			EndTime:       timestamppb.New(activityEnt.EndTime),
-			Duration:      activityEnt.Duration,
-			Route:         activityEnt.Route,
-			ActivityName:  activityEnt.ActivityName,
-			ActivityNote:  activityEnt.ActivityNote,
+func TransformPlanListEntToPlanList(planList []*ent.Plan) []*plan.PlanInfo {
+	planInfoList := []*plan.PlanInfo{}
+	for _, planEnt := range planList {
+		planInfo := &plan.PlanInfo{
+			Id:           planEnt.ID,
+			ActivityType: plan.ActivityType(planEnt.ActivityType),
+			StartTime:    timestamppb.New(planEnt.StartTime),
+			EndTime:      timestamppb.New(planEnt.EndTime),
+			Goal:         planEnt.Goal,
+			Total:        planEnt.Total,
+			Name:         planEnt.Name,
+			Note:         planEnt.Note,
+			Rule:         plan.Rule(planEnt.Rule),
+			Progress:     transformPlanEntProgressToPlanProgress(planEnt.Progess),
 		}
-		activityInfoList = append(activityInfoList, activityInfo)
+		planInfoList = append(planInfoList, planInfo)
 	}
-	return activityInfoList
+	return planInfoList
+}
+
+func transformPlanEntProgressToPlanProgress(entProgress *schema.Progress) []*plan.PlanProgress {
+	if entProgress != nil {
+		progressList := make([]*plan.PlanProgress, len(entProgress.ProgressDays))
+		for idx, entDay := range entProgress.ProgressDays {
+			progressList[idx] = &plan.PlanProgress{
+				Timestamp: entDay.GetTimestamp(),
+				Value:     entDay.GetValue(),
+			}
+		}
+		return progressList
+	}
+	return []*plan.PlanProgress{}
 }

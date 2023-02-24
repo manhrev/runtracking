@@ -158,6 +158,12 @@ func (pu *PlanUpdate) SetProgess(s *schema.Progress) *PlanUpdate {
 	return pu
 }
 
+// ClearProgess clears the value of the "progess" field.
+func (pu *PlanUpdate) ClearProgess() *PlanUpdate {
+	pu.mutation.ClearProgess()
+	return pu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (pu *PlanUpdate) SetCreatedAt(t time.Time) *PlanUpdate {
 	pu.mutation.SetCreatedAt(t)
@@ -169,6 +175,32 @@ func (pu *PlanUpdate) SetNillableCreatedAt(t *time.Time) *PlanUpdate {
 	if t != nil {
 		pu.SetCreatedAt(*t)
 	}
+	return pu
+}
+
+// SetName sets the "name" field.
+func (pu *PlanUpdate) SetName(s string) *PlanUpdate {
+	pu.mutation.SetName(s)
+	return pu
+}
+
+// SetNote sets the "note" field.
+func (pu *PlanUpdate) SetNote(s string) *PlanUpdate {
+	pu.mutation.SetNote(s)
+	return pu
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (pu *PlanUpdate) SetNillableNote(s *string) *PlanUpdate {
+	if s != nil {
+		pu.SetNote(*s)
+	}
+	return pu
+}
+
+// ClearNote clears the value of the "note" field.
+func (pu *PlanUpdate) ClearNote() *PlanUpdate {
+	pu.mutation.ClearNote()
 	return pu
 }
 
@@ -264,8 +296,20 @@ func (pu *PlanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Progess(); ok {
 		_spec.SetField(plan.FieldProgess, field.TypeJSON, value)
 	}
+	if pu.mutation.ProgessCleared() {
+		_spec.ClearField(plan.FieldProgess, field.TypeJSON)
+	}
 	if value, ok := pu.mutation.CreatedAt(); ok {
 		_spec.SetField(plan.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := pu.mutation.Name(); ok {
+		_spec.SetField(plan.FieldName, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.Note(); ok {
+		_spec.SetField(plan.FieldNote, field.TypeString, value)
+	}
+	if pu.mutation.NoteCleared() {
+		_spec.ClearField(plan.FieldNote, field.TypeString)
 	}
 	_spec.AddModifiers(pu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
@@ -417,6 +461,12 @@ func (puo *PlanUpdateOne) SetProgess(s *schema.Progress) *PlanUpdateOne {
 	return puo
 }
 
+// ClearProgess clears the value of the "progess" field.
+func (puo *PlanUpdateOne) ClearProgess() *PlanUpdateOne {
+	puo.mutation.ClearProgess()
+	return puo
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (puo *PlanUpdateOne) SetCreatedAt(t time.Time) *PlanUpdateOne {
 	puo.mutation.SetCreatedAt(t)
@@ -428,6 +478,32 @@ func (puo *PlanUpdateOne) SetNillableCreatedAt(t *time.Time) *PlanUpdateOne {
 	if t != nil {
 		puo.SetCreatedAt(*t)
 	}
+	return puo
+}
+
+// SetName sets the "name" field.
+func (puo *PlanUpdateOne) SetName(s string) *PlanUpdateOne {
+	puo.mutation.SetName(s)
+	return puo
+}
+
+// SetNote sets the "note" field.
+func (puo *PlanUpdateOne) SetNote(s string) *PlanUpdateOne {
+	puo.mutation.SetNote(s)
+	return puo
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (puo *PlanUpdateOne) SetNillableNote(s *string) *PlanUpdateOne {
+	if s != nil {
+		puo.SetNote(*s)
+	}
+	return puo
+}
+
+// ClearNote clears the value of the "note" field.
+func (puo *PlanUpdateOne) ClearNote() *PlanUpdateOne {
+	puo.mutation.ClearNote()
 	return puo
 }
 
@@ -553,8 +629,20 @@ func (puo *PlanUpdateOne) sqlSave(ctx context.Context) (_node *Plan, err error) 
 	if value, ok := puo.mutation.Progess(); ok {
 		_spec.SetField(plan.FieldProgess, field.TypeJSON, value)
 	}
+	if puo.mutation.ProgessCleared() {
+		_spec.ClearField(plan.FieldProgess, field.TypeJSON)
+	}
 	if value, ok := puo.mutation.CreatedAt(); ok {
 		_spec.SetField(plan.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := puo.mutation.Name(); ok {
+		_spec.SetField(plan.FieldName, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.Note(); ok {
+		_spec.SetField(plan.FieldNote, field.TypeString, value)
+	}
+	if puo.mutation.NoteCleared() {
+		_spec.ClearField(plan.FieldNote, field.TypeString)
 	}
 	_spec.AddModifiers(puo.modifiers...)
 	_node = &Plan{config: puo.config}

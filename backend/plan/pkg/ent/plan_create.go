@@ -121,6 +121,26 @@ func (pc *PlanCreate) SetNillableCreatedAt(t *time.Time) *PlanCreate {
 	return pc
 }
 
+// SetName sets the "name" field.
+func (pc *PlanCreate) SetName(s string) *PlanCreate {
+	pc.mutation.SetName(s)
+	return pc
+}
+
+// SetNote sets the "note" field.
+func (pc *PlanCreate) SetNote(s string) *PlanCreate {
+	pc.mutation.SetNote(s)
+	return pc
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (pc *PlanCreate) SetNillableNote(s *string) *PlanCreate {
+	if s != nil {
+		pc.SetNote(*s)
+	}
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PlanCreate) SetID(i int64) *PlanCreate {
 	pc.mutation.SetID(i)
@@ -210,11 +230,11 @@ func (pc *PlanCreate) check() error {
 	if _, ok := pc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Plan.status"`)}
 	}
-	if _, ok := pc.mutation.Progess(); !ok {
-		return &ValidationError{Name: "progess", err: errors.New(`ent: missing required field "Plan.progess"`)}
-	}
 	if _, ok := pc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Plan.created_at"`)}
+	}
+	if _, ok := pc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Plan.name"`)}
 	}
 	return nil
 }
@@ -287,6 +307,14 @@ func (pc *PlanCreate) createSpec() (*Plan, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.SetField(plan.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := pc.mutation.Name(); ok {
+		_spec.SetField(plan.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := pc.mutation.Note(); ok {
+		_spec.SetField(plan.FieldNote, field.TypeString, value)
+		_node.Note = value
 	}
 	return _node, _spec
 }

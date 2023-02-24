@@ -38,6 +38,10 @@ type Plan struct {
 	Progess *schema.Progress `json:"progess,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Note holds the value of the "note" field.
+	Note string `json:"note,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -49,6 +53,8 @@ func (*Plan) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case plan.FieldID, plan.FieldUserID, plan.FieldRule, plan.FieldActivityType, plan.FieldTotal, plan.FieldGoal, plan.FieldStatus:
 			values[i] = new(sql.NullInt64)
+		case plan.FieldName, plan.FieldNote:
+			values[i] = new(sql.NullString)
 		case plan.FieldStartTime, plan.FieldEndTime, plan.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		default:
@@ -134,6 +140,18 @@ func (pl *Plan) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pl.CreatedAt = value.Time
 			}
+		case plan.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				pl.Name = value.String
+			}
+		case plan.FieldNote:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field note", values[i])
+			} else if value.Valid {
+				pl.Note = value.String
+			}
 		}
 	}
 	return nil
@@ -191,6 +209,12 @@ func (pl *Plan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(pl.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(pl.Name)
+	builder.WriteString(", ")
+	builder.WriteString("note=")
+	builder.WriteString(pl.Note)
 	builder.WriteByte(')')
 	return builder.String()
 }

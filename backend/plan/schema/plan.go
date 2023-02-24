@@ -24,8 +24,10 @@ func (Plan) Fields() []ent.Field {
 		field.Int64("total").Default(0),
 		field.Int64("goal"),
 		field.Int64("status").Default(int64(plan.RuleStatus_RULE_STATUS_INPROGRESS)),
-		field.JSON("progess", &Progress{}),
+		field.JSON("progess", &Progress{}).Optional(),
 		field.Time("created_at").Default(time.Now()),
+		field.String("name"),
+		field.String("note").Optional(),
 	}
 }
 
