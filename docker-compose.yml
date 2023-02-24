@@ -1,12 +1,14 @@
 version: '3.7'
 
 services:
-
   gateway:
     build:
       context: backend/gateway
       dockerfile: Dockerfile
     container_name: gateway
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 8080:8080
 
@@ -17,9 +19,78 @@ services:
     container_name: auth
     volumes:
       - ./backend/auth:/app
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - auth_db
       - redis
+
+  group:
+    build:
+      context: backend/group
+      dockerfile: build/Dockerfile
+    container_name: group
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - group_db
+  
+  activity:
+    build:
+      context: backend/activity
+      dockerfile: build/Dockerfile
+    container_name: activity
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - activity_db
+
+  notification:
+    build:
+      context: backend/notification
+      dockerfile: build/Dockerfile
+    container_name: notification
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - notification_db
+    ports:
+      - 8000:8000
+
+  plan:
+    build:
+      context: backend/plan
+      dockerfile: build/Dockerfile
+    container_name: plan
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - plan_db
+
+  gcloud-tasks-emulator:
+    image: ghcr.io/aertje/cloud-tasks-emulator:latest
+    command: -host 0.0.0.0 -port 8123 -queue "projects/daring-acumen-370401/locations/asia-southeast2/queues/test-queue1"
+    ports:
+      - "${TASKS_PORT:-8123}:8123"
+    environment:
+      APP_ENGINE_EMULATOR_HOST: http://localhost:8080
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - "6379:6379"
+    # restart: always
 
   auth_db:
     image: mysql
@@ -29,23 +100,10 @@ services:
     container_name: 'db-auth'
     volumes:
       - "./tmp/db/auth:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33306:3306
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-    # restart: always
-
-  group:
-    build:
-      context: backend/group
-      dockerfile: build/Dockerfile
-    container_name: group
-    depends_on:
-      - group_db
 
   group_db:
     image: mysql
@@ -55,16 +113,10 @@ services:
     container_name: 'db-group'
     volumes:
       - "./tmp/db/group:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33307:3306
-
-  activity:
-    build:
-      context: backend/activity
-      dockerfile: build/Dockerfile
-    container_name: activity
-    depends_on:
-      - activity_db
 
   activity_db:
     image: mysql
@@ -74,5 +126,33 @@ services:
     container_name: 'db-activity'
     volumes:
       - "./tmp/db/activity:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33308:3306
+    
+  notification_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: notification
+    container_name: 'db-notification'
+    volumes:
+      - "./tmp/db/notification:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - 33309:3306
+
+  plan_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: plan
+    container_name: 'db-plan'
+    volumes:
+      - "./tmp/db/plan:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - 33310:3306

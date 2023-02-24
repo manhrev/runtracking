@@ -26,7 +26,7 @@ export default function ProfileHome({
     navigation.navigate("AppSetting");
   };
   const handleViewNofification = () => {
-    navigation.navigate("NotificationList");
+    navigation.navigate("NotificationList", {});
   };
   useEffect(() => {
     dispatch(getMeThunk());

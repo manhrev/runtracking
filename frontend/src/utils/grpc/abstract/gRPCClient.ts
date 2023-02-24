@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const KEY_ACCESS_TOKEN = "accessToken";
 export const QUERY_PARAM_ACCESS_TOKEN = "token";
+export const EXPO_PUSH_TOKEN = "expoPushToken"
 export const IGNORE_TOAST_CODES = [grpcStatusCode.UNAUTHENTICATED];
 
 class gRPCClientAbstract {

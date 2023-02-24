@@ -3,8 +3,10 @@ package server
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/group/internal/server/group"
@@ -46,6 +48,14 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
+	http.HandleFunc("/group", getRoot)
+	go func() {
+		err = http.ListenAndServe(":8000", nil)
+		if err != nil {
+			log.Fatalf("Failed to serve http server: %v", err)
+		}
+	}()
+
 	// register main and other server servers
 	pb.RegisterGroupServer(server, group.NewServer(entClient))
 
@@ -53,8 +63,15 @@ func Serve(server *grpc.Server) {
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)
 	}
+
 	err = server.Serve(lis)
 	if err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
+
+}
+
+func getRoot(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("got / request\n")
+	io.WriteString(w, "This is my website for group test!\n")
 }

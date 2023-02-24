@@ -71,7 +71,7 @@ const ExtendedDefaultTheme = {
     ...CombinedDefaultTheme.colors,
     primary: "rgb(114, 222, 94)",
     onPrimary: "rgb(0, 58, 0)",
-    primaryContainer: "rgb(0, 83, 0)",
+    primaryContainer: "rgb(255, 215, 245)",
     onPrimaryContainer: "rgb(141, 251, 119)",
     secondary: "rgb(187, 203, 178)",
     onSecondary: "rgb(38, 52, 34)",

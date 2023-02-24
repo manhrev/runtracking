@@ -14,6 +14,10 @@ import RunResult from "../screens/Run/RunResult";
 import PlanDetail from "../screens/Plan/PlanDetail";
 import PlanAdd from "../screens/Plan/PlanAdd";
 import RunHome from "../screens/Run/RunHome";
+import { notificationClient } from "../utils/grpc";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import { Subscription } from 'expo-modules-core';
 import * as google_protobuf_timestamp_pb from "google-protobuf/google/protobuf/timestamp_pb";
 import {
   CreateActivityInfoRequest,
@@ -26,11 +30,13 @@ import {
   isUserSliceLoading,
   selectUserSlice,
 } from "../redux/features/user/slice";
-import { View } from "react-native";
+import { View, Platform  } from "react-native";
 import { Text } from "react-native-paper";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getMeThunk } from "../redux/features/user/thunk";
 import ComingSoon from "../screens/ComingSoon";
+import { ExpoPushTokenRequest } from "../lib/notification/notification_pb";
+import NotificationList from "../screens/Profile/NotificationList";
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -73,7 +79,7 @@ export type RootBaseStackParamList = {
   AppSetting: undefined;
 
   // Notification
-  NotificationList: undefined;
+  NotificationList: {};
 
   // Auth
   Login: undefined;
@@ -82,15 +88,18 @@ export type RootBaseStackParamList = {
   GetInfo: undefined;
 };
 
+
+
 const Stack = createNativeStackNavigator<RootBaseStackParamList>();
 
 export const BaseStack = () => {
+  
   const dispatch = useAppDispatch();
   // const loading = useAppSelector(isUserSliceLoading);
   const { isSignedIn } = useAppSelector(selectUserSlice);
 
   const getMe = async () => {
-    const { error } = await dispatch(getMeThunk()).unwrap();
+    const { response ,error } = await dispatch(getMeThunk()).unwrap();
     if (error) {
       alert("Un authenticated!");
     }
@@ -98,15 +107,10 @@ export const BaseStack = () => {
 
   useEffect(() => {
     getMe();
+
   }, []);
 
-  // if (loading) {
-  //   return (
-  //     <View>
-  //       <Text>Loading</Text>
-  //     </View>
-  //   );
-  // }
+  
 
   return (
     <Stack.Navigator screenOptions={{ header: CustomNavBar }}>
@@ -179,7 +183,7 @@ export const BaseStack = () => {
               title: "Notifications",
               headerBackVisible: true,
             }}
-            component={ComingSoon}
+            component={NotificationList}
           />
         </>
       ) : (
@@ -221,3 +225,5 @@ export const BaseStack = () => {
     </Stack.Navigator>
   );
 };
+
+

@@ -27,6 +27,28 @@ export function formatDate(time: Timestamp.AsObject | undefined): string {
   return "NA";
 }
 
+export function formatDateNotification(time: Timestamp.AsObject | undefined): string{
+  if(time !== undefined) {
+      let date = timestampToDate(time)
+      let curDate = new Date()
+      let minutes = (curDate.getTime() - date.getTime()) / 1000 / 60
+      if(minutes < 60){
+        if(minutes < 1) return "Just now"
+        return Math.abs(Math.round(minutes)).toString() + " minutes ago"
+      }
+      else return formatDate(time)
+  }
+  return "NA"
+}
+
+export function timestampToDate(time: Timestamp.AsObject | undefined): Date {
+  if (time !== undefined) {
+    var date = new Date(time.seconds * 1000);
+    return date
+  }
+  return new Date();
+}
+
 export function secondsToMinutes(seconds: number): string {
   var min = Math.floor(seconds / 60);
   var sec = seconds - min * 60;

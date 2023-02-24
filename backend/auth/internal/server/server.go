@@ -20,12 +20,16 @@ import (
 	pb "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent"
 	"github.com/manhrev/runtracking/backend/auth/pkg/extractor"
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
-	ENVIRONMENT_MODE = "ENVIRONMENT_MODE"
+	ENVIRONMENT_MODE                 = "ENVIRONMENT_MODE"
+	notification_service      string = "notification"
+	notification_service_port string = "8080"
 )
 
 func Run() {
@@ -60,6 +64,12 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", notification_service, notification_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("error while create connect to sample service: %v", err)
+	}
+	notificationClient := notification.NewNotificationIClient(conn)
+
 	tokenService, err := token.New()
 	if err != nil {
 		log.Fatalf("cannot create token service: %v", err)
@@ -93,7 +103,7 @@ func Serve(server *grpc.Server) {
 	}
 
 	// Register Auth Server
-	pb.RegisterAuthServer(server, auth.NewServer(entClient, tokenService, featureSignIn, featureSignUp, cacheService, extractorService))
+	pb.RegisterAuthServer(server, auth.NewServer(entClient, tokenService, featureSignIn, featureSignUp, cacheService, extractorService, notificationClient))
 	// Register User Server
 	pb.RegisterUserServer(server, user.NewServer(entClient, extractorService))
 
