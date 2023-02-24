@@ -4,6 +4,7 @@ import toggle from "./features/toggle/slice";
 import activityList from "./features/activityList/slice";
 import activityStatisticList from "./features/activityStatistic/slice";
 import user from "./features/user/slice";
+import planList from "./features/planList/slice";
 
 const rootReducer = combineReducers({
   common,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   activityList,
   activityStatisticList,
   user,
+  planList,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

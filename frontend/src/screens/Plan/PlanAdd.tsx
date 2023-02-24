@@ -5,7 +5,11 @@ import { Dropdown } from 'react-native-element-dropdown';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
+import { useAppDispatch } from "../../redux/store";
 
+import {
+    createPlanThunk
+} from "../../redux/features/planList/thunk";
 
 import { baseStyles } from "../baseStyle";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
@@ -23,6 +27,7 @@ export default function PlanAdd({
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, "PlanAdd">) {
     const theme = useAppTheme();
+    const dispatch = useAppDispatch();
 
     const data = [
         { label: 'Total Km', value: '1' },
@@ -64,13 +69,20 @@ export default function PlanAdd({
             name: name,
             activityType: activityType,
             rule: rule,
-            startTime: startTime,
-            endTime: endTime,
+            startTime: {
+                seconds: startTime.getTime() / 1000,
+                nanos: 0,
+            },
+            endTime: {
+                seconds: endTime.getTime() / 1000,
+                nanos: 0,
+            },
             goal: goal,
             note: note,
         }
-        console.log(planData);
-        alert("Plan saved!");
+        dispatch(createPlanThunk(planData));
+        alert("Plan created!");
+        navigation.goBack();
     }
     
 
@@ -186,7 +198,7 @@ export default function PlanAdd({
                             onPress={() => savePlan()}
                             style={styles(theme).button}
                             >
-                            Save
+                            Create
                         </Button>
                     </View>
 

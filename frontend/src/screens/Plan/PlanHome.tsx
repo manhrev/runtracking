@@ -2,81 +2,22 @@ import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import { Button, IconButton, SegmentedButtons, Text, List, Divider } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
-
-
+import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { baseStyles } from "../baseStyle";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import {
+    isPlanListLoading,
+    getPlanList,
+} from "../../redux/features/planList/slice";
+
+import {
+    listPlanThunk
+} from "../../redux/features/planList/thunk";
 
 
 const windowWidth = Dimensions.get("window").width;
-
-const fdata = [ // completed, failed, doing
-    {
-        id: 1,
-        name: "First Item",
-        start_date: "2021-07-01",
-        end_date: "2021-07-31",
-        total: 100,
-        goal: 150,
-        status: "doing",
-    },
-    {
-        id: 2,
-        name: "Second Item",
-        start_date: "2021-07-01",
-        end_date: "2021-07-31",
-        total: 100,
-        goal: 150,
-        status: "doing",
-    },
-    {
-        id: 3,
-        name: "Third Item",
-        start_date: "2021-07-01",
-        end_date: "2021-07-31",
-        total: 100,
-        goal: 150,
-        status: "doing",
-    },
-    {
-        id: 4,
-        name: "Fourth Item",
-        start_date: "2021-07-01",
-        end_date: "2021-07-31",
-        total: 100,
-        goal: 150,
-        status: "completed",
-    },
-    {
-        id: 5,
-        name: "Fifth Item",
-        start_date: "2021-07-01",
-        end_date: "2021-07-31",
-        total: 100,
-        goal: 150,
-        status: "doing",
-    },
-    {
-        id: 6,
-        name: "Sixth Item",
-        start_date: "2021-07-01",
-        end_date: "2021-07-31",
-        total: 100,
-        goal: 150,
-        status: "doing",
-    },
-    {
-        id: 7,
-        name: "Seventh Item",
-        start_date: "2021-07-01",
-        end_date: "2021-07-31",
-        total: 100,
-        goal: 150,
-        status: "doing",
-    },
-
-];
 
 
 export default function Plan({
@@ -85,7 +26,24 @@ export default function Plan({
 }: NativeStackScreenProps<RootHomeTabsParamList, "PlanHome">) {
     const theme = useAppTheme();
 
+    const dispatch = useAppDispatch();
+    const { planList } = useAppSelector(getPlanList);
+    // const isLoading = useAppSelector(isPlanListLoading);
     const [tabState, setTabState] = useState("current");
+
+    useEffect(() => {
+        dispatch(listPlanThunk());
+    }, []);
+
+    const toDate = (seconds: number) => {
+        // dd/mm/yyyy
+        const date = new Date(seconds * 1000);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+    }
+
     return (
         <>
             <View style={styles(theme).container}>
@@ -112,14 +70,14 @@ export default function Plan({
                         ]}
                     />
 
-                    {fdata.map((item, index) => (
+                    {planList.map((item, index) => (
                         ((item.status === "doing" && tabState === "current") || (item.status !== "doing" && tabState === "history")) ? 
                             <List.Item
                                 style={styles(theme).curPlan}
-                                key={item.id}
+                                key={index}
                                 title={item.name}
                                 titleStyle={styles(theme).planName}
-                                description={`Start: ${item.start_date}    -    End: ${item.end_date}\nProgress: ${item.total}/${item.goal}`}
+                                description={`Start: ${toDate(item.startTime.seconds)}    -    End: ${toDate(item.endTime.seconds)}\nProgress: ${item.total}/${item.goal}`}
                                 left={props => <List.Icon {...props} icon="run" />}
                                 // enter bracket icon
                                 right={props => <IconButton {...props} icon="chevron-right" />}
