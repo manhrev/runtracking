@@ -18,6 +18,11 @@ import {
     ActivityType
 } from "../../lib/activity/activity_pb";
 
+import {
+    Rule,
+    CreatePlanRequest
+} from "../../lib/plan/plan_pb";
+
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -30,15 +35,17 @@ export default function PlanAdd({
     const dispatch = useAppDispatch();
 
     const data = [
-        { label: 'Total Km', value: '1' },
-        { label: 'Km per day', value: '2' },
-        { label: 'Total activity', value: '3' },
-        { label: 'Activity per day', value: '4' },
-        { label: 'Total calories', value: '5' },
-        { label: 'Calories per day', value: '6' },
+        { label: 'Total Km', value: Rule.RULE_TOTAL_DISTANCE.toString()},
+        { label: 'Km per day', value: Rule.RULE_TOTAL_DISTANCE_DAILY.toString()},
+        { label: 'Total time', value: Rule.RULE_TOTAL_TIME.toString()},
+        { label: 'Time per day', value: Rule.RULE_TOTAL_TIME_DAILY.toString()},
+        { label: 'Total activities', value: Rule.RULE_TOTAL_ACTIVITY.toString()},
+        { label: 'Activities per day', value: Rule.RULE_TOTAL_ACTIVITY_DAILY.toString()},
+        { label: 'Total calories', value: Rule.RULE_TOTAL_CALORIES.toString()},
+        { label: 'Calories per day', value: Rule.RULE_TOTAL_CALORIES_DAILY.toString()},
     ];
 
-    const getLabel = (value: string) => {
+    const getLabel = (value: any) => {
         const item = data.find((item) => item.value === value);
         return item ? item.label : '';
     };
@@ -48,7 +55,7 @@ export default function PlanAdd({
 
     const [name, setName] = useState<string>('Example Plan');
     const [activityType, setActivityType] = useState<ActivityType>(ActivityType.ACTIVITY_TYPE_RUNNING);
-    const [rule, setRule] = useState('1');
+    const [rule, setRule] = useState(Rule.RULE_TOTAL_DISTANCE.toString() );
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
     const [goal, setGoal] = useState(1);
@@ -65,22 +72,23 @@ export default function PlanAdd({
     }
 
     const savePlan = () => {
-        const planData = {
+        const planData : CreatePlanRequest.AsObject = {
             name: name,
             activityType: activityType,
-            rule: rule,
+            rule: Number(rule),
             startTime: {
-                seconds: startTime.getTime() / 1000,
+                seconds: parseInt((startTime.getTime() / 1000).toString()),
                 nanos: 0,
             },
             endTime: {
-                seconds: endTime.getTime() / 1000,
+                seconds: parseInt((endTime.getTime() / 1000).toString()),
                 nanos: 0,
             },
             goal: goal,
-            note: note,
+            note: note
         }
         dispatch(createPlanThunk(planData));
+        console.log(planData);
         alert("Plan created!");
         navigation.goBack();
     }
@@ -137,7 +145,7 @@ export default function PlanAdd({
                         valueField="value"
                         placeholder="Select item"
                         searchPlaceholder="Search..."
-                        value={rule}
+                        value={rule.toString()}
                         onChange={item => {
                             setRule(item.value);
                         }}
@@ -168,7 +176,7 @@ export default function PlanAdd({
                     <Text style={styles(theme).title}>Goal: </Text>
                     <TextInput
                         mode="outlined"
-                        value={goal.toString()}
+                        value={goal ? goal.toString() : ""}
                         onChangeText={text => setGoal(parseInt(text))}
                         label={getLabel(rule)}
                     />

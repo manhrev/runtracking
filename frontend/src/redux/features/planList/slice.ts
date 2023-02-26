@@ -23,17 +23,21 @@ const slice = createSlice({
       state.status = StatusEnum.LOADING;
     });
     builder.addCase(listPlanThunk.fulfilled, (state, { payload }) => {
-    //   const { response, error } = payload;
-    //   if (error) return;
+      const { response, error } = payload;
+      if (error) return;
+
       state.status = StatusEnum.SUCCEEDED;
-      state.planList = payload || [];
+      state.planList = response?.plansList || [];
     });
     builder.addCase(createPlanThunk.pending, (state) => {
         state.status = StatusEnum.LOADING;
     });
     builder.addCase(createPlanThunk.fulfilled, (state, { payload }) => {
+        const { response, error } = payload;
+        if (error) return;
+
         state.status = StatusEnum.SUCCEEDED;
-        state.planList.push(payload);
+        // state.planList.push(payload);
     });
   },
 });

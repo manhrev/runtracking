@@ -32,7 +32,13 @@ export default function Plan({
     const [tabState, setTabState] = useState("current");
 
     useEffect(() => {
-        dispatch(listPlanThunk());
+        dispatch(listPlanThunk({
+            activityType: 0,
+            ascending: false,
+            limit: 100,
+            offset: 0,
+            sortBy: 1,
+        })).unwrap();
     }, []);
 
     const toDate = (seconds: number) => {
@@ -71,7 +77,7 @@ export default function Plan({
                     />
 
                     {planList.map((item, index) => (
-                        ((item.status === "doing" && tabState === "current") || (item.status !== "doing" && tabState === "history")) ? 
+                        // ((item.status === "doing" && tabState === "current") || (item.status !== "doing" && tabState === "history")) ? 
                             <List.Item
                                 style={styles(theme).curPlan}
                                 key={index}
@@ -83,7 +89,7 @@ export default function Plan({
                                 right={props => <IconButton {...props} icon="chevron-right" />}
                                 onPress={() => navigation.navigate("PlanDetail", {planId: item.id})}
                             />
-                        : null
+                        // : null
                     ))}
                 </ScrollView>
             </View>
