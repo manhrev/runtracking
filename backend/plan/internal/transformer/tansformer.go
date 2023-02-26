@@ -21,6 +21,8 @@ func TransformPlanListEntToPlanList(planList []*ent.Plan) []*plan.PlanInfo {
 			Note:         planEnt.Note,
 			Rule:         plan.Rule(planEnt.Rule),
 			Progress:     transformPlanEntProgressToPlanProgress(planEnt.Progess),
+			CreatedAt:    timestamppb.New(planEnt.CreatedAt),
+			Status:       plan.RuleStatus(planEnt.Status),
 		}
 		planInfoList = append(planInfoList, planInfo)
 	}

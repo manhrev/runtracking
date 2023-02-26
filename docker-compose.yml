@@ -70,6 +70,8 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - plan_db
+    ports:
+      - 8081:8080
 
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest

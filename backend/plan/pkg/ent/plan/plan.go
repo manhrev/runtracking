@@ -35,6 +35,8 @@ const (
 	FieldName = "name"
 	// FieldNote holds the string denoting the note field in the database.
 	FieldNote = "note"
+	// FieldTimeZone holds the string denoting the time_zone field in the database.
+	FieldTimeZone = "time_zone"
 	// Table holds the table name of the plan in the database.
 	Table = "plans"
 )
@@ -54,6 +56,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldName,
 	FieldNote,
+	FieldTimeZone,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
