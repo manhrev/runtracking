@@ -9,6 +9,7 @@ import (
 	plan_pb "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/pkg/ent"
 	"github.com/manhrev/runtracking/backend/plan/pkg/ent/plan"
+	"github.com/manhrev/runtracking/backend/plan/pkg/ent/schema"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -23,6 +24,7 @@ type Plan interface {
 		goal int64,
 		name string,
 		note string,
+		timezone uint32,
 		startTime *timestamppb.Timestamp,
 		endTime *timestamppb.Timestamp,
 	) error
@@ -51,6 +53,12 @@ type Plan interface {
 		name string,
 		note string,
 	) error
+	UpdateProgress(
+		ctx context.Context,
+		plan_id int64,
+		value_increment int64,
+		timestamp *timestamppb.Timestamp,
+	) error
 }
 
 type planImpl struct {
@@ -71,6 +79,7 @@ func (p *planImpl) Create(
 	goal int64,
 	name string,
 	note string,
+	timezone uint32,
 	startTime *timestamppb.Timestamp,
 	endTime *timestamppb.Timestamp,
 ) error {
@@ -86,6 +95,7 @@ func (p *planImpl) Create(
 		SetStatus(int64(plan_pb.RuleStatus_RULE_STATUS_INPROGRESS)).
 		SetTotal(0).
 		SetCreatedAt(time.Now()).
+		SetTimeZone(timezone).
 		Save(ctx)
 
 	if err != nil {
@@ -162,8 +172,8 @@ func (p *planImpl) List(
 
 	if from != nil && to != nil {
 		query.Where(
-			plan.CreatedAtGTE(from.AsTime().Local()),
-			plan.CreatedAtLTE(to.AsTime().Local()),
+			plan.CreatedAtGTE(from.AsTime()),
+			plan.CreatedAtLTE(to.AsTime()),
 		)
 	}
 
@@ -230,6 +240,129 @@ func (p *planImpl) Update(
 	if err != nil {
 		log.Printf("Error update plan: %v", err)
 		return status.Internal(err.Error())
+	}
+
+	return nil
+}
+
+func (p *planImpl) UpdateProgress(
+	ctx context.Context,
+	plan_id int64,
+	value_increment int64,
+	timestamp *timestamppb.Timestamp,
+) error {
+	// get current plan
+	planned, err := p.entClient.Plan.Get(ctx, plan_id)
+	if err != nil {
+		log.Printf("Error update plan progress: cannot get plan: %v", err)
+		return status.Internal(err.Error())
+	}
+
+	rule := plan_pb.Rule(planned.Rule)
+
+	// if plan status is failed, reject
+	if planned.Status == int64(plan_pb.RuleStatus_RULE_STATUS_FAILED) {
+		log.Printf("Error update plan progress: plan failed")
+		return status.Internal("plan failed")
+	}
+
+	// check plan ended but not completed -> change to failed
+	if planned.Status == int64(plan_pb.RuleStatus_RULE_STATUS_INPROGRESS) && time.Now().After(planned.EndTime) {
+		err := p.entClient.Plan.UpdateOne(planned).SetStatus(int64(plan_pb.RuleStatus_RULE_STATUS_FAILED)).Exec(ctx)
+		if err != nil {
+			log.Printf("Error update plan progress: cannot update plan status: %v", err)
+			return status.Internal(err.Error())
+		}
+
+		log.Printf("Error update plan progress: plan failed")
+		return status.Internal("plan failed")
+	}
+
+	// check if new progress day is in planned time range and /*before now*/
+	newProgessTime := timestamp.AsTime()
+	if newProgessTime.Before(planned.StartTime) || newProgessTime.After(planned.EndTime) /*|| newProgessTime.After(time.Now())*/ {
+		log.Printf("Error update plan progress: new progress time is not in planned time range")
+		return status.Internal("new progress time is not in planned time range")
+	}
+
+	// plan rule normal
+	if rule == plan_pb.Rule_RULE_TOTAL_ACTIVITY ||
+		rule == plan_pb.Rule_RULE_TOTAL_DISTANCE ||
+		rule == plan_pb.Rule_RULE_TOTAL_TIME ||
+		rule == plan_pb.Rule_RULE_TOTAL_CALORIES {
+
+		updateQuery := p.entClient.Plan.UpdateOne(planned).AddTotal(value_increment)
+
+		// if finished or not
+		if (planned.Total + value_increment) >= planned.Goal {
+			updateQuery.SetStatus(int64(plan_pb.RuleStatus_RULE_STATUS_COMPLETED))
+		}
+
+		err = updateQuery.Exec(ctx)
+		if err != nil {
+			log.Printf("Error update plan progress: total type: %v", err)
+			return status.Internal(err.Error())
+		}
+	}
+
+	// plan rule daily
+	if rule == plan_pb.Rule_RULE_TOTAL_ACTIVITY_DAILY ||
+		rule == plan_pb.Rule_RULE_TOTAL_DISTANCE_DAILY ||
+		rule == plan_pb.Rule_RULE_TOTAL_TIME_DAILY ||
+		rule == plan_pb.Rule_RULE_TOTAL_CALORIES_DAILY {
+
+		// TODO: check newProgress is in current day
+
+		var currentProgress []*plan_pb.PlanProgress
+		if planned.Progess == nil {
+			currentProgress = []*plan_pb.PlanProgress{}
+		} else {
+			currentProgress = planned.Progess.ProgressDays
+		}
+
+		//TODO: convert timezone.   currentTz := planned.TimeZone
+
+		// no progress yet
+		if len(currentProgress) == 0 {
+			currentProgress = append(currentProgress, &plan_pb.PlanProgress{
+				Timestamp: timestamp,
+				Value:     value_increment,
+			})
+		} else {
+
+			maxIdx := len(currentProgress) - 1
+			newestProgressDay := currentProgress[maxIdx].GetTimestamp().AsTime().In(time.FixedZone("UTC+7", 7*60*60)).Day()
+			newProgressDay := newProgessTime.In(time.FixedZone("UTC+7", 7*60*60)).Day()
+
+			if newestProgressDay == newProgressDay {
+				currentProgress[maxIdx] = &plan_pb.PlanProgress{
+					Timestamp: timestamp,
+					Value:     currentProgress[maxIdx].GetValue() + value_increment,
+				}
+			} else {
+				currentProgress = append(currentProgress, &plan_pb.PlanProgress{
+					Timestamp: timestamp,
+					Value:     value_increment,
+				})
+			}
+		}
+
+		updateQuery := p.entClient.Plan.UpdateOneID(plan_id).SetProgess(&schema.Progress{
+			ProgressDays: currentProgress,
+		})
+
+		// check if finished
+		todayProgress := currentProgress[len(currentProgress)-1]
+		if todayProgress.Timestamp.AsTime().In(time.FixedZone("UTC+7", 7*60*60)).Day() == planned.EndTime.In(time.FixedZone("UTC+7", 7*60*60)).Day() &&
+			todayProgress.Value >= planned.Goal {
+			updateQuery.SetStatus(int64(plan_pb.RuleStatus_RULE_STATUS_COMPLETED))
+		}
+
+		err = updateQuery.Exec(ctx)
+		if err != nil {
+			log.Printf("Error update plan progress: daily type: %v", err)
+			return status.Internal(err.Error())
+		}
 	}
 
 	return nil

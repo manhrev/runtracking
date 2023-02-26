@@ -23,6 +23,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "note", Type: field.TypeString, Nullable: true},
+		{Name: "time_zone", Type: field.TypeUint32},
 	}
 	// PlansTable holds the schema information for the "plans" table.
 	PlansTable = &schema.Table{

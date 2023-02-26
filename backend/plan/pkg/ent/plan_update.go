@@ -204,6 +204,19 @@ func (pu *PlanUpdate) ClearNote() *PlanUpdate {
 	return pu
 }
 
+// SetTimeZone sets the "time_zone" field.
+func (pu *PlanUpdate) SetTimeZone(u uint32) *PlanUpdate {
+	pu.mutation.ResetTimeZone()
+	pu.mutation.SetTimeZone(u)
+	return pu
+}
+
+// AddTimeZone adds u to the "time_zone" field.
+func (pu *PlanUpdate) AddTimeZone(u int32) *PlanUpdate {
+	pu.mutation.AddTimeZone(u)
+	return pu
+}
+
 // Mutation returns the PlanMutation object of the builder.
 func (pu *PlanUpdate) Mutation() *PlanMutation {
 	return pu.mutation
@@ -310,6 +323,12 @@ func (pu *PlanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.NoteCleared() {
 		_spec.ClearField(plan.FieldNote, field.TypeString)
+	}
+	if value, ok := pu.mutation.TimeZone(); ok {
+		_spec.SetField(plan.FieldTimeZone, field.TypeUint32, value)
+	}
+	if value, ok := pu.mutation.AddedTimeZone(); ok {
+		_spec.AddField(plan.FieldTimeZone, field.TypeUint32, value)
 	}
 	_spec.AddModifiers(pu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
@@ -507,6 +526,19 @@ func (puo *PlanUpdateOne) ClearNote() *PlanUpdateOne {
 	return puo
 }
 
+// SetTimeZone sets the "time_zone" field.
+func (puo *PlanUpdateOne) SetTimeZone(u uint32) *PlanUpdateOne {
+	puo.mutation.ResetTimeZone()
+	puo.mutation.SetTimeZone(u)
+	return puo
+}
+
+// AddTimeZone adds u to the "time_zone" field.
+func (puo *PlanUpdateOne) AddTimeZone(u int32) *PlanUpdateOne {
+	puo.mutation.AddTimeZone(u)
+	return puo
+}
+
 // Mutation returns the PlanMutation object of the builder.
 func (puo *PlanUpdateOne) Mutation() *PlanMutation {
 	return puo.mutation
@@ -643,6 +675,12 @@ func (puo *PlanUpdateOne) sqlSave(ctx context.Context) (_node *Plan, err error) 
 	}
 	if puo.mutation.NoteCleared() {
 		_spec.ClearField(plan.FieldNote, field.TypeString)
+	}
+	if value, ok := puo.mutation.TimeZone(); ok {
+		_spec.SetField(plan.FieldTimeZone, field.TypeUint32, value)
+	}
+	if value, ok := puo.mutation.AddedTimeZone(); ok {
+		_spec.AddField(plan.FieldTimeZone, field.TypeUint32, value)
 	}
 	_spec.AddModifiers(puo.modifiers...)
 	_node = &Plan{config: puo.config}

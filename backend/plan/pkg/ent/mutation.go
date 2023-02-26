@@ -53,6 +53,8 @@ type PlanMutation struct {
 	created_at       *time.Time
 	name             *string
 	note             *string
+	time_zone        *uint32
+	addtime_zone     *int32
 	clearedFields    map[string]struct{}
 	done             bool
 	oldValue         func(context.Context) (*Plan, error)
@@ -741,6 +743,62 @@ func (m *PlanMutation) ResetNote() {
 	delete(m.clearedFields, plan.FieldNote)
 }
 
+// SetTimeZone sets the "time_zone" field.
+func (m *PlanMutation) SetTimeZone(u uint32) {
+	m.time_zone = &u
+	m.addtime_zone = nil
+}
+
+// TimeZone returns the value of the "time_zone" field in the mutation.
+func (m *PlanMutation) TimeZone() (r uint32, exists bool) {
+	v := m.time_zone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimeZone returns the old "time_zone" field's value of the Plan entity.
+// If the Plan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlanMutation) OldTimeZone(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimeZone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimeZone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimeZone: %w", err)
+	}
+	return oldValue.TimeZone, nil
+}
+
+// AddTimeZone adds u to the "time_zone" field.
+func (m *PlanMutation) AddTimeZone(u int32) {
+	if m.addtime_zone != nil {
+		*m.addtime_zone += u
+	} else {
+		m.addtime_zone = &u
+	}
+}
+
+// AddedTimeZone returns the value that was added to the "time_zone" field in this mutation.
+func (m *PlanMutation) AddedTimeZone() (r int32, exists bool) {
+	v := m.addtime_zone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTimeZone resets all changes to the "time_zone" field.
+func (m *PlanMutation) ResetTimeZone() {
+	m.time_zone = nil
+	m.addtime_zone = nil
+}
+
 // Where appends a list predicates to the PlanMutation builder.
 func (m *PlanMutation) Where(ps ...predicate.Plan) {
 	m.predicates = append(m.predicates, ps...)
@@ -775,7 +833,7 @@ func (m *PlanMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PlanMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.user_id != nil {
 		fields = append(fields, plan.FieldUserID)
 	}
@@ -812,6 +870,9 @@ func (m *PlanMutation) Fields() []string {
 	if m.note != nil {
 		fields = append(fields, plan.FieldNote)
 	}
+	if m.time_zone != nil {
+		fields = append(fields, plan.FieldTimeZone)
+	}
 	return fields
 }
 
@@ -844,6 +905,8 @@ func (m *PlanMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case plan.FieldNote:
 		return m.Note()
+	case plan.FieldTimeZone:
+		return m.TimeZone()
 	}
 	return nil, false
 }
@@ -877,6 +940,8 @@ func (m *PlanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case plan.FieldNote:
 		return m.OldNote(ctx)
+	case plan.FieldTimeZone:
+		return m.OldTimeZone(ctx)
 	}
 	return nil, fmt.Errorf("unknown Plan field %s", name)
 }
@@ -970,6 +1035,13 @@ func (m *PlanMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetNote(v)
 		return nil
+	case plan.FieldTimeZone:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimeZone(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Plan field %s", name)
 }
@@ -996,6 +1068,9 @@ func (m *PlanMutation) AddedFields() []string {
 	if m.addstatus != nil {
 		fields = append(fields, plan.FieldStatus)
 	}
+	if m.addtime_zone != nil {
+		fields = append(fields, plan.FieldTimeZone)
+	}
 	return fields
 }
 
@@ -1016,6 +1091,8 @@ func (m *PlanMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedGoal()
 	case plan.FieldStatus:
 		return m.AddedStatus()
+	case plan.FieldTimeZone:
+		return m.AddedTimeZone()
 	}
 	return nil, false
 }
@@ -1066,6 +1143,13 @@ func (m *PlanMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStatus(v)
+		return nil
+	case plan.FieldTimeZone:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTimeZone(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Plan numeric field %s", name)
@@ -1144,6 +1228,9 @@ func (m *PlanMutation) ResetField(name string) error {
 		return nil
 	case plan.FieldNote:
 		m.ResetNote()
+		return nil
+	case plan.FieldTimeZone:
+		m.ResetTimeZone()
 		return nil
 	}
 	return fmt.Errorf("unknown Plan field %s", name)
