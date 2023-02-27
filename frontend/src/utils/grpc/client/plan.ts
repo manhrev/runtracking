@@ -4,7 +4,9 @@ import {
     ListPlanRequest,
     ListPlanReply,
     CreatePlanRequest,
-    CreatePlanReply
+    CreatePlanReply,
+    UpdatePlanRequest,
+    UpdatePlanReply,
 } from "../../../lib/plan/plan_pb";
 
 import { GRPCClientConfig } from "../abstract/types";
@@ -34,6 +36,23 @@ class rpcPlanClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<CreatePlanReply.AsObject>(
       "createPlan",
+      req
+    );
+  }
+
+  async updatePlan(updatePlanObj: UpdatePlanRequest.AsObject) {
+    const req = new UpdatePlanRequest();
+    req
+      .setId(updatePlanObj?.id)
+      .setNote(updatePlanObj?.note || "")
+      .setName(updatePlanObj?.name || "")
+      .setEndTime(
+        new Timestamp().setSeconds(updatePlanObj?.endTime?.seconds || 0)
+      )
+      .setGoal(updatePlanObj?.goal || 0);
+
+    return await this.gRPCClientRequest<UpdatePlanReply.AsObject>(
+      "updatePlan",
       req
     );
   }

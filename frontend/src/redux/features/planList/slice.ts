@@ -3,7 +3,7 @@ import { ActivityInfo } from "../../../lib/activity/activity_pb";
 import { CommonState } from "../../common/types";
 import { StatusEnum } from "../../constant";
 import { RootState } from "../../reducers";
-import { listPlanThunk, createPlanThunk } from "./thunk";
+import { listPlanThunk, createPlanThunk, updatePlanThunk } from "./thunk";
 
 type PlanListState = {
   planList: Array<any>;
@@ -33,6 +33,16 @@ const slice = createSlice({
         state.status = StatusEnum.LOADING;
     });
     builder.addCase(createPlanThunk.fulfilled, (state, { payload }) => {
+        const { response, error } = payload;
+        if (error) return;
+
+        state.status = StatusEnum.SUCCEEDED;
+        // state.planList.push(payload);
+    });
+    builder.addCase(updatePlanThunk.pending, (state) => {
+        state.status = StatusEnum.LOADING;
+    });
+    builder.addCase(updatePlanThunk.fulfilled, (state, { payload }) => {
         const { response, error } = payload;
         if (error) return;
 

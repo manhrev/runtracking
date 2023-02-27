@@ -4,6 +4,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
 import { useAppSelector } from "../../redux/store";
 import { useState, useEffect } from "react";
+import { useAppDispatch } from "../../redux/store";
 
 import {
     isPlanListLoading,
@@ -16,8 +17,13 @@ import {
 
 import {
     Rule,
-    PlanInfo
+    PlanInfo,
+    UpdatePlanRequest
 } from "../../lib/plan/plan_pb";
+
+import {
+    updatePlanThunk
+} from "../../redux/features/planList/thunk";
 
 
 import { baseStyles } from "../baseStyle";
@@ -32,6 +38,8 @@ export default function PlanDetail({
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, "PlanDetail">) {
     const theme = useAppTheme();
+    const dispatch = useAppDispatch();
+
     const { planList } = useAppSelector(getPlanList);
 
     const [selectedPlan, setSelectedPlan] = useState<PlanInfo.AsObject | null>(null);
@@ -83,6 +91,28 @@ export default function PlanDetail({
     }
 
 
+    
+
+    const updatePlan = (planId: number | undefined) => {
+        const updateInfo: UpdatePlanRequest.AsObject = {
+            id: planId || 0,
+            endTime: {
+              seconds: 1677248749,
+              nanos: 0
+            },
+            goal: 30,
+            name: "Hello zzzz",
+            note: "Hello there"
+        }
+        
+        if(planId) {
+            dispatch(updatePlanThunk(updateInfo)).unwrap();
+            alert("Plan updated");
+            navigation.goBack();
+        }
+        else alert("Plan ID is undefined");
+    }
+
 
 
     useEffect(() => {
@@ -132,7 +162,7 @@ export default function PlanDetail({
                     <TextInput
                         mode="outlined"
                         value={selectedPlan?.total.toString()}
-                        editable={editMode}
+                        editable={false}
                     />
                     <Text style={editMode ? styles(theme).editModeTitle : styles(theme).title}>Goal: </Text>
                     <TextInput
@@ -165,7 +195,7 @@ export default function PlanDetail({
 
                         <Button
                             mode="contained"
-                            onPress={() => { alert("Plan saved"); navigation.goBack(); }}
+                            onPress={() => updatePlan(selectedPlan?.id)}
                             style={styles(theme).button}
                             >
                             Save
