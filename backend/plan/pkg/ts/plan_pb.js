@@ -285,7 +285,8 @@ proto.plan.CreatePlanRequest.toObject = function(includeInstance, msg) {
     endTime: (f = msg.getEndTime()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     goal: jspb.Message.getFieldWithDefault(msg, 5, 0),
     name: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    note: jspb.Message.getFieldWithDefault(msg, 7, "")
+    note: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    timeZone: jspb.Message.getFieldWithDefault(msg, 8, 0)
   };
 
   if (includeInstance) {
@@ -351,6 +352,10 @@ proto.plan.CreatePlanRequest.deserializeBinaryFromReader = function(msg, reader)
     case 7:
       var value = /** @type {string} */ (reader.readString());
       msg.setNote(value);
+      break;
+    case 8:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setTimeZone(value);
       break;
     default:
       reader.skipField();
@@ -429,6 +434,13 @@ proto.plan.CreatePlanRequest.serializeBinaryToWriter = function(message, writer)
   if (f.length > 0) {
     writer.writeString(
       7,
+      f
+    );
+  }
+  f = message.getTimeZone();
+  if (f !== 0) {
+    writer.writeUint32(
+      8,
       f
     );
   }
@@ -596,6 +608,24 @@ proto.plan.CreatePlanRequest.prototype.getNote = function() {
  */
 proto.plan.CreatePlanRequest.prototype.setNote = function(value) {
   return jspb.Message.setProto3StringField(this, 7, value);
+};
+
+
+/**
+ * optional uint32 time_zone = 8;
+ * @return {number}
+ */
+proto.plan.CreatePlanRequest.prototype.getTimeZone = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.plan.CreatePlanRequest} returns this
+ */
+proto.plan.CreatePlanRequest.prototype.setTimeZone = function(value) {
+  return jspb.Message.setProto3IntField(this, 8, value);
 };
 
 
@@ -930,7 +960,9 @@ proto.plan.PlanInfo.toObject = function(includeInstance, msg) {
     note: jspb.Message.getFieldWithDefault(msg, 9, ""),
     rule: jspb.Message.getFieldWithDefault(msg, 10, 0),
     progressList: jspb.Message.toObjectList(msg.getProgressList(),
-    proto.plan.PlanProgress.toObject, includeInstance)
+    proto.plan.PlanProgress.toObject, includeInstance),
+    createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    status: jspb.Message.getFieldWithDefault(msg, 12, 0)
   };
 
   if (includeInstance) {
@@ -1009,6 +1041,15 @@ proto.plan.PlanInfo.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.plan.PlanProgress;
       reader.readMessage(value,proto.plan.PlanProgress.deserializeBinaryFromReader);
       msg.addProgress(value);
+      break;
+    case 7:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreatedAt(value);
+      break;
+    case 12:
+      var value = /** @type {!proto.plan.RuleStatus} */ (reader.readEnum());
+      msg.setStatus(value);
       break;
     default:
       reader.skipField();
@@ -1110,6 +1151,21 @@ proto.plan.PlanInfo.serializeBinaryToWriter = function(message, writer) {
       11,
       f,
       proto.plan.PlanProgress.serializeBinaryToWriter
+    );
+  }
+  f = message.getCreatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getStatus();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      12,
+      f
     );
   }
 };
@@ -1350,6 +1406,61 @@ proto.plan.PlanInfo.prototype.addProgress = function(opt_value, opt_index) {
  */
 proto.plan.PlanInfo.prototype.clearProgressList = function() {
   return this.setProgressList([]);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp created_at = 7;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.plan.PlanInfo.prototype.getCreatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Timestamp|undefined} value
+ * @return {!proto.plan.PlanInfo} returns this
+*/
+proto.plan.PlanInfo.prototype.setCreatedAt = function(value) {
+  return jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.plan.PlanInfo} returns this
+ */
+proto.plan.PlanInfo.prototype.clearCreatedAt = function() {
+  return this.setCreatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.plan.PlanInfo.prototype.hasCreatedAt = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional RuleStatus status = 12;
+ * @return {!proto.plan.RuleStatus}
+ */
+proto.plan.PlanInfo.prototype.getStatus = function() {
+  return /** @type {!proto.plan.RuleStatus} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+};
+
+
+/**
+ * @param {!proto.plan.RuleStatus} value
+ * @return {!proto.plan.PlanInfo} returns this
+ */
+proto.plan.PlanInfo.prototype.setStatus = function(value) {
+  return jspb.Message.setProto3EnumField(this, 12, value);
 };
 
 
@@ -2567,7 +2678,9 @@ proto.plan.RuleStatus = {
 proto.plan.PlanSortBy = {
   PLAN_SORT_BY_UNSPECIFIED: 0,
   PLAN_SORT_BY_CREATED_TIME: 1,
-  PLAN_SORT_BY_PROGESS: 2
+  PLAN_SORT_BY_PROGESS: 2,
+  PLAN_SORT_BY_END_TIME: 3,
+  PLAN_SORT_BY_START_TIME: 4
 };
 
 goog.object.extend(exports, proto.plan);
