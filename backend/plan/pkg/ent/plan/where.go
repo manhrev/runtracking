@@ -109,6 +109,11 @@ func Note(v string) predicate.Plan {
 	return predicate.Plan(sql.FieldEQ(FieldNote, v))
 }
 
+// TimeZone applies equality check predicate on the "time_zone" field. It's identical to TimeZoneEQ.
+func TimeZone(v uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldTimeZone, v))
+}
+
 // UserIDEQ applies the EQ predicate on the "user_id" field.
 func UserIDEQ(v int64) predicate.Plan {
 	return predicate.Plan(sql.FieldEQ(FieldUserID, v))
@@ -617,6 +622,46 @@ func NoteEqualFold(v string) predicate.Plan {
 // NoteContainsFold applies the ContainsFold predicate on the "note" field.
 func NoteContainsFold(v string) predicate.Plan {
 	return predicate.Plan(sql.FieldContainsFold(FieldNote, v))
+}
+
+// TimeZoneEQ applies the EQ predicate on the "time_zone" field.
+func TimeZoneEQ(v uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldTimeZone, v))
+}
+
+// TimeZoneNEQ applies the NEQ predicate on the "time_zone" field.
+func TimeZoneNEQ(v uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldNEQ(FieldTimeZone, v))
+}
+
+// TimeZoneIn applies the In predicate on the "time_zone" field.
+func TimeZoneIn(vs ...uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldIn(FieldTimeZone, vs...))
+}
+
+// TimeZoneNotIn applies the NotIn predicate on the "time_zone" field.
+func TimeZoneNotIn(vs ...uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldNotIn(FieldTimeZone, vs...))
+}
+
+// TimeZoneGT applies the GT predicate on the "time_zone" field.
+func TimeZoneGT(v uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldGT(FieldTimeZone, v))
+}
+
+// TimeZoneGTE applies the GTE predicate on the "time_zone" field.
+func TimeZoneGTE(v uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldGTE(FieldTimeZone, v))
+}
+
+// TimeZoneLT applies the LT predicate on the "time_zone" field.
+func TimeZoneLT(v uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldLT(FieldTimeZone, v))
+}
+
+// TimeZoneLTE applies the LTE predicate on the "time_zone" field.
+func TimeZoneLTE(v uint32) predicate.Plan {
+	return predicate.Plan(sql.FieldLTE(FieldTimeZone, v))
 }
 
 // And groups predicates with the AND operator between them.

@@ -48,6 +48,7 @@ message CreatePlanRequest {
     int64 goal = 5;
     string name = 6;
     string note = 7;
+    uint32 time_zone = 8;
 }
 
 message CreatePlanReply {
@@ -57,6 +58,8 @@ enum PlanSortBy {
     PLAN_SORT_BY_UNSPECIFIED = 0;
     PLAN_SORT_BY_CREATED_TIME = 1; // Same as Date created
     PLAN_SORT_BY_PROGESS = 2;
+    PLAN_SORT_BY_END_TIME = 3;
+    PLAN_SORT_BY_START_TIME = 4;
 }
 
 message PlanProgress {
@@ -75,7 +78,8 @@ message PlanInfo {
     string note = 9;
     Rule rule = 10;
     repeated PlanProgress progress = 11;
-
+    google.protobuf.Timestamp created_at = 7;
+    RuleStatus status = 12;
 }
 
 message ListPlanRequest {

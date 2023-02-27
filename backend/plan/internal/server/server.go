@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/plan/internal/server/plan"
+	"github.com/manhrev/runtracking/backend/plan/internal/server/plani"
 	pb "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/pkg/ent"
 	"google.golang.org/grpc"
@@ -48,6 +49,7 @@ func Serve(server *grpc.Server) {
 
 	// register main and other server servers
 	pb.RegisterPlanServer(server, plan.NewServer(entClient))
+	pb.RegisterPlanIServer(server, plani.NewServer(entClient))
 
 	lis, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {

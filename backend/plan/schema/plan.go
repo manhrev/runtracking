@@ -28,9 +28,10 @@ func (Plan) Fields() []ent.Field {
 		field.Time("created_at").Default(time.Now()),
 		field.String("name"),
 		field.String("note").Optional(),
+		field.Uint32("time_zone"),
 	}
 }
 
 type Progress struct {
-	ProgressDays []plan.PlanProgress
+	ProgressDays []*plan.PlanProgress
 }

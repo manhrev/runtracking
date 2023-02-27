@@ -68,12 +68,12 @@ static_resources:
                             cluster: notification_http_cluster
 
                         - match:
-                            prefix: /activity.Activity
+                            prefix: /activity.Activity/
                           route:
                             cluster: activity_cluster
 
                         - match:
-                            prefix: /plan.Plan
+                            prefix: /plan.Plan/
                           route:
                             cluster: plan_cluster
 

@@ -42,6 +42,8 @@ type Plan struct {
 	Name string `json:"name,omitempty"`
 	// Note holds the value of the "note" field.
 	Note string `json:"note,omitempty"`
+	// TimeZone holds the value of the "time_zone" field.
+	TimeZone uint32 `json:"time_zone,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -51,7 +53,7 @@ func (*Plan) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case plan.FieldProgess:
 			values[i] = new([]byte)
-		case plan.FieldID, plan.FieldUserID, plan.FieldRule, plan.FieldActivityType, plan.FieldTotal, plan.FieldGoal, plan.FieldStatus:
+		case plan.FieldID, plan.FieldUserID, plan.FieldRule, plan.FieldActivityType, plan.FieldTotal, plan.FieldGoal, plan.FieldStatus, plan.FieldTimeZone:
 			values[i] = new(sql.NullInt64)
 		case plan.FieldName, plan.FieldNote:
 			values[i] = new(sql.NullString)
@@ -152,6 +154,12 @@ func (pl *Plan) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pl.Note = value.String
 			}
+		case plan.FieldTimeZone:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field time_zone", values[i])
+			} else if value.Valid {
+				pl.TimeZone = uint32(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -215,6 +223,9 @@ func (pl *Plan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("note=")
 	builder.WriteString(pl.Note)
+	builder.WriteString(", ")
+	builder.WriteString("time_zone=")
+	builder.WriteString(fmt.Sprintf("%v", pl.TimeZone))
 	builder.WriteByte(')')
 	return builder.String()
 }

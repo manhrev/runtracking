@@ -141,6 +141,12 @@ func (pc *PlanCreate) SetNillableNote(s *string) *PlanCreate {
 	return pc
 }
 
+// SetTimeZone sets the "time_zone" field.
+func (pc *PlanCreate) SetTimeZone(u uint32) *PlanCreate {
+	pc.mutation.SetTimeZone(u)
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PlanCreate) SetID(i int64) *PlanCreate {
 	pc.mutation.SetID(i)
@@ -236,6 +242,9 @@ func (pc *PlanCreate) check() error {
 	if _, ok := pc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Plan.name"`)}
 	}
+	if _, ok := pc.mutation.TimeZone(); !ok {
+		return &ValidationError{Name: "time_zone", err: errors.New(`ent: missing required field "Plan.time_zone"`)}
+	}
 	return nil
 }
 
@@ -315,6 +324,10 @@ func (pc *PlanCreate) createSpec() (*Plan, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Note(); ok {
 		_spec.SetField(plan.FieldNote, field.TypeString, value)
 		_node.Note = value
+	}
+	if value, ok := pc.mutation.TimeZone(); ok {
+		_spec.SetField(plan.FieldTimeZone, field.TypeUint32, value)
+		_node.TimeZone = value
 	}
 	return _node, _spec
 }

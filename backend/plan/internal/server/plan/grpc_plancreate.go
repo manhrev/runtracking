@@ -22,6 +22,7 @@ func (s *planServer) CreatePlan(ctx context.Context, request *plan.CreatePlanReq
 		request.GetGoal(),
 		request.GetName(),
 		request.GetNote(),
+		request.GetTimeZone(),
 		request.GetStartTime(),
 		request.GetEndTime(),
 	)
