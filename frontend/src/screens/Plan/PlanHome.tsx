@@ -16,6 +16,10 @@ import {
     listPlanThunk
 } from "../../redux/features/planList/thunk";
 
+import {
+    RuleStatus
+} from "../../lib/plan/plan_pb";
+
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -77,7 +81,7 @@ export default function Plan({
                     />
 
                     {planList.map((item, index) => (
-                        // ((item.status === "doing" && tabState === "current") || (item.status !== "doing" && tabState === "history")) ? 
+                        ((item.status === RuleStatus.RULE_STATUS_INPROGRESS && tabState === "current") || (item.status !== RuleStatus.RULE_STATUS_INPROGRESS && tabState === "history")) ? 
                             <List.Item
                                 style={styles(theme).curPlan}
                                 key={index}
@@ -89,7 +93,7 @@ export default function Plan({
                                 right={props => <IconButton {...props} icon="chevron-right" />}
                                 onPress={() => navigation.navigate("PlanDetail", {planId: item.id})}
                             />
-                        // : null
+                        : null
                     ))}
                 </ScrollView>
             </View>

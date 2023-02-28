@@ -43,11 +43,18 @@ const slice = createSlice({
         state.status = StatusEnum.LOADING;
     });
     builder.addCase(updatePlanThunk.fulfilled, (state, { payload }) => {
-        const { response, error } = payload;
+        const { response, error, updateData } = payload;
         if (error) return;
 
         state.status = StatusEnum.SUCCEEDED;
-        // state.planList.push(payload);
+
+        const index = state.planList.findIndex((plan: any) => plan.id === updateData.id);
+        if (index !== -1) {
+            state.planList[index].name = updateData.name;
+            state.planList[index].goal = updateData.goal;
+            state.planList[index].note = updateData.note;
+            state.planList[index].endTime = updateData.endTime;
+        }
     });
   },
 });

@@ -19,6 +19,10 @@ export const createPlanThunk = createAsyncThunk(
 export const updatePlanThunk = createAsyncThunk(
   "plan/updatePlan",
   async (param: UpdatePlanRequest.AsObject) => {
-      return await planClient.updatePlan(param);
+      const res = await planClient.updatePlan(param);
+      return {
+          ...res,
+          updateData: param,
+      }
   }
 );

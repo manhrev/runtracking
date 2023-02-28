@@ -29,6 +29,9 @@ export class CreatePlanRequest extends jspb.Message {
   getNote(): string;
   setNote(value: string): CreatePlanRequest;
 
+  getTimeZone(): number;
+  setTimeZone(value: number): CreatePlanRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CreatePlanRequest.AsObject;
   static toObject(includeInstance: boolean, msg: CreatePlanRequest): CreatePlanRequest.AsObject;
@@ -46,6 +49,7 @@ export namespace CreatePlanRequest {
     goal: number,
     name: string,
     note: string,
+    timeZone: number,
   }
 }
 
@@ -124,6 +128,14 @@ export class PlanInfo extends jspb.Message {
   clearProgressList(): PlanInfo;
   addProgress(value?: PlanProgress, index?: number): PlanProgress;
 
+  getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): PlanInfo;
+  hasCreatedAt(): boolean;
+  clearCreatedAt(): PlanInfo;
+
+  getStatus(): RuleStatus;
+  setStatus(value: RuleStatus): PlanInfo;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PlanInfo.AsObject;
   static toObject(includeInstance: boolean, msg: PlanInfo): PlanInfo.AsObject;
@@ -144,6 +156,8 @@ export namespace PlanInfo {
     note: string,
     rule: Rule,
     progressList: Array<PlanProgress.AsObject>,
+    createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    status: RuleStatus,
   }
 }
 
@@ -328,4 +342,6 @@ export enum PlanSortBy {
   PLAN_SORT_BY_UNSPECIFIED = 0,
   PLAN_SORT_BY_CREATED_TIME = 1,
   PLAN_SORT_BY_PROGESS = 2,
+  PLAN_SORT_BY_END_TIME = 3,
+  PLAN_SORT_BY_START_TIME = 4,
 }

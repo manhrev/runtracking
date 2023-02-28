@@ -8,7 +8,8 @@ import { AppTheme, useAppTheme } from "../../theme";
 import { useAppDispatch } from "../../redux/store";
 
 import {
-    createPlanThunk
+    createPlanThunk,
+    listPlanThunk
 } from "../../redux/features/planList/thunk";
 
 import { baseStyles } from "../baseStyle";
@@ -71,7 +72,26 @@ export default function PlanAdd({
         setEndTime(date);
     }
 
-    const savePlan = () => {
+    const isDayAfterDay = (day1Sec: number, day2Sec: number) => {
+        // how many days = day1 - day2
+        const day1 = new Date(day1Sec * 1000);
+        const day2 = new Date(day2Sec * 1000);
+        const diff = day1.getTime() - day2.getTime();
+        const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+        return diffDays > 0;
+    }
+
+    const goalNumberOnChange = (text: string) => {
+        if(text === "") {
+            setGoal(0);
+            return;
+        }
+        // remove all non-number characters
+        const number = text.replace(/[^0-9]/g, "");
+        setGoal(parseInt(number));
+    }
+
+    const savePlan = async () => {
         const planData : CreatePlanRequest.AsObject = {
             name: name,
             activityType: activityType,
@@ -85,10 +105,35 @@ export default function PlanAdd({
                 nanos: 0,
             },
             goal: goal,
-            note: note
+            note: note,
+            timeZone: 7,
         }
-        dispatch(createPlanThunk(planData));
-        console.log(planData);
+
+        if(planData.name === "") {
+            alert("Plan name cannot be empty!");
+            return;
+        }
+
+        if(!isDayAfterDay(planData.endTime?.seconds || 0, planData.startTime?.seconds || 0)) {
+            alert("End time must be after start time!");
+            return;
+        }
+
+        if(planData.goal <= 0) {
+            alert("Goal must be greater than 0!");
+            return;
+        }
+
+        const res = await dispatch(createPlanThunk(planData));
+
+        const list = await dispatch(listPlanThunk({
+            activityType: 0,
+            ascending: false,
+            limit: 100,
+            offset: 0,
+            sortBy: 1,
+        })).unwrap();
+
         alert("Plan created!");
         navigation.goBack();
     }
@@ -176,8 +221,8 @@ export default function PlanAdd({
                     <Text style={styles(theme).title}>Goal: </Text>
                     <TextInput
                         mode="outlined"
-                        value={goal ? goal.toString() : ""}
-                        onChangeText={text => setGoal(parseInt(text))}
+                        value={goal.toString()}
+                        onChangeText={text => goalNumberOnChange(text)}
                         label={getLabel(rule)}
                     />
                     

@@ -5,6 +5,7 @@ import { AppTheme, useAppTheme } from "../../theme";
 import { useAppSelector } from "../../redux/store";
 import { useState, useEffect } from "react";
 import { useAppDispatch } from "../../redux/store";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {
     isPlanListLoading,
@@ -42,8 +43,39 @@ export default function PlanDetail({
 
     const { planList } = useAppSelector(getPlanList);
 
-    const [selectedPlan, setSelectedPlan] = useState<PlanInfo.AsObject | null>(null);
+    const [selectedPlan, setSelectedPlan] = useState({
+        id: -1,
+        name: "",
+        activityType: 0,
+        rule: 0,
+        startTime: {
+            seconds: 0,
+            nanos: 0
+        },
+        endTime: {
+            seconds: 0,
+            nanos: 0
+        },
+        total: 0,
+        goal: 0,
+        note: "",
+        status: 0
+    });
     const [editMode, setEditMode] = useState(false);
+    const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+    const setEnd = (event: any, date: any) => {
+        setShowEndTimePicker(false);
+        if (date) {
+            setSelectedPlan({
+                ...selectedPlan,
+                endTime: {
+                    seconds: date.getTime() / 1000,
+                    nanos: 0
+                }
+            });
+        }
+    }
 
     const toDate = (seconds: number) => {
         // dd/mm/yyyy
@@ -52,6 +84,11 @@ export default function PlanDetail({
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
         return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+    }
+
+    const toNewDate = (seconds: number) => {
+        const t = new Date(seconds * 1000);
+        return new Date(t.getFullYear(), t.getMonth(), t.getDate());
     }
 
     const getTextFromActivityType = (activityType: number) => {
@@ -90,22 +127,54 @@ export default function PlanDetail({
         }
     }
 
+    const goalNumberOnChange = (text: string) => {
+        if(text === "") {
+            setSelectedPlan({...selectedPlan, goal: 0});
+            return;
+        }
+        // remove all non-number characters
+        const number = text.replace(/[^0-9]/g, "");
+        setSelectedPlan({...selectedPlan, goal: parseInt(number)});
+    }
 
+    const isDayAfterDay = (day1Sec: number, day2Sec: number) => {
+        // how many days = day1 - day2
+        const day1 = new Date(day1Sec * 1000);
+        const day2 = new Date(day2Sec * 1000);
+        const diff = day1.getTime() - day2.getTime();
+        const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+        return diffDays > 0;
+    }
     
 
     const updatePlan = (planId: number | undefined) => {
         const updateInfo: UpdatePlanRequest.AsObject = {
             id: planId || 0,
             endTime: {
-              seconds: 1677248749,
+              seconds: selectedPlan?.endTime?.seconds || 0,
               nanos: 0
             },
-            goal: 30,
-            name: "Hello zzzz",
-            note: "Hello there"
+            goal: selectedPlan?.goal || 0,
+            name: selectedPlan?.name || "",
+            note: selectedPlan?.note || "",
         }
         
         if(planId) {
+            if(updateInfo.name === "") {
+                alert("Plan name cannot be empty!");
+                return;
+            }
+
+            if(!isDayAfterDay(updateInfo.endTime?.seconds || 0, selectedPlan?.startTime?.seconds || 0)) {
+                alert("End day must be after start day!");
+                return;
+            }
+
+            if(updateInfo.goal <= 0) {
+                alert("Goal must be greater than 0!");
+                return;
+            }
+
             dispatch(updatePlanThunk(updateInfo)).unwrap();
             alert("Plan updated");
             navigation.goBack();
@@ -130,7 +199,7 @@ export default function PlanDetail({
                     <TextInput
                         mode="outlined"
                         value={selectedPlan?.name}
-                        // onChangeText={text => setName(text)}
+                        onChangeText={text => setSelectedPlan({...selectedPlan, name: text})}
                         editable={editMode}
                     />
                     <Text style={styles(theme).title}>Activity Type: </Text>
@@ -155,9 +224,14 @@ export default function PlanDetail({
                     <TextInput
                         mode="outlined"
                         value={toDate(selectedPlan?.endTime?.seconds || 0)}
-                        // onChangeText={text => setName(text)}
                         editable={editMode}
+                        right={
+                            editMode && <TextInput.Icon iconColor={theme.colors.primary} icon="calendar" onPress={() => setShowEndTimePicker(true)}
+                        />}
                     />
+                    {showEndTimePicker && (
+                        <DateTimePicker value={toNewDate(selectedPlan?.endTime?.seconds || 0)} mode="date" display="default" onChange={setEnd} />
+                    )}
                     <Text style={styles(theme).title}>Total: </Text>
                     <TextInput
                         mode="outlined"
@@ -169,7 +243,7 @@ export default function PlanDetail({
                         mode="outlined"
                         value={selectedPlan?.goal.toString()}
                         label={getTextFromRule(selectedPlan?.rule || 0)}
-                        // onChangeText={text => setName(text)}
+                        onChangeText={text => goalNumberOnChange(text)}
                         editable={editMode}
                     />
                     <Text style={editMode ? styles(theme).editModeTitle : styles(theme).title}>Note: </Text>
@@ -179,7 +253,7 @@ export default function PlanDetail({
                         numberOfLines={4}
                         mode="outlined"
                         value={selectedPlan?.note}
-                        // onChangeText={text => setNote(text)}
+                        onChangeText={text => setSelectedPlan({...selectedPlan, note: text})}
                         editable={editMode}
                     />
 
@@ -271,6 +345,5 @@ const styles = (theme: AppTheme) =>
         fontWeight: "bold",
         fontSize: 16,
     },
-
 });
 

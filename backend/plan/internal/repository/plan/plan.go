@@ -219,9 +219,11 @@ func (p *planImpl) Update(
 	)
 
 	if newEndTime != nil {
-		query.Where(
-			plan.EndTimeLT(newEndTime.AsTime()),
-		).SetEndTime(newEndTime.AsTime())
+		// query.Where(
+		// 	plan.EndTimeLTE(newEndTime.AsTime()),
+		// ).SetEndTime(newEndTime.AsTime())
+		query.SetEndTime(newEndTime.AsTime())
+
 	}
 
 	if newGoal != 0 {
