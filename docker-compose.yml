@@ -39,7 +39,7 @@ services:
   activity:
     build:
       context: backend/activity
-      dockerfile: build/Dockerfile
+      dockerfile: Dockerfile
     container_name: activity
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
