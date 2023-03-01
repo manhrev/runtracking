@@ -79,6 +79,13 @@ services:
       - plan_db
     ports:
       - 8081:8080
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: plan_db
+      DB_PORT: 3306
+      DB_NAME: plan
 
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest

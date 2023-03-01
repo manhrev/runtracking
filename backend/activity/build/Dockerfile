@@ -7,6 +7,7 @@ COPY wait-for-it.sh /wait-for-it.sh
 COPY build/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /wait-for-it.sh /docker-entrypoint.sh
 RUN apk add --no-cache bash
-EXPOSE 8080
+EXPOSE ${LISTEN_PORT}
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/server"]
