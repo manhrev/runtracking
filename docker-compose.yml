@@ -35,7 +35,7 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - group_db
-  
+
   activity:
     build:
       context: backend/activity
@@ -46,6 +46,13 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - activity_db
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: activity_db
+      DB_PORT: 3306
+      DB_NAME: activity
 
   notification:
     build:
@@ -72,6 +79,13 @@ services:
       - plan_db
     ports:
       - 8081:8080
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: plan_db
+      DB_PORT: 3306
+      DB_NAME: plan
 
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest
@@ -132,7 +146,7 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33308:3306
-    
+
   notification_db:
     image: mysql
     environment:
