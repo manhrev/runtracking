@@ -223,25 +223,25 @@ func UserIDLTE(v int64) predicate.Member {
 	})
 }
 
-// HasGroup applies the HasEdge predicate on the "group" edge.
-func HasGroup() predicate.Member {
+// HasGroupz applies the HasEdge predicate on the "groupz" edge.
+func HasGroupz() predicate.Member {
 	return predicate.Member(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(GroupTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
+			sqlgraph.To(GroupzTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasGroupWith applies the HasEdge predicate on the "group" edge with a given conditions (other predicates).
-func HasGroupWith(preds ...predicate.Group) predicate.Member {
+// HasGroupzWith applies the HasEdge predicate on the "groupz" edge with a given conditions (other predicates).
+func HasGroupzWith(preds ...predicate.Groupz) predicate.Member {
 	return predicate.Member(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(GroupInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
+			sqlgraph.To(GroupzInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

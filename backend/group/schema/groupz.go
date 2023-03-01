@@ -8,12 +8,12 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type Group struct {
+type Groupz struct {
 	ent.Schema
 }
 
 // Fields of the Agent
-func (Group) Fields() []ent.Field {
+func (Groupz) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Unique(),
@@ -29,8 +29,9 @@ func (Group) Fields() []ent.Field {
 	}
 }
 
-func (Group) Edges() []ent.Edge {
+func (Groupz) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("members", Member.Type),
+		edge.To("challenges", Challenge.Type),
 	}
 }

@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 )
 
 // Challenge is the model entity for the Challenge schema.
@@ -24,22 +25,23 @@ type Challenge struct {
 	EndTime time.Time `json:"end_time,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
-	// GroupID holds the value of the "group_id" field.
-	GroupID int64 `json:"group_id,omitempty"`
 	// TypeID holds the value of the "type_id" field.
 	TypeID int64 `json:"type_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChallengeQuery when eager-loading is set.
-	Edges ChallengeEdges `json:"edges"`
+	Edges             ChallengeEdges `json:"edges"`
+	groupz_challenges *int64
 }
 
 // ChallengeEdges holds the relations/edges for other nodes in the graph.
 type ChallengeEdges struct {
 	// ChallengeMembers holds the value of the challenge_members edge.
 	ChallengeMembers []*ChallengeMember `json:"challenge_members,omitempty"`
+	// Groupz holds the value of the groupz edge.
+	Groupz *Groupz `json:"groupz,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ChallengeMembersOrErr returns the ChallengeMembers value or an error if the edge
@@ -51,17 +53,32 @@ func (e ChallengeEdges) ChallengeMembersOrErr() ([]*ChallengeMember, error) {
 	return nil, &NotLoadedError{edge: "challenge_members"}
 }
 
+// GroupzOrErr returns the Groupz value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ChallengeEdges) GroupzOrErr() (*Groupz, error) {
+	if e.loadedTypes[1] {
+		if e.Groupz == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: groupz.Label}
+		}
+		return e.Groupz, nil
+	}
+	return nil, &NotLoadedError{edge: "groupz"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Challenge) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challenge.FieldID, challenge.FieldGroupID, challenge.FieldTypeID:
+		case challenge.FieldID, challenge.FieldTypeID:
 			values[i] = new(sql.NullInt64)
 		case challenge.FieldDescription:
 			values[i] = new(sql.NullString)
 		case challenge.FieldCreatedAt, challenge.FieldStartTime, challenge.FieldEndTime:
 			values[i] = new(sql.NullTime)
+		case challenge.ForeignKeys[0]: // groupz_challenges
+			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Challenge", columns[i])
 		}
@@ -107,17 +124,18 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Description = value.String
 			}
-		case challenge.FieldGroupID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field group_id", values[i])
-			} else if value.Valid {
-				c.GroupID = value.Int64
-			}
 		case challenge.FieldTypeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field type_id", values[i])
 			} else if value.Valid {
 				c.TypeID = value.Int64
+			}
+		case challenge.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field groupz_challenges", value)
+			} else if value.Valid {
+				c.groupz_challenges = new(int64)
+				*c.groupz_challenges = int64(value.Int64)
 			}
 		}
 	}
@@ -127,6 +145,11 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 // QueryChallengeMembers queries the "challenge_members" edge of the Challenge entity.
 func (c *Challenge) QueryChallengeMembers() *ChallengeMemberQuery {
 	return (&ChallengeClient{config: c.config}).QueryChallengeMembers(c)
+}
+
+// QueryGroupz queries the "groupz" edge of the Challenge entity.
+func (c *Challenge) QueryGroupz() *GroupzQuery {
+	return (&ChallengeClient{config: c.config}).QueryGroupz(c)
 }
 
 // Update returns a builder for updating this Challenge.
@@ -163,9 +186,6 @@ func (c *Challenge) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)
-	builder.WriteString(", ")
-	builder.WriteString("group_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.GroupID))
 	builder.WriteString(", ")
 	builder.WriteString("type_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.TypeID))

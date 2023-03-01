@@ -48,6 +48,13 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - group_db
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: group_db
+      DB_PORT: 3306
+      DB_NAME: group
     
   
   activity:

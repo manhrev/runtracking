@@ -25,7 +25,6 @@ func (Challenge) Fields() []ent.Field {
 			Optional(),
 		field.String("description").
 			Optional(),
-		field.Int64("group_id"),
 		field.Int64("type_id"),
 	}
 }
@@ -33,5 +32,8 @@ func (Challenge) Fields() []ent.Field {
 func (Challenge) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("challenge_members", ChallengeMember.Type),
+		edge.From("groupz", Groupz.Type).
+			Ref("challenges").
+			Unique(),
 	}
 }

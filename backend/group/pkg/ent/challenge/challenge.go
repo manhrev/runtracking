@@ -19,12 +19,12 @@ const (
 	FieldEndTime = "end_time"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldGroupID holds the string denoting the group_id field in the database.
-	FieldGroupID = "group_id"
 	// FieldTypeID holds the string denoting the type_id field in the database.
 	FieldTypeID = "type_id"
 	// EdgeChallengeMembers holds the string denoting the challenge_members edge name in mutations.
 	EdgeChallengeMembers = "challenge_members"
+	// EdgeGroupz holds the string denoting the groupz edge name in mutations.
+	EdgeGroupz = "groupz"
 	// Table holds the table name of the challenge in the database.
 	Table = "challenges"
 	// ChallengeMembersTable is the table that holds the challenge_members relation/edge.
@@ -34,6 +34,13 @@ const (
 	ChallengeMembersInverseTable = "challenge_members"
 	// ChallengeMembersColumn is the table column denoting the challenge_members relation/edge.
 	ChallengeMembersColumn = "challenge_challenge_members"
+	// GroupzTable is the table that holds the groupz relation/edge.
+	GroupzTable = "challenges"
+	// GroupzInverseTable is the table name for the Groupz entity.
+	// It exists in this package in order to avoid circular dependency with the "groupz" package.
+	GroupzInverseTable = "groupzs"
+	// GroupzColumn is the table column denoting the groupz relation/edge.
+	GroupzColumn = "groupz_challenges"
 )
 
 // Columns holds all SQL columns for challenge fields.
@@ -43,14 +50,24 @@ var Columns = []string{
 	FieldStartTime,
 	FieldEndTime,
 	FieldDescription,
-	FieldGroupID,
 	FieldTypeID,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "challenges"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"groupz_challenges",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

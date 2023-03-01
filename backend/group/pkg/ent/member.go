@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
@@ -23,30 +23,30 @@ type Member struct {
 	UserID int64 `json:"user_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MemberQuery when eager-loading is set.
-	Edges         MemberEdges `json:"edges"`
-	group_members *int64
+	Edges          MemberEdges `json:"edges"`
+	groupz_members *int64
 }
 
 // MemberEdges holds the relations/edges for other nodes in the graph.
 type MemberEdges struct {
-	// Group holds the value of the group edge.
-	Group *Group `json:"group,omitempty"`
+	// Groupz holds the value of the groupz edge.
+	Groupz *Groupz `json:"groupz,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// GroupOrErr returns the Group value or an error if the edge
+// GroupzOrErr returns the Groupz value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e MemberEdges) GroupOrErr() (*Group, error) {
+func (e MemberEdges) GroupzOrErr() (*Groupz, error) {
 	if e.loadedTypes[0] {
-		if e.Group == nil {
+		if e.Groupz == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: group.Label}
+			return nil, &NotFoundError{label: groupz.Label}
 		}
-		return e.Group, nil
+		return e.Groupz, nil
 	}
-	return nil, &NotLoadedError{edge: "group"}
+	return nil, &NotLoadedError{edge: "groupz"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -58,7 +58,7 @@ func (*Member) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case member.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case member.ForeignKeys[0]: // group_members
+		case member.ForeignKeys[0]: // groupz_members
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Member", columns[i])
@@ -95,19 +95,19 @@ func (m *Member) assignValues(columns []string, values []any) error {
 			}
 		case member.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field group_members", value)
+				return fmt.Errorf("unexpected type %T for edge-field groupz_members", value)
 			} else if value.Valid {
-				m.group_members = new(int64)
-				*m.group_members = int64(value.Int64)
+				m.groupz_members = new(int64)
+				*m.groupz_members = int64(value.Int64)
 			}
 		}
 	}
 	return nil
 }
 
-// QueryGroup queries the "group" edge of the Member entity.
-func (m *Member) QueryGroup() *GroupQuery {
-	return (&MemberClient{config: m.config}).QueryGroup(m)
+// QueryGroupz queries the "groupz" edge of the Member entity.
+func (m *Member) QueryGroupz() *GroupzQuery {
+	return (&MemberClient{config: m.config}).QueryGroupz(m)
 }
 
 // Update returns a builder for updating this Member.

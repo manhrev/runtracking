@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
@@ -24,7 +24,7 @@ type MemberQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Member
-	withGroup  *GroupQuery
+	withGroupz *GroupzQuery
 	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -63,9 +63,9 @@ func (mq *MemberQuery) Order(o ...OrderFunc) *MemberQuery {
 	return mq
 }
 
-// QueryGroup chains the current query on the "group" edge.
-func (mq *MemberQuery) QueryGroup() *GroupQuery {
-	query := &GroupQuery{config: mq.config}
+// QueryGroupz chains the current query on the "groupz" edge.
+func (mq *MemberQuery) QueryGroupz() *GroupzQuery {
+	query := &GroupzQuery{config: mq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -76,8 +76,8 @@ func (mq *MemberQuery) QueryGroup() *GroupQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(member.Table, member.FieldID, selector),
-			sqlgraph.To(group.Table, group.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, member.GroupTable, member.GroupColumn),
+			sqlgraph.To(groupz.Table, groupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, member.GroupzTable, member.GroupzColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -266,7 +266,7 @@ func (mq *MemberQuery) Clone() *MemberQuery {
 		offset:     mq.offset,
 		order:      append([]OrderFunc{}, mq.order...),
 		predicates: append([]predicate.Member{}, mq.predicates...),
-		withGroup:  mq.withGroup.Clone(),
+		withGroupz: mq.withGroupz.Clone(),
 		// clone intermediate query.
 		sql:    mq.sql.Clone(),
 		path:   mq.path,
@@ -274,14 +274,14 @@ func (mq *MemberQuery) Clone() *MemberQuery {
 	}
 }
 
-// WithGroup tells the query-builder to eager-load the nodes that are connected to
-// the "group" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MemberQuery) WithGroup(opts ...func(*GroupQuery)) *MemberQuery {
-	query := &GroupQuery{config: mq.config}
+// WithGroupz tells the query-builder to eager-load the nodes that are connected to
+// the "groupz" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MemberQuery) WithGroupz(opts ...func(*GroupzQuery)) *MemberQuery {
+	query := &GroupzQuery{config: mq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	mq.withGroup = query
+	mq.withGroupz = query
 	return mq
 }
 
@@ -362,10 +362,10 @@ func (mq *MemberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Membe
 		withFKs     = mq.withFKs
 		_spec       = mq.querySpec()
 		loadedTypes = [1]bool{
-			mq.withGroup != nil,
+			mq.withGroupz != nil,
 		}
 	)
-	if mq.withGroup != nil {
+	if mq.withGroupz != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -392,29 +392,29 @@ func (mq *MemberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Membe
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mq.withGroup; query != nil {
-		if err := mq.loadGroup(ctx, query, nodes, nil,
-			func(n *Member, e *Group) { n.Edges.Group = e }); err != nil {
+	if query := mq.withGroupz; query != nil {
+		if err := mq.loadGroupz(ctx, query, nodes, nil,
+			func(n *Member, e *Groupz) { n.Edges.Groupz = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (mq *MemberQuery) loadGroup(ctx context.Context, query *GroupQuery, nodes []*Member, init func(*Member), assign func(*Member, *Group)) error {
+func (mq *MemberQuery) loadGroupz(ctx context.Context, query *GroupzQuery, nodes []*Member, init func(*Member), assign func(*Member, *Groupz)) error {
 	ids := make([]int64, 0, len(nodes))
 	nodeids := make(map[int64][]*Member)
 	for i := range nodes {
-		if nodes[i].group_members == nil {
+		if nodes[i].groupz_members == nil {
 			continue
 		}
-		fk := *nodes[i].group_members
+		fk := *nodes[i].groupz_members
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.Where(group.IDIn(ids...))
+	query.Where(groupz.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -422,7 +422,7 @@ func (mq *MemberQuery) loadGroup(ctx context.Context, query *GroupQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "group_members" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "groupz_members" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 )
 
 // ChallengeCreate is the builder for creating a Challenge entity.
@@ -77,12 +78,6 @@ func (cc *ChallengeCreate) SetNillableDescription(s *string) *ChallengeCreate {
 	return cc
 }
 
-// SetGroupID sets the "group_id" field.
-func (cc *ChallengeCreate) SetGroupID(i int64) *ChallengeCreate {
-	cc.mutation.SetGroupID(i)
-	return cc
-}
-
 // SetTypeID sets the "type_id" field.
 func (cc *ChallengeCreate) SetTypeID(i int64) *ChallengeCreate {
 	cc.mutation.SetTypeID(i)
@@ -108,6 +103,25 @@ func (cc *ChallengeCreate) AddChallengeMembers(c ...*ChallengeMember) *Challenge
 		ids[i] = c[i].ID
 	}
 	return cc.AddChallengeMemberIDs(ids...)
+}
+
+// SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
+func (cc *ChallengeCreate) SetGroupzID(id int64) *ChallengeCreate {
+	cc.mutation.SetGroupzID(id)
+	return cc
+}
+
+// SetNillableGroupzID sets the "groupz" edge to the Groupz entity by ID if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableGroupzID(id *int64) *ChallengeCreate {
+	if id != nil {
+		cc = cc.SetGroupzID(*id)
+	}
+	return cc
+}
+
+// SetGroupz sets the "groupz" edge to the Groupz entity.
+func (cc *ChallengeCreate) SetGroupz(g *Groupz) *ChallengeCreate {
+	return cc.SetGroupzID(g.ID)
 }
 
 // Mutation returns the ChallengeMutation object of the builder.
@@ -198,9 +212,6 @@ func (cc *ChallengeCreate) check() error {
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Challenge.created_at"`)}
 	}
-	if _, ok := cc.mutation.GroupID(); !ok {
-		return &ValidationError{Name: "group_id", err: errors.New(`ent: missing required field "Challenge.group_id"`)}
-	}
 	if _, ok := cc.mutation.TypeID(); !ok {
 		return &ValidationError{Name: "type_id", err: errors.New(`ent: missing required field "Challenge.type_id"`)}
 	}
@@ -253,10 +264,6 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 		_spec.SetField(challenge.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := cc.mutation.GroupID(); ok {
-		_spec.SetField(challenge.FieldGroupID, field.TypeInt64, value)
-		_node.GroupID = value
-	}
 	if value, ok := cc.mutation.TypeID(); ok {
 		_spec.SetField(challenge.FieldTypeID, field.TypeInt64, value)
 		_node.TypeID = value
@@ -278,6 +285,26 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.GroupzIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challenge.GroupzTable,
+			Columns: []string{challenge.GroupzColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: groupz.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.groupz_challenges = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -15,8 +15,8 @@ type ChallengeMember func(*sql.Selector)
 // ChallengeMemberRule is the predicate function for challengememberrule builders.
 type ChallengeMemberRule func(*sql.Selector)
 
-// Group is the predicate function for group builders.
-type Group func(*sql.Selector)
+// Groupz is the predicate function for groupz builders.
+type Groupz func(*sql.Selector)
 
 // Member is the predicate function for member builders.
 type Member func(*sql.Selector)

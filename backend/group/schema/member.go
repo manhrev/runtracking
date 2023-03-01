@@ -26,7 +26,7 @@ func (Member) Fields() []ent.Field {
 
 func (Member) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("group", Group.Type).
+		edge.From("groupz", Groupz.Type).
 			Ref("members").
 			Unique(),
 	}
@@ -35,7 +35,7 @@ func (Member) Edges() []ent.Edge {
 func (Member) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("user_id").
-			Edges("group").
+			Edges("groupz").
 			Unique(),
 	}
 }

@@ -48,15 +48,15 @@ func (f ChallengeMemberRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (en
 	return f(ctx, mv)
 }
 
-// The GroupFunc type is an adapter to allow the use of ordinary
-// function as Group mutator.
-type GroupFunc func(context.Context, *ent.GroupMutation) (ent.Value, error)
+// The GroupzFunc type is an adapter to allow the use of ordinary
+// function as Groupz mutator.
+type GroupzFunc func(context.Context, *ent.GroupzMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f GroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.GroupMutation)
+func (f GroupzFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.GroupzMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupzMutation", m)
 	}
 	return f(ctx, mv)
 }

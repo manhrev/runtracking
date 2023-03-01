@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -26,6 +27,8 @@ type ChallengeQuery struct {
 	fields               []string
 	predicates           []predicate.Challenge
 	withChallengeMembers *ChallengeMemberQuery
+	withGroupz           *GroupzQuery
+	withFKs              bool
 	modifiers            []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -78,6 +81,28 @@ func (cq *ChallengeQuery) QueryChallengeMembers() *ChallengeMemberQuery {
 			sqlgraph.From(challenge.Table, challenge.FieldID, selector),
 			sqlgraph.To(challengemember.Table, challengemember.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, challenge.ChallengeMembersTable, challenge.ChallengeMembersColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGroupz chains the current query on the "groupz" edge.
+func (cq *ChallengeQuery) QueryGroupz() *GroupzQuery {
+	query := &GroupzQuery{config: cq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, selector),
+			sqlgraph.To(groupz.Table, groupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challenge.GroupzTable, challenge.GroupzColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -267,6 +292,7 @@ func (cq *ChallengeQuery) Clone() *ChallengeQuery {
 		order:                append([]OrderFunc{}, cq.order...),
 		predicates:           append([]predicate.Challenge{}, cq.predicates...),
 		withChallengeMembers: cq.withChallengeMembers.Clone(),
+		withGroupz:           cq.withGroupz.Clone(),
 		// clone intermediate query.
 		sql:    cq.sql.Clone(),
 		path:   cq.path,
@@ -282,6 +308,17 @@ func (cq *ChallengeQuery) WithChallengeMembers(opts ...func(*ChallengeMemberQuer
 		opt(query)
 	}
 	cq.withChallengeMembers = query
+	return cq
+}
+
+// WithGroupz tells the query-builder to eager-load the nodes that are connected to
+// the "groupz" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ChallengeQuery) WithGroupz(opts ...func(*GroupzQuery)) *ChallengeQuery {
+	query := &GroupzQuery{config: cq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withGroupz = query
 	return cq
 }
 
@@ -359,11 +396,19 @@ func (cq *ChallengeQuery) prepareQuery(ctx context.Context) error {
 func (cq *ChallengeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Challenge, error) {
 	var (
 		nodes       = []*Challenge{}
+		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			cq.withChallengeMembers != nil,
+			cq.withGroupz != nil,
 		}
 	)
+	if cq.withGroupz != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, challenge.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Challenge).scanValues(nil, columns)
 	}
@@ -389,6 +434,12 @@ func (cq *ChallengeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 		if err := cq.loadChallengeMembers(ctx, query, nodes,
 			func(n *Challenge) { n.Edges.ChallengeMembers = []*ChallengeMember{} },
 			func(n *Challenge, e *ChallengeMember) { n.Edges.ChallengeMembers = append(n.Edges.ChallengeMembers, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withGroupz; query != nil {
+		if err := cq.loadGroupz(ctx, query, nodes, nil,
+			func(n *Challenge, e *Groupz) { n.Edges.Groupz = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -423,6 +474,35 @@ func (cq *ChallengeQuery) loadChallengeMembers(ctx context.Context, query *Chall
 			return fmt.Errorf(`unexpected foreign-key "challenge_challenge_members" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (cq *ChallengeQuery) loadGroupz(ctx context.Context, query *GroupzQuery, nodes []*Challenge, init func(*Challenge), assign func(*Challenge, *Groupz)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*Challenge)
+	for i := range nodes {
+		if nodes[i].groupz_challenges == nil {
+			continue
+		}
+		fk := *nodes[i].groupz_challenges
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	query.Where(groupz.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "groupz_challenges" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

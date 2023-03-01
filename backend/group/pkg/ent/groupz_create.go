@@ -10,25 +10,26 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
-// GroupCreate is the builder for creating a Group entity.
-type GroupCreate struct {
+// GroupzCreate is the builder for creating a Groupz entity.
+type GroupzCreate struct {
 	config
-	mutation *GroupMutation
+	mutation *GroupzMutation
 	hooks    []Hook
 }
 
 // SetName sets the "name" field.
-func (gc *GroupCreate) SetName(s string) *GroupCreate {
+func (gc *GroupzCreate) SetName(s string) *GroupzCreate {
 	gc.mutation.SetName(s)
 	return gc
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableName(s *string) *GroupCreate {
+func (gc *GroupzCreate) SetNillableName(s *string) *GroupzCreate {
 	if s != nil {
 		gc.SetName(*s)
 	}
@@ -36,13 +37,13 @@ func (gc *GroupCreate) SetNillableName(s *string) *GroupCreate {
 }
 
 // SetDescription sets the "description" field.
-func (gc *GroupCreate) SetDescription(s string) *GroupCreate {
+func (gc *GroupzCreate) SetDescription(s string) *GroupzCreate {
 	gc.mutation.SetDescription(s)
 	return gc
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableDescription(s *string) *GroupCreate {
+func (gc *GroupzCreate) SetNillableDescription(s *string) *GroupzCreate {
 	if s != nil {
 		gc.SetDescription(*s)
 	}
@@ -50,13 +51,13 @@ func (gc *GroupCreate) SetNillableDescription(s *string) *GroupCreate {
 }
 
 // SetBackgroundPicture sets the "background_picture" field.
-func (gc *GroupCreate) SetBackgroundPicture(s string) *GroupCreate {
+func (gc *GroupzCreate) SetBackgroundPicture(s string) *GroupzCreate {
 	gc.mutation.SetBackgroundPicture(s)
 	return gc
 }
 
 // SetNillableBackgroundPicture sets the "background_picture" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableBackgroundPicture(s *string) *GroupCreate {
+func (gc *GroupzCreate) SetNillableBackgroundPicture(s *string) *GroupzCreate {
 	if s != nil {
 		gc.SetBackgroundPicture(*s)
 	}
@@ -64,13 +65,13 @@ func (gc *GroupCreate) SetNillableBackgroundPicture(s *string) *GroupCreate {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (gc *GroupCreate) SetCreatedAt(t time.Time) *GroupCreate {
+func (gc *GroupzCreate) SetCreatedAt(t time.Time) *GroupzCreate {
 	gc.mutation.SetCreatedAt(t)
 	return gc
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableCreatedAt(t *time.Time) *GroupCreate {
+func (gc *GroupzCreate) SetNillableCreatedAt(t *time.Time) *GroupzCreate {
 	if t != nil {
 		gc.SetCreatedAt(*t)
 	}
@@ -78,25 +79,25 @@ func (gc *GroupCreate) SetNillableCreatedAt(t *time.Time) *GroupCreate {
 }
 
 // SetLeaderID sets the "leader_id" field.
-func (gc *GroupCreate) SetLeaderID(i int64) *GroupCreate {
+func (gc *GroupzCreate) SetLeaderID(i int64) *GroupzCreate {
 	gc.mutation.SetLeaderID(i)
 	return gc
 }
 
 // SetID sets the "id" field.
-func (gc *GroupCreate) SetID(i int64) *GroupCreate {
+func (gc *GroupzCreate) SetID(i int64) *GroupzCreate {
 	gc.mutation.SetID(i)
 	return gc
 }
 
 // AddMemberIDs adds the "members" edge to the Member entity by IDs.
-func (gc *GroupCreate) AddMemberIDs(ids ...int64) *GroupCreate {
+func (gc *GroupzCreate) AddMemberIDs(ids ...int64) *GroupzCreate {
 	gc.mutation.AddMemberIDs(ids...)
 	return gc
 }
 
 // AddMembers adds the "members" edges to the Member entity.
-func (gc *GroupCreate) AddMembers(m ...*Member) *GroupCreate {
+func (gc *GroupzCreate) AddMembers(m ...*Member) *GroupzCreate {
 	ids := make([]int64, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -104,16 +105,31 @@ func (gc *GroupCreate) AddMembers(m ...*Member) *GroupCreate {
 	return gc.AddMemberIDs(ids...)
 }
 
-// Mutation returns the GroupMutation object of the builder.
-func (gc *GroupCreate) Mutation() *GroupMutation {
+// AddChallengeIDs adds the "challenges" edge to the Challenge entity by IDs.
+func (gc *GroupzCreate) AddChallengeIDs(ids ...int64) *GroupzCreate {
+	gc.mutation.AddChallengeIDs(ids...)
+	return gc
+}
+
+// AddChallenges adds the "challenges" edges to the Challenge entity.
+func (gc *GroupzCreate) AddChallenges(c ...*Challenge) *GroupzCreate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return gc.AddChallengeIDs(ids...)
+}
+
+// Mutation returns the GroupzMutation object of the builder.
+func (gc *GroupzCreate) Mutation() *GroupzMutation {
 	return gc.mutation
 }
 
-// Save creates the Group in the database.
-func (gc *GroupCreate) Save(ctx context.Context) (*Group, error) {
+// Save creates the Groupz in the database.
+func (gc *GroupzCreate) Save(ctx context.Context) (*Groupz, error) {
 	var (
 		err  error
-		node *Group
+		node *Groupz
 	)
 	gc.defaults()
 	if len(gc.hooks) == 0 {
@@ -123,7 +139,7 @@ func (gc *GroupCreate) Save(ctx context.Context) (*Group, error) {
 		node, err = gc.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*GroupMutation)
+			mutation, ok := m.(*GroupzMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
 			}
@@ -148,9 +164,9 @@ func (gc *GroupCreate) Save(ctx context.Context) (*Group, error) {
 		if err != nil {
 			return nil, err
 		}
-		nv, ok := v.(*Group)
+		nv, ok := v.(*Groupz)
 		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from GroupMutation", v)
+			return nil, fmt.Errorf("unexpected node type %T returned from GroupzMutation", v)
 		}
 		node = nv
 	}
@@ -158,7 +174,7 @@ func (gc *GroupCreate) Save(ctx context.Context) (*Group, error) {
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (gc *GroupCreate) SaveX(ctx context.Context) *Group {
+func (gc *GroupzCreate) SaveX(ctx context.Context) *Groupz {
 	v, err := gc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -167,45 +183,45 @@ func (gc *GroupCreate) SaveX(ctx context.Context) *Group {
 }
 
 // Exec executes the query.
-func (gc *GroupCreate) Exec(ctx context.Context) error {
+func (gc *GroupzCreate) Exec(ctx context.Context) error {
 	_, err := gc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gc *GroupCreate) ExecX(ctx context.Context) {
+func (gc *GroupzCreate) ExecX(ctx context.Context) {
 	if err := gc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (gc *GroupCreate) defaults() {
+func (gc *GroupzCreate) defaults() {
 	if _, ok := gc.mutation.BackgroundPicture(); !ok {
-		v := group.DefaultBackgroundPicture
+		v := groupz.DefaultBackgroundPicture
 		gc.mutation.SetBackgroundPicture(v)
 	}
 	if _, ok := gc.mutation.CreatedAt(); !ok {
-		v := group.DefaultCreatedAt()
+		v := groupz.DefaultCreatedAt()
 		gc.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (gc *GroupCreate) check() error {
+func (gc *GroupzCreate) check() error {
 	if _, ok := gc.mutation.BackgroundPicture(); !ok {
-		return &ValidationError{Name: "background_picture", err: errors.New(`ent: missing required field "Group.background_picture"`)}
+		return &ValidationError{Name: "background_picture", err: errors.New(`ent: missing required field "Groupz.background_picture"`)}
 	}
 	if _, ok := gc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Group.created_at"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Groupz.created_at"`)}
 	}
 	if _, ok := gc.mutation.LeaderID(); !ok {
-		return &ValidationError{Name: "leader_id", err: errors.New(`ent: missing required field "Group.leader_id"`)}
+		return &ValidationError{Name: "leader_id", err: errors.New(`ent: missing required field "Groupz.leader_id"`)}
 	}
 	return nil
 }
 
-func (gc *GroupCreate) sqlSave(ctx context.Context) (*Group, error) {
+func (gc *GroupzCreate) sqlSave(ctx context.Context) (*Groupz, error) {
 	_node, _spec := gc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, gc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -220,14 +236,14 @@ func (gc *GroupCreate) sqlSave(ctx context.Context) (*Group, error) {
 	return _node, nil
 }
 
-func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
+func (gc *GroupzCreate) createSpec() (*Groupz, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Group{config: gc.config}
+		_node = &Groupz{config: gc.config}
 		_spec = &sqlgraph.CreateSpec{
-			Table: group.Table,
+			Table: groupz.Table,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt64,
-				Column: group.FieldID,
+				Column: groupz.FieldID,
 			},
 		}
 	)
@@ -236,31 +252,31 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := gc.mutation.Name(); ok {
-		_spec.SetField(group.FieldName, field.TypeString, value)
+		_spec.SetField(groupz.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
 	if value, ok := gc.mutation.Description(); ok {
-		_spec.SetField(group.FieldDescription, field.TypeString, value)
+		_spec.SetField(groupz.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
 	if value, ok := gc.mutation.BackgroundPicture(); ok {
-		_spec.SetField(group.FieldBackgroundPicture, field.TypeString, value)
+		_spec.SetField(groupz.FieldBackgroundPicture, field.TypeString, value)
 		_node.BackgroundPicture = value
 	}
 	if value, ok := gc.mutation.CreatedAt(); ok {
-		_spec.SetField(group.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(groupz.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := gc.mutation.LeaderID(); ok {
-		_spec.SetField(group.FieldLeaderID, field.TypeInt64, value)
+		_spec.SetField(groupz.FieldLeaderID, field.TypeInt64, value)
 		_node.LeaderID = value
 	}
 	if nodes := gc.mutation.MembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   group.MembersTable,
-			Columns: []string{group.MembersColumn},
+			Table:   groupz.MembersTable,
+			Columns: []string{groupz.MembersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -274,26 +290,45 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := gc.mutation.ChallengesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   groupz.ChallengesTable,
+			Columns: []string{groupz.ChallengesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challenge.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
-// GroupCreateBulk is the builder for creating many Group entities in bulk.
-type GroupCreateBulk struct {
+// GroupzCreateBulk is the builder for creating many Groupz entities in bulk.
+type GroupzCreateBulk struct {
 	config
-	builders []*GroupCreate
+	builders []*GroupzCreate
 }
 
-// Save creates the Group entities in the database.
-func (gcb *GroupCreateBulk) Save(ctx context.Context) ([]*Group, error) {
+// Save creates the Groupz entities in the database.
+func (gcb *GroupzCreateBulk) Save(ctx context.Context) ([]*Groupz, error) {
 	specs := make([]*sqlgraph.CreateSpec, len(gcb.builders))
-	nodes := make([]*Group, len(gcb.builders))
+	nodes := make([]*Groupz, len(gcb.builders))
 	mutators := make([]Mutator, len(gcb.builders))
 	for i := range gcb.builders {
 		func(i int, root context.Context) {
 			builder := gcb.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*GroupMutation)
+				mutation, ok := m.(*GroupzMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -340,7 +375,7 @@ func (gcb *GroupCreateBulk) Save(ctx context.Context) ([]*Group, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (gcb *GroupCreateBulk) SaveX(ctx context.Context) []*Group {
+func (gcb *GroupzCreateBulk) SaveX(ctx context.Context) []*Groupz {
 	v, err := gcb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -349,13 +384,13 @@ func (gcb *GroupCreateBulk) SaveX(ctx context.Context) []*Group {
 }
 
 // Exec executes the query.
-func (gcb *GroupCreateBulk) Exec(ctx context.Context) error {
+func (gcb *GroupzCreateBulk) Exec(ctx context.Context) error {
 	_, err := gcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gcb *GroupCreateBulk) ExecX(ctx context.Context) {
+func (gcb *GroupzCreateBulk) ExecX(ctx context.Context) {
 	if err := gcb.Exec(ctx); err != nil {
 		panic(err)
 	}

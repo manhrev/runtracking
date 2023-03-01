@@ -13,7 +13,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 
 	"entgo.io/ent/dialect"
@@ -32,8 +32,8 @@ type Client struct {
 	ChallengeMember *ChallengeMemberClient
 	// ChallengeMemberRule is the client for interacting with the ChallengeMemberRule builders.
 	ChallengeMemberRule *ChallengeMemberRuleClient
-	// Group is the client for interacting with the Group builders.
-	Group *GroupClient
+	// Groupz is the client for interacting with the Groupz builders.
+	Groupz *GroupzClient
 	// Member is the client for interacting with the Member builders.
 	Member *MemberClient
 }
@@ -52,7 +52,7 @@ func (c *Client) init() {
 	c.Challenge = NewChallengeClient(c.config)
 	c.ChallengeMember = NewChallengeMemberClient(c.config)
 	c.ChallengeMemberRule = NewChallengeMemberRuleClient(c.config)
-	c.Group = NewGroupClient(c.config)
+	c.Groupz = NewGroupzClient(c.config)
 	c.Member = NewMemberClient(c.config)
 }
 
@@ -90,7 +90,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Challenge:           NewChallengeClient(cfg),
 		ChallengeMember:     NewChallengeMemberClient(cfg),
 		ChallengeMemberRule: NewChallengeMemberRuleClient(cfg),
-		Group:               NewGroupClient(cfg),
+		Groupz:              NewGroupzClient(cfg),
 		Member:              NewMemberClient(cfg),
 	}, nil
 }
@@ -114,7 +114,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Challenge:           NewChallengeClient(cfg),
 		ChallengeMember:     NewChallengeMemberClient(cfg),
 		ChallengeMemberRule: NewChallengeMemberRuleClient(cfg),
-		Group:               NewGroupClient(cfg),
+		Groupz:              NewGroupzClient(cfg),
 		Member:              NewMemberClient(cfg),
 	}, nil
 }
@@ -148,7 +148,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Challenge.Use(hooks...)
 	c.ChallengeMember.Use(hooks...)
 	c.ChallengeMemberRule.Use(hooks...)
-	c.Group.Use(hooks...)
+	c.Groupz.Use(hooks...)
 	c.Member.Use(hooks...)
 }
 
@@ -246,6 +246,22 @@ func (c *ChallengeClient) QueryChallengeMembers(ch *Challenge) *ChallengeMemberQ
 			sqlgraph.From(challenge.Table, challenge.FieldID, id),
 			sqlgraph.To(challengemember.Table, challengemember.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, challenge.ChallengeMembersTable, challenge.ChallengeMembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryGroupz queries the groupz edge of a Challenge.
+func (c *ChallengeClient) QueryGroupz(ch *Challenge) *GroupzQuery {
+	query := &GroupzQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, id),
+			sqlgraph.To(groupz.Table, groupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challenge.GroupzTable, challenge.GroupzColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
@@ -486,84 +502,84 @@ func (c *ChallengeMemberRuleClient) Hooks() []Hook {
 	return c.hooks.ChallengeMemberRule
 }
 
-// GroupClient is a client for the Group schema.
-type GroupClient struct {
+// GroupzClient is a client for the Groupz schema.
+type GroupzClient struct {
 	config
 }
 
-// NewGroupClient returns a client for the Group from the given config.
-func NewGroupClient(c config) *GroupClient {
-	return &GroupClient{config: c}
+// NewGroupzClient returns a client for the Groupz from the given config.
+func NewGroupzClient(c config) *GroupzClient {
+	return &GroupzClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `group.Hooks(f(g(h())))`.
-func (c *GroupClient) Use(hooks ...Hook) {
-	c.hooks.Group = append(c.hooks.Group, hooks...)
+// A call to `Use(f, g, h)` equals to `groupz.Hooks(f(g(h())))`.
+func (c *GroupzClient) Use(hooks ...Hook) {
+	c.hooks.Groupz = append(c.hooks.Groupz, hooks...)
 }
 
-// Create returns a builder for creating a Group entity.
-func (c *GroupClient) Create() *GroupCreate {
-	mutation := newGroupMutation(c.config, OpCreate)
-	return &GroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Groupz entity.
+func (c *GroupzClient) Create() *GroupzCreate {
+	mutation := newGroupzMutation(c.config, OpCreate)
+	return &GroupzCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Group entities.
-func (c *GroupClient) CreateBulk(builders ...*GroupCreate) *GroupCreateBulk {
-	return &GroupCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Groupz entities.
+func (c *GroupzClient) CreateBulk(builders ...*GroupzCreate) *GroupzCreateBulk {
+	return &GroupzCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Group.
-func (c *GroupClient) Update() *GroupUpdate {
-	mutation := newGroupMutation(c.config, OpUpdate)
-	return &GroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Groupz.
+func (c *GroupzClient) Update() *GroupzUpdate {
+	mutation := newGroupzMutation(c.config, OpUpdate)
+	return &GroupzUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *GroupClient) UpdateOne(gr *Group) *GroupUpdateOne {
-	mutation := newGroupMutation(c.config, OpUpdateOne, withGroup(gr))
-	return &GroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *GroupzClient) UpdateOne(gr *Groupz) *GroupzUpdateOne {
+	mutation := newGroupzMutation(c.config, OpUpdateOne, withGroupz(gr))
+	return &GroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *GroupClient) UpdateOneID(id int64) *GroupUpdateOne {
-	mutation := newGroupMutation(c.config, OpUpdateOne, withGroupID(id))
-	return &GroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *GroupzClient) UpdateOneID(id int64) *GroupzUpdateOne {
+	mutation := newGroupzMutation(c.config, OpUpdateOne, withGroupzID(id))
+	return &GroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Group.
-func (c *GroupClient) Delete() *GroupDelete {
-	mutation := newGroupMutation(c.config, OpDelete)
-	return &GroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Groupz.
+func (c *GroupzClient) Delete() *GroupzDelete {
+	mutation := newGroupzMutation(c.config, OpDelete)
+	return &GroupzDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *GroupClient) DeleteOne(gr *Group) *GroupDeleteOne {
+func (c *GroupzClient) DeleteOne(gr *Groupz) *GroupzDeleteOne {
 	return c.DeleteOneID(gr.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *GroupClient) DeleteOneID(id int64) *GroupDeleteOne {
-	builder := c.Delete().Where(group.ID(id))
+func (c *GroupzClient) DeleteOneID(id int64) *GroupzDeleteOne {
+	builder := c.Delete().Where(groupz.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &GroupDeleteOne{builder}
+	return &GroupzDeleteOne{builder}
 }
 
-// Query returns a query builder for Group.
-func (c *GroupClient) Query() *GroupQuery {
-	return &GroupQuery{
+// Query returns a query builder for Groupz.
+func (c *GroupzClient) Query() *GroupzQuery {
+	return &GroupzQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a Group entity by its id.
-func (c *GroupClient) Get(ctx context.Context, id int64) (*Group, error) {
-	return c.Query().Where(group.ID(id)).Only(ctx)
+// Get returns a Groupz entity by its id.
+func (c *GroupzClient) Get(ctx context.Context, id int64) (*Groupz, error) {
+	return c.Query().Where(groupz.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *GroupClient) GetX(ctx context.Context, id int64) *Group {
+func (c *GroupzClient) GetX(ctx context.Context, id int64) *Groupz {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -571,15 +587,31 @@ func (c *GroupClient) GetX(ctx context.Context, id int64) *Group {
 	return obj
 }
 
-// QueryMembers queries the members edge of a Group.
-func (c *GroupClient) QueryMembers(gr *Group) *MemberQuery {
+// QueryMembers queries the members edge of a Groupz.
+func (c *GroupzClient) QueryMembers(gr *Groupz) *MemberQuery {
 	query := &MemberQuery{config: c.config}
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := gr.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(group.Table, group.FieldID, id),
+			sqlgraph.From(groupz.Table, groupz.FieldID, id),
 			sqlgraph.To(member.Table, member.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, group.MembersTable, group.MembersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, groupz.MembersTable, groupz.MembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(gr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChallenges queries the challenges edge of a Groupz.
+func (c *GroupzClient) QueryChallenges(gr *Groupz) *ChallengeQuery {
+	query := &ChallengeQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := gr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(groupz.Table, groupz.FieldID, id),
+			sqlgraph.To(challenge.Table, challenge.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, groupz.ChallengesTable, groupz.ChallengesColumn),
 		)
 		fromV = sqlgraph.Neighbors(gr.driver.Dialect(), step)
 		return fromV, nil
@@ -588,8 +620,8 @@ func (c *GroupClient) QueryMembers(gr *Group) *MemberQuery {
 }
 
 // Hooks returns the client hooks.
-func (c *GroupClient) Hooks() []Hook {
-	return c.hooks.Group
+func (c *GroupzClient) Hooks() []Hook {
+	return c.hooks.Groupz
 }
 
 // MemberClient is a client for the Member schema.
@@ -677,15 +709,15 @@ func (c *MemberClient) GetX(ctx context.Context, id int64) *Member {
 	return obj
 }
 
-// QueryGroup queries the group edge of a Member.
-func (c *MemberClient) QueryGroup(m *Member) *GroupQuery {
-	query := &GroupQuery{config: c.config}
+// QueryGroupz queries the groupz edge of a Member.
+func (c *MemberClient) QueryGroupz(m *Member) *GroupzQuery {
+	query := &GroupzQuery{config: c.config}
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(member.Table, member.FieldID, id),
-			sqlgraph.To(group.Table, group.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, member.GroupTable, member.GroupColumn),
+			sqlgraph.To(groupz.Table, groupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, member.GroupzTable, member.GroupzColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil

@@ -9,25 +9,25 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
-// GroupDelete is the builder for deleting a Group entity.
-type GroupDelete struct {
+// GroupzDelete is the builder for deleting a Groupz entity.
+type GroupzDelete struct {
 	config
 	hooks    []Hook
-	mutation *GroupMutation
+	mutation *GroupzMutation
 }
 
-// Where appends a list predicates to the GroupDelete builder.
-func (gd *GroupDelete) Where(ps ...predicate.Group) *GroupDelete {
+// Where appends a list predicates to the GroupzDelete builder.
+func (gd *GroupzDelete) Where(ps ...predicate.Groupz) *GroupzDelete {
 	gd.mutation.Where(ps...)
 	return gd
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (gd *GroupDelete) Exec(ctx context.Context) (int, error) {
+func (gd *GroupzDelete) Exec(ctx context.Context) (int, error) {
 	var (
 		err      error
 		affected int
@@ -36,7 +36,7 @@ func (gd *GroupDelete) Exec(ctx context.Context) (int, error) {
 		affected, err = gd.sqlExec(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*GroupMutation)
+			mutation, ok := m.(*GroupzMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
 			}
@@ -59,7 +59,7 @@ func (gd *GroupDelete) Exec(ctx context.Context) (int, error) {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gd *GroupDelete) ExecX(ctx context.Context) int {
+func (gd *GroupzDelete) ExecX(ctx context.Context) int {
 	n, err := gd.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -67,13 +67,13 @@ func (gd *GroupDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (gd *GroupDelete) sqlExec(ctx context.Context) (int, error) {
+func (gd *GroupzDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := &sqlgraph.DeleteSpec{
 		Node: &sqlgraph.NodeSpec{
-			Table: group.Table,
+			Table: groupz.Table,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt64,
-				Column: group.FieldID,
+				Column: groupz.FieldID,
 			},
 		},
 	}
@@ -91,25 +91,25 @@ func (gd *GroupDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// GroupDeleteOne is the builder for deleting a single Group entity.
-type GroupDeleteOne struct {
-	gd *GroupDelete
+// GroupzDeleteOne is the builder for deleting a single Groupz entity.
+type GroupzDeleteOne struct {
+	gd *GroupzDelete
 }
 
 // Exec executes the deletion query.
-func (gdo *GroupDeleteOne) Exec(ctx context.Context) error {
+func (gdo *GroupzDeleteOne) Exec(ctx context.Context) error {
 	n, err := gdo.gd.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{group.Label}
+		return &NotFoundError{groupz.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gdo *GroupDeleteOne) ExecX(ctx context.Context) {
+func (gdo *GroupzDeleteOne) ExecX(ctx context.Context) {
 	gdo.gd.ExecX(ctx)
 }

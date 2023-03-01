@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -104,19 +105,6 @@ func (cu *ChallengeUpdate) ClearDescription() *ChallengeUpdate {
 	return cu
 }
 
-// SetGroupID sets the "group_id" field.
-func (cu *ChallengeUpdate) SetGroupID(i int64) *ChallengeUpdate {
-	cu.mutation.ResetGroupID()
-	cu.mutation.SetGroupID(i)
-	return cu
-}
-
-// AddGroupID adds i to the "group_id" field.
-func (cu *ChallengeUpdate) AddGroupID(i int64) *ChallengeUpdate {
-	cu.mutation.AddGroupID(i)
-	return cu
-}
-
 // SetTypeID sets the "type_id" field.
 func (cu *ChallengeUpdate) SetTypeID(i int64) *ChallengeUpdate {
 	cu.mutation.ResetTypeID()
@@ -145,6 +133,25 @@ func (cu *ChallengeUpdate) AddChallengeMembers(c ...*ChallengeMember) *Challenge
 	return cu.AddChallengeMemberIDs(ids...)
 }
 
+// SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
+func (cu *ChallengeUpdate) SetGroupzID(id int64) *ChallengeUpdate {
+	cu.mutation.SetGroupzID(id)
+	return cu
+}
+
+// SetNillableGroupzID sets the "groupz" edge to the Groupz entity by ID if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableGroupzID(id *int64) *ChallengeUpdate {
+	if id != nil {
+		cu = cu.SetGroupzID(*id)
+	}
+	return cu
+}
+
+// SetGroupz sets the "groupz" edge to the Groupz entity.
+func (cu *ChallengeUpdate) SetGroupz(g *Groupz) *ChallengeUpdate {
+	return cu.SetGroupzID(g.ID)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cu *ChallengeUpdate) Mutation() *ChallengeMutation {
 	return cu.mutation
@@ -169,6 +176,12 @@ func (cu *ChallengeUpdate) RemoveChallengeMembers(c ...*ChallengeMember) *Challe
 		ids[i] = c[i].ID
 	}
 	return cu.RemoveChallengeMemberIDs(ids...)
+}
+
+// ClearGroupz clears the "groupz" edge to the Groupz entity.
+func (cu *ChallengeUpdate) ClearGroupz() *ChallengeUpdate {
+	cu.mutation.ClearGroupz()
+	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -270,12 +283,6 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.DescriptionCleared() {
 		_spec.ClearField(challenge.FieldDescription, field.TypeString)
 	}
-	if value, ok := cu.mutation.GroupID(); ok {
-		_spec.SetField(challenge.FieldGroupID, field.TypeInt64, value)
-	}
-	if value, ok := cu.mutation.AddedGroupID(); ok {
-		_spec.AddField(challenge.FieldGroupID, field.TypeInt64, value)
-	}
 	if value, ok := cu.mutation.TypeID(); ok {
 		_spec.SetField(challenge.FieldTypeID, field.TypeInt64, value)
 	}
@@ -328,6 +335,41 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: challengemember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.GroupzCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challenge.GroupzTable,
+			Columns: []string{challenge.GroupzColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: groupz.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.GroupzIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challenge.GroupzTable,
+			Columns: []string{challenge.GroupzColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: groupz.FieldID,
 				},
 			},
 		}
@@ -431,19 +473,6 @@ func (cuo *ChallengeUpdateOne) ClearDescription() *ChallengeUpdateOne {
 	return cuo
 }
 
-// SetGroupID sets the "group_id" field.
-func (cuo *ChallengeUpdateOne) SetGroupID(i int64) *ChallengeUpdateOne {
-	cuo.mutation.ResetGroupID()
-	cuo.mutation.SetGroupID(i)
-	return cuo
-}
-
-// AddGroupID adds i to the "group_id" field.
-func (cuo *ChallengeUpdateOne) AddGroupID(i int64) *ChallengeUpdateOne {
-	cuo.mutation.AddGroupID(i)
-	return cuo
-}
-
 // SetTypeID sets the "type_id" field.
 func (cuo *ChallengeUpdateOne) SetTypeID(i int64) *ChallengeUpdateOne {
 	cuo.mutation.ResetTypeID()
@@ -472,6 +501,25 @@ func (cuo *ChallengeUpdateOne) AddChallengeMembers(c ...*ChallengeMember) *Chall
 	return cuo.AddChallengeMemberIDs(ids...)
 }
 
+// SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
+func (cuo *ChallengeUpdateOne) SetGroupzID(id int64) *ChallengeUpdateOne {
+	cuo.mutation.SetGroupzID(id)
+	return cuo
+}
+
+// SetNillableGroupzID sets the "groupz" edge to the Groupz entity by ID if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableGroupzID(id *int64) *ChallengeUpdateOne {
+	if id != nil {
+		cuo = cuo.SetGroupzID(*id)
+	}
+	return cuo
+}
+
+// SetGroupz sets the "groupz" edge to the Groupz entity.
+func (cuo *ChallengeUpdateOne) SetGroupz(g *Groupz) *ChallengeUpdateOne {
+	return cuo.SetGroupzID(g.ID)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cuo *ChallengeUpdateOne) Mutation() *ChallengeMutation {
 	return cuo.mutation
@@ -496,6 +544,12 @@ func (cuo *ChallengeUpdateOne) RemoveChallengeMembers(c ...*ChallengeMember) *Ch
 		ids[i] = c[i].ID
 	}
 	return cuo.RemoveChallengeMemberIDs(ids...)
+}
+
+// ClearGroupz clears the "groupz" edge to the Groupz entity.
+func (cuo *ChallengeUpdateOne) ClearGroupz() *ChallengeUpdateOne {
+	cuo.mutation.ClearGroupz()
+	return cuo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -627,12 +681,6 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	if cuo.mutation.DescriptionCleared() {
 		_spec.ClearField(challenge.FieldDescription, field.TypeString)
 	}
-	if value, ok := cuo.mutation.GroupID(); ok {
-		_spec.SetField(challenge.FieldGroupID, field.TypeInt64, value)
-	}
-	if value, ok := cuo.mutation.AddedGroupID(); ok {
-		_spec.AddField(challenge.FieldGroupID, field.TypeInt64, value)
-	}
 	if value, ok := cuo.mutation.TypeID(); ok {
 		_spec.SetField(challenge.FieldTypeID, field.TypeInt64, value)
 	}
@@ -685,6 +733,41 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: challengemember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.GroupzCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challenge.GroupzTable,
+			Columns: []string{challenge.GroupzColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: groupz.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.GroupzIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challenge.GroupzTable,
+			Columns: []string{challenge.GroupzColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: groupz.FieldID,
 				},
 			},
 		}

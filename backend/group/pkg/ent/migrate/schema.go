@@ -15,14 +15,22 @@ var (
 		{Name: "start_time", Type: field.TypeTime, Nullable: true},
 		{Name: "end_time", Type: field.TypeTime, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "group_id", Type: field.TypeInt64},
 		{Name: "type_id", Type: field.TypeInt64},
+		{Name: "groupz_challenges", Type: field.TypeInt64, Nullable: true},
 	}
 	// ChallengesTable holds the schema information for the "challenges" table.
 	ChallengesTable = &schema.Table{
 		Name:       "challenges",
 		Columns:    ChallengesColumns,
 		PrimaryKey: []*schema.Column{ChallengesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "challenges_groupzs_challenges",
+				Columns:    []*schema.Column{ChallengesColumns[6]},
+				RefColumns: []*schema.Column{GroupzsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// ChallengeMembersColumns holds the columns for the "challenge_members" table.
 	ChallengeMembersColumns = []*schema.Column{
@@ -79,8 +87,8 @@ var (
 			},
 		},
 	}
-	// GroupsColumns holds the columns for the "groups" table.
-	GroupsColumns = []*schema.Column{
+	// GroupzsColumns holds the columns for the "groupzs" table.
+	GroupzsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
@@ -88,18 +96,18 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "leader_id", Type: field.TypeInt64},
 	}
-	// GroupsTable holds the schema information for the "groups" table.
-	GroupsTable = &schema.Table{
-		Name:       "groups",
-		Columns:    GroupsColumns,
-		PrimaryKey: []*schema.Column{GroupsColumns[0]},
+	// GroupzsTable holds the schema information for the "groupzs" table.
+	GroupzsTable = &schema.Table{
+		Name:       "groupzs",
+		Columns:    GroupzsColumns,
+		PrimaryKey: []*schema.Column{GroupzsColumns[0]},
 	}
 	// MembersColumns holds the columns for the "members" table.
 	MembersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "user_id", Type: field.TypeInt64},
-		{Name: "group_members", Type: field.TypeInt64, Nullable: true},
+		{Name: "groupz_members", Type: field.TypeInt64, Nullable: true},
 	}
 	// MembersTable holds the schema information for the "members" table.
 	MembersTable = &schema.Table{
@@ -108,15 +116,15 @@ var (
 		PrimaryKey: []*schema.Column{MembersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "members_groups_members",
+				Symbol:     "members_groupzs_members",
 				Columns:    []*schema.Column{MembersColumns[3]},
-				RefColumns: []*schema.Column{GroupsColumns[0]},
+				RefColumns: []*schema.Column{GroupzsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "member_user_id_group_members",
+				Name:    "member_user_id_groupz_members",
 				Unique:  true,
 				Columns: []*schema.Column{MembersColumns[2], MembersColumns[3]},
 			},
@@ -127,13 +135,14 @@ var (
 		ChallengesTable,
 		ChallengeMembersTable,
 		ChallengeMemberRulesTable,
-		GroupsTable,
+		GroupzsTable,
 		MembersTable,
 	}
 )
 
 func init() {
+	ChallengesTable.ForeignKeys[0].RefTable = GroupzsTable
 	ChallengeMembersTable.ForeignKeys[0].RefTable = ChallengesTable
 	ChallengeMemberRulesTable.ForeignKeys[0].RefTable = ChallengeMembersTable
-	MembersTable.ForeignKeys[0].RefTable = GroupsTable
+	MembersTable.ForeignKeys[0].RefTable = GroupzsTable
 }

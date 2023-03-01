@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
@@ -57,23 +57,23 @@ func (mu *MemberUpdate) AddUserID(i int64) *MemberUpdate {
 	return mu
 }
 
-// SetGroupID sets the "group" edge to the Group entity by ID.
-func (mu *MemberUpdate) SetGroupID(id int64) *MemberUpdate {
-	mu.mutation.SetGroupID(id)
+// SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
+func (mu *MemberUpdate) SetGroupzID(id int64) *MemberUpdate {
+	mu.mutation.SetGroupzID(id)
 	return mu
 }
 
-// SetNillableGroupID sets the "group" edge to the Group entity by ID if the given value is not nil.
-func (mu *MemberUpdate) SetNillableGroupID(id *int64) *MemberUpdate {
+// SetNillableGroupzID sets the "groupz" edge to the Groupz entity by ID if the given value is not nil.
+func (mu *MemberUpdate) SetNillableGroupzID(id *int64) *MemberUpdate {
 	if id != nil {
-		mu = mu.SetGroupID(*id)
+		mu = mu.SetGroupzID(*id)
 	}
 	return mu
 }
 
-// SetGroup sets the "group" edge to the Group entity.
-func (mu *MemberUpdate) SetGroup(g *Group) *MemberUpdate {
-	return mu.SetGroupID(g.ID)
+// SetGroupz sets the "groupz" edge to the Groupz entity.
+func (mu *MemberUpdate) SetGroupz(g *Groupz) *MemberUpdate {
+	return mu.SetGroupzID(g.ID)
 }
 
 // Mutation returns the MemberMutation object of the builder.
@@ -81,9 +81,9 @@ func (mu *MemberUpdate) Mutation() *MemberMutation {
 	return mu.mutation
 }
 
-// ClearGroup clears the "group" edge to the Group entity.
-func (mu *MemberUpdate) ClearGroup() *MemberUpdate {
-	mu.mutation.ClearGroup()
+// ClearGroupz clears the "groupz" edge to the Groupz entity.
+func (mu *MemberUpdate) ClearGroupz() *MemberUpdate {
+	mu.mutation.ClearGroupz()
 	return mu
 }
 
@@ -174,33 +174,33 @@ func (mu *MemberUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.AddedUserID(); ok {
 		_spec.AddField(member.FieldUserID, field.TypeInt64, value)
 	}
-	if mu.mutation.GroupCleared() {
+	if mu.mutation.GroupzCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   member.GroupTable,
-			Columns: []string{member.GroupColumn},
+			Table:   member.GroupzTable,
+			Columns: []string{member.GroupzColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: group.FieldID,
+					Column: groupz.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.GroupIDs(); len(nodes) > 0 {
+	if nodes := mu.mutation.GroupzIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   member.GroupTable,
-			Columns: []string{member.GroupColumn},
+			Table:   member.GroupzTable,
+			Columns: []string{member.GroupzColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: group.FieldID,
+					Column: groupz.FieldID,
 				},
 			},
 		}
@@ -257,23 +257,23 @@ func (muo *MemberUpdateOne) AddUserID(i int64) *MemberUpdateOne {
 	return muo
 }
 
-// SetGroupID sets the "group" edge to the Group entity by ID.
-func (muo *MemberUpdateOne) SetGroupID(id int64) *MemberUpdateOne {
-	muo.mutation.SetGroupID(id)
+// SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
+func (muo *MemberUpdateOne) SetGroupzID(id int64) *MemberUpdateOne {
+	muo.mutation.SetGroupzID(id)
 	return muo
 }
 
-// SetNillableGroupID sets the "group" edge to the Group entity by ID if the given value is not nil.
-func (muo *MemberUpdateOne) SetNillableGroupID(id *int64) *MemberUpdateOne {
+// SetNillableGroupzID sets the "groupz" edge to the Groupz entity by ID if the given value is not nil.
+func (muo *MemberUpdateOne) SetNillableGroupzID(id *int64) *MemberUpdateOne {
 	if id != nil {
-		muo = muo.SetGroupID(*id)
+		muo = muo.SetGroupzID(*id)
 	}
 	return muo
 }
 
-// SetGroup sets the "group" edge to the Group entity.
-func (muo *MemberUpdateOne) SetGroup(g *Group) *MemberUpdateOne {
-	return muo.SetGroupID(g.ID)
+// SetGroupz sets the "groupz" edge to the Groupz entity.
+func (muo *MemberUpdateOne) SetGroupz(g *Groupz) *MemberUpdateOne {
+	return muo.SetGroupzID(g.ID)
 }
 
 // Mutation returns the MemberMutation object of the builder.
@@ -281,9 +281,9 @@ func (muo *MemberUpdateOne) Mutation() *MemberMutation {
 	return muo.mutation
 }
 
-// ClearGroup clears the "group" edge to the Group entity.
-func (muo *MemberUpdateOne) ClearGroup() *MemberUpdateOne {
-	muo.mutation.ClearGroup()
+// ClearGroupz clears the "groupz" edge to the Groupz entity.
+func (muo *MemberUpdateOne) ClearGroupz() *MemberUpdateOne {
+	muo.mutation.ClearGroupz()
 	return muo
 }
 
@@ -404,33 +404,33 @@ func (muo *MemberUpdateOne) sqlSave(ctx context.Context) (_node *Member, err err
 	if value, ok := muo.mutation.AddedUserID(); ok {
 		_spec.AddField(member.FieldUserID, field.TypeInt64, value)
 	}
-	if muo.mutation.GroupCleared() {
+	if muo.mutation.GroupzCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   member.GroupTable,
-			Columns: []string{member.GroupColumn},
+			Table:   member.GroupzTable,
+			Columns: []string{member.GroupzColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: group.FieldID,
+					Column: groupz.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.GroupIDs(); len(nodes) > 0 {
+	if nodes := muo.mutation.GroupzIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   member.GroupTable,
-			Columns: []string{member.GroupColumn},
+			Table:   member.GroupzTable,
+			Columns: []string{member.GroupzColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: group.FieldID,
+					Column: groupz.FieldID,
 				},
 			},
 		}

@@ -27,7 +27,7 @@ type hooks struct {
 	Challenge           []ent.Hook
 	ChallengeMember     []ent.Hook
 	ChallengeMemberRule []ent.Hook
-	Group               []ent.Hook
+	Groupz              []ent.Hook
 	Member              []ent.Hook
 }
 

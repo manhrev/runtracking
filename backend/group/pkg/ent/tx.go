@@ -18,8 +18,8 @@ type Tx struct {
 	ChallengeMember *ChallengeMemberClient
 	// ChallengeMemberRule is the client for interacting with the ChallengeMemberRule builders.
 	ChallengeMemberRule *ChallengeMemberRuleClient
-	// Group is the client for interacting with the Group builders.
-	Group *GroupClient
+	// Groupz is the client for interacting with the Groupz builders.
+	Groupz *GroupzClient
 	// Member is the client for interacting with the Member builders.
 	Member *MemberClient
 
@@ -156,7 +156,7 @@ func (tx *Tx) init() {
 	tx.Challenge = NewChallengeClient(tx.config)
 	tx.ChallengeMember = NewChallengeMemberClient(tx.config)
 	tx.ChallengeMemberRule = NewChallengeMemberRuleClient(tx.config)
-	tx.Group = NewGroupClient(tx.config)
+	tx.Groupz = NewGroupzClient(tx.config)
 	tx.Member = NewMemberClient(tx.config)
 }
 

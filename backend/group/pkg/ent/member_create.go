@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
@@ -47,23 +47,23 @@ func (mc *MemberCreate) SetID(i int64) *MemberCreate {
 	return mc
 }
 
-// SetGroupID sets the "group" edge to the Group entity by ID.
-func (mc *MemberCreate) SetGroupID(id int64) *MemberCreate {
-	mc.mutation.SetGroupID(id)
+// SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
+func (mc *MemberCreate) SetGroupzID(id int64) *MemberCreate {
+	mc.mutation.SetGroupzID(id)
 	return mc
 }
 
-// SetNillableGroupID sets the "group" edge to the Group entity by ID if the given value is not nil.
-func (mc *MemberCreate) SetNillableGroupID(id *int64) *MemberCreate {
+// SetNillableGroupzID sets the "groupz" edge to the Groupz entity by ID if the given value is not nil.
+func (mc *MemberCreate) SetNillableGroupzID(id *int64) *MemberCreate {
 	if id != nil {
-		mc = mc.SetGroupID(*id)
+		mc = mc.SetGroupzID(*id)
 	}
 	return mc
 }
 
-// SetGroup sets the "group" edge to the Group entity.
-func (mc *MemberCreate) SetGroup(g *Group) *MemberCreate {
-	return mc.SetGroupID(g.ID)
+// SetGroupz sets the "groupz" edge to the Groupz entity.
+func (mc *MemberCreate) SetGroupz(g *Groupz) *MemberCreate {
+	return mc.SetGroupzID(g.ID)
 }
 
 // Mutation returns the MemberMutation object of the builder.
@@ -198,24 +198,24 @@ func (mc *MemberCreate) createSpec() (*Member, *sqlgraph.CreateSpec) {
 		_spec.SetField(member.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
 	}
-	if nodes := mc.mutation.GroupIDs(); len(nodes) > 0 {
+	if nodes := mc.mutation.GroupzIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   member.GroupTable,
-			Columns: []string{member.GroupColumn},
+			Table:   member.GroupzTable,
+			Columns: []string{member.GroupzColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
-					Column: group.FieldID,
+					Column: groupz.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.group_members = &nodes[0]
+		_node.groupz_members = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

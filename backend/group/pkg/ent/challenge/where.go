@@ -109,13 +109,6 @@ func Description(v string) predicate.Challenge {
 	})
 }
 
-// GroupID applies equality check predicate on the "group_id" field. It's identical to GroupIDEQ.
-func GroupID(v int64) predicate.Challenge {
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldGroupID), v))
-	})
-}
-
 // TypeID applies equality check predicate on the "type_id" field. It's identical to TypeIDEQ.
 func TypeID(v int64) predicate.Challenge {
 	return predicate.Challenge(func(s *sql.Selector) {
@@ -456,70 +449,6 @@ func DescriptionContainsFold(v string) predicate.Challenge {
 	})
 }
 
-// GroupIDEQ applies the EQ predicate on the "group_id" field.
-func GroupIDEQ(v int64) predicate.Challenge {
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldGroupID), v))
-	})
-}
-
-// GroupIDNEQ applies the NEQ predicate on the "group_id" field.
-func GroupIDNEQ(v int64) predicate.Challenge {
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldGroupID), v))
-	})
-}
-
-// GroupIDIn applies the In predicate on the "group_id" field.
-func GroupIDIn(vs ...int64) predicate.Challenge {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldGroupID), v...))
-	})
-}
-
-// GroupIDNotIn applies the NotIn predicate on the "group_id" field.
-func GroupIDNotIn(vs ...int64) predicate.Challenge {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldGroupID), v...))
-	})
-}
-
-// GroupIDGT applies the GT predicate on the "group_id" field.
-func GroupIDGT(v int64) predicate.Challenge {
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldGroupID), v))
-	})
-}
-
-// GroupIDGTE applies the GTE predicate on the "group_id" field.
-func GroupIDGTE(v int64) predicate.Challenge {
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldGroupID), v))
-	})
-}
-
-// GroupIDLT applies the LT predicate on the "group_id" field.
-func GroupIDLT(v int64) predicate.Challenge {
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldGroupID), v))
-	})
-}
-
-// GroupIDLTE applies the LTE predicate on the "group_id" field.
-func GroupIDLTE(v int64) predicate.Challenge {
-	return predicate.Challenge(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldGroupID), v))
-	})
-}
-
 // TypeIDEQ applies the EQ predicate on the "type_id" field.
 func TypeIDEQ(v int64) predicate.Challenge {
 	return predicate.Challenge(func(s *sql.Selector) {
@@ -603,6 +532,34 @@ func HasChallengeMembersWith(preds ...predicate.ChallengeMember) predicate.Chall
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ChallengeMembersInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, ChallengeMembersTable, ChallengeMembersColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasGroupz applies the HasEdge predicate on the "groupz" edge.
+func HasGroupz() predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(GroupzTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasGroupzWith applies the HasEdge predicate on the "groupz" edge with a given conditions (other predicates).
+func HasGroupzWith(preds ...predicate.Groupz) predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(GroupzInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

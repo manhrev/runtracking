@@ -15,17 +15,17 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
-	// EdgeGroup holds the string denoting the group edge name in mutations.
-	EdgeGroup = "group"
+	// EdgeGroupz holds the string denoting the groupz edge name in mutations.
+	EdgeGroupz = "groupz"
 	// Table holds the table name of the member in the database.
 	Table = "members"
-	// GroupTable is the table that holds the group relation/edge.
-	GroupTable = "members"
-	// GroupInverseTable is the table name for the Group entity.
-	// It exists in this package in order to avoid circular dependency with the "group" package.
-	GroupInverseTable = "groups"
-	// GroupColumn is the table column denoting the group relation/edge.
-	GroupColumn = "group_members"
+	// GroupzTable is the table that holds the groupz relation/edge.
+	GroupzTable = "members"
+	// GroupzInverseTable is the table name for the Groupz entity.
+	// It exists in this package in order to avoid circular dependency with the "groupz" package.
+	GroupzInverseTable = "groupzs"
+	// GroupzColumn is the table column denoting the groupz relation/edge.
+	GroupzColumn = "groupz_members"
 )
 
 // Columns holds all SQL columns for member fields.
@@ -38,7 +38,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "members"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"group_members",
+	"groupz_members",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
