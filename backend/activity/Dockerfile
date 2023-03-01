@@ -1,6 +1,6 @@
 FROM golang:1.18.3-alpine 
 WORKDIR /app
-COPY ./../ /app/
+COPY ./ /app/
 WORKDIR /app/cmd/
 RUN go build -o /server
 COPY wait-for-it.sh /wait-for-it.sh
