@@ -9,7 +9,6 @@ import (
 
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/manhrev/runtracking/backend/auth/config"
 	"github.com/manhrev/runtracking/backend/auth/internal/cache"
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signin"
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signup"
@@ -26,10 +25,17 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const (
-	ENVIRONMENT_MODE                 = "ENVIRONMENT_MODE"
-	notification_service      string = "notification"
-	notification_service_port string = "8080"
+var (
+	db_user_name string = os.Getenv("DB_USERNAME")
+	db_password  string = os.Getenv("DB_PASSWORD")
+	db_domain    string = os.Getenv("DB_HOST")
+	db_port      string = os.Getenv("DB_PORT")
+	db_name      string = os.Getenv("DB_NAME")
+
+	notification_service string = os.Getenv("NOTIFICATION_SERVICE")
+	notification_port    string = os.Getenv("NOTIFICATION_PORT")
+
+	listen_port string = os.Getenv("LISTEN_PORT")
 )
 
 func Run() {
@@ -43,15 +49,8 @@ func newServer() *grpc.Server {
 }
 
 func Serve(server *grpc.Server) {
-	conf := config.GetConfig(os.Getenv(ENVIRONMENT_MODE))
-	configuration, err := conf.New()
-	if err != nil {
-		log.Fatalf("cannot read values from yml config file: %v", err)
-	}
-
 	// init other services client connections, database driver and pass to server
-	db := configuration.Database
-	entClient, err := ent.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", db.Username, db.Password, db.Domain, db.Port, db.Name))
+	entClient, err := ent.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", db_user_name, db_password, db_domain, db_port, db_name))
 	if err != nil {
 		log.Fatalf("cannot create database connection: %v", err)
 	}
@@ -64,7 +63,7 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", notification_service, notification_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", notification_service, notification_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("error while create connect to sample service: %v", err)
 	}
@@ -87,7 +86,7 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("cannot create featureSignUp: %v", err)
 	}
 
-	cacheService, err := cache.New(entClient, configuration)
+	cacheService, err := cache.New(entClient)
 
 	if err != nil {
 		log.Fatalf("cannot create cacheService: %v", err)
@@ -107,8 +106,7 @@ func Serve(server *grpc.Server) {
 	// Register User Server
 	pb.RegisterUserServer(server, user.NewServer(entClient, extractorService))
 
-	grpc := configuration.Grpc
-	lis, err := net.Listen(grpc.Network, fmt.Sprintf("%s:%s", grpc.Host, grpc.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)
 	}
