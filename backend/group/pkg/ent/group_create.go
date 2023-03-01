@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 // GroupCreate is the builder for creating a Group entity.
@@ -78,31 +78,30 @@ func (gc *GroupCreate) SetNillableCreatedAt(t *time.Time) *GroupCreate {
 }
 
 // SetLeaderID sets the "leader_id" field.
-func (gc *GroupCreate) SetLeaderID(u uuid.UUID) *GroupCreate {
-	gc.mutation.SetLeaderID(u)
-	return gc
-}
-
-// SetNillableLeaderID sets the "leader_id" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableLeaderID(u *uuid.UUID) *GroupCreate {
-	if u != nil {
-		gc.SetLeaderID(*u)
-	}
+func (gc *GroupCreate) SetLeaderID(i int64) *GroupCreate {
+	gc.mutation.SetLeaderID(i)
 	return gc
 }
 
 // SetID sets the "id" field.
-func (gc *GroupCreate) SetID(u uuid.UUID) *GroupCreate {
-	gc.mutation.SetID(u)
+func (gc *GroupCreate) SetID(i int64) *GroupCreate {
+	gc.mutation.SetID(i)
 	return gc
 }
 
-// SetNillableID sets the "id" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableID(u *uuid.UUID) *GroupCreate {
-	if u != nil {
-		gc.SetID(*u)
-	}
+// AddMemberIDs adds the "members" edge to the Member entity by IDs.
+func (gc *GroupCreate) AddMemberIDs(ids ...int64) *GroupCreate {
+	gc.mutation.AddMemberIDs(ids...)
 	return gc
+}
+
+// AddMembers adds the "members" edges to the Member entity.
+func (gc *GroupCreate) AddMembers(m ...*Member) *GroupCreate {
+	ids := make([]int64, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return gc.AddMemberIDs(ids...)
 }
 
 // Mutation returns the GroupMutation object of the builder.
@@ -190,14 +189,6 @@ func (gc *GroupCreate) defaults() {
 		v := group.DefaultCreatedAt()
 		gc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := gc.mutation.LeaderID(); !ok {
-		v := group.DefaultLeaderID()
-		gc.mutation.SetLeaderID(v)
-	}
-	if _, ok := gc.mutation.ID(); !ok {
-		v := group.DefaultID()
-		gc.mutation.SetID(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -222,12 +213,9 @@ func (gc *GroupCreate) sqlSave(ctx context.Context) (*Group, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int64(id)
 	}
 	return _node, nil
 }
@@ -238,14 +226,14 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: group.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt64,
 				Column: group.FieldID,
 			},
 		}
 	)
 	if id, ok := gc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := gc.mutation.Name(); ok {
 		_spec.SetField(group.FieldName, field.TypeString, value)
@@ -264,8 +252,27 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		_node.CreatedAt = value
 	}
 	if value, ok := gc.mutation.LeaderID(); ok {
-		_spec.SetField(group.FieldLeaderID, field.TypeUUID, value)
+		_spec.SetField(group.FieldLeaderID, field.TypeInt64, value)
 		_node.LeaderID = value
+	}
+	if nodes := gc.mutation.MembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: []string{group.MembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -311,6 +318,10 @@ func (gcb *GroupCreateBulk) Save(ctx context.Context) ([]*Group, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int64(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

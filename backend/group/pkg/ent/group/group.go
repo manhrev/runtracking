@@ -4,8 +4,6 @@ package group
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const (
@@ -23,8 +21,17 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldLeaderID holds the string denoting the leader_id field in the database.
 	FieldLeaderID = "leader_id"
+	// EdgeMembers holds the string denoting the members edge name in mutations.
+	EdgeMembers = "members"
 	// Table holds the table name of the group in the database.
 	Table = "groups"
+	// MembersTable is the table that holds the members relation/edge.
+	MembersTable = "members"
+	// MembersInverseTable is the table name for the Member entity.
+	// It exists in this package in order to avoid circular dependency with the "member" package.
+	MembersInverseTable = "members"
+	// MembersColumn is the table column denoting the members relation/edge.
+	MembersColumn = "group_members"
 )
 
 // Columns holds all SQL columns for group fields.
@@ -52,8 +59,4 @@ var (
 	DefaultBackgroundPicture string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultLeaderID holds the default value on creation for the "leader_id" field.
-	DefaultLeaderID func() uuid.UUID
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
 )

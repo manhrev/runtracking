@@ -11,16 +11,17 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
 // GroupUpdate is the builder for updating Group entities.
 type GroupUpdate struct {
 	config
-	hooks    []Hook
-	mutation *GroupMutation
+	hooks     []Hook
+	mutation  *GroupMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the GroupUpdate builder.
@@ -98,22 +99,57 @@ func (gu *GroupUpdate) SetNillableCreatedAt(t *time.Time) *GroupUpdate {
 }
 
 // SetLeaderID sets the "leader_id" field.
-func (gu *GroupUpdate) SetLeaderID(u uuid.UUID) *GroupUpdate {
-	gu.mutation.SetLeaderID(u)
+func (gu *GroupUpdate) SetLeaderID(i int64) *GroupUpdate {
+	gu.mutation.ResetLeaderID()
+	gu.mutation.SetLeaderID(i)
 	return gu
 }
 
-// SetNillableLeaderID sets the "leader_id" field if the given value is not nil.
-func (gu *GroupUpdate) SetNillableLeaderID(u *uuid.UUID) *GroupUpdate {
-	if u != nil {
-		gu.SetLeaderID(*u)
-	}
+// AddLeaderID adds i to the "leader_id" field.
+func (gu *GroupUpdate) AddLeaderID(i int64) *GroupUpdate {
+	gu.mutation.AddLeaderID(i)
 	return gu
+}
+
+// AddMemberIDs adds the "members" edge to the Member entity by IDs.
+func (gu *GroupUpdate) AddMemberIDs(ids ...int64) *GroupUpdate {
+	gu.mutation.AddMemberIDs(ids...)
+	return gu
+}
+
+// AddMembers adds the "members" edges to the Member entity.
+func (gu *GroupUpdate) AddMembers(m ...*Member) *GroupUpdate {
+	ids := make([]int64, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return gu.AddMemberIDs(ids...)
 }
 
 // Mutation returns the GroupMutation object of the builder.
 func (gu *GroupUpdate) Mutation() *GroupMutation {
 	return gu.mutation
+}
+
+// ClearMembers clears all "members" edges to the Member entity.
+func (gu *GroupUpdate) ClearMembers() *GroupUpdate {
+	gu.mutation.ClearMembers()
+	return gu
+}
+
+// RemoveMemberIDs removes the "members" edge to Member entities by IDs.
+func (gu *GroupUpdate) RemoveMemberIDs(ids ...int64) *GroupUpdate {
+	gu.mutation.RemoveMemberIDs(ids...)
+	return gu
+}
+
+// RemoveMembers removes "members" edges to Member entities.
+func (gu *GroupUpdate) RemoveMembers(m ...*Member) *GroupUpdate {
+	ids := make([]int64, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return gu.RemoveMemberIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -170,13 +206,19 @@ func (gu *GroupUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (gu *GroupUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *GroupUpdate {
+	gu.modifiers = append(gu.modifiers, modifiers...)
+	return gu
+}
+
 func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   group.Table,
 			Columns: group.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt64,
 				Column: group.FieldID,
 			},
 		},
@@ -207,8 +249,66 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(group.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := gu.mutation.LeaderID(); ok {
-		_spec.SetField(group.FieldLeaderID, field.TypeUUID, value)
+		_spec.SetField(group.FieldLeaderID, field.TypeInt64, value)
 	}
+	if value, ok := gu.mutation.AddedLeaderID(); ok {
+		_spec.AddField(group.FieldLeaderID, field.TypeInt64, value)
+	}
+	if gu.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: []string{group.MembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := gu.mutation.RemovedMembersIDs(); len(nodes) > 0 && !gu.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: []string{group.MembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := gu.mutation.MembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: []string{group.MembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	_spec.AddModifiers(gu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, gu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{group.Label}
@@ -223,9 +323,10 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 // GroupUpdateOne is the builder for updating a single Group entity.
 type GroupUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *GroupMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *GroupMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetName sets the "name" field.
@@ -297,22 +398,57 @@ func (guo *GroupUpdateOne) SetNillableCreatedAt(t *time.Time) *GroupUpdateOne {
 }
 
 // SetLeaderID sets the "leader_id" field.
-func (guo *GroupUpdateOne) SetLeaderID(u uuid.UUID) *GroupUpdateOne {
-	guo.mutation.SetLeaderID(u)
+func (guo *GroupUpdateOne) SetLeaderID(i int64) *GroupUpdateOne {
+	guo.mutation.ResetLeaderID()
+	guo.mutation.SetLeaderID(i)
 	return guo
 }
 
-// SetNillableLeaderID sets the "leader_id" field if the given value is not nil.
-func (guo *GroupUpdateOne) SetNillableLeaderID(u *uuid.UUID) *GroupUpdateOne {
-	if u != nil {
-		guo.SetLeaderID(*u)
-	}
+// AddLeaderID adds i to the "leader_id" field.
+func (guo *GroupUpdateOne) AddLeaderID(i int64) *GroupUpdateOne {
+	guo.mutation.AddLeaderID(i)
 	return guo
+}
+
+// AddMemberIDs adds the "members" edge to the Member entity by IDs.
+func (guo *GroupUpdateOne) AddMemberIDs(ids ...int64) *GroupUpdateOne {
+	guo.mutation.AddMemberIDs(ids...)
+	return guo
+}
+
+// AddMembers adds the "members" edges to the Member entity.
+func (guo *GroupUpdateOne) AddMembers(m ...*Member) *GroupUpdateOne {
+	ids := make([]int64, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return guo.AddMemberIDs(ids...)
 }
 
 // Mutation returns the GroupMutation object of the builder.
 func (guo *GroupUpdateOne) Mutation() *GroupMutation {
 	return guo.mutation
+}
+
+// ClearMembers clears all "members" edges to the Member entity.
+func (guo *GroupUpdateOne) ClearMembers() *GroupUpdateOne {
+	guo.mutation.ClearMembers()
+	return guo
+}
+
+// RemoveMemberIDs removes the "members" edge to Member entities by IDs.
+func (guo *GroupUpdateOne) RemoveMemberIDs(ids ...int64) *GroupUpdateOne {
+	guo.mutation.RemoveMemberIDs(ids...)
+	return guo
+}
+
+// RemoveMembers removes "members" edges to Member entities.
+func (guo *GroupUpdateOne) RemoveMembers(m ...*Member) *GroupUpdateOne {
+	ids := make([]int64, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return guo.RemoveMemberIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -382,13 +518,19 @@ func (guo *GroupUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (guo *GroupUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *GroupUpdateOne {
+	guo.modifiers = append(guo.modifiers, modifiers...)
+	return guo
+}
+
 func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   group.Table,
 			Columns: group.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt64,
 				Column: group.FieldID,
 			},
 		},
@@ -436,8 +578,66 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 		_spec.SetField(group.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := guo.mutation.LeaderID(); ok {
-		_spec.SetField(group.FieldLeaderID, field.TypeUUID, value)
+		_spec.SetField(group.FieldLeaderID, field.TypeInt64, value)
 	}
+	if value, ok := guo.mutation.AddedLeaderID(); ok {
+		_spec.AddField(group.FieldLeaderID, field.TypeInt64, value)
+	}
+	if guo.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: []string{group.MembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := guo.mutation.RemovedMembersIDs(); len(nodes) > 0 && !guo.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: []string{group.MembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := guo.mutation.MembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: []string{group.MembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	_spec.AddModifiers(guo.modifiers...)
 	_node = &Group{config: guo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "backend/activity"
+		},
+		{
+			"path": "backend/group"
 		}
 	],
 	"settings": {}

@@ -6,33 +6,33 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id uuid.UUID) predicate.Group {
+func ID(id int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id uuid.UUID) predicate.Group {
+func IDEQ(id int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id uuid.UUID) predicate.Group {
+func IDNEQ(id int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...uuid.UUID) predicate.Group {
+func IDIn(ids ...int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -43,7 +43,7 @@ func IDIn(ids ...uuid.UUID) predicate.Group {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...uuid.UUID) predicate.Group {
+func IDNotIn(ids ...int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -54,28 +54,28 @@ func IDNotIn(ids ...uuid.UUID) predicate.Group {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id uuid.UUID) predicate.Group {
+func IDGT(id int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id uuid.UUID) predicate.Group {
+func IDGTE(id int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id uuid.UUID) predicate.Group {
+func IDLT(id int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id uuid.UUID) predicate.Group {
+func IDLTE(id int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -110,7 +110,7 @@ func CreatedAt(v time.Time) predicate.Group {
 }
 
 // LeaderID applies equality check predicate on the "leader_id" field. It's identical to LeaderIDEQ.
-func LeaderID(v uuid.UUID) predicate.Group {
+func LeaderID(v int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLeaderID), v))
 	})
@@ -506,21 +506,21 @@ func CreatedAtLTE(v time.Time) predicate.Group {
 }
 
 // LeaderIDEQ applies the EQ predicate on the "leader_id" field.
-func LeaderIDEQ(v uuid.UUID) predicate.Group {
+func LeaderIDEQ(v int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLeaderID), v))
 	})
 }
 
 // LeaderIDNEQ applies the NEQ predicate on the "leader_id" field.
-func LeaderIDNEQ(v uuid.UUID) predicate.Group {
+func LeaderIDNEQ(v int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldLeaderID), v))
 	})
 }
 
 // LeaderIDIn applies the In predicate on the "leader_id" field.
-func LeaderIDIn(vs ...uuid.UUID) predicate.Group {
+func LeaderIDIn(vs ...int64) predicate.Group {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -531,7 +531,7 @@ func LeaderIDIn(vs ...uuid.UUID) predicate.Group {
 }
 
 // LeaderIDNotIn applies the NotIn predicate on the "leader_id" field.
-func LeaderIDNotIn(vs ...uuid.UUID) predicate.Group {
+func LeaderIDNotIn(vs ...int64) predicate.Group {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -542,30 +542,58 @@ func LeaderIDNotIn(vs ...uuid.UUID) predicate.Group {
 }
 
 // LeaderIDGT applies the GT predicate on the "leader_id" field.
-func LeaderIDGT(v uuid.UUID) predicate.Group {
+func LeaderIDGT(v int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldLeaderID), v))
 	})
 }
 
 // LeaderIDGTE applies the GTE predicate on the "leader_id" field.
-func LeaderIDGTE(v uuid.UUID) predicate.Group {
+func LeaderIDGTE(v int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldLeaderID), v))
 	})
 }
 
 // LeaderIDLT applies the LT predicate on the "leader_id" field.
-func LeaderIDLT(v uuid.UUID) predicate.Group {
+func LeaderIDLT(v int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldLeaderID), v))
 	})
 }
 
 // LeaderIDLTE applies the LTE predicate on the "leader_id" field.
-func LeaderIDLTE(v uuid.UUID) predicate.Group {
+func LeaderIDLTE(v int64) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldLeaderID), v))
+	})
+}
+
+// HasMembers applies the HasEdge predicate on the "members" edge.
+func HasMembers() predicate.Group {
+	return predicate.Group(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MembersTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, MembersTable, MembersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMembersWith applies the HasEdge predicate on the "members" edge with a given conditions (other predicates).
+func HasMembersWith(preds ...predicate.Member) predicate.Group {
+	return predicate.Group(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MembersInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, MembersTable, MembersColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

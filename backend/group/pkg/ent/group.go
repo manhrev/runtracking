@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
 )
 
@@ -16,7 +15,7 @@ import (
 type Group struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
@@ -26,7 +25,28 @@ type Group struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// LeaderID holds the value of the "leader_id" field.
-	LeaderID uuid.UUID `json:"leader_id,omitempty"`
+	LeaderID int64 `json:"leader_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the GroupQuery when eager-loading is set.
+	Edges GroupEdges `json:"edges"`
+}
+
+// GroupEdges holds the relations/edges for other nodes in the graph.
+type GroupEdges struct {
+	// Members holds the value of the members edge.
+	Members []*Member `json:"members,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// MembersOrErr returns the Members value or an error if the edge
+// was not loaded in eager-loading.
+func (e GroupEdges) MembersOrErr() ([]*Member, error) {
+	if e.loadedTypes[0] {
+		return e.Members, nil
+	}
+	return nil, &NotLoadedError{edge: "members"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -34,12 +54,12 @@ func (*Group) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case group.FieldID, group.FieldLeaderID:
+			values[i] = new(sql.NullInt64)
 		case group.FieldName, group.FieldDescription, group.FieldBackgroundPicture:
 			values[i] = new(sql.NullString)
 		case group.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case group.FieldID, group.FieldLeaderID:
-			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Group", columns[i])
 		}
@@ -56,11 +76,11 @@ func (gr *Group) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case group.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				gr.ID = *value
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			gr.ID = int64(value.Int64)
 		case group.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -86,14 +106,19 @@ func (gr *Group) assignValues(columns []string, values []any) error {
 				gr.CreatedAt = value.Time
 			}
 		case group.FieldLeaderID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field leader_id", values[i])
-			} else if value != nil {
-				gr.LeaderID = *value
+			} else if value.Valid {
+				gr.LeaderID = value.Int64
 			}
 		}
 	}
 	return nil
+}
+
+// QueryMembers queries the "members" edge of the Group entity.
+func (gr *Group) QueryMembers() *MemberQuery {
+	return (&GroupClient{config: gr.config}).QueryMembers(gr)
 }
 
 // Update returns a builder for updating this Group.

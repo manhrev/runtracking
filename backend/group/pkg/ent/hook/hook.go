@@ -9,6 +9,45 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 )
 
+// The ChallengeFunc type is an adapter to allow the use of ordinary
+// function as Challenge mutator.
+type ChallengeFunc func(context.Context, *ent.ChallengeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChallengeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ChallengeMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ChallengeMemberFunc type is an adapter to allow the use of ordinary
+// function as ChallengeMember mutator.
+type ChallengeMemberFunc func(context.Context, *ent.ChallengeMemberMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChallengeMemberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ChallengeMemberMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMemberMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ChallengeMemberRuleFunc type is an adapter to allow the use of ordinary
+// function as ChallengeMemberRule mutator.
+type ChallengeMemberRuleFunc func(context.Context, *ent.ChallengeMemberRuleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChallengeMemberRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ChallengeMemberRuleMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMemberRuleMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The GroupFunc type is an adapter to allow the use of ordinary
 // function as Group mutator.
 type GroupFunc func(context.Context, *ent.GroupMutation) (ent.Value, error)
@@ -18,6 +57,19 @@ func (f GroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	mv, ok := m.(*ent.GroupMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The MemberFunc type is an adapter to allow the use of ordinary
+// function as Member mutator.
+type MemberFunc func(context.Context, *ent.MemberMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MemberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.MemberMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MemberMutation", m)
 	}
 	return f(ctx, mv)
 }

@@ -3,9 +3,8 @@ package schema
 import (
 	"time"
 
-	"github.com/google/uuid"
-
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -16,8 +15,8 @@ type Group struct {
 // Fields of the Agent
 func (Group) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+		field.Int64("id").
+			Unique(),
 		field.String("name").
 			Optional(),
 		field.String("description").
@@ -26,7 +25,12 @@ func (Group) Fields() []ent.Field {
 			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
 		field.Time("created_at").
 			Default(time.Now),
-		field.UUID("leader_id", uuid.UUID{}).
-			Default(uuid.New),
+		field.Int64("leader_id"),
+	}
+}
+
+func (Group) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("members", Member.Type),
 	}
 }

@@ -12,8 +12,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Challenge is the client for interacting with the Challenge builders.
+	Challenge *ChallengeClient
+	// ChallengeMember is the client for interacting with the ChallengeMember builders.
+	ChallengeMember *ChallengeMemberClient
+	// ChallengeMemberRule is the client for interacting with the ChallengeMemberRule builders.
+	ChallengeMemberRule *ChallengeMemberRuleClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// Member is the client for interacting with the Member builders.
+	Member *MemberClient
 
 	// lazily loaded.
 	client     *Client
@@ -145,7 +153,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Challenge = NewChallengeClient(tx.config)
+	tx.ChallengeMember = NewChallengeMemberClient(tx.config)
+	tx.ChallengeMemberRule = NewChallengeMemberRuleClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
+	tx.Member = NewMemberClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -155,7 +167,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Group.QueryXXX(), the query will be executed
+// applies a query, for example: Challenge.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
