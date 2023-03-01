@@ -7,6 +7,8 @@ import {
     CreatePlanReply,
     UpdatePlanRequest,
     UpdatePlanReply,
+    DeletePlansRequest,
+    DeletePlansReply,
 } from "../../../lib/plan/plan_pb";
 
 import { GRPCClientConfig } from "../abstract/types";
@@ -53,6 +55,17 @@ class rpcPlanClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<UpdatePlanReply.AsObject>(
       "updatePlan",
+      req
+    );
+  }
+
+  async deletePlans(deletePlanObj: DeletePlansRequest.AsObject) {
+    const req = new DeletePlansRequest();
+
+    req.setIdsList(deletePlanObj.idsList);
+
+    return await this.gRPCClientRequest<DeletePlansReply.AsObject>(
+      "deletePlans",
       req
     );
   }

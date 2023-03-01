@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { CreatePlanRequest, ListPlanRequest, UpdatePlanRequest} from "../../../lib/plan/plan_pb";
+import { CreatePlanRequest, ListPlanRequest, UpdatePlanRequest, DeletePlansRequest} from "../../../lib/plan/plan_pb";
 import { planClient } from "../../../utils/grpc";
 
 export const listPlanThunk = createAsyncThunk(
@@ -23,6 +23,17 @@ export const updatePlanThunk = createAsyncThunk(
       return {
           ...res,
           updateData: param,
+      }
+  }
+);
+
+export const deletePlansThunk = createAsyncThunk(
+  "plan/deletePlans",
+  async (param: DeletePlansRequest.AsObject) => {
+      const res = await planClient.deletePlans(param);
+      return {
+          ...res,
+          deleteData: param,
       }
   }
 );

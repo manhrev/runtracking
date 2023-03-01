@@ -57,8 +57,6 @@ export default function Plan({
     return (
         <>
             <View style={styles(theme).container}>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                
                     <Button mode="text" onPress={() => navigation.navigate("PlanAdd")} style={styles(theme).addPlanBtn} labelStyle={{fontSize: 16}}>
                         ADD NEW PLAN
                     </Button>
@@ -79,7 +77,7 @@ export default function Plan({
                         }
                         ]}
                     />
-
+                <ScrollView showsVerticalScrollIndicator={false}>
                     {planList.map((item, index) => (
                         ((item.status === RuleStatus.RULE_STATUS_INPROGRESS && tabState === "current") || (item.status !== RuleStatus.RULE_STATUS_INPROGRESS && tabState === "history")) ? 
                             <List.Item
