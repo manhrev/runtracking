@@ -32,7 +32,8 @@ message ActivityInfo {
     int64 id = 11;
     ActivityType type = 1;
     double total_distance = 2; // meters
-    float kcal = 3; // kcal
+    float kcal = 3; /gateway
+    / kcal
     google.protobuf.Timestamp start_time = 4;
     google.protobuf.Timestamp end_time = 6;
     uint64 duration = 7; // seconds

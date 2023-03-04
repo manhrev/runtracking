@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb"
@@ -30,18 +31,27 @@ type NotificationTransfer struct {
 	NotificationType int    `json:"notification_type"`
 }
 
+var (
+	gcp_cloud_task_host string = os.Getenv("GCP_CLOUD_TASK_HOST")
+	gcp_cloud_task_port string = os.Getenv("GCP_CLOUD_TASK_PORT")
+
+	gcp_cloud_task_project_id  string = os.Getenv("GCP_CLOUD_TASK_PROJECT_ID")
+	gcp_cloud_task_location_id string = os.Getenv("GCP_CLOUD_TASK_LOCATION_ID")
+	gcp_cloud_task_queue_id    string = os.Getenv("GCP_CLOUD_TASK_QUEUE_ID")
+)
+
 func NewCloudTask() CloudTask {
 	return &cloudTask{
-		projectID:  "daring-acumen-370401",
-		locationID: "asia-southeast2",
-		queueID:    "test-queue1",
+		projectID:  gcp_cloud_task_project_id,
+		locationID: gcp_cloud_task_location_id,
+		queueID:    gcp_cloud_task_queue_id,
 	}
 }
 
 func (task *cloudTask) CreateHTTPTask(url string, message NotificationTransfer, scheduledTime *timestamppb.Timestamp) (*taskspb.Task, error) {
 	ctx := context.Background()
 	// client, err := cloudtasks.NewClient(ctx, option.WithCredentialsFile("daring-acumen-370401-ddf8f283029a.json"))
-	conn, _ := grpc.Dial("gcloud-tasks-emulator:8123", grpc.WithInsecure())
+	conn, _ := grpc.Dial(fmt.Sprintf("%s:%s", gcp_cloud_task_host, gcp_cloud_task_port), grpc.WithInsecure())
 	clientOpt := option.WithGRPCConn(conn)
 	client, err := cloudtasks.NewClient(context.Background(), clientOpt)
 

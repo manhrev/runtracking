@@ -24,6 +24,19 @@ services:
     depends_on:
       - auth_db
       - redis
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: auth_db
+      DB_PORT: 3306
+      DB_NAME: auth
+      NOTIFICATION_SERVICE: notification
+      NOTIFICATION_PORT: 8080
+      CACHE_HOST: redis
+      CACHE_PORT: 6379
+      CACHE_PASSWORD: ""
+      CACHE_DB: 0
 
   group:
     build:
@@ -35,7 +48,15 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - group_db
-
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: group_db
+      DB_PORT: 3306
+      DB_NAME: group
+    
+  
   activity:
     build:
       context: backend/activity
@@ -66,6 +87,21 @@ services:
       - notification_db
     ports:
       - 8000:8000
+    environment:
+      LISTEN_PORT: 8080
+      LISTEN_HTTP_PORT: 8000
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: notification_db
+      DB_PORT: 3306
+      DB_NAME: notification
+      AUTH_SERVICE: auth
+      AUTH_PORT: 8080
+      GCP_CLOUD_TASK_HOST: gcloud-tasks-emulator
+      GCP_CLOUD_TASK_PORT: 8123
+      GCP_CLOUD_TASK_PROJECT_ID: daring-acumen-370401
+      GCP_CLOUD_TASK_LOCATION_ID: asia-southeast2
+      GCP_CLOUD_TASK_QUEUE_ID: test-queue1
 
   plan:
     build:

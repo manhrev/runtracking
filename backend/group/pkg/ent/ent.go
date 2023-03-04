@@ -10,7 +10,11 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -31,7 +35,11 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		group.Table: group.ValidColumn,
+		challenge.Table:           challenge.ValidColumn,
+		challengemember.Table:     challengemember.ValidColumn,
+		challengememberrule.Table: challengememberrule.ValidColumn,
+		groupz.Table:              groupz.ValidColumn,
+		member.Table:              member.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {
