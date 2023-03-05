@@ -8,26 +8,141 @@ import (
 )
 
 var (
-	// GroupsColumns holds the columns for the "groups" table.
-	GroupsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
+	// ChallengesColumns holds the columns for the "challenges" table.
+	ChallengesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "start_time", Type: field.TypeTime, Nullable: true},
+		{Name: "end_time", Type: field.TypeTime, Nullable: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "type_id", Type: field.TypeInt64},
+		{Name: "groupz_challenges", Type: field.TypeInt64, Nullable: true},
+	}
+	// ChallengesTable holds the schema information for the "challenges" table.
+	ChallengesTable = &schema.Table{
+		Name:       "challenges",
+		Columns:    ChallengesColumns,
+		PrimaryKey: []*schema.Column{ChallengesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "challenges_groupzs_challenges",
+				Columns:    []*schema.Column{ChallengesColumns[6]},
+				RefColumns: []*schema.Column{GroupzsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ChallengeMembersColumns holds the columns for the "challenge_members" table.
+	ChallengeMembersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "member_id", Type: field.TypeInt64},
+		{Name: "challenge_challenge_members", Type: field.TypeInt64, Nullable: true},
+	}
+	// ChallengeMembersTable holds the schema information for the "challenge_members" table.
+	ChallengeMembersTable = &schema.Table{
+		Name:       "challenge_members",
+		Columns:    ChallengeMembersColumns,
+		PrimaryKey: []*schema.Column{ChallengeMembersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "challenge_members_challenges_challenge_members",
+				Columns:    []*schema.Column{ChallengeMembersColumns[2]},
+				RefColumns: []*schema.Column{ChallengesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "challengemember_member_id_challenge_challenge_members",
+				Unique:  true,
+				Columns: []*schema.Column{ChallengeMembersColumns[1], ChallengeMembersColumns[2]},
+			},
+		},
+	}
+	// ChallengeMemberRulesColumns holds the columns for the "challenge_member_rules" table.
+	ChallengeMemberRulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "total", Type: field.TypeInt64, Nullable: true},
+		{Name: "rule_id", Type: field.TypeInt64},
+		{Name: "challenge_member_challenge_member_rules", Type: field.TypeInt64, Nullable: true},
+	}
+	// ChallengeMemberRulesTable holds the schema information for the "challenge_member_rules" table.
+	ChallengeMemberRulesTable = &schema.Table{
+		Name:       "challenge_member_rules",
+		Columns:    ChallengeMemberRulesColumns,
+		PrimaryKey: []*schema.Column{ChallengeMemberRulesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "challenge_member_rules_challenge_members_challenge_member_rules",
+				Columns:    []*schema.Column{ChallengeMemberRulesColumns[3]},
+				RefColumns: []*schema.Column{ChallengeMembersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "challengememberrule_rule_id_challenge_member_challenge_member_rules",
+				Unique:  true,
+				Columns: []*schema.Column{ChallengeMemberRulesColumns[2], ChallengeMemberRulesColumns[3]},
+			},
+		},
+	}
+	// GroupzsColumns holds the columns for the "groupzs" table.
+	GroupzsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "background_picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "leader_id", Type: field.TypeUUID},
+		{Name: "leader_id", Type: field.TypeInt64},
 	}
-	// GroupsTable holds the schema information for the "groups" table.
-	GroupsTable = &schema.Table{
-		Name:       "groups",
-		Columns:    GroupsColumns,
-		PrimaryKey: []*schema.Column{GroupsColumns[0]},
+	// GroupzsTable holds the schema information for the "groupzs" table.
+	GroupzsTable = &schema.Table{
+		Name:       "groupzs",
+		Columns:    GroupzsColumns,
+		PrimaryKey: []*schema.Column{GroupzsColumns[0]},
+	}
+	// MembersColumns holds the columns for the "members" table.
+	MembersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt64},
+		{Name: "groupz_members", Type: field.TypeInt64, Nullable: true},
+	}
+	// MembersTable holds the schema information for the "members" table.
+	MembersTable = &schema.Table{
+		Name:       "members",
+		Columns:    MembersColumns,
+		PrimaryKey: []*schema.Column{MembersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "members_groupzs_members",
+				Columns:    []*schema.Column{MembersColumns[3]},
+				RefColumns: []*schema.Column{GroupzsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "member_user_id_groupz_members",
+				Unique:  true,
+				Columns: []*schema.Column{MembersColumns[2], MembersColumns[3]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		GroupsTable,
+		ChallengesTable,
+		ChallengeMembersTable,
+		ChallengeMemberRulesTable,
+		GroupzsTable,
+		MembersTable,
 	}
 )
 
 func init() {
+	ChallengesTable.ForeignKeys[0].RefTable = GroupzsTable
+	ChallengeMembersTable.ForeignKeys[0].RefTable = ChallengesTable
+	ChallengeMemberRulesTable.ForeignKeys[0].RefTable = ChallengeMembersTable
+	MembersTable.ForeignKeys[0].RefTable = GroupzsTable
 }

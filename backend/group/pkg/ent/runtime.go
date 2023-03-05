@@ -5,8 +5,9 @@ package ent
 import (
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/schema"
 )
 
@@ -14,22 +15,26 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	groupFields := schema.Group{}.Fields()
-	_ = groupFields
-	// groupDescBackgroundPicture is the schema descriptor for background_picture field.
-	groupDescBackgroundPicture := groupFields[3].Descriptor()
-	// group.DefaultBackgroundPicture holds the default value on creation for the background_picture field.
-	group.DefaultBackgroundPicture = groupDescBackgroundPicture.Default.(string)
-	// groupDescCreatedAt is the schema descriptor for created_at field.
-	groupDescCreatedAt := groupFields[4].Descriptor()
-	// group.DefaultCreatedAt holds the default value on creation for the created_at field.
-	group.DefaultCreatedAt = groupDescCreatedAt.Default.(func() time.Time)
-	// groupDescLeaderID is the schema descriptor for leader_id field.
-	groupDescLeaderID := groupFields[5].Descriptor()
-	// group.DefaultLeaderID holds the default value on creation for the leader_id field.
-	group.DefaultLeaderID = groupDescLeaderID.Default.(func() uuid.UUID)
-	// groupDescID is the schema descriptor for id field.
-	groupDescID := groupFields[0].Descriptor()
-	// group.DefaultID holds the default value on creation for the id field.
-	group.DefaultID = groupDescID.Default.(func() uuid.UUID)
+	challengeFields := schema.Challenge{}.Fields()
+	_ = challengeFields
+	// challengeDescCreatedAt is the schema descriptor for created_at field.
+	challengeDescCreatedAt := challengeFields[1].Descriptor()
+	// challenge.DefaultCreatedAt holds the default value on creation for the created_at field.
+	challenge.DefaultCreatedAt = challengeDescCreatedAt.Default.(func() time.Time)
+	groupzFields := schema.Groupz{}.Fields()
+	_ = groupzFields
+	// groupzDescBackgroundPicture is the schema descriptor for background_picture field.
+	groupzDescBackgroundPicture := groupzFields[3].Descriptor()
+	// groupz.DefaultBackgroundPicture holds the default value on creation for the background_picture field.
+	groupz.DefaultBackgroundPicture = groupzDescBackgroundPicture.Default.(string)
+	// groupzDescCreatedAt is the schema descriptor for created_at field.
+	groupzDescCreatedAt := groupzFields[4].Descriptor()
+	// groupz.DefaultCreatedAt holds the default value on creation for the created_at field.
+	groupz.DefaultCreatedAt = groupzDescCreatedAt.Default.(func() time.Time)
+	memberFields := schema.Member{}.Fields()
+	_ = memberFields
+	// memberDescCreatedAt is the schema descriptor for created_at field.
+	memberDescCreatedAt := memberFields[1].Descriptor()
+	// member.DefaultCreatedAt holds the default value on creation for the created_at field.
+	member.DefaultCreatedAt = memberDescCreatedAt.Default.(func() time.Time)
 }
