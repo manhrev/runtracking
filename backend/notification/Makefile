@@ -22,7 +22,7 @@ generate-ts:
 generate-ent:
 	mkdir -p ./pkg/ent
 	cp -R ./schema ./pkg/ent/schema
-	go run -mod=mod entgo.io/ent/cmd/ent generate ./pkg/ent/schema --feature sql/versioned-migration
+	go run -mod=mod entgo.io/ent/cmd/ent generate ./pkg/ent/schema --feature sql/modifier
 # rm -r ./pkg/ent/schema
 
 migrate: 

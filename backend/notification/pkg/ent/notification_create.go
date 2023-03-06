@@ -34,31 +34,37 @@ func (nc *NotificationCreate) SetNillableMessage(s *string) *NotificationCreate 
 	return nc
 }
 
-// SetType sets the "type" field.
-func (nc *NotificationCreate) SetType(i int64) *NotificationCreate {
-	nc.mutation.SetType(i)
+// SetSourceType sets the "source_type" field.
+func (nc *NotificationCreate) SetSourceType(i int64) *NotificationCreate {
+	nc.mutation.SetSourceType(i)
 	return nc
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (nc *NotificationCreate) SetNillableType(i *int64) *NotificationCreate {
+// SetNillableSourceType sets the "source_type" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableSourceType(i *int64) *NotificationCreate {
 	if i != nil {
-		nc.SetType(*i)
+		nc.SetSourceType(*i)
 	}
 	return nc
 }
 
-// SetReceivedID sets the "received_id" field.
-func (nc *NotificationCreate) SetReceivedID(i int64) *NotificationCreate {
-	nc.mutation.SetReceivedID(i)
+// SetSourceID sets the "source_id" field.
+func (nc *NotificationCreate) SetSourceID(i int64) *NotificationCreate {
+	nc.mutation.SetSourceID(i)
 	return nc
 }
 
-// SetNillableReceivedID sets the "received_id" field if the given value is not nil.
-func (nc *NotificationCreate) SetNillableReceivedID(i *int64) *NotificationCreate {
+// SetNillableSourceID sets the "source_id" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableSourceID(i *int64) *NotificationCreate {
 	if i != nil {
-		nc.SetReceivedID(*i)
+		nc.SetSourceID(*i)
 	}
+	return nc
+}
+
+// SetReceiveIds sets the "receive_ids" field.
+func (nc *NotificationCreate) SetReceiveIds(i []int64) *NotificationCreate {
+	nc.mutation.SetReceiveIds(i)
 	return nc
 }
 
@@ -173,13 +179,17 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec.SetField(notification.FieldMessage, field.TypeString, value)
 		_node.Message = value
 	}
-	if value, ok := nc.mutation.GetType(); ok {
-		_spec.SetField(notification.FieldType, field.TypeInt64, value)
-		_node.Type = value
+	if value, ok := nc.mutation.SourceType(); ok {
+		_spec.SetField(notification.FieldSourceType, field.TypeInt64, value)
+		_node.SourceType = value
 	}
-	if value, ok := nc.mutation.ReceivedID(); ok {
-		_spec.SetField(notification.FieldReceivedID, field.TypeInt64, value)
-		_node.ReceivedID = value
+	if value, ok := nc.mutation.SourceID(); ok {
+		_spec.SetField(notification.FieldSourceID, field.TypeInt64, value)
+		_node.SourceID = value
+	}
+	if value, ok := nc.mutation.ReceiveIds(); ok {
+		_spec.SetField(notification.FieldReceiveIds, field.TypeJSON, value)
+		_node.ReceiveIds = value
 	}
 	if value, ok := nc.mutation.ScheduledTime(); ok {
 		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
