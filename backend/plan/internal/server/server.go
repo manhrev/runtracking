@@ -8,11 +8,13 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/internal/server/plan"
 	"github.com/manhrev/runtracking/backend/plan/internal/server/plani"
 	pb "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/pkg/ent"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -23,6 +25,10 @@ var (
 	db_name      string = os.Getenv("DB_NAME")
 
 	listen_port string = os.Getenv("LISTEN_PORT")
+
+	//notificationi service
+	notificationi_domain string = os.Getenv("NOTIFICATIONI_DOMAIN")
+	notificationi_port   string = os.Getenv("NOTIFICATIONI_PORT")
 )
 
 func Run() {
@@ -50,9 +56,15 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
+	notificationIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", notificationi_domain, notificationi_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("error while create connect to sample service: %v", err)
+	}
+	notificationiClient := notification.NewNotificationIClient(notificationIConn)
+
 	// register main and other server servers
 	pb.RegisterPlanServer(server, plan.NewServer(entClient))
-	pb.RegisterPlanIServer(server, plani.NewServer(entClient))
+	pb.RegisterPlanIServer(server, plani.NewServer(entClient, notificationiClient))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {

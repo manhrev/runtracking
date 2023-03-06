@@ -129,6 +129,13 @@ func StartTime(v time.Time) predicate.Activity {
 	})
 }
 
+// Duration applies equality check predicate on the "duration" field. It's identical to DurationEQ.
+func Duration(v uint64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDuration), v))
+	})
+}
+
 // EndTime applies equality check predicate on the "end_time" field. It's identical to EndTimeEQ.
 func EndTime(v time.Time) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
@@ -136,10 +143,24 @@ func EndTime(v time.Time) predicate.Activity {
 	})
 }
 
-// Duration applies equality check predicate on the "duration" field. It's identical to DurationEQ.
-func Duration(v uint64) predicate.Activity {
+// PlanID applies equality check predicate on the "plan_id" field. It's identical to PlanIDEQ.
+func PlanID(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
+		s.Where(sql.EQ(s.C(FieldPlanID), v))
+	})
+}
+
+// ChallengeID applies equality check predicate on the "challenge_id" field. It's identical to ChallengeIDEQ.
+func ChallengeID(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldChallengeID), v))
+	})
+}
+
+// EventID applies equality check predicate on the "event_id" field. It's identical to EventIDEQ.
+func EventID(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEventID), v))
 	})
 }
 
@@ -668,6 +689,70 @@ func StartTimeLTE(v time.Time) predicate.Activity {
 	})
 }
 
+// DurationEQ applies the EQ predicate on the "duration" field.
+func DurationEQ(v uint64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDuration), v))
+	})
+}
+
+// DurationNEQ applies the NEQ predicate on the "duration" field.
+func DurationNEQ(v uint64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldDuration), v))
+	})
+}
+
+// DurationIn applies the In predicate on the "duration" field.
+func DurationIn(vs ...uint64) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldDuration), v...))
+	})
+}
+
+// DurationNotIn applies the NotIn predicate on the "duration" field.
+func DurationNotIn(vs ...uint64) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldDuration), v...))
+	})
+}
+
+// DurationGT applies the GT predicate on the "duration" field.
+func DurationGT(v uint64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldDuration), v))
+	})
+}
+
+// DurationGTE applies the GTE predicate on the "duration" field.
+func DurationGTE(v uint64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldDuration), v))
+	})
+}
+
+// DurationLT applies the LT predicate on the "duration" field.
+func DurationLT(v uint64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldDuration), v))
+	})
+}
+
+// DurationLTE applies the LTE predicate on the "duration" field.
+func DurationLTE(v uint64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldDuration), v))
+	})
+}
+
 // EndTimeEQ applies the EQ predicate on the "end_time" field.
 func EndTimeEQ(v time.Time) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
@@ -732,67 +817,237 @@ func EndTimeLTE(v time.Time) predicate.Activity {
 	})
 }
 
-// DurationEQ applies the EQ predicate on the "duration" field.
-func DurationEQ(v uint64) predicate.Activity {
+// PlanIDEQ applies the EQ predicate on the "plan_id" field.
+func PlanIDEQ(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
+		s.Where(sql.EQ(s.C(FieldPlanID), v))
 	})
 }
 
-// DurationNEQ applies the NEQ predicate on the "duration" field.
-func DurationNEQ(v uint64) predicate.Activity {
+// PlanIDNEQ applies the NEQ predicate on the "plan_id" field.
+func PlanIDNEQ(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDuration), v))
+		s.Where(sql.NEQ(s.C(FieldPlanID), v))
 	})
 }
 
-// DurationIn applies the In predicate on the "duration" field.
-func DurationIn(vs ...uint64) predicate.Activity {
+// PlanIDIn applies the In predicate on the "plan_id" field.
+func PlanIDIn(vs ...int64) predicate.Activity {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldDuration), v...))
+		s.Where(sql.In(s.C(FieldPlanID), v...))
 	})
 }
 
-// DurationNotIn applies the NotIn predicate on the "duration" field.
-func DurationNotIn(vs ...uint64) predicate.Activity {
+// PlanIDNotIn applies the NotIn predicate on the "plan_id" field.
+func PlanIDNotIn(vs ...int64) predicate.Activity {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldDuration), v...))
+		s.Where(sql.NotIn(s.C(FieldPlanID), v...))
 	})
 }
 
-// DurationGT applies the GT predicate on the "duration" field.
-func DurationGT(v uint64) predicate.Activity {
+// PlanIDGT applies the GT predicate on the "plan_id" field.
+func PlanIDGT(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDuration), v))
+		s.Where(sql.GT(s.C(FieldPlanID), v))
 	})
 }
 
-// DurationGTE applies the GTE predicate on the "duration" field.
-func DurationGTE(v uint64) predicate.Activity {
+// PlanIDGTE applies the GTE predicate on the "plan_id" field.
+func PlanIDGTE(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDuration), v))
+		s.Where(sql.GTE(s.C(FieldPlanID), v))
 	})
 }
 
-// DurationLT applies the LT predicate on the "duration" field.
-func DurationLT(v uint64) predicate.Activity {
+// PlanIDLT applies the LT predicate on the "plan_id" field.
+func PlanIDLT(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDuration), v))
+		s.Where(sql.LT(s.C(FieldPlanID), v))
 	})
 }
 
-// DurationLTE applies the LTE predicate on the "duration" field.
-func DurationLTE(v uint64) predicate.Activity {
+// PlanIDLTE applies the LTE predicate on the "plan_id" field.
+func PlanIDLTE(v int64) predicate.Activity {
 	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDuration), v))
+		s.Where(sql.LTE(s.C(FieldPlanID), v))
+	})
+}
+
+// PlanIDIsNil applies the IsNil predicate on the "plan_id" field.
+func PlanIDIsNil() predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPlanID)))
+	})
+}
+
+// PlanIDNotNil applies the NotNil predicate on the "plan_id" field.
+func PlanIDNotNil() predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPlanID)))
+	})
+}
+
+// ChallengeIDEQ applies the EQ predicate on the "challenge_id" field.
+func ChallengeIDEQ(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldChallengeID), v))
+	})
+}
+
+// ChallengeIDNEQ applies the NEQ predicate on the "challenge_id" field.
+func ChallengeIDNEQ(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldChallengeID), v))
+	})
+}
+
+// ChallengeIDIn applies the In predicate on the "challenge_id" field.
+func ChallengeIDIn(vs ...int64) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldChallengeID), v...))
+	})
+}
+
+// ChallengeIDNotIn applies the NotIn predicate on the "challenge_id" field.
+func ChallengeIDNotIn(vs ...int64) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldChallengeID), v...))
+	})
+}
+
+// ChallengeIDGT applies the GT predicate on the "challenge_id" field.
+func ChallengeIDGT(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldChallengeID), v))
+	})
+}
+
+// ChallengeIDGTE applies the GTE predicate on the "challenge_id" field.
+func ChallengeIDGTE(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldChallengeID), v))
+	})
+}
+
+// ChallengeIDLT applies the LT predicate on the "challenge_id" field.
+func ChallengeIDLT(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldChallengeID), v))
+	})
+}
+
+// ChallengeIDLTE applies the LTE predicate on the "challenge_id" field.
+func ChallengeIDLTE(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldChallengeID), v))
+	})
+}
+
+// ChallengeIDIsNil applies the IsNil predicate on the "challenge_id" field.
+func ChallengeIDIsNil() predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldChallengeID)))
+	})
+}
+
+// ChallengeIDNotNil applies the NotNil predicate on the "challenge_id" field.
+func ChallengeIDNotNil() predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldChallengeID)))
+	})
+}
+
+// EventIDEQ applies the EQ predicate on the "event_id" field.
+func EventIDEQ(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEventID), v))
+	})
+}
+
+// EventIDNEQ applies the NEQ predicate on the "event_id" field.
+func EventIDNEQ(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldEventID), v))
+	})
+}
+
+// EventIDIn applies the In predicate on the "event_id" field.
+func EventIDIn(vs ...int64) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldEventID), v...))
+	})
+}
+
+// EventIDNotIn applies the NotIn predicate on the "event_id" field.
+func EventIDNotIn(vs ...int64) predicate.Activity {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldEventID), v...))
+	})
+}
+
+// EventIDGT applies the GT predicate on the "event_id" field.
+func EventIDGT(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldEventID), v))
+	})
+}
+
+// EventIDGTE applies the GTE predicate on the "event_id" field.
+func EventIDGTE(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldEventID), v))
+	})
+}
+
+// EventIDLT applies the LT predicate on the "event_id" field.
+func EventIDLT(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldEventID), v))
+	})
+}
+
+// EventIDLTE applies the LTE predicate on the "event_id" field.
+func EventIDLTE(v int64) predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldEventID), v))
+	})
+}
+
+// EventIDIsNil applies the IsNil predicate on the "event_id" field.
+func EventIDIsNil() predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldEventID)))
+	})
+}
+
+// EventIDNotNil applies the NotNil predicate on the "event_id" field.
+func EventIDNotNil() predicate.Activity {
+	return predicate.Activity(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldEventID)))
 	})
 }
 

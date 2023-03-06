@@ -33,12 +33,18 @@ type Activity struct {
 	Kcal float32 `json:"kcal,omitempty"`
 	// StartTime holds the value of the "start_time" field.
 	StartTime time.Time `json:"start_time,omitempty"`
-	// EndTime holds the value of the "end_time" field.
-	EndTime time.Time `json:"end_time,omitempty"`
 	// Duration holds the value of the "duration" field.
 	Duration uint64 `json:"duration,omitempty"`
+	// EndTime holds the value of the "end_time" field.
+	EndTime time.Time `json:"end_time,omitempty"`
 	// Route holds the value of the "route" field.
 	Route []*activity.TrackPoint `json:"route,omitempty"`
+	// PlanID holds the value of the "plan_id" field.
+	PlanID int64 `json:"plan_id,omitempty"`
+	// ChallengeID holds the value of the "challenge_id" field.
+	ChallengeID int64 `json:"challenge_id,omitempty"`
+	// EventID holds the value of the "event_id" field.
+	EventID int64 `json:"event_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
@@ -52,7 +58,7 @@ func (*Activity) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case entactivity.FieldTotalDistance, entactivity.FieldKcal:
 			values[i] = new(sql.NullFloat64)
-		case entactivity.FieldID, entactivity.FieldUserID, entactivity.FieldType, entactivity.FieldDuration:
+		case entactivity.FieldID, entactivity.FieldUserID, entactivity.FieldType, entactivity.FieldDuration, entactivity.FieldPlanID, entactivity.FieldChallengeID, entactivity.FieldEventID:
 			values[i] = new(sql.NullInt64)
 		case entactivity.FieldActivityName, entactivity.FieldActivityNote:
 			values[i] = new(sql.NullString)
@@ -121,17 +127,17 @@ func (a *Activity) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.StartTime = value.Time
 			}
-		case entactivity.FieldEndTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field end_time", values[i])
-			} else if value.Valid {
-				a.EndTime = value.Time
-			}
 		case entactivity.FieldDuration:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field duration", values[i])
 			} else if value.Valid {
 				a.Duration = uint64(value.Int64)
+			}
+		case entactivity.FieldEndTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field end_time", values[i])
+			} else if value.Valid {
+				a.EndTime = value.Time
 			}
 		case entactivity.FieldRoute:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -140,6 +146,24 @@ func (a *Activity) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &a.Route); err != nil {
 					return fmt.Errorf("unmarshal field route: %w", err)
 				}
+			}
+		case entactivity.FieldPlanID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field plan_id", values[i])
+			} else if value.Valid {
+				a.PlanID = value.Int64
+			}
+		case entactivity.FieldChallengeID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field challenge_id", values[i])
+			} else if value.Valid {
+				a.ChallengeID = value.Int64
+			}
+		case entactivity.FieldEventID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field event_id", values[i])
+			} else if value.Valid {
+				a.EventID = value.Int64
 			}
 		case entactivity.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -196,14 +220,23 @@ func (a *Activity) String() string {
 	builder.WriteString("start_time=")
 	builder.WriteString(a.StartTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("end_time=")
-	builder.WriteString(a.EndTime.Format(time.ANSIC))
-	builder.WriteString(", ")
 	builder.WriteString("duration=")
 	builder.WriteString(fmt.Sprintf("%v", a.Duration))
 	builder.WriteString(", ")
+	builder.WriteString("end_time=")
+	builder.WriteString(a.EndTime.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("route=")
 	builder.WriteString(fmt.Sprintf("%v", a.Route))
+	builder.WriteString(", ")
+	builder.WriteString("plan_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.PlanID))
+	builder.WriteString(", ")
+	builder.WriteString("challenge_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.ChallengeID))
+	builder.WriteString(", ")
+	builder.WriteString("event_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.EventID))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(a.CreatedAt.Format(time.ANSIC))

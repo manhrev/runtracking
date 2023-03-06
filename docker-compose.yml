@@ -73,6 +73,8 @@ services:
       DB_HOST: activity_db
       DB_PORT: 3306
       DB_NAME: activity
+      PLANI_DOMAIN: plan
+      PLANI_PORT: 8080
 
   notification:
     build:
@@ -121,6 +123,8 @@ services:
       DB_HOST: plan_db
       DB_PORT: 3306
       DB_NAME: plan
+      NOTIFICATIONI_DOMAIN: notification
+      NOTIFICATIONI_PORT: 8080
 
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest

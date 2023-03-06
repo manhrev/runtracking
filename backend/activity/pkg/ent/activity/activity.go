@@ -25,12 +25,18 @@ const (
 	FieldKcal = "kcal"
 	// FieldStartTime holds the string denoting the start_time field in the database.
 	FieldStartTime = "start_time"
-	// FieldEndTime holds the string denoting the end_time field in the database.
-	FieldEndTime = "end_time"
 	// FieldDuration holds the string denoting the duration field in the database.
 	FieldDuration = "duration"
+	// FieldEndTime holds the string denoting the end_time field in the database.
+	FieldEndTime = "end_time"
 	// FieldRoute holds the string denoting the route field in the database.
 	FieldRoute = "route"
+	// FieldPlanID holds the string denoting the plan_id field in the database.
+	FieldPlanID = "plan_id"
+	// FieldChallengeID holds the string denoting the challenge_id field in the database.
+	FieldChallengeID = "challenge_id"
+	// FieldEventID holds the string denoting the event_id field in the database.
+	FieldEventID = "event_id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// Table holds the table name of the activity in the database.
@@ -47,9 +53,12 @@ var Columns = []string{
 	FieldTotalDistance,
 	FieldKcal,
 	FieldStartTime,
-	FieldEndTime,
 	FieldDuration,
+	FieldEndTime,
 	FieldRoute,
+	FieldPlanID,
+	FieldChallengeID,
+	FieldEventID,
 	FieldCreatedAt,
 }
 
