@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"testing"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/plan/pkg/ent"
@@ -11,20 +12,21 @@ import (
 
 const (
 	_driver = "mysql"
-	_url    = "root:password@1@tcp(localhost:33308)/plan?charset=utf8&parseTime=true"
+	_url    = "root:password@1@tcp(localhost:33310)/plan?charset=utf8&parseTime=true"
 )
 
-func Test_List(t *testing.T) {
+func Test_CheckDaily(t *testing.T) {
 	entClient, err := ent.Open(_driver, _url)
 	if err != nil {
 		log.Fatalf("error creating connection to database%v", err.Error())
 	}
 	var (
-		_ = context.Background()
-		_ = entClient
+		ctx    = context.Background()
+		client = entClient
 	)
 
-	// 	planRepo := New(client)
+	planRepo := New(client, nil)
+	planRepo.CheckProgressDaily(ctx, time.Now().AddDate(0, 0, 5))
 	// 	records, total, err := planRepo.List(
 	// 		ctx,
 	// 		3,

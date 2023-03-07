@@ -9,7 +9,7 @@ import (
 
 func NewServer(entClient *ent.Client, notificationIClient notification.NotificationIClient) plani.PlanIServer {
 	return &planIServer{
-		repository:          repository.New(entClient),
+		repository:          repository.New(entClient, notificationIClient),
 		notificationIClient: notificationIClient,
 	}
 }

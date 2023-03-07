@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/internal/status"
 	plan_pb "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/pkg/ent"
@@ -60,15 +61,18 @@ type Plan interface {
 		value_increment int64,
 		timestamp *timestamppb.Timestamp,
 	) (int64, string, error)
+	CheckProgressDaily(ctx context.Context, timeCheck time.Time) error
 }
 
 type planImpl struct {
-	entClient *ent.Client
+	entClient           *ent.Client
+	notificationIClient notification.NotificationIClient
 }
 
-func New(entClient *ent.Client) Plan {
+func New(entClient *ent.Client, notificationIClient notification.NotificationIClient) Plan {
 	return &planImpl{
-		entClient: entClient,
+		entClient:           entClient,
+		notificationIClient: notificationIClient,
 	}
 }
 
@@ -374,4 +378,21 @@ func (p *planImpl) UpdateProgress(
 	}
 
 	return userId, pushNotifyMessage, nil
+}
+
+// timeCheck to specify exact time to check plan expired (23h59)
+func (p *planImpl) CheckProgressDaily(ctx context.Context, timeCheck time.Time) error {
+	// get all unfinished plans
+	planlist, err := p.entClient.Plan.Query().
+		Where(plan.StatusEQ(int64(plan_pb.RuleStatus_RULE_STATUS_INPROGRESS))).
+		All(ctx)
+	if err != nil {
+		log.Printf("Error while query plan to check progress daily: %v", err)
+		return status.Internal(err.Error())
+	}
+
+	for _, planInfo := range planlist {
+		_ = checkIfPlanExpired(ctx, p.entClient, planInfo, p.notificationIClient, timeCheck)
+	}
+	return nil
 }
