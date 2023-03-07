@@ -43,6 +43,17 @@ type Activity interface {
 		groupBy activitypb.GetActivityStatisticRequest_GroupBy,
 		tz uint32,
 	) ([]*ActivityStatisticData, error)
+	GetById(
+		ctx context.Context,
+		userId int64,
+		activityId int64,
+	) (*ent.Activity, error)
+	SetCommit( // set commit state for activity
+		ctx context.Context,
+		activityId int64,
+		commitType activitypb.CommitType,
+		targetId int64, // challenge id or plan id or ... id
+	) error
 }
 
 type activityImpl struct {
@@ -76,6 +87,24 @@ func (m *activityImpl) Create(ctx context.Context, userId int64, activityInfo *a
 	return newActivity, nil
 }
 
+func (m *activityImpl) GetById(
+	ctx context.Context,
+	userId int64,
+	activityId int64,
+) (*ent.Activity, error) {
+	activity, err := m.entClient.Activity.Query().Where(
+		activity.UserIDEQ(userId),
+		activity.IDEQ(activityId),
+	).Only(ctx)
+
+	if err != nil {
+		log.Printf("Error while getting activity by id: %v", err)
+		return nil, status.Internal(err.Error())
+	}
+
+	return activity, nil
+}
+
 func (m *activityImpl) List(
 	ctx context.Context,
 	userId int64,
@@ -102,8 +131,10 @@ func (m *activityImpl) List(
 
 	// sort by type
 	switch sortBy {
-	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_DURATION:
+	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_END_TIME:
 		byField = activity.FieldEndTime
+	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_DURATION:
+		byField = activity.FieldDuration
 	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_ENERGY:
 		byField = activity.FieldKcal
 	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_TOTAL_DISTANCE:
@@ -168,6 +199,29 @@ func (m *activityImpl) Delete(ctx context.Context, userId int64, activityIdList 
 
 	if deletedCount == 0 {
 		return status.Internal("no records were deleted")
+	}
+
+	return nil
+}
+
+func (m *activityImpl) SetCommit(
+	ctx context.Context,
+	activityId int64,
+	commitType activitypb.CommitType,
+	targetId int64,
+) error {
+	query := m.entClient.Activity.UpdateOneID(activityId)
+	switch commitType {
+	case activitypb.CommitType_COMMIT_TYPE_CHALLENGE:
+		query.SetChallengeID(targetId)
+	case activitypb.CommitType_COMMIT_TYPE_PLAN:
+		query.SetPlanID(targetId)
+	case activitypb.CommitType_COMMIT_TYPE_EVENT:
+		query.SetEventID(targetId)
+	}
+	_, err := query.Save(ctx)
+	if err != nil {
+		log.Printf("Error while SetCommit: %v", err)
 	}
 
 	return nil

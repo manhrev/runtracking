@@ -6,7 +6,8 @@ require (
 	entgo.io/ent v0.11.8
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/manhrev/runtracking/backend/activity v0.0.0-20230222093014-ee7e6e66a0e5
-	github.com/manhrev/runtracking/backend/auth v0.0.0-20221203014235-23c074a45158
+	github.com/manhrev/runtracking/backend/auth v0.0.0-20230214155215-7210dd6427ff
+	github.com/manhrev/runtracking/backend/notification v0.0.0-20230304110622-ca4cf0ae879f
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
 )

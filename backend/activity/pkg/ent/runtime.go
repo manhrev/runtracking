@@ -20,7 +20,7 @@ func init() {
 	// entactivity.DefaultType holds the default value on creation for the type field.
 	entactivity.DefaultType = entactivityDescType.Default.(uint32)
 	// entactivityDescCreatedAt is the schema descriptor for created_at field.
-	entactivityDescCreatedAt := entactivityFields[11].Descriptor()
+	entactivityDescCreatedAt := entactivityFields[14].Descriptor()
 	// entactivity.DefaultCreatedAt holds the default value on creation for the created_at field.
 	entactivity.DefaultCreatedAt = entactivityDescCreatedAt.Default.(time.Time)
 }

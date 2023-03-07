@@ -8,7 +8,7 @@ import (
 
 func NewServer(entClient *ent.Client) plan.PlanServer {
 	return &planServer{
-		repository: repository.New(entClient),
+		repository: repository.New(entClient, nil),
 	}
 }
 

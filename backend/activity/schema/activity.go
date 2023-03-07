@@ -26,6 +26,9 @@ func (Activity) Fields() []ent.Field {
 		field.Uint64("duration"),
 		field.Time("end_time"),
 		field.JSON("route", []*activity.TrackPoint{}),
+		field.Int64("plan_id").Optional(),
+		field.Int64("challenge_id").Optional(),
+		field.Int64("event_id").Optional(),
 		field.Time("created_at").Default(time.Now()),
 	}
 }

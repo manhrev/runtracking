@@ -11,6 +11,8 @@ service Activity {
     rpc ListActivityInfo(ListActivityInfoRequest) returns (ListActivityInfoReply);
     rpc DeleteActivityInfo(DeleteActivityInfoRequest) returns (DeleteActivityInfoReply);
     rpc GetActivityStatistic(GetActivityStatisticRequest) returns (GetActivityStatisticReply);
+
+    rpc CommitActivity(CommitActivityRequest) returns (CommitActivityReply);
 }
 
 enum ActivityType {
@@ -32,8 +34,7 @@ message ActivityInfo {
     int64 id = 11;
     ActivityType type = 1;
     double total_distance = 2; // meters
-    float kcal = 3; /gateway
-    / kcal
+    float kcal = 3; // kcal
     google.protobuf.Timestamp start_time = 4;
     google.protobuf.Timestamp end_time = 6;
     uint64 duration = 7; // seconds
@@ -103,4 +104,22 @@ message ActivityStatisticData {
     uint64 total_distance = 2; // meters
     uint64 total_duration = 3; // seconds
     uint32 number_of_activities = 4;
+}
+
+enum CommitType {
+    COMMIT_TYPE_UNSPECIFIED = 0;
+    COMMIT_TYPE_PLAN = 1; // personal plan
+    COMMIT_TYPE_CHALLENGE = 2; // group challenge
+    COMMIT_TYPE_EVENT = 3; // event between group
+}
+
+message CommitActivityRequest {
+    int64 activity_id = 1;
+    int64 commit_id = 2;
+    CommitType commit_type = 3;
+    uint32 rule = 4; //rule for commit type: challenge, event or plan, view plan, group,.. api for detail 
+    // when call plani or other internal api to commit, convert rule to their RuleType
+}
+
+message CommitActivityReply {
 }

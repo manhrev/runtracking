@@ -72,21 +72,63 @@ func (ac *ActivityCreate) SetStartTime(t time.Time) *ActivityCreate {
 	return ac
 }
 
-// SetEndTime sets the "end_time" field.
-func (ac *ActivityCreate) SetEndTime(t time.Time) *ActivityCreate {
-	ac.mutation.SetEndTime(t)
-	return ac
-}
-
 // SetDuration sets the "duration" field.
 func (ac *ActivityCreate) SetDuration(u uint64) *ActivityCreate {
 	ac.mutation.SetDuration(u)
 	return ac
 }
 
+// SetEndTime sets the "end_time" field.
+func (ac *ActivityCreate) SetEndTime(t time.Time) *ActivityCreate {
+	ac.mutation.SetEndTime(t)
+	return ac
+}
+
 // SetRoute sets the "route" field.
 func (ac *ActivityCreate) SetRoute(ap []*activity.TrackPoint) *ActivityCreate {
 	ac.mutation.SetRoute(ap)
+	return ac
+}
+
+// SetPlanID sets the "plan_id" field.
+func (ac *ActivityCreate) SetPlanID(i int64) *ActivityCreate {
+	ac.mutation.SetPlanID(i)
+	return ac
+}
+
+// SetNillablePlanID sets the "plan_id" field if the given value is not nil.
+func (ac *ActivityCreate) SetNillablePlanID(i *int64) *ActivityCreate {
+	if i != nil {
+		ac.SetPlanID(*i)
+	}
+	return ac
+}
+
+// SetChallengeID sets the "challenge_id" field.
+func (ac *ActivityCreate) SetChallengeID(i int64) *ActivityCreate {
+	ac.mutation.SetChallengeID(i)
+	return ac
+}
+
+// SetNillableChallengeID sets the "challenge_id" field if the given value is not nil.
+func (ac *ActivityCreate) SetNillableChallengeID(i *int64) *ActivityCreate {
+	if i != nil {
+		ac.SetChallengeID(*i)
+	}
+	return ac
+}
+
+// SetEventID sets the "event_id" field.
+func (ac *ActivityCreate) SetEventID(i int64) *ActivityCreate {
+	ac.mutation.SetEventID(i)
+	return ac
+}
+
+// SetNillableEventID sets the "event_id" field if the given value is not nil.
+func (ac *ActivityCreate) SetNillableEventID(i *int64) *ActivityCreate {
+	if i != nil {
+		ac.SetEventID(*i)
+	}
 	return ac
 }
 
@@ -220,11 +262,11 @@ func (ac *ActivityCreate) check() error {
 	if _, ok := ac.mutation.StartTime(); !ok {
 		return &ValidationError{Name: "start_time", err: errors.New(`ent: missing required field "Activity.start_time"`)}
 	}
-	if _, ok := ac.mutation.EndTime(); !ok {
-		return &ValidationError{Name: "end_time", err: errors.New(`ent: missing required field "Activity.end_time"`)}
-	}
 	if _, ok := ac.mutation.Duration(); !ok {
 		return &ValidationError{Name: "duration", err: errors.New(`ent: missing required field "Activity.duration"`)}
+	}
+	if _, ok := ac.mutation.EndTime(); !ok {
+		return &ValidationError{Name: "end_time", err: errors.New(`ent: missing required field "Activity.end_time"`)}
 	}
 	if _, ok := ac.mutation.Route(); !ok {
 		return &ValidationError{Name: "route", err: errors.New(`ent: missing required field "Activity.route"`)}
@@ -293,17 +335,29 @@ func (ac *ActivityCreate) createSpec() (*Activity, *sqlgraph.CreateSpec) {
 		_spec.SetField(entactivity.FieldStartTime, field.TypeTime, value)
 		_node.StartTime = value
 	}
-	if value, ok := ac.mutation.EndTime(); ok {
-		_spec.SetField(entactivity.FieldEndTime, field.TypeTime, value)
-		_node.EndTime = value
-	}
 	if value, ok := ac.mutation.Duration(); ok {
 		_spec.SetField(entactivity.FieldDuration, field.TypeUint64, value)
 		_node.Duration = value
 	}
+	if value, ok := ac.mutation.EndTime(); ok {
+		_spec.SetField(entactivity.FieldEndTime, field.TypeTime, value)
+		_node.EndTime = value
+	}
 	if value, ok := ac.mutation.Route(); ok {
 		_spec.SetField(entactivity.FieldRoute, field.TypeJSON, value)
 		_node.Route = value
+	}
+	if value, ok := ac.mutation.PlanID(); ok {
+		_spec.SetField(entactivity.FieldPlanID, field.TypeInt64, value)
+		_node.PlanID = value
+	}
+	if value, ok := ac.mutation.ChallengeID(); ok {
+		_spec.SetField(entactivity.FieldChallengeID, field.TypeInt64, value)
+		_node.ChallengeID = value
+	}
+	if value, ok := ac.mutation.EventID(); ok {
+		_spec.SetField(entactivity.FieldEventID, field.TypeInt64, value)
+		_node.EventID = value
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(entactivity.FieldCreatedAt, field.TypeTime, value)

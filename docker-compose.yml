@@ -15,7 +15,7 @@ services:
   auth:
     build:
       context: backend/auth
-      dockerfile: build/Dockerfile
+      dockerfile: Dockerfile
     container_name: auth
     volumes:
       - ./backend/auth:/app
@@ -41,7 +41,7 @@ services:
   group:
     build:
       context: backend/group
-      dockerfile: build/Dockerfile
+      dockerfile: Dockerfile
     container_name: group
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
@@ -55,12 +55,11 @@ services:
       DB_HOST: group_db
       DB_PORT: 3306
       DB_NAME: group
-    
-  
+
   activity:
     build:
       context: backend/activity
-      dockerfile: build/Dockerfile
+      dockerfile: Dockerfile
     container_name: activity
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
@@ -74,11 +73,13 @@ services:
       DB_HOST: activity_db
       DB_PORT: 3306
       DB_NAME: activity
+      PLANI_DOMAIN: plan
+      PLANI_PORT: 8080
 
   notification:
     build:
       context: backend/notification
-      dockerfile: build/Dockerfile
+      dockerfile: Dockerfile
     container_name: notification
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
@@ -106,7 +107,7 @@ services:
   plan:
     build:
       context: backend/plan
-      dockerfile: build/Dockerfile
+      dockerfile: Dockerfile
     container_name: plan
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
@@ -122,6 +123,8 @@ services:
       DB_HOST: plan_db
       DB_PORT: 3306
       DB_NAME: plan
+      NOTIFICATIONI_DOMAIN: notification
+      NOTIFICATIONI_PORT: 8080
 
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest
