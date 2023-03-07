@@ -110,12 +110,6 @@ func (au *ActivityUpdate) SetStartTime(t time.Time) *ActivityUpdate {
 	return au
 }
 
-// SetEndTime sets the "end_time" field.
-func (au *ActivityUpdate) SetEndTime(t time.Time) *ActivityUpdate {
-	au.mutation.SetEndTime(t)
-	return au
-}
-
 // SetDuration sets the "duration" field.
 func (au *ActivityUpdate) SetDuration(u uint64) *ActivityUpdate {
 	au.mutation.ResetDuration()
@@ -129,6 +123,12 @@ func (au *ActivityUpdate) AddDuration(u int64) *ActivityUpdate {
 	return au
 }
 
+// SetEndTime sets the "end_time" field.
+func (au *ActivityUpdate) SetEndTime(t time.Time) *ActivityUpdate {
+	au.mutation.SetEndTime(t)
+	return au
+}
+
 // SetRoute sets the "route" field.
 func (au *ActivityUpdate) SetRoute(ap []*activity.TrackPoint) *ActivityUpdate {
 	au.mutation.SetRoute(ap)
@@ -138,6 +138,87 @@ func (au *ActivityUpdate) SetRoute(ap []*activity.TrackPoint) *ActivityUpdate {
 // AppendRoute appends ap to the "route" field.
 func (au *ActivityUpdate) AppendRoute(ap []*activity.TrackPoint) *ActivityUpdate {
 	au.mutation.AppendRoute(ap)
+	return au
+}
+
+// SetPlanID sets the "plan_id" field.
+func (au *ActivityUpdate) SetPlanID(i int64) *ActivityUpdate {
+	au.mutation.ResetPlanID()
+	au.mutation.SetPlanID(i)
+	return au
+}
+
+// SetNillablePlanID sets the "plan_id" field if the given value is not nil.
+func (au *ActivityUpdate) SetNillablePlanID(i *int64) *ActivityUpdate {
+	if i != nil {
+		au.SetPlanID(*i)
+	}
+	return au
+}
+
+// AddPlanID adds i to the "plan_id" field.
+func (au *ActivityUpdate) AddPlanID(i int64) *ActivityUpdate {
+	au.mutation.AddPlanID(i)
+	return au
+}
+
+// ClearPlanID clears the value of the "plan_id" field.
+func (au *ActivityUpdate) ClearPlanID() *ActivityUpdate {
+	au.mutation.ClearPlanID()
+	return au
+}
+
+// SetChallengeID sets the "challenge_id" field.
+func (au *ActivityUpdate) SetChallengeID(i int64) *ActivityUpdate {
+	au.mutation.ResetChallengeID()
+	au.mutation.SetChallengeID(i)
+	return au
+}
+
+// SetNillableChallengeID sets the "challenge_id" field if the given value is not nil.
+func (au *ActivityUpdate) SetNillableChallengeID(i *int64) *ActivityUpdate {
+	if i != nil {
+		au.SetChallengeID(*i)
+	}
+	return au
+}
+
+// AddChallengeID adds i to the "challenge_id" field.
+func (au *ActivityUpdate) AddChallengeID(i int64) *ActivityUpdate {
+	au.mutation.AddChallengeID(i)
+	return au
+}
+
+// ClearChallengeID clears the value of the "challenge_id" field.
+func (au *ActivityUpdate) ClearChallengeID() *ActivityUpdate {
+	au.mutation.ClearChallengeID()
+	return au
+}
+
+// SetEventID sets the "event_id" field.
+func (au *ActivityUpdate) SetEventID(i int64) *ActivityUpdate {
+	au.mutation.ResetEventID()
+	au.mutation.SetEventID(i)
+	return au
+}
+
+// SetNillableEventID sets the "event_id" field if the given value is not nil.
+func (au *ActivityUpdate) SetNillableEventID(i *int64) *ActivityUpdate {
+	if i != nil {
+		au.SetEventID(*i)
+	}
+	return au
+}
+
+// AddEventID adds i to the "event_id" field.
+func (au *ActivityUpdate) AddEventID(i int64) *ActivityUpdate {
+	au.mutation.AddEventID(i)
+	return au
+}
+
+// ClearEventID clears the value of the "event_id" field.
+func (au *ActivityUpdate) ClearEventID() *ActivityUpdate {
+	au.mutation.ClearEventID()
 	return au
 }
 
@@ -271,14 +352,14 @@ func (au *ActivityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.StartTime(); ok {
 		_spec.SetField(entactivity.FieldStartTime, field.TypeTime, value)
 	}
-	if value, ok := au.mutation.EndTime(); ok {
-		_spec.SetField(entactivity.FieldEndTime, field.TypeTime, value)
-	}
 	if value, ok := au.mutation.Duration(); ok {
 		_spec.SetField(entactivity.FieldDuration, field.TypeUint64, value)
 	}
 	if value, ok := au.mutation.AddedDuration(); ok {
 		_spec.AddField(entactivity.FieldDuration, field.TypeUint64, value)
+	}
+	if value, ok := au.mutation.EndTime(); ok {
+		_spec.SetField(entactivity.FieldEndTime, field.TypeTime, value)
 	}
 	if value, ok := au.mutation.Route(); ok {
 		_spec.SetField(entactivity.FieldRoute, field.TypeJSON, value)
@@ -287,6 +368,33 @@ func (au *ActivityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, entactivity.FieldRoute, value)
 		})
+	}
+	if value, ok := au.mutation.PlanID(); ok {
+		_spec.SetField(entactivity.FieldPlanID, field.TypeInt64, value)
+	}
+	if value, ok := au.mutation.AddedPlanID(); ok {
+		_spec.AddField(entactivity.FieldPlanID, field.TypeInt64, value)
+	}
+	if au.mutation.PlanIDCleared() {
+		_spec.ClearField(entactivity.FieldPlanID, field.TypeInt64)
+	}
+	if value, ok := au.mutation.ChallengeID(); ok {
+		_spec.SetField(entactivity.FieldChallengeID, field.TypeInt64, value)
+	}
+	if value, ok := au.mutation.AddedChallengeID(); ok {
+		_spec.AddField(entactivity.FieldChallengeID, field.TypeInt64, value)
+	}
+	if au.mutation.ChallengeIDCleared() {
+		_spec.ClearField(entactivity.FieldChallengeID, field.TypeInt64)
+	}
+	if value, ok := au.mutation.EventID(); ok {
+		_spec.SetField(entactivity.FieldEventID, field.TypeInt64, value)
+	}
+	if value, ok := au.mutation.AddedEventID(); ok {
+		_spec.AddField(entactivity.FieldEventID, field.TypeInt64, value)
+	}
+	if au.mutation.EventIDCleared() {
+		_spec.ClearField(entactivity.FieldEventID, field.TypeInt64)
 	}
 	if value, ok := au.mutation.CreatedAt(); ok {
 		_spec.SetField(entactivity.FieldCreatedAt, field.TypeTime, value)
@@ -390,12 +498,6 @@ func (auo *ActivityUpdateOne) SetStartTime(t time.Time) *ActivityUpdateOne {
 	return auo
 }
 
-// SetEndTime sets the "end_time" field.
-func (auo *ActivityUpdateOne) SetEndTime(t time.Time) *ActivityUpdateOne {
-	auo.mutation.SetEndTime(t)
-	return auo
-}
-
 // SetDuration sets the "duration" field.
 func (auo *ActivityUpdateOne) SetDuration(u uint64) *ActivityUpdateOne {
 	auo.mutation.ResetDuration()
@@ -409,6 +511,12 @@ func (auo *ActivityUpdateOne) AddDuration(u int64) *ActivityUpdateOne {
 	return auo
 }
 
+// SetEndTime sets the "end_time" field.
+func (auo *ActivityUpdateOne) SetEndTime(t time.Time) *ActivityUpdateOne {
+	auo.mutation.SetEndTime(t)
+	return auo
+}
+
 // SetRoute sets the "route" field.
 func (auo *ActivityUpdateOne) SetRoute(ap []*activity.TrackPoint) *ActivityUpdateOne {
 	auo.mutation.SetRoute(ap)
@@ -418,6 +526,87 @@ func (auo *ActivityUpdateOne) SetRoute(ap []*activity.TrackPoint) *ActivityUpdat
 // AppendRoute appends ap to the "route" field.
 func (auo *ActivityUpdateOne) AppendRoute(ap []*activity.TrackPoint) *ActivityUpdateOne {
 	auo.mutation.AppendRoute(ap)
+	return auo
+}
+
+// SetPlanID sets the "plan_id" field.
+func (auo *ActivityUpdateOne) SetPlanID(i int64) *ActivityUpdateOne {
+	auo.mutation.ResetPlanID()
+	auo.mutation.SetPlanID(i)
+	return auo
+}
+
+// SetNillablePlanID sets the "plan_id" field if the given value is not nil.
+func (auo *ActivityUpdateOne) SetNillablePlanID(i *int64) *ActivityUpdateOne {
+	if i != nil {
+		auo.SetPlanID(*i)
+	}
+	return auo
+}
+
+// AddPlanID adds i to the "plan_id" field.
+func (auo *ActivityUpdateOne) AddPlanID(i int64) *ActivityUpdateOne {
+	auo.mutation.AddPlanID(i)
+	return auo
+}
+
+// ClearPlanID clears the value of the "plan_id" field.
+func (auo *ActivityUpdateOne) ClearPlanID() *ActivityUpdateOne {
+	auo.mutation.ClearPlanID()
+	return auo
+}
+
+// SetChallengeID sets the "challenge_id" field.
+func (auo *ActivityUpdateOne) SetChallengeID(i int64) *ActivityUpdateOne {
+	auo.mutation.ResetChallengeID()
+	auo.mutation.SetChallengeID(i)
+	return auo
+}
+
+// SetNillableChallengeID sets the "challenge_id" field if the given value is not nil.
+func (auo *ActivityUpdateOne) SetNillableChallengeID(i *int64) *ActivityUpdateOne {
+	if i != nil {
+		auo.SetChallengeID(*i)
+	}
+	return auo
+}
+
+// AddChallengeID adds i to the "challenge_id" field.
+func (auo *ActivityUpdateOne) AddChallengeID(i int64) *ActivityUpdateOne {
+	auo.mutation.AddChallengeID(i)
+	return auo
+}
+
+// ClearChallengeID clears the value of the "challenge_id" field.
+func (auo *ActivityUpdateOne) ClearChallengeID() *ActivityUpdateOne {
+	auo.mutation.ClearChallengeID()
+	return auo
+}
+
+// SetEventID sets the "event_id" field.
+func (auo *ActivityUpdateOne) SetEventID(i int64) *ActivityUpdateOne {
+	auo.mutation.ResetEventID()
+	auo.mutation.SetEventID(i)
+	return auo
+}
+
+// SetNillableEventID sets the "event_id" field if the given value is not nil.
+func (auo *ActivityUpdateOne) SetNillableEventID(i *int64) *ActivityUpdateOne {
+	if i != nil {
+		auo.SetEventID(*i)
+	}
+	return auo
+}
+
+// AddEventID adds i to the "event_id" field.
+func (auo *ActivityUpdateOne) AddEventID(i int64) *ActivityUpdateOne {
+	auo.mutation.AddEventID(i)
+	return auo
+}
+
+// ClearEventID clears the value of the "event_id" field.
+func (auo *ActivityUpdateOne) ClearEventID() *ActivityUpdateOne {
+	auo.mutation.ClearEventID()
 	return auo
 }
 
@@ -581,14 +770,14 @@ func (auo *ActivityUpdateOne) sqlSave(ctx context.Context) (_node *Activity, err
 	if value, ok := auo.mutation.StartTime(); ok {
 		_spec.SetField(entactivity.FieldStartTime, field.TypeTime, value)
 	}
-	if value, ok := auo.mutation.EndTime(); ok {
-		_spec.SetField(entactivity.FieldEndTime, field.TypeTime, value)
-	}
 	if value, ok := auo.mutation.Duration(); ok {
 		_spec.SetField(entactivity.FieldDuration, field.TypeUint64, value)
 	}
 	if value, ok := auo.mutation.AddedDuration(); ok {
 		_spec.AddField(entactivity.FieldDuration, field.TypeUint64, value)
+	}
+	if value, ok := auo.mutation.EndTime(); ok {
+		_spec.SetField(entactivity.FieldEndTime, field.TypeTime, value)
 	}
 	if value, ok := auo.mutation.Route(); ok {
 		_spec.SetField(entactivity.FieldRoute, field.TypeJSON, value)
@@ -597,6 +786,33 @@ func (auo *ActivityUpdateOne) sqlSave(ctx context.Context) (_node *Activity, err
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, entactivity.FieldRoute, value)
 		})
+	}
+	if value, ok := auo.mutation.PlanID(); ok {
+		_spec.SetField(entactivity.FieldPlanID, field.TypeInt64, value)
+	}
+	if value, ok := auo.mutation.AddedPlanID(); ok {
+		_spec.AddField(entactivity.FieldPlanID, field.TypeInt64, value)
+	}
+	if auo.mutation.PlanIDCleared() {
+		_spec.ClearField(entactivity.FieldPlanID, field.TypeInt64)
+	}
+	if value, ok := auo.mutation.ChallengeID(); ok {
+		_spec.SetField(entactivity.FieldChallengeID, field.TypeInt64, value)
+	}
+	if value, ok := auo.mutation.AddedChallengeID(); ok {
+		_spec.AddField(entactivity.FieldChallengeID, field.TypeInt64, value)
+	}
+	if auo.mutation.ChallengeIDCleared() {
+		_spec.ClearField(entactivity.FieldChallengeID, field.TypeInt64)
+	}
+	if value, ok := auo.mutation.EventID(); ok {
+		_spec.SetField(entactivity.FieldEventID, field.TypeInt64, value)
+	}
+	if value, ok := auo.mutation.AddedEventID(); ok {
+		_spec.AddField(entactivity.FieldEventID, field.TypeInt64, value)
+	}
+	if auo.mutation.EventIDCleared() {
+		_spec.ClearField(entactivity.FieldEventID, field.TypeInt64)
 	}
 	if value, ok := auo.mutation.CreatedAt(); ok {
 		_spec.SetField(entactivity.FieldCreatedAt, field.TypeTime, value)

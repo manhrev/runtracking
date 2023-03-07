@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 
@@ -20,15 +21,18 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const (
-	db_user_name string = "root"
-	db_password  string = "password@1"
-	db_domain    string = "notification_db"
-	db_port      string = "3306"
-	db_name      string = "notification"
+var (
+	db_user_name string = os.Getenv("DB_USERNAME")
+	db_password  string = os.Getenv("DB_PASSWORD")
+	db_domain    string = os.Getenv("DB_HOST")
+	db_port      string = os.Getenv("DB_PORT")
+	db_name      string = os.Getenv("DB_NAME")
 
-	auth_service string = "auth"
-	auth_port    string = "8080"
+	auth_service string = os.Getenv("AUTH_SERVICE")
+	auth_port    string = os.Getenv("AUTH_PORT")
+
+	listen_port      string = os.Getenv("LISTEN_PORT")
+	listen_http_port string = os.Getenv("LISTEN_HTTP_PORT")
 )
 
 func Run() {
@@ -69,7 +73,7 @@ func Serve(server *grpc.Server) {
 	notificationi.RegisterRouteHttpServer(entClient, r, authClient, expoPushService)
 
 	go func() {
-		err = http.ListenAndServe(":8000", r)
+		err = http.ListenAndServe(fmt.Sprintf(":%s", listen_http_port), r)
 		if err != nil {
 			log.Fatalf("Failed to serve http server: %v", err)
 		}
@@ -78,7 +82,7 @@ func Serve(server *grpc.Server) {
 	// register main and other server servers
 	pb.RegisterNotificationServer(server, notification.NewServer(entClient))
 	pb.RegisterNotificationIServer(server, notificationi.NewServer(entClient))
-	lis, err := net.Listen("tcp", "0.0.0.0:8080")
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)
 	}

@@ -9,8 +9,8 @@ import { useAppDispatch } from "../../redux/store";
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
 import { notificationClient } from "../../utils/grpc";
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 import { ExpoPushTokenRequest } from "../../lib/notification/notification_pb";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,7 +24,7 @@ export default function Login({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const handleLogin = async () => {
-    const {response, error } = await dispatch(
+    const { response, error } = await dispatch(
       loginThunk({
         password,
         userName: username,
@@ -35,14 +35,15 @@ export default function Login({
       alert("Cannot login, please try again");
     } else {
       alert("Logged in!");
-      let expoPushToken = await registerForPushNotificationsAsync()
-      let req = new ExpoPushTokenRequest()
-      if(expoPushToken != undefined){
-        req.setExpoPushToken(expoPushToken)
-        await AsyncStorage.setItem(EXPO_PUSH_TOKEN, expoPushToken)
+      let expoPushToken = await registerForPushNotificationsAsync();
+      let req = new ExpoPushTokenRequest();
+      if (expoPushToken != undefined) {
+        req.setExpoPushToken(expoPushToken);
+        await AsyncStorage.setItem(EXPO_PUSH_TOKEN, expoPushToken);
       }
-      if(response != null && response.userId != undefined ) req.setUserId(response.userId)
-      await dispatch(
+      if (response != null && response.userId != undefined)
+        req.setUserId(response.userId);
+      const { error } = await dispatch(
         checkIfExistOrSaveExpoPushTokenThunk(req.toObject())
       ).unwrap();
     }
@@ -137,34 +138,35 @@ const styles = (theme: AppTheme) =>
       marginBottom: 10,
     },
   });
-  async function registerForPushNotificationsAsync() {
-    let token;
-  
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
-  
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
-    } else {
-      alert('Must use physical device for Push Notifications');
-    }
-  
-    return token;
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
   }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  return token;
+}

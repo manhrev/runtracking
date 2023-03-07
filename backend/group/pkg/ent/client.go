@@ -8,13 +8,17 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/google/uuid"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/migrate"
 
-	"github.com/manhrev/runtracking/backend/group/pkg/ent/group"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -22,8 +26,16 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Group is the client for interacting with the Group builders.
-	Group *GroupClient
+	// Challenge is the client for interacting with the Challenge builders.
+	Challenge *ChallengeClient
+	// ChallengeMember is the client for interacting with the ChallengeMember builders.
+	ChallengeMember *ChallengeMemberClient
+	// ChallengeMemberRule is the client for interacting with the ChallengeMemberRule builders.
+	ChallengeMemberRule *ChallengeMemberRuleClient
+	// Groupz is the client for interacting with the Groupz builders.
+	Groupz *GroupzClient
+	// Member is the client for interacting with the Member builders.
+	Member *MemberClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -37,7 +49,11 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Group = NewGroupClient(c.config)
+	c.Challenge = NewChallengeClient(c.config)
+	c.ChallengeMember = NewChallengeMemberClient(c.config)
+	c.ChallengeMemberRule = NewChallengeMemberRuleClient(c.config)
+	c.Groupz = NewGroupzClient(c.config)
+	c.Member = NewMemberClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -69,9 +85,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Group:  NewGroupClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		Challenge:           NewChallengeClient(cfg),
+		ChallengeMember:     NewChallengeMemberClient(cfg),
+		ChallengeMemberRule: NewChallengeMemberRuleClient(cfg),
+		Groupz:              NewGroupzClient(cfg),
+		Member:              NewMemberClient(cfg),
 	}, nil
 }
 
@@ -89,16 +109,20 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Group:  NewGroupClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		Challenge:           NewChallengeClient(cfg),
+		ChallengeMember:     NewChallengeMemberClient(cfg),
+		ChallengeMemberRule: NewChallengeMemberRuleClient(cfg),
+		Groupz:              NewGroupzClient(cfg),
+		Member:              NewMemberClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Group.
+//		Challenge.
 //		Query().
 //		Count(ctx)
 //
@@ -121,87 +145,91 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Group.Use(hooks...)
+	c.Challenge.Use(hooks...)
+	c.ChallengeMember.Use(hooks...)
+	c.ChallengeMemberRule.Use(hooks...)
+	c.Groupz.Use(hooks...)
+	c.Member.Use(hooks...)
 }
 
-// GroupClient is a client for the Group schema.
-type GroupClient struct {
+// ChallengeClient is a client for the Challenge schema.
+type ChallengeClient struct {
 	config
 }
 
-// NewGroupClient returns a client for the Group from the given config.
-func NewGroupClient(c config) *GroupClient {
-	return &GroupClient{config: c}
+// NewChallengeClient returns a client for the Challenge from the given config.
+func NewChallengeClient(c config) *ChallengeClient {
+	return &ChallengeClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `group.Hooks(f(g(h())))`.
-func (c *GroupClient) Use(hooks ...Hook) {
-	c.hooks.Group = append(c.hooks.Group, hooks...)
+// A call to `Use(f, g, h)` equals to `challenge.Hooks(f(g(h())))`.
+func (c *ChallengeClient) Use(hooks ...Hook) {
+	c.hooks.Challenge = append(c.hooks.Challenge, hooks...)
 }
 
-// Create returns a builder for creating a Group entity.
-func (c *GroupClient) Create() *GroupCreate {
-	mutation := newGroupMutation(c.config, OpCreate)
-	return &GroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Challenge entity.
+func (c *ChallengeClient) Create() *ChallengeCreate {
+	mutation := newChallengeMutation(c.config, OpCreate)
+	return &ChallengeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Group entities.
-func (c *GroupClient) CreateBulk(builders ...*GroupCreate) *GroupCreateBulk {
-	return &GroupCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Challenge entities.
+func (c *ChallengeClient) CreateBulk(builders ...*ChallengeCreate) *ChallengeCreateBulk {
+	return &ChallengeCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Group.
-func (c *GroupClient) Update() *GroupUpdate {
-	mutation := newGroupMutation(c.config, OpUpdate)
-	return &GroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Challenge.
+func (c *ChallengeClient) Update() *ChallengeUpdate {
+	mutation := newChallengeMutation(c.config, OpUpdate)
+	return &ChallengeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *GroupClient) UpdateOne(gr *Group) *GroupUpdateOne {
-	mutation := newGroupMutation(c.config, OpUpdateOne, withGroup(gr))
-	return &GroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ChallengeClient) UpdateOne(ch *Challenge) *ChallengeUpdateOne {
+	mutation := newChallengeMutation(c.config, OpUpdateOne, withChallenge(ch))
+	return &ChallengeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *GroupClient) UpdateOneID(id uuid.UUID) *GroupUpdateOne {
-	mutation := newGroupMutation(c.config, OpUpdateOne, withGroupID(id))
-	return &GroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ChallengeClient) UpdateOneID(id int64) *ChallengeUpdateOne {
+	mutation := newChallengeMutation(c.config, OpUpdateOne, withChallengeID(id))
+	return &ChallengeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Group.
-func (c *GroupClient) Delete() *GroupDelete {
-	mutation := newGroupMutation(c.config, OpDelete)
-	return &GroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Challenge.
+func (c *ChallengeClient) Delete() *ChallengeDelete {
+	mutation := newChallengeMutation(c.config, OpDelete)
+	return &ChallengeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *GroupClient) DeleteOne(gr *Group) *GroupDeleteOne {
-	return c.DeleteOneID(gr.ID)
+func (c *ChallengeClient) DeleteOne(ch *Challenge) *ChallengeDeleteOne {
+	return c.DeleteOneID(ch.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *GroupClient) DeleteOneID(id uuid.UUID) *GroupDeleteOne {
-	builder := c.Delete().Where(group.ID(id))
+func (c *ChallengeClient) DeleteOneID(id int64) *ChallengeDeleteOne {
+	builder := c.Delete().Where(challenge.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &GroupDeleteOne{builder}
+	return &ChallengeDeleteOne{builder}
 }
 
-// Query returns a query builder for Group.
-func (c *GroupClient) Query() *GroupQuery {
-	return &GroupQuery{
+// Query returns a query builder for Challenge.
+func (c *ChallengeClient) Query() *ChallengeQuery {
+	return &ChallengeQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a Group entity by its id.
-func (c *GroupClient) Get(ctx context.Context, id uuid.UUID) (*Group, error) {
-	return c.Query().Where(group.ID(id)).Only(ctx)
+// Get returns a Challenge entity by its id.
+func (c *ChallengeClient) Get(ctx context.Context, id int64) (*Challenge, error) {
+	return c.Query().Where(challenge.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *GroupClient) GetX(ctx context.Context, id uuid.UUID) *Group {
+func (c *ChallengeClient) GetX(ctx context.Context, id int64) *Challenge {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -209,7 +237,495 @@ func (c *GroupClient) GetX(ctx context.Context, id uuid.UUID) *Group {
 	return obj
 }
 
+// QueryChallengeMembers queries the challenge_members edge of a Challenge.
+func (c *ChallengeClient) QueryChallengeMembers(ch *Challenge) *ChallengeMemberQuery {
+	query := &ChallengeMemberQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, id),
+			sqlgraph.To(challengemember.Table, challengemember.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, challenge.ChallengeMembersTable, challenge.ChallengeMembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryGroupz queries the groupz edge of a Challenge.
+func (c *ChallengeClient) QueryGroupz(ch *Challenge) *GroupzQuery {
+	query := &GroupzQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, id),
+			sqlgraph.To(groupz.Table, groupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challenge.GroupzTable, challenge.GroupzColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
-func (c *GroupClient) Hooks() []Hook {
-	return c.hooks.Group
+func (c *ChallengeClient) Hooks() []Hook {
+	return c.hooks.Challenge
+}
+
+// ChallengeMemberClient is a client for the ChallengeMember schema.
+type ChallengeMemberClient struct {
+	config
+}
+
+// NewChallengeMemberClient returns a client for the ChallengeMember from the given config.
+func NewChallengeMemberClient(c config) *ChallengeMemberClient {
+	return &ChallengeMemberClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `challengemember.Hooks(f(g(h())))`.
+func (c *ChallengeMemberClient) Use(hooks ...Hook) {
+	c.hooks.ChallengeMember = append(c.hooks.ChallengeMember, hooks...)
+}
+
+// Create returns a builder for creating a ChallengeMember entity.
+func (c *ChallengeMemberClient) Create() *ChallengeMemberCreate {
+	mutation := newChallengeMemberMutation(c.config, OpCreate)
+	return &ChallengeMemberCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ChallengeMember entities.
+func (c *ChallengeMemberClient) CreateBulk(builders ...*ChallengeMemberCreate) *ChallengeMemberCreateBulk {
+	return &ChallengeMemberCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ChallengeMember.
+func (c *ChallengeMemberClient) Update() *ChallengeMemberUpdate {
+	mutation := newChallengeMemberMutation(c.config, OpUpdate)
+	return &ChallengeMemberUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ChallengeMemberClient) UpdateOne(cm *ChallengeMember) *ChallengeMemberUpdateOne {
+	mutation := newChallengeMemberMutation(c.config, OpUpdateOne, withChallengeMember(cm))
+	return &ChallengeMemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ChallengeMemberClient) UpdateOneID(id int64) *ChallengeMemberUpdateOne {
+	mutation := newChallengeMemberMutation(c.config, OpUpdateOne, withChallengeMemberID(id))
+	return &ChallengeMemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ChallengeMember.
+func (c *ChallengeMemberClient) Delete() *ChallengeMemberDelete {
+	mutation := newChallengeMemberMutation(c.config, OpDelete)
+	return &ChallengeMemberDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ChallengeMemberClient) DeleteOne(cm *ChallengeMember) *ChallengeMemberDeleteOne {
+	return c.DeleteOneID(cm.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ChallengeMemberClient) DeleteOneID(id int64) *ChallengeMemberDeleteOne {
+	builder := c.Delete().Where(challengemember.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ChallengeMemberDeleteOne{builder}
+}
+
+// Query returns a query builder for ChallengeMember.
+func (c *ChallengeMemberClient) Query() *ChallengeMemberQuery {
+	return &ChallengeMemberQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a ChallengeMember entity by its id.
+func (c *ChallengeMemberClient) Get(ctx context.Context, id int64) (*ChallengeMember, error) {
+	return c.Query().Where(challengemember.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ChallengeMemberClient) GetX(ctx context.Context, id int64) *ChallengeMember {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChallengeMemberRules queries the challenge_member_rules edge of a ChallengeMember.
+func (c *ChallengeMemberClient) QueryChallengeMemberRules(cm *ChallengeMember) *ChallengeMemberRuleQuery {
+	query := &ChallengeMemberRuleQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cm.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengemember.Table, challengemember.FieldID, id),
+			sqlgraph.To(challengememberrule.Table, challengememberrule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, challengemember.ChallengeMemberRulesTable, challengemember.ChallengeMemberRulesColumn),
+		)
+		fromV = sqlgraph.Neighbors(cm.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChallenge queries the challenge edge of a ChallengeMember.
+func (c *ChallengeMemberClient) QueryChallenge(cm *ChallengeMember) *ChallengeQuery {
+	query := &ChallengeQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cm.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengemember.Table, challengemember.FieldID, id),
+			sqlgraph.To(challenge.Table, challenge.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengemember.ChallengeTable, challengemember.ChallengeColumn),
+		)
+		fromV = sqlgraph.Neighbors(cm.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ChallengeMemberClient) Hooks() []Hook {
+	return c.hooks.ChallengeMember
+}
+
+// ChallengeMemberRuleClient is a client for the ChallengeMemberRule schema.
+type ChallengeMemberRuleClient struct {
+	config
+}
+
+// NewChallengeMemberRuleClient returns a client for the ChallengeMemberRule from the given config.
+func NewChallengeMemberRuleClient(c config) *ChallengeMemberRuleClient {
+	return &ChallengeMemberRuleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `challengememberrule.Hooks(f(g(h())))`.
+func (c *ChallengeMemberRuleClient) Use(hooks ...Hook) {
+	c.hooks.ChallengeMemberRule = append(c.hooks.ChallengeMemberRule, hooks...)
+}
+
+// Create returns a builder for creating a ChallengeMemberRule entity.
+func (c *ChallengeMemberRuleClient) Create() *ChallengeMemberRuleCreate {
+	mutation := newChallengeMemberRuleMutation(c.config, OpCreate)
+	return &ChallengeMemberRuleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ChallengeMemberRule entities.
+func (c *ChallengeMemberRuleClient) CreateBulk(builders ...*ChallengeMemberRuleCreate) *ChallengeMemberRuleCreateBulk {
+	return &ChallengeMemberRuleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ChallengeMemberRule.
+func (c *ChallengeMemberRuleClient) Update() *ChallengeMemberRuleUpdate {
+	mutation := newChallengeMemberRuleMutation(c.config, OpUpdate)
+	return &ChallengeMemberRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ChallengeMemberRuleClient) UpdateOne(cmr *ChallengeMemberRule) *ChallengeMemberRuleUpdateOne {
+	mutation := newChallengeMemberRuleMutation(c.config, OpUpdateOne, withChallengeMemberRule(cmr))
+	return &ChallengeMemberRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ChallengeMemberRuleClient) UpdateOneID(id int64) *ChallengeMemberRuleUpdateOne {
+	mutation := newChallengeMemberRuleMutation(c.config, OpUpdateOne, withChallengeMemberRuleID(id))
+	return &ChallengeMemberRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ChallengeMemberRule.
+func (c *ChallengeMemberRuleClient) Delete() *ChallengeMemberRuleDelete {
+	mutation := newChallengeMemberRuleMutation(c.config, OpDelete)
+	return &ChallengeMemberRuleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ChallengeMemberRuleClient) DeleteOne(cmr *ChallengeMemberRule) *ChallengeMemberRuleDeleteOne {
+	return c.DeleteOneID(cmr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ChallengeMemberRuleClient) DeleteOneID(id int64) *ChallengeMemberRuleDeleteOne {
+	builder := c.Delete().Where(challengememberrule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ChallengeMemberRuleDeleteOne{builder}
+}
+
+// Query returns a query builder for ChallengeMemberRule.
+func (c *ChallengeMemberRuleClient) Query() *ChallengeMemberRuleQuery {
+	return &ChallengeMemberRuleQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a ChallengeMemberRule entity by its id.
+func (c *ChallengeMemberRuleClient) Get(ctx context.Context, id int64) (*ChallengeMemberRule, error) {
+	return c.Query().Where(challengememberrule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ChallengeMemberRuleClient) GetX(ctx context.Context, id int64) *ChallengeMemberRule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChallengeMember queries the challenge_member edge of a ChallengeMemberRule.
+func (c *ChallengeMemberRuleClient) QueryChallengeMember(cmr *ChallengeMemberRule) *ChallengeMemberQuery {
+	query := &ChallengeMemberQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cmr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengememberrule.Table, challengememberrule.FieldID, id),
+			sqlgraph.To(challengemember.Table, challengemember.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengememberrule.ChallengeMemberTable, challengememberrule.ChallengeMemberColumn),
+		)
+		fromV = sqlgraph.Neighbors(cmr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ChallengeMemberRuleClient) Hooks() []Hook {
+	return c.hooks.ChallengeMemberRule
+}
+
+// GroupzClient is a client for the Groupz schema.
+type GroupzClient struct {
+	config
+}
+
+// NewGroupzClient returns a client for the Groupz from the given config.
+func NewGroupzClient(c config) *GroupzClient {
+	return &GroupzClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `groupz.Hooks(f(g(h())))`.
+func (c *GroupzClient) Use(hooks ...Hook) {
+	c.hooks.Groupz = append(c.hooks.Groupz, hooks...)
+}
+
+// Create returns a builder for creating a Groupz entity.
+func (c *GroupzClient) Create() *GroupzCreate {
+	mutation := newGroupzMutation(c.config, OpCreate)
+	return &GroupzCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Groupz entities.
+func (c *GroupzClient) CreateBulk(builders ...*GroupzCreate) *GroupzCreateBulk {
+	return &GroupzCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Groupz.
+func (c *GroupzClient) Update() *GroupzUpdate {
+	mutation := newGroupzMutation(c.config, OpUpdate)
+	return &GroupzUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *GroupzClient) UpdateOne(gr *Groupz) *GroupzUpdateOne {
+	mutation := newGroupzMutation(c.config, OpUpdateOne, withGroupz(gr))
+	return &GroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *GroupzClient) UpdateOneID(id int64) *GroupzUpdateOne {
+	mutation := newGroupzMutation(c.config, OpUpdateOne, withGroupzID(id))
+	return &GroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Groupz.
+func (c *GroupzClient) Delete() *GroupzDelete {
+	mutation := newGroupzMutation(c.config, OpDelete)
+	return &GroupzDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *GroupzClient) DeleteOne(gr *Groupz) *GroupzDeleteOne {
+	return c.DeleteOneID(gr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *GroupzClient) DeleteOneID(id int64) *GroupzDeleteOne {
+	builder := c.Delete().Where(groupz.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &GroupzDeleteOne{builder}
+}
+
+// Query returns a query builder for Groupz.
+func (c *GroupzClient) Query() *GroupzQuery {
+	return &GroupzQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Groupz entity by its id.
+func (c *GroupzClient) Get(ctx context.Context, id int64) (*Groupz, error) {
+	return c.Query().Where(groupz.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *GroupzClient) GetX(ctx context.Context, id int64) *Groupz {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMembers queries the members edge of a Groupz.
+func (c *GroupzClient) QueryMembers(gr *Groupz) *MemberQuery {
+	query := &MemberQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := gr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(groupz.Table, groupz.FieldID, id),
+			sqlgraph.To(member.Table, member.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, groupz.MembersTable, groupz.MembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(gr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChallenges queries the challenges edge of a Groupz.
+func (c *GroupzClient) QueryChallenges(gr *Groupz) *ChallengeQuery {
+	query := &ChallengeQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := gr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(groupz.Table, groupz.FieldID, id),
+			sqlgraph.To(challenge.Table, challenge.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, groupz.ChallengesTable, groupz.ChallengesColumn),
+		)
+		fromV = sqlgraph.Neighbors(gr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *GroupzClient) Hooks() []Hook {
+	return c.hooks.Groupz
+}
+
+// MemberClient is a client for the Member schema.
+type MemberClient struct {
+	config
+}
+
+// NewMemberClient returns a client for the Member from the given config.
+func NewMemberClient(c config) *MemberClient {
+	return &MemberClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `member.Hooks(f(g(h())))`.
+func (c *MemberClient) Use(hooks ...Hook) {
+	c.hooks.Member = append(c.hooks.Member, hooks...)
+}
+
+// Create returns a builder for creating a Member entity.
+func (c *MemberClient) Create() *MemberCreate {
+	mutation := newMemberMutation(c.config, OpCreate)
+	return &MemberCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Member entities.
+func (c *MemberClient) CreateBulk(builders ...*MemberCreate) *MemberCreateBulk {
+	return &MemberCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Member.
+func (c *MemberClient) Update() *MemberUpdate {
+	mutation := newMemberMutation(c.config, OpUpdate)
+	return &MemberUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MemberClient) UpdateOne(m *Member) *MemberUpdateOne {
+	mutation := newMemberMutation(c.config, OpUpdateOne, withMember(m))
+	return &MemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MemberClient) UpdateOneID(id int64) *MemberUpdateOne {
+	mutation := newMemberMutation(c.config, OpUpdateOne, withMemberID(id))
+	return &MemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Member.
+func (c *MemberClient) Delete() *MemberDelete {
+	mutation := newMemberMutation(c.config, OpDelete)
+	return &MemberDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MemberClient) DeleteOne(m *Member) *MemberDeleteOne {
+	return c.DeleteOneID(m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MemberClient) DeleteOneID(id int64) *MemberDeleteOne {
+	builder := c.Delete().Where(member.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MemberDeleteOne{builder}
+}
+
+// Query returns a query builder for Member.
+func (c *MemberClient) Query() *MemberQuery {
+	return &MemberQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Member entity by its id.
+func (c *MemberClient) Get(ctx context.Context, id int64) (*Member, error) {
+	return c.Query().Where(member.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MemberClient) GetX(ctx context.Context, id int64) *Member {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryGroupz queries the groupz edge of a Member.
+func (c *MemberClient) QueryGroupz(m *Member) *GroupzQuery {
+	query := &GroupzQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(member.Table, member.FieldID, id),
+			sqlgraph.To(groupz.Table, groupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, member.GroupzTable, member.GroupzColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MemberClient) Hooks() []Hook {
+	return c.hooks.Member
 }

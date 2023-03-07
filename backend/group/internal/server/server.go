@@ -3,10 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net"
-	"net/http"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/group/internal/server/group"
@@ -15,12 +14,14 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	db_user_name string = "root"
-	db_password  string = "password@1"
-	db_domain    string = "group_db"
-	db_port      string = "3306"
-	db_name      string = "group"
+var (
+	db_user_name string = os.Getenv("DB_USERNAME")
+	db_password  string = os.Getenv("DB_PASSWORD")
+	db_domain    string = os.Getenv("DB_HOST")
+	db_port      string = os.Getenv("DB_PORT")
+	db_name      string = os.Getenv("DB_NAME")
+
+	listen_port string = os.Getenv("LISTEN_PORT")
 )
 
 func Run() {
@@ -48,18 +49,10 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	http.HandleFunc("/group", getRoot)
-	go func() {
-		err = http.ListenAndServe(":8000", nil)
-		if err != nil {
-			log.Fatalf("Failed to serve http server: %v", err)
-		}
-	}()
-
 	// register main and other server servers
 	pb.RegisterGroupServer(server, group.NewServer(entClient))
 
-	lis, err := net.Listen("tcp", "0.0.0.0:8080")
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)
 	}
@@ -69,9 +62,4 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("Failed to serve: %v", err)
 	}
 
-}
-
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got / request\n")
-	io.WriteString(w, "This is my website for group test!\n")
 }

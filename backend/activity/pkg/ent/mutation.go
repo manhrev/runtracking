@@ -45,11 +45,17 @@ type ActivityMutation struct {
 	kcal              *float32
 	addkcal           *float32
 	start_time        *time.Time
-	end_time          *time.Time
 	duration          *uint64
 	addduration       *int64
+	end_time          *time.Time
 	route             *[]*activity.TrackPoint
 	appendroute       []*activity.TrackPoint
+	plan_id           *int64
+	addplan_id        *int64
+	challenge_id      *int64
+	addchallenge_id   *int64
+	event_id          *int64
+	addevent_id       *int64
 	created_at        *time.Time
 	clearedFields     map[string]struct{}
 	done              bool
@@ -493,42 +499,6 @@ func (m *ActivityMutation) ResetStartTime() {
 	m.start_time = nil
 }
 
-// SetEndTime sets the "end_time" field.
-func (m *ActivityMutation) SetEndTime(t time.Time) {
-	m.end_time = &t
-}
-
-// EndTime returns the value of the "end_time" field in the mutation.
-func (m *ActivityMutation) EndTime() (r time.Time, exists bool) {
-	v := m.end_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEndTime returns the old "end_time" field's value of the Activity entity.
-// If the Activity object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ActivityMutation) OldEndTime(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEndTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEndTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEndTime: %w", err)
-	}
-	return oldValue.EndTime, nil
-}
-
-// ResetEndTime resets all changes to the "end_time" field.
-func (m *ActivityMutation) ResetEndTime() {
-	m.end_time = nil
-}
-
 // SetDuration sets the "duration" field.
 func (m *ActivityMutation) SetDuration(u uint64) {
 	m.duration = &u
@@ -585,6 +555,42 @@ func (m *ActivityMutation) ResetDuration() {
 	m.addduration = nil
 }
 
+// SetEndTime sets the "end_time" field.
+func (m *ActivityMutation) SetEndTime(t time.Time) {
+	m.end_time = &t
+}
+
+// EndTime returns the value of the "end_time" field in the mutation.
+func (m *ActivityMutation) EndTime() (r time.Time, exists bool) {
+	v := m.end_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndTime returns the old "end_time" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldEndTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndTime: %w", err)
+	}
+	return oldValue.EndTime, nil
+}
+
+// ResetEndTime resets all changes to the "end_time" field.
+func (m *ActivityMutation) ResetEndTime() {
+	m.end_time = nil
+}
+
 // SetRoute sets the "route" field.
 func (m *ActivityMutation) SetRoute(ap []*activity.TrackPoint) {
 	m.route = &ap
@@ -634,6 +640,216 @@ func (m *ActivityMutation) AppendedRoute() ([]*activity.TrackPoint, bool) {
 func (m *ActivityMutation) ResetRoute() {
 	m.route = nil
 	m.appendroute = nil
+}
+
+// SetPlanID sets the "plan_id" field.
+func (m *ActivityMutation) SetPlanID(i int64) {
+	m.plan_id = &i
+	m.addplan_id = nil
+}
+
+// PlanID returns the value of the "plan_id" field in the mutation.
+func (m *ActivityMutation) PlanID() (r int64, exists bool) {
+	v := m.plan_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlanID returns the old "plan_id" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldPlanID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlanID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlanID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlanID: %w", err)
+	}
+	return oldValue.PlanID, nil
+}
+
+// AddPlanID adds i to the "plan_id" field.
+func (m *ActivityMutation) AddPlanID(i int64) {
+	if m.addplan_id != nil {
+		*m.addplan_id += i
+	} else {
+		m.addplan_id = &i
+	}
+}
+
+// AddedPlanID returns the value that was added to the "plan_id" field in this mutation.
+func (m *ActivityMutation) AddedPlanID() (r int64, exists bool) {
+	v := m.addplan_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearPlanID clears the value of the "plan_id" field.
+func (m *ActivityMutation) ClearPlanID() {
+	m.plan_id = nil
+	m.addplan_id = nil
+	m.clearedFields[entactivity.FieldPlanID] = struct{}{}
+}
+
+// PlanIDCleared returns if the "plan_id" field was cleared in this mutation.
+func (m *ActivityMutation) PlanIDCleared() bool {
+	_, ok := m.clearedFields[entactivity.FieldPlanID]
+	return ok
+}
+
+// ResetPlanID resets all changes to the "plan_id" field.
+func (m *ActivityMutation) ResetPlanID() {
+	m.plan_id = nil
+	m.addplan_id = nil
+	delete(m.clearedFields, entactivity.FieldPlanID)
+}
+
+// SetChallengeID sets the "challenge_id" field.
+func (m *ActivityMutation) SetChallengeID(i int64) {
+	m.challenge_id = &i
+	m.addchallenge_id = nil
+}
+
+// ChallengeID returns the value of the "challenge_id" field in the mutation.
+func (m *ActivityMutation) ChallengeID() (r int64, exists bool) {
+	v := m.challenge_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChallengeID returns the old "challenge_id" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldChallengeID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChallengeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChallengeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChallengeID: %w", err)
+	}
+	return oldValue.ChallengeID, nil
+}
+
+// AddChallengeID adds i to the "challenge_id" field.
+func (m *ActivityMutation) AddChallengeID(i int64) {
+	if m.addchallenge_id != nil {
+		*m.addchallenge_id += i
+	} else {
+		m.addchallenge_id = &i
+	}
+}
+
+// AddedChallengeID returns the value that was added to the "challenge_id" field in this mutation.
+func (m *ActivityMutation) AddedChallengeID() (r int64, exists bool) {
+	v := m.addchallenge_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearChallengeID clears the value of the "challenge_id" field.
+func (m *ActivityMutation) ClearChallengeID() {
+	m.challenge_id = nil
+	m.addchallenge_id = nil
+	m.clearedFields[entactivity.FieldChallengeID] = struct{}{}
+}
+
+// ChallengeIDCleared returns if the "challenge_id" field was cleared in this mutation.
+func (m *ActivityMutation) ChallengeIDCleared() bool {
+	_, ok := m.clearedFields[entactivity.FieldChallengeID]
+	return ok
+}
+
+// ResetChallengeID resets all changes to the "challenge_id" field.
+func (m *ActivityMutation) ResetChallengeID() {
+	m.challenge_id = nil
+	m.addchallenge_id = nil
+	delete(m.clearedFields, entactivity.FieldChallengeID)
+}
+
+// SetEventID sets the "event_id" field.
+func (m *ActivityMutation) SetEventID(i int64) {
+	m.event_id = &i
+	m.addevent_id = nil
+}
+
+// EventID returns the value of the "event_id" field in the mutation.
+func (m *ActivityMutation) EventID() (r int64, exists bool) {
+	v := m.event_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventID returns the old "event_id" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldEventID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventID: %w", err)
+	}
+	return oldValue.EventID, nil
+}
+
+// AddEventID adds i to the "event_id" field.
+func (m *ActivityMutation) AddEventID(i int64) {
+	if m.addevent_id != nil {
+		*m.addevent_id += i
+	} else {
+		m.addevent_id = &i
+	}
+}
+
+// AddedEventID returns the value that was added to the "event_id" field in this mutation.
+func (m *ActivityMutation) AddedEventID() (r int64, exists bool) {
+	v := m.addevent_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearEventID clears the value of the "event_id" field.
+func (m *ActivityMutation) ClearEventID() {
+	m.event_id = nil
+	m.addevent_id = nil
+	m.clearedFields[entactivity.FieldEventID] = struct{}{}
+}
+
+// EventIDCleared returns if the "event_id" field was cleared in this mutation.
+func (m *ActivityMutation) EventIDCleared() bool {
+	_, ok := m.clearedFields[entactivity.FieldEventID]
+	return ok
+}
+
+// ResetEventID resets all changes to the "event_id" field.
+func (m *ActivityMutation) ResetEventID() {
+	m.event_id = nil
+	m.addevent_id = nil
+	delete(m.clearedFields, entactivity.FieldEventID)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -691,7 +907,7 @@ func (m *ActivityMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ActivityMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 14)
 	if m.activity_name != nil {
 		fields = append(fields, entactivity.FieldActivityName)
 	}
@@ -713,14 +929,23 @@ func (m *ActivityMutation) Fields() []string {
 	if m.start_time != nil {
 		fields = append(fields, entactivity.FieldStartTime)
 	}
-	if m.end_time != nil {
-		fields = append(fields, entactivity.FieldEndTime)
-	}
 	if m.duration != nil {
 		fields = append(fields, entactivity.FieldDuration)
 	}
+	if m.end_time != nil {
+		fields = append(fields, entactivity.FieldEndTime)
+	}
 	if m.route != nil {
 		fields = append(fields, entactivity.FieldRoute)
+	}
+	if m.plan_id != nil {
+		fields = append(fields, entactivity.FieldPlanID)
+	}
+	if m.challenge_id != nil {
+		fields = append(fields, entactivity.FieldChallengeID)
+	}
+	if m.event_id != nil {
+		fields = append(fields, entactivity.FieldEventID)
 	}
 	if m.created_at != nil {
 		fields = append(fields, entactivity.FieldCreatedAt)
@@ -747,12 +972,18 @@ func (m *ActivityMutation) Field(name string) (ent.Value, bool) {
 		return m.Kcal()
 	case entactivity.FieldStartTime:
 		return m.StartTime()
-	case entactivity.FieldEndTime:
-		return m.EndTime()
 	case entactivity.FieldDuration:
 		return m.Duration()
+	case entactivity.FieldEndTime:
+		return m.EndTime()
 	case entactivity.FieldRoute:
 		return m.Route()
+	case entactivity.FieldPlanID:
+		return m.PlanID()
+	case entactivity.FieldChallengeID:
+		return m.ChallengeID()
+	case entactivity.FieldEventID:
+		return m.EventID()
 	case entactivity.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -778,12 +1009,18 @@ func (m *ActivityMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldKcal(ctx)
 	case entactivity.FieldStartTime:
 		return m.OldStartTime(ctx)
-	case entactivity.FieldEndTime:
-		return m.OldEndTime(ctx)
 	case entactivity.FieldDuration:
 		return m.OldDuration(ctx)
+	case entactivity.FieldEndTime:
+		return m.OldEndTime(ctx)
 	case entactivity.FieldRoute:
 		return m.OldRoute(ctx)
+	case entactivity.FieldPlanID:
+		return m.OldPlanID(ctx)
+	case entactivity.FieldChallengeID:
+		return m.OldChallengeID(ctx)
+	case entactivity.FieldEventID:
+		return m.OldEventID(ctx)
 	case entactivity.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -844,13 +1081,6 @@ func (m *ActivityMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStartTime(v)
 		return nil
-	case entactivity.FieldEndTime:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEndTime(v)
-		return nil
 	case entactivity.FieldDuration:
 		v, ok := value.(uint64)
 		if !ok {
@@ -858,12 +1088,40 @@ func (m *ActivityMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDuration(v)
 		return nil
+	case entactivity.FieldEndTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndTime(v)
+		return nil
 	case entactivity.FieldRoute:
 		v, ok := value.([]*activity.TrackPoint)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRoute(v)
+		return nil
+	case entactivity.FieldPlanID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlanID(v)
+		return nil
+	case entactivity.FieldChallengeID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChallengeID(v)
+		return nil
+	case entactivity.FieldEventID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventID(v)
 		return nil
 	case entactivity.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -895,6 +1153,15 @@ func (m *ActivityMutation) AddedFields() []string {
 	if m.addduration != nil {
 		fields = append(fields, entactivity.FieldDuration)
 	}
+	if m.addplan_id != nil {
+		fields = append(fields, entactivity.FieldPlanID)
+	}
+	if m.addchallenge_id != nil {
+		fields = append(fields, entactivity.FieldChallengeID)
+	}
+	if m.addevent_id != nil {
+		fields = append(fields, entactivity.FieldEventID)
+	}
 	return fields
 }
 
@@ -913,6 +1180,12 @@ func (m *ActivityMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedKcal()
 	case entactivity.FieldDuration:
 		return m.AddedDuration()
+	case entactivity.FieldPlanID:
+		return m.AddedPlanID()
+	case entactivity.FieldChallengeID:
+		return m.AddedChallengeID()
+	case entactivity.FieldEventID:
+		return m.AddedEventID()
 	}
 	return nil, false
 }
@@ -957,6 +1230,27 @@ func (m *ActivityMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddDuration(v)
 		return nil
+	case entactivity.FieldPlanID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPlanID(v)
+		return nil
+	case entactivity.FieldChallengeID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddChallengeID(v)
+		return nil
+	case entactivity.FieldEventID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEventID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Activity numeric field %s", name)
 }
@@ -964,7 +1258,17 @@ func (m *ActivityMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ActivityMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(entactivity.FieldPlanID) {
+		fields = append(fields, entactivity.FieldPlanID)
+	}
+	if m.FieldCleared(entactivity.FieldChallengeID) {
+		fields = append(fields, entactivity.FieldChallengeID)
+	}
+	if m.FieldCleared(entactivity.FieldEventID) {
+		fields = append(fields, entactivity.FieldEventID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -977,6 +1281,17 @@ func (m *ActivityMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ActivityMutation) ClearField(name string) error {
+	switch name {
+	case entactivity.FieldPlanID:
+		m.ClearPlanID()
+		return nil
+	case entactivity.FieldChallengeID:
+		m.ClearChallengeID()
+		return nil
+	case entactivity.FieldEventID:
+		m.ClearEventID()
+		return nil
+	}
 	return fmt.Errorf("unknown Activity nullable field %s", name)
 }
 
@@ -1005,14 +1320,23 @@ func (m *ActivityMutation) ResetField(name string) error {
 	case entactivity.FieldStartTime:
 		m.ResetStartTime()
 		return nil
-	case entactivity.FieldEndTime:
-		m.ResetEndTime()
-		return nil
 	case entactivity.FieldDuration:
 		m.ResetDuration()
 		return nil
+	case entactivity.FieldEndTime:
+		m.ResetEndTime()
+		return nil
 	case entactivity.FieldRoute:
 		m.ResetRoute()
+		return nil
+	case entactivity.FieldPlanID:
+		m.ResetPlanID()
+		return nil
+	case entactivity.FieldChallengeID:
+		m.ResetChallengeID()
+		return nil
+	case entactivity.FieldEventID:
+		m.ResetEventID()
 		return nil
 	case entactivity.FieldCreatedAt:
 		m.ResetCreatedAt()

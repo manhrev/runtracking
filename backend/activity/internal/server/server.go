@@ -5,20 +5,28 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/activity/internal/server/activity"
 	pb "github.com/manhrev/runtracking/backend/activity/pkg/api"
 	"github.com/manhrev/runtracking/backend/activity/pkg/ent"
+	plan "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-const (
-	db_user_name string = "root"
-	db_password  string = "password@1"
-	db_domain    string = "activity_db"
-	db_port      string = "3306"
-	db_name      string = "activity"
+var (
+	db_user_name string = os.Getenv("DB_USERNAME")
+	db_password  string = os.Getenv("DB_PASSWORD")
+	db_domain    string = os.Getenv("DB_HOST")
+	db_port      string = os.Getenv("DB_PORT")
+	db_name      string = os.Getenv("DB_NAME")
+	listen_port  string = os.Getenv("LISTEN_PORT")
+
+	//plani service
+	plani_domain string = os.Getenv("PLANI_DOMAIN")
+	plani_port   string = os.Getenv("PLANI_PORT")
 )
 
 func Run() {
@@ -46,10 +54,16 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	// register main and other server servers
-	pb.RegisterActivityServer(server, activity.NewServer(entClient))
+	planIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", plani_domain, plani_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("error while create connect to plani service: %v", err)
+	}
+	planiClient := plan.NewPlanIClient(planIConn)
 
-	lis, err := net.Listen("tcp", "0.0.0.0:8080")
+	// register main and other server servers
+	pb.RegisterActivityServer(server, activity.NewServer(entClient, planiClient))
+
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)
 	}

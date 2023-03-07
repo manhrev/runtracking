@@ -6,5 +6,17 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Group is the predicate function for group builders.
-type Group func(*sql.Selector)
+// Challenge is the predicate function for challenge builders.
+type Challenge func(*sql.Selector)
+
+// ChallengeMember is the predicate function for challengemember builders.
+type ChallengeMember func(*sql.Selector)
+
+// ChallengeMemberRule is the predicate function for challengememberrule builders.
+type ChallengeMemberRule func(*sql.Selector)
+
+// Groupz is the predicate function for groupz builders.
+type Groupz func(*sql.Selector)
+
+// Member is the predicate function for member builders.
+type Member func(*sql.Selector)
