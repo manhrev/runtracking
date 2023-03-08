@@ -1,4 +1,4 @@
-package auth
+package authi
 
 import (
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"

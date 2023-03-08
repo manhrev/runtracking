@@ -2,7 +2,6 @@ package receiver
 
 import (
 	"context"
-	"errors"
 
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/helper"
@@ -18,14 +17,14 @@ func (r *receiverAdmin) GetAllUsers(ctx context.Context, message cloudtask.Notif
 	var users *auth.GetAllUsersReply
 	var err error
 	if len(message.ReceivedIds) > 0 {
-		users, err = r.authClient.GetUserByIds(ctx, &auth.GetByIdsRequest{
+		users, err = r.authClient.GetUsersByIds(ctx, &auth.GetByIdsRequest{
 			Ids: helper.ConvertIntsToInt64s(message.ReceivedIds)})
 	} else {
 		users, err = r.authClient.GetAllUsers(ctx, &emptypb.Empty{})
 	}
 
 	if err != nil {
-		return nil, errors.New("Error when fetching users")
+		return nil, err
 	}
 
 	return users.Users, nil

@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthIClient interface {
 	GetAllUsers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllUsersReply, error)
-	GetUserByIds(ctx context.Context, in *GetByIdsRequest, opts ...grpc.CallOption) (*GetAllUsersReply, error)
+	GetUsersByIds(ctx context.Context, in *GetByIdsRequest, opts ...grpc.CallOption) (*GetAllUsersReply, error)
 }
 
 type authIClient struct {
@@ -44,9 +44,9 @@ func (c *authIClient) GetAllUsers(ctx context.Context, in *emptypb.Empty, opts .
 	return out, nil
 }
 
-func (c *authIClient) GetUserByIds(ctx context.Context, in *GetByIdsRequest, opts ...grpc.CallOption) (*GetAllUsersReply, error) {
+func (c *authIClient) GetUsersByIds(ctx context.Context, in *GetByIdsRequest, opts ...grpc.CallOption) (*GetAllUsersReply, error) {
 	out := new(GetAllUsersReply)
-	err := c.cc.Invoke(ctx, "/auth.AuthI/GetUserByIds", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth.AuthI/GetUsersByIds", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *authIClient) GetUserByIds(ctx context.Context, in *GetByIdsRequest, opt
 // for forward compatibility
 type AuthIServer interface {
 	GetAllUsers(context.Context, *emptypb.Empty) (*GetAllUsersReply, error)
-	GetUserByIds(context.Context, *GetByIdsRequest) (*GetAllUsersReply, error)
+	GetUsersByIds(context.Context, *GetByIdsRequest) (*GetAllUsersReply, error)
 	mustEmbedUnimplementedAuthIServer()
 }
 
@@ -69,8 +69,8 @@ type UnimplementedAuthIServer struct {
 func (UnimplementedAuthIServer) GetAllUsers(context.Context, *emptypb.Empty) (*GetAllUsersReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllUsers not implemented")
 }
-func (UnimplementedAuthIServer) GetUserByIds(context.Context, *GetByIdsRequest) (*GetAllUsersReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserByIds not implemented")
+func (UnimplementedAuthIServer) GetUsersByIds(context.Context, *GetByIdsRequest) (*GetAllUsersReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsersByIds not implemented")
 }
 func (UnimplementedAuthIServer) mustEmbedUnimplementedAuthIServer() {}
 
@@ -103,20 +103,20 @@ func _AuthI_GetAllUsers_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthI_GetUserByIds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AuthI_GetUsersByIds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetByIdsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthIServer).GetUserByIds(ctx, in)
+		return srv.(AuthIServer).GetUsersByIds(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.AuthI/GetUserByIds",
+		FullMethod: "/auth.AuthI/GetUsersByIds",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthIServer).GetUserByIds(ctx, req.(*GetByIdsRequest))
+		return srv.(AuthIServer).GetUsersByIds(ctx, req.(*GetByIdsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,8 +133,8 @@ var AuthI_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthI_GetAllUsers_Handler,
 		},
 		{
-			MethodName: "GetUserByIds",
-			Handler:    _AuthI_GetUserByIds_Handler,
+			MethodName: "GetUsersByIds",
+			Handler:    _AuthI_GetUsersByIds_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
