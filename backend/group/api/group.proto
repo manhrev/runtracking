@@ -5,28 +5,67 @@ package group;
 option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;group";
 
 service Group {
-    rpc GetGroup(GetGroupRequest) returns (GetGroupReply){};
-    rpc SetGroup(SetGroupRequest) returns (SetGroupReply){};
-}
-
-message GetGroupRequest{
-    string id = 1;
-}
-
-message GetGroupReply{
-    GroupInfo group = 1;
-}
-
-message SetGroupRequest{
-    GroupInfo group = 1;
-}
-
-message SetGroupReply{
-    string group_id = 1;
+    rpc CreateGroup(CreateGroupRequest) returns(CreateGroupReply){};
+    rpc ListGroup(ListGroupRequest) returns(ListGroupReply){};
+    rpc GetGroup(GetGroupRequest) returns(GetGroupReply){};
+    rpc UpdateGroup(UpdateGroupRequest) returns(UpdateGroupReply){};
+    rpc DeleteGroup(DeleteGroupRequest) returns(DeleteGroupReply){};
 }
 
 message GroupInfo{
-    string id = 1;
-    string name = 2;
+    string name = 1;
+    string description = 2;
+    string background_picture = 3;
+    int64 leader_id = 4;
 }
+
+message CreateGroupRequest{
+    GroupInfo group_info = 1;
+}
+
+message CreateGroupReply{}
+
+message ListGroupRequest{
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    GroupSortBy sort_by = 4;
+}
+
+message ListGroupReply{
+    repeated GroupInfo group_list = 1;
+    int64 total = 2;
+}
+
+message GetGroupRequest{
+    int64 group_id = 1;
+}
+
+message GetGroupReply{}
+
+message UpdateGroupRequest{}
+message UpdateGroupReply{}
+
+message DeleteGroupRequest{}
+
+message DeleteGroupReply{}
+
+enum RULE {
+    RULE_UNSPECIFIED = 0;
+    RULE_TOTAL_DISTANCE = 1;
+    RULE_TOTAL_TIME = 2;
+    RULE_TOTAL_CALORIES = 3;
+}
+
+enum GroupSortBy {
+    GROUP_SORT_BY_UNSPECIFIED = 0;
+    GROUP_SORT_BY_CREATED_TIME = 1; // Sort by time created Group
+    GROUP_SORT_BY_NAME = 2;
+}
+
+message Member{
+    string name = 1;
+}
+
+
 
