@@ -35,7 +35,6 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const windowWidth = Dimensions.get("window").width;
 const weekLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-console.log(moment().endOf("month").endOf("day").unix());
 
 interface GeneralInfo {
   numberOfActivity: number;
@@ -246,15 +245,18 @@ export default function StatisticSection() {
               height={200}
               yAxisLabel={""}
               chartConfig={{
+                barPercentage: 0.25,
+                propsForLabels: { inlineSize: 1 },
                 backgroundColor: theme.colors.elevation.level4,
                 backgroundGradientFrom: theme.colors.secondaryContainer,
                 backgroundGradientTo: theme.colors.tertiaryContainer,
                 decimalPlaces: 0,
+
                 color: () => theme.colors.primary,
-                style: {
-                  borderRadius: 16,
-                },
               }}
+              hidePointsAtIndex={Array.from({ length: 30 }, (v, k) =>
+                k % 3 !== 0 ? k : 999
+              )}
               style={{
                 borderRadius: 16,
                 alignSelf: "center",
@@ -367,11 +369,12 @@ function convertMomentListToDayInMonthList(t: moment.Moment[]): string[] {
 }
 
 function mapData(
-  indata: Array<ActivityStatisticData.AsObject>,
+  indata: ActivityStatisticData.AsObject[],
   momentList: moment.Moment[]
 ): number[] {
-  let data = [...indata];
-
+  let data = [...indata].sort(
+    (a, b) => (a.datetime?.seconds || 0) - (b.datetime?.seconds || 0)
+  );
   let retData: number[] = [];
   let i = 0;
   momentList.forEach((mom) => {
