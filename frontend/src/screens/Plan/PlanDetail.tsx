@@ -256,7 +256,13 @@ export default function PlanDetail({
                         />}
                     />
                     {showEndTimePicker && (
-                        <DateTimePicker value={toNewDate(selectedPlan?.endTime?.seconds || 0)} mode="date" display="default" onChange={setEnd} />
+                        <DateTimePicker
+                            value={toNewDate(selectedPlan?.endTime?.seconds || 0)}
+                            mode="date"
+                            display="default"
+                            minimumDate={toNewDate(selectedPlan?.startTime?.seconds + 86400 || 0)}
+                            onChange={setEnd}
+                        />
                     )}
                     <Text style={styles(theme).title}>Total: </Text>
                     <TextInput

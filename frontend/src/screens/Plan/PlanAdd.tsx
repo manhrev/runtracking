@@ -58,7 +58,7 @@ export default function PlanAdd({
     const [activityType, setActivityType] = useState<ActivityType>(ActivityType.ACTIVITY_TYPE_RUNNING);
     const [rule, setRule] = useState(Rule.RULE_TOTAL_DISTANCE.toString() );
     const [startTime, setStartTime] = useState(new Date());
-    const [endTime, setEndTime] = useState(new Date());
+    const [endTime, setEndTime] = useState(new Date(new Date().getTime() + 24 * 60 * 60 * 1000)); // 1 day after
     const [goal, setGoal] = useState(1);
     const [note, setNote] = useState('Example Note');
 
@@ -205,7 +205,13 @@ export default function PlanAdd({
                         right={<TextInput.Icon icon="calendar" onPress={() => setShowStartTimePicker(true)} />} 
                     />
                     {showStartTimePicker && (
-                        <DateTimePicker value={startTime} mode="date" display="default" onChange={setStart} />
+                        <DateTimePicker
+                            value={startTime}
+                            mode="date"
+                            display="default"
+                            minimumDate={new Date()}
+                            onChange={setStart}
+                        />
                     )}
                     <Text style={styles(theme).title}>End Date: </Text>
                     <TextInput
@@ -216,7 +222,14 @@ export default function PlanAdd({
                         right={<TextInput.Icon icon="calendar" onPress={() => setShowEndTimePicker(true)} />} 
                     />
                     {showEndTimePicker && (
-                        <DateTimePicker value={endTime} mode="date" display="default" onChange={setEnd} />
+                        <DateTimePicker
+                            value={endTime}
+                            mode="date"
+                            display="default"
+                            // tommorow
+                            minimumDate={new Date(startTime.getTime() + 24 * 60 * 60 * 1000)}
+                            onChange={setEnd}
+                        />
                     )}
                     <Text style={styles(theme).title}>Goal: </Text>
                     <TextInput

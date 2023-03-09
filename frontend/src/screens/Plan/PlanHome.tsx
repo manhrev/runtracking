@@ -5,7 +5,9 @@ import { AppTheme, useAppTheme } from "../../theme";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { baseStyles } from "../baseStyle";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 import {
     isPlanListLoading,
@@ -39,15 +41,17 @@ export default function Plan({
     // const isLoading = useAppSelector(isPlanListLoading);
     const [tabState, setTabState] = useState("current");
 
-    useEffect(() => {
-        dispatch(listPlanThunk({
-            activityType: 0,
-            ascending: false,
-            limit: 100,
-            offset: 0,
-            sortBy: 1,
-        })).unwrap();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            dispatch(listPlanThunk({
+                activityType: 0,
+                ascending: false,
+                limit: 100,
+                offset: 0,
+                sortBy: 1,
+            })).unwrap();
+        }, [])
+    );
 
     const toDate = (seconds: number) => {
         // dd/mm/yyyy
