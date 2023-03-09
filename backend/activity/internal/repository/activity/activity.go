@@ -192,7 +192,6 @@ func (m *activityImpl) Delete(ctx context.Context, userId int64, activityIdList 
 			activity.IDIn(activityIdList...),
 		).
 		Exec(ctx)
-	log.Println(deletedCount)
 	if err != nil {
 		return status.Internal(err.Error())
 	}
