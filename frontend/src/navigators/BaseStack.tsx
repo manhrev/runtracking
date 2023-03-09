@@ -14,6 +14,7 @@ import RunResult from "../screens/Run/RunResult";
 import PlanDetail from "../screens/Plan/PlanDetail";
 import PlanAdd from "../screens/Plan/PlanAdd";
 import RunHome from "../screens/Run/RunHome";
+import RunCommit from "../screens/Run/RunCommit";
 import { notificationClient } from "../utils/grpc";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -24,6 +25,7 @@ import {
   CreateActivityInfoReply,
   ActivityInfo,
   TrackPoint,
+  ActivityType
 } from "../lib/activity/activity_pb";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import {
@@ -68,8 +70,15 @@ export type RootBaseStackParamList = {
     resetRunInfo: () => void;
   };
 
+  RunCommit: {
+    activityId: number;
+    activityType: ActivityType;
+    resetRunInfo: () => void;
+  }
+
   PlanDetail : {
     planId: number;
+    canEdit: boolean;
   };
 
   PlanAdd: undefined;
@@ -144,6 +153,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={RunResult}
+          />
+          <Stack.Screen
+            name="RunCommit"
+            options={{
+              title: "Run Commit",
+              headerBackVisible: true,
+            }}
+            component={RunCommit}
           />
           <Stack.Screen
             name="PlanDetail"

@@ -20,6 +20,10 @@ import {
     RuleStatus
 } from "../../lib/plan/plan_pb";
 
+import {
+    ActivityType
+} from "../../lib/activity/activity_pb";
+
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -86,10 +90,12 @@ export default function Plan({
                                 title={item.name}
                                 titleStyle={styles(theme).planName}
                                 description={`Start: ${toDate(item.startTime.seconds)}    -    End: ${toDate(item.endTime.seconds)}\nProgress: ${item.total}/${item.goal}`}
-                                left={props => <List.Icon {...props} icon="run" />}
+                                left={props => <List.Icon {...props} icon={
+                                    item.activityType === ActivityType.ACTIVITY_TYPE_RUNNING ? "run-fast" : (item.activityType === ActivityType.ACTIVITY_TYPE_WALKING ? "walk" : "bike")
+                                }/>}
                                 // enter bracket icon
-                                right={props => <IconButton {...props} icon="chevron-right" />}
-                                onPress={() => navigation.navigate("PlanDetail", {planId: item.id})}
+                                right={props => <IconButton {...props} icon="chevron-right"/>}
+                                onPress={() => navigation.navigate("PlanDetail", {planId: item.id, canEdit: true})}
                             />
                         : null
                     ))}

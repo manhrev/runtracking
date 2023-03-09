@@ -216,9 +216,11 @@ export default function PlanDetail({
         <>
             <View style={styles(theme).container}>
                 <ScrollView showsVerticalScrollIndicator={false}>
+                    {route.params.canEdit ?
                     <Button mode="text" onPress={() => setEditMode(!editMode)} style={styles(theme).addPlanBtn} labelStyle={{fontSize: 16}}>
                         {editMode ? "EDITABLE: ON  " : "EDITABLE: OFF"}
-                    </Button>
+                    </Button>: null}
+
                     <Text style={editMode ? styles(theme).editModeTitle : styles(theme).title}>Plan Name (ID: {selectedPlan?.id}): </Text>
                     <TextInput
                         mode="outlined"
