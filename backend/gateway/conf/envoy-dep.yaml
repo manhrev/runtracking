@@ -33,6 +33,11 @@ static_resources:
                             prefix: /auth.Auth/Login
                           route:
                             cluster: auth_cluster
+                            timeout: 0s
+                            host_rewrite_literal: auth-jzg35jprna-as.a.run.app
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
+
                           typed_per_filter_config:
                             envoy.filters.http.ext_authz:
                               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
@@ -41,14 +46,24 @@ static_resources:
                             prefix: /auth.Auth/SignUp
                           route:
                             cluster: auth_cluster
+                            timeout: 0s
+                            host_rewrite_literal: auth-jzg35jprna-as.a.run.app
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
                           typed_per_filter_config:
                             envoy.filters.http.ext_authz:
                               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                               disabled: true
+
                         - match:
                             prefix: /auth.
                           route:
                             cluster: auth_cluster
+                            timeout: 0s
+                            host_rewrite_literal: auth-jzg35jprna-as.a.run.app
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
+
                         # - match:
                         #     prefix: /group.Group
                         #   route:
