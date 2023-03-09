@@ -1,7 +1,5 @@
 module github.com/manhrev/runtracking/backend/notification
 
-replace github.com/manhrev/runtracking/backend/auth => ../auth
-
 go 1.18
 
 require (
@@ -35,7 +33,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
-	github.com/manhrev/runtracking/backend/auth v0.0.0-20230214155215-7210dd6427ff
+	github.com/manhrev/runtracking/backend/auth v0.0.0-20230309083444-f2ece01bc224
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/oliveroneill/exponent-server-sdk-golang v0.0.0-20210823140141-d050598be512
 	github.com/zclconf/go-cty v1.8.0 // indirect
