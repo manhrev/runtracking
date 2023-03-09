@@ -105,7 +105,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: https://auth-jzg35jprna-as.a.run.app
+                      address: auth-jzg35jprna-as.a.run.app
                       port_value: 443
       dns_lookup_family: V4_ONLY
       transport_socket:
