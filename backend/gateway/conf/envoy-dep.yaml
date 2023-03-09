@@ -103,6 +103,10 @@ static_resources:
                       grpc_service:
                         envoy_grpc:
                           cluster_name: auth_cluster
+                          timeout: 0s
+                          host_rewrite_literal: auth-jzg35jprna-as.a.run.app
+                          max_stream_duration:
+                            grpc_timeout_header_max: 0s
                         timeout: 0.250s
                       transport_api_version: V3
                   - name: envoy.filters.http.router
