@@ -4,6 +4,8 @@ package group;
 
 option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;group";
 
+import "google/protobuf/timestamp.proto";
+
 service Group {
     rpc CreateGroup(CreateGroupRequest) returns(CreateGroupReply){};
     rpc ListGroup(ListGroupRequest) returns(ListGroupReply){};
@@ -12,12 +14,6 @@ service Group {
     rpc DeleteGroup(DeleteGroupRequest) returns(DeleteGroupReply){};
 }
 
-message GroupInfo{
-    string name = 1;
-    string description = 2;
-    string background_picture = 3;
-    int64 leader_id = 4;
-}
 
 message CreateGroupRequest{
     GroupInfo group_info = 1;
@@ -37,24 +33,49 @@ message ListGroupReply{
     int64 total = 2;
 }
 
+message GroupInfo{
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string background_picture = 4;
+}
+
 message GetGroupRequest{
     int64 group_id = 1;
 }
 
-message GetGroupReply{}
+message GetGroupReply{
+    GroupInfo groupInfo = 1;
+    repeated Member members = 2;
+    repeated ChallengeInfo challenges = 3;
+    repeated EventInfo events = 4;
+}
 
-message UpdateGroupRequest{}
+
+message UpdateGroupRequest{
+
+}
+
 message UpdateGroupReply{}
 
-message DeleteGroupRequest{}
+message DeleteGroupRequest{
+    int64 id_to_delete = 1;
+}
 
 message DeleteGroupReply{}
 
-enum RULE {
+enum Rule {
     RULE_UNSPECIFIED = 0;
     RULE_TOTAL_DISTANCE = 1;
     RULE_TOTAL_TIME = 2;
     RULE_TOTAL_CALORIES = 3;
+}
+
+enum ActivityType {
+    ACTIVITY_TYPE_UNSPECIFIED = 0;
+    ACTIVITY_TYPE_RUNNING = 1;
+    ACTIVITY_TYPE_CYCLING = 2;
+    ACTIVITY_TYPE_WALKING = 3;
 }
 
 enum GroupSortBy {
@@ -64,7 +85,35 @@ enum GroupSortBy {
 }
 
 message Member{
-    string name = 1;
+    int64 user_id = 1;
+    string display_name = 7;
+    string username = 2;
+    string email = 3;
+}
+
+message ChallengeInfo{
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    repeated Rule rules = 8;
+    ActivityType type = 9;
+    int64 goal = 10;
+    int64 total = 11;
+    google.protobuf.Timestamp from = 6;
+    google.protobuf.Timestamp to = 7;
+}
+
+
+message EventInfo{
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    repeated Rule rules = 8;
+    ActivityType type = 9;
+    int64 goal = 10;
+    int64 total = 11;
+    google.protobuf.Timestamp from = 6;
+    google.protobuf.Timestamp to = 7;
 }
 
 
