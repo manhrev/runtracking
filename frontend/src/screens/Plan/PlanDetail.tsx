@@ -20,7 +20,6 @@ import {
     Rule,
     PlanInfo,
     UpdatePlanRequest,
-    DeletePlansRequest
 } from "../../lib/plan/plan_pb";
 
 import {
@@ -184,30 +183,6 @@ export default function PlanDetail({
         else alert("Plan ID is undefined");
     }
 
-    const deletePlanOrNot = () => {
-        Alert.alert(
-            "Delete Plan",
-            "Are you sure you want to delete \"" + selectedPlan?.name + "\" ?",
-            [
-                {
-                    text: "No",
-                    style: "cancel"
-                },
-                { text: "Yes", onPress: () => deletePlanConfirmed() }
-            ],
-            { cancelable: false }
-        );
-    }
-
-    const deletePlanConfirmed = () => {
-        const deleteInfo: DeletePlansRequest.AsObject = {
-            idsList: [selectedPlan?.id || 0]
-        }
-        dispatch(deletePlansThunk(deleteInfo)).unwrap();
-        alert("Deleted plan with ID: " + selectedPlan?.id);
-        navigation.goBack();
-    }
-
     useEffect(() => {
         setSelectedPlan(planList.find(plan => plan.id === route.params.planId));
     }, []);
@@ -307,17 +282,6 @@ export default function PlanDetail({
                             Save
                         </Button>
                     </View>
-
-                    {editMode && <Button mode="text" onPress={() => deletePlanOrNot()} 
-                        style={styles(theme).deleteBtn}
-                        labelStyle={{
-                            fontSize: 16,
-                            borderBottomColor: "#e82525",
-                            borderBottomWidth: 1,
-                            color: "#e82525"
-                        }}>
-                        [ Delete Plan ]
-                    </Button>}
                 </ScrollView>
             </View>
         </>

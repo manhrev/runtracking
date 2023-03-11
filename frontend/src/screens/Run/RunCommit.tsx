@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { baseStyles } from "../baseStyle";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
 import { useState, useEffect } from "react";
+import * as Progress from 'react-native-progress';
 
 import {
     isPlanListLoading,
@@ -18,7 +19,10 @@ import {
 
 import {
     PlanInfo,
-    RuleStatus
+    RuleStatus,
+    DeletePlansRequest,
+    Rule,
+    PlanProgress
 } from "../../lib/plan/plan_pb";
 
 import {
@@ -88,6 +92,7 @@ export default function RunCommit({
         activityClient.commitActivity(commitObj).then((res) => {
             if(!res.error){
                 alert("Commited to plan ID: " + selectedPlan.id);
+                
                 backToHome();
             }
             else alert("Failed!");
@@ -100,6 +105,31 @@ export default function RunCommit({
     }
 
     const filteredPlanList = planList.filter((item) => item.status === RuleStatus.RULE_STATUS_INPROGRESS && item.activityType == route.params.activityType);
+
+    const isDailyActivity = (planRule: Rule) => {
+        return  planRule === Rule.RULE_TOTAL_DISTANCE_DAILY ||
+                planRule === Rule.RULE_TOTAL_TIME_DAILY ||
+                planRule === Rule.RULE_TOTAL_ACTIVITY_DAILY ||
+                planRule === Rule.RULE_TOTAL_CALORIES_DAILY;
+    }
+
+    const getProgressOfDailyActivity = (progressList: Array<PlanProgress.AsObject>) => {
+        if(progressList.length > 0)
+        {
+            const today = (new Date()). getDate();
+            var value = -1;
+            progressList.map((element: any) => {
+                // if the date is today -> get this element value
+                const date = new Date(element.timestamp.seconds * 1000);
+                if(date.getDate() === today){
+                    value = Number(element.value);
+                }
+            });
+            if(value === -1) return 0;
+            else return value;
+        }
+        return 0;
+    }
 
     return (
         <>
@@ -114,15 +144,41 @@ export default function RunCommit({
                                 key={index}
                                 title={item.name}
                                 titleStyle={styles(theme).planName}
-                                description={`Start: ${toDate(item.startTime.seconds)}    -    End: ${toDate(item.endTime.seconds)}\nProgress: ${item.total}/${item.goal}`}
-                                left={props => <List.Icon {...props} icon={
-                                    item.activityType === ActivityType.ACTIVITY_TYPE_RUNNING ? "run-fast" : (item.activityType === ActivityType.ACTIVITY_TYPE_WALKING ? "walk" : "bike")
-                                }/>}
+                                descriptionNumberOfLines={10}
+                                description={
+                                    <View>
+                                        <Text>St: {toDate(item.startTime.seconds)}    -    End: {toDate(item.endTime.seconds)}</Text>
+                                        {isDailyActivity(item.rule) ?
+                                            <Text style={{marginBottom: 3}}>Today: {getProgressOfDailyActivity(item.progressList)} / {item.goal}</Text> :
+                                            <Text style={{marginBottom: 3}}>Progress: {item.total} / {item.goal}</Text>
+                                        }
+                                        <Progress.Bar
+                                            progress={isDailyActivity(item.rule) ? getProgressOfDailyActivity(item.progressList) / item.goal : item.total / item.goal}
+                                            width={windowWidth*0.6}
+                                            color={theme.colors.primary}
+                                            borderColor="#e0e0e0"
+                                            unfilledColor="#e0e0e0"
+                                            borderRadius={5}
+                                            animated={true}
+                                        />
+                                    </View>
+                                }
+                                left={props =>
+                                    <List.Icon {...props}
+                                        icon={
+                                            item.activityType === ActivityType.ACTIVITY_TYPE_RUNNING ? "run-fast" : (item.activityType === ActivityType.ACTIVITY_TYPE_WALKING ? "walk" : "bike")
+                                        }
+                                        style={{
+                                            alignSelf: 'center',
+                                            marginLeft: 20,
+                                        }}
+                                    />
+                                }
                                 right={props =>
                                     <IconButton {...props}
                                         icon={selectedPlan.id === item.id ? "checkbox-marked" : "checkbox-blank-outline"}
-                                        iconColor={theme.colors.primary}
-                                        size={30}
+                                        iconColor={selectedPlan.id === item.id ? theme.colors.primary : "#969696"}
+                                        size={27}
                                         onPress={() => setSelectedPlan(item)}
                                     />
                                 }
@@ -181,14 +237,7 @@ const styles = (theme: AppTheme) =>
         // bottom divider
         width: '100%',
         borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-    },
-    curPlanBordered: {
-        width: '100%',
-        borderStyle: 'solid',
-        borderWidth: 5,
-        borderColor: theme.colors.primary,
-        borderRadius: 10,
+        borderBottomColor: "#b5b7ba",
     },
     commitBtn: {
         alignSelf: 'flex-end',
