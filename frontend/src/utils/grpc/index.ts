@@ -4,6 +4,7 @@ import { Code as AuthCode } from "../../lib/auth/auth_code_pb";
 import Constants from "expo-constants";
 import rpcActivityClient from "./client/activity";
 import rpcNotificationClient from "./client/notification";
+import rpcPlanClient from "./client/plan";
 
 export * from "./abstract/gRPCClient";
 export * from "./abstract/types";
@@ -49,3 +50,4 @@ export const activityClient = new rpcActivityClient(activityConfig);
 
 export const authClient = new rpcAuthClient(authConfig);
 export const notificationClient = new rpcNotificationClient(notificationConfig);
+export const planClient = new rpcPlanClient(notificationConfig);

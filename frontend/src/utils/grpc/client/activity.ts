@@ -9,6 +9,8 @@ import {
   TrackPoint,
   GetActivityStatisticRequest,
   GetActivityStatisticReply,
+  CommitActivityRequest,
+  CommitActivityReply,
 } from "../../../lib/activity/activity_pb";
 
 import { GRPCClientConfig } from "../abstract/types";
@@ -101,6 +103,21 @@ class rpcActivityClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<GetActivityStatisticReply.AsObject>(
       "getActivityStatistic",
+      req
+    );
+  }
+
+  async commitActivity(commitObj: CommitActivityRequest.AsObject) {
+    const req = new CommitActivityRequest();
+    req
+      .setActivityId(commitObj.activityId)
+      .setCommitId(commitObj.commitId)
+      .setCommitType(commitObj.commitType)
+      .setRule(commitObj.rule);
+
+
+    return await this.gRPCClientRequest<CommitActivityReply.AsObject>(
+      "commitActivity",
       req
     );
   }

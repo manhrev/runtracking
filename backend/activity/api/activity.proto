@@ -47,7 +47,9 @@ message CreateActivityInfoRequest {
     ActivityInfo activity_info = 1;
 }
 
-message CreateActivityInfoReply {}
+message CreateActivityInfoReply {
+    int64 id_created = 1;
+}
 
 message ListActivityInfoRequest {
     uint32 limit = 1;

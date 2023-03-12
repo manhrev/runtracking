@@ -18,9 +18,11 @@ func (s *activityServer) CreateActivityInfo(
 		return nil, status.Internal(err.Error())
 	}
 
-	_, err = s.repository.Activity.Create(ctx, userId, request.GetActivityInfo())
+	activity_ent, err := s.repository.Activity.Create(ctx, userId, request.GetActivityInfo())
 	if err != nil {
 		return nil, err
 	}
-	return &activity.CreateActivityInfoReply{}, nil
+	return &activity.CreateActivityInfoReply{
+		IdCreated: activity_ent.ID,
+	}, nil
 }
