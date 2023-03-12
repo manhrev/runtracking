@@ -1,5 +1,5 @@
 import { Dimensions, ScrollView, StyleSheet, View, Alert } from "react-native";
-import { Button, IconButton, SegmentedButtons, Text, List, Divider } from "react-native-paper";
+import { Button, IconButton, SegmentedButtons, Text, List, Menu } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
@@ -48,6 +48,14 @@ export default function Plan({
     // const isLoading = useAppSelector(isPlanListLoading);
     const [tabState, setTabState] = useState("current");
     const [deleteListId, setDeleteListId] = useState<number[]>([]);
+    const [selectedAll, setSelectedAll] = useState(false);
+
+
+    // filter menu
+    const [visible, setVisible] = useState(false);
+    const openMenu = () => setVisible(true);
+    const closeMenu = () => setVisible(false);
+    const [filteredActivityType, setFilteredActivityType] = useState<ActivityType>(ActivityType.ACTIVITY_TYPE_UNSPECIFIED);
 
     useFocusEffect(
         useCallback(() => {
@@ -60,6 +68,12 @@ export default function Plan({
             })).unwrap();
         }, [])
     );
+
+    // if tab or filter change, reset selected all and delete list
+    useEffect(() => {
+        setSelectedAll(false);
+        setDeleteListId([]);
+    }, [tabState, filteredActivityType]);
 
     const toDate = (seconds: number) => {
         // dd/mm/yyyy
@@ -74,8 +88,10 @@ export default function Plan({
         if(deleteListId.includes(id)){
             // remove from delete list
             setDeleteListId(deleteListId.filter((item) => item !== id));
+            setSelectedAll(false);
         } else {
             setDeleteListId([...deleteListId, id]);
+            if(deleteListId.length + 1 === filteredPlanList.length) setSelectedAll(true); // if all selected
         }
     }
 
@@ -106,6 +122,7 @@ export default function Plan({
         dispatch(deletePlansThunk(deleteInfo)).unwrap();
         alert("Deleted plan with ID(s): " + deleteListId);
         setDeleteListId([]);
+        setSelectedAll(false);
     }
 
     const isDailyActivity = (planRule: Rule) => {
@@ -133,6 +150,26 @@ export default function Plan({
         return 0;
     }
 
+    const selectOrUnselectAll = () => {
+        if(selectedAll){
+            setSelectedAll(false);
+            setDeleteListId([]);
+        } else {
+            setSelectedAll(true);
+            const listId: number[] = [];
+            filteredPlanList.map((plan) => {
+                listId.push(plan.id);
+            });
+            setDeleteListId(listId);
+        }
+    }
+
+    const filteredPlanList = planList.filter((item) => 
+        ((item.status === RuleStatus.RULE_STATUS_INPROGRESS && tabState === "current") ||
+        (item.status !== RuleStatus.RULE_STATUS_INPROGRESS && tabState === "history")) &&
+        (filteredActivityType === ActivityType.ACTIVITY_TYPE_UNSPECIFIED || item.activityType === filteredActivityType)
+    );
+
 
     return (
         <>
@@ -150,27 +187,60 @@ export default function Plan({
                     </Button>
                 </View>
 
-                    <SegmentedButtons
-                        style={styles(theme).segmentedBtn}
-                        value={tabState}
-                        onValueChange={setTabState}
-                        density="regular"
-                        buttons={[
-                        {
-                            value: 'current',
-                            label: '      Current      ',
-                        },
-                        {
-                            value: 'history',
-                            label: '      History      ',
-                        }
-                        ]}
+                <SegmentedButtons
+                    style={styles(theme).segmentedBtn}
+                    value={tabState}
+                    onValueChange={setTabState}
+                    density="regular"
+                    buttons={[
+                    {
+                        value: 'current',
+                        label: '      Current      ',
+                    },
+                    {
+                        value: 'history',
+                        label: '      History      ',
+                    }
+                    ]}
+                />
+
+                <View style={styles(theme).filterContainer}>
+                    <Menu
+                            visible={visible}
+                            onDismiss={closeMenu}
+                            anchor={<IconButton icon="filter-menu" style={{marginLeft: 10}} iconColor={theme.colors.primary} size={24} onPress={openMenu} />}>
+                            <Menu.Item onPress={() => {setFilteredActivityType(ActivityType.ACTIVITY_TYPE_UNSPECIFIED); closeMenu()}} title="All" />
+                            <Menu.Item onPress={() => {setFilteredActivityType(ActivityType.ACTIVITY_TYPE_RUNNING); closeMenu()}} title="Running" />
+                            <Menu.Item onPress={() => {setFilteredActivityType(ActivityType.ACTIVITY_TYPE_WALKING); closeMenu()}} title="Walking" />
+                            <Menu.Item onPress={() => {setFilteredActivityType(ActivityType.ACTIVITY_TYPE_CYCLING); closeMenu()}} title="Cycling" />
+                    </Menu>
+
+                    <Text
+                        variant="bodyLarge"
+                        style={{
+                          fontWeight: "bold",
+                          textAlignVertical: "center",
+                          color: theme.colors.secondary,
+                        }}
+                        onPress={openMenu}
+                    >
+                        {filteredActivityType === ActivityType.ACTIVITY_TYPE_RUNNING ? "Running" :
+                        filteredActivityType === ActivityType.ACTIVITY_TYPE_WALKING ? "Walking" :
+                        filteredActivityType === ActivityType.ACTIVITY_TYPE_CYCLING ? "Cycling" : "All"}
+                    </Text>
+                    
+                    <IconButton
+                        icon={selectedAll ? "checkbox-marked" : "checkbox-blank-outline"}
+                        iconColor={selectedAll ? "#e82525" : "#969696"}
+                        size={25}
+                        onPress={() => selectOrUnselectAll()}
                     />
+                </View>
+
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    {planList.map((item, index) => (
-                        ((item.status === RuleStatus.RULE_STATUS_INPROGRESS && tabState === "current") || (item.status !== RuleStatus.RULE_STATUS_INPROGRESS && tabState === "history")) ? 
+                    {filteredPlanList.map((item, index) => (
                             <List.Item
-                                style={styles(theme).curPlan}
+                                style={index == 0 ? styles(theme).curPlanTopDownBordered : styles(theme).curPlan}
                                 key={index}
                                 title={item.name}
                                 titleStyle={styles(theme).planName}
@@ -211,9 +281,8 @@ export default function Plan({
                                     size={27}
                                     onPress={() => addOrRemoveFromDeleteList(item.id)}
                                 />}
-                                onPress={() => navigation.navigate("PlanDetail", {planId: item.id, canEdit: true})}
+                                onPress={() => navigation.navigate("PlanDetail", {planId: item.id, canEdit: item.status === RuleStatus.RULE_STATUS_INPROGRESS})} // only in progress plan can be edited
                             />
-                        : null
                     ))}
                 </ScrollView>
             </View>
@@ -243,6 +312,14 @@ const styles = (theme: AppTheme) =>
         borderBottomWidth: 1,
         borderBottomColor: "#b5b7ba"
     },
+    curPlanTopDownBordered: {
+        // top and bottom divider
+        width: '100%',
+        borderBottomWidth: 1,
+        borderBottomColor: "#b5b7ba",
+        borderTopWidth: 1,
+        borderTopColor: "#b5b7ba"
+    },
     addPlanBtn: {
         marginLeft: 10,
     },
@@ -255,7 +332,13 @@ const styles = (theme: AppTheme) =>
     },
     segmentedBtn: {
         marginTop: 10,
-        marginBottom: 10,
+        // marginBottom: 10,
         alignSelf: "center",
+    },
+    filterContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
   });
