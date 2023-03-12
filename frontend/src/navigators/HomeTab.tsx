@@ -6,6 +6,7 @@ import ProfileHome from "../screens/Profile/ProfileHome";
 import RunHome from "../screens/Run/RunHome";
 import { RootBaseStackParamList } from "./BaseStack";
 import ComingSoon from "../screens/ComingSoon";
+import PlanHome from "../screens/Plan/PlanHome";
 
 export type RootHomeTabsParamList = {
   ActivityHome: undefined;
@@ -41,7 +42,7 @@ export default function HomeTabs() {
       />
       <Tab.Screen
         name="PlanHome"
-        component={ComingSoon}
+        component={PlanHome}
         options={{ tabBarIcon: "file-document-edit" }}
       />
       <Tab.Screen

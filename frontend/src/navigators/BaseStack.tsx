@@ -11,7 +11,10 @@ import Signup from "../screens/Authentication/Signup";
 import Intro from "../screens/Authentication/Intro";
 import GetInfo from "../screens/Authentication/GetInfo";
 import RunResult from "../screens/Run/RunResult";
+import PlanDetail from "../screens/Plan/PlanDetail";
+import PlanAdd from "../screens/Plan/PlanAdd";
 import RunHome from "../screens/Run/RunHome";
+import RunCommit from "../screens/Run/RunCommit";
 import { notificationClient } from "../utils/grpc";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -22,6 +25,7 @@ import {
   CreateActivityInfoReply,
   ActivityInfo,
   TrackPoint,
+  ActivityType
 } from "../lib/activity/activity_pb";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import {
@@ -65,6 +69,19 @@ export type RootBaseStackParamList = {
     // pass function to reset
     resetRunInfo: () => void;
   };
+
+  RunCommit: {
+    activityId: number;
+    activityType: ActivityType;
+    resetRunInfo: () => void;
+  }
+
+  PlanDetail : {
+    planId: number;
+    canEdit: boolean;
+  };
+
+  PlanAdd: undefined;
 
   // Profile
   ProfileSetting: undefined;
@@ -136,6 +153,30 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={RunResult}
+          />
+          <Stack.Screen
+            name="RunCommit"
+            options={{
+              title: "Run Commit",
+              headerBackVisible: true,
+            }}
+            component={RunCommit}
+          />
+          <Stack.Screen
+            name="PlanDetail"
+            options={{
+              title: "Plan Detail",
+              headerBackVisible: true,
+            }}
+            component={PlanDetail}
+          />
+          <Stack.Screen
+            name="PlanAdd"
+            options={{
+              title: "Add New Plan",
+              headerBackVisible: true,
+            }}
+            component={PlanAdd}
           />
           <Stack.Screen
             name="AppSetting"

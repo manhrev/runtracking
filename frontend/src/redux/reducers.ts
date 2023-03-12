@@ -4,6 +4,7 @@ import toggle from "./features/toggle/slice";
 import activityList from "./features/activityList/slice";
 import activityStatisticList from "./features/activityStatistic/slice";
 import user from "./features/user/slice";
+import planList from "./features/planList/slice";
 import notificationList from "./features/notification/slice";
 
 const rootReducer = combineReducers({
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   activityList,
   activityStatisticList,
   user,
+  planList,
   notificationList
 });
 

@@ -207,5 +207,48 @@ export class ActivityClient {
     this.methodDescriptorGetActivityStatistic);
   }
 
+  methodDescriptorCommitActivity = new grpcWeb.MethodDescriptor(
+    '/activity.Activity/CommitActivity',
+    grpcWeb.MethodType.UNARY,
+    activity_pb.CommitActivityRequest,
+    activity_pb.CommitActivityReply,
+    (request: activity_pb.CommitActivityRequest) => {
+      return request.serializeBinary();
+    },
+    activity_pb.CommitActivityReply.deserializeBinary
+  );
+
+  commitActivity(
+    request: activity_pb.CommitActivityRequest,
+    metadata: grpcWeb.Metadata | null): Promise<activity_pb.CommitActivityReply>;
+
+  commitActivity(
+    request: activity_pb.CommitActivityRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: activity_pb.CommitActivityReply) => void): grpcWeb.ClientReadableStream<activity_pb.CommitActivityReply>;
+
+  commitActivity(
+    request: activity_pb.CommitActivityRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: activity_pb.CommitActivityReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/activity.Activity/CommitActivity',
+        request,
+        metadata || {},
+        this.methodDescriptorCommitActivity,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/activity.Activity/CommitActivity',
+    request,
+    metadata || {},
+    this.methodDescriptorCommitActivity);
+  }
+
 }
 

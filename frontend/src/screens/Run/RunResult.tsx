@@ -48,9 +48,10 @@ export default function RunResult({
     // console.log(activityInfo);
     activityClient.createActivityInfo(activityInfo).then((res) => {
       if(!res.error){
-        alert("Activity saved successfully!");
-        route.params.resetRunInfo();
-        navigation.goBack();
+        if(res.response?.idCreated)
+        {
+          navigation.navigate("RunCommit", {activityId: res.response.idCreated, activityType: activityType, resetRunInfo: route.params.resetRunInfo});
+        }
       }
       else alert("Failed!");
     });

@@ -120,6 +120,9 @@ export namespace CreateActivityInfoRequest {
 }
 
 export class CreateActivityInfoReply extends jspb.Message {
+  getIdCreated(): number;
+  setIdCreated(value: number): CreateActivityInfoReply;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CreateActivityInfoReply.AsObject;
   static toObject(includeInstance: boolean, msg: CreateActivityInfoReply): CreateActivityInfoReply.AsObject;
@@ -130,6 +133,7 @@ export class CreateActivityInfoReply extends jspb.Message {
 
 export namespace CreateActivityInfoReply {
   export type AsObject = {
+    idCreated: number,
   }
 }
 
@@ -335,6 +339,50 @@ export namespace ActivityStatisticData {
   }
 }
 
+export class CommitActivityRequest extends jspb.Message {
+  getActivityId(): number;
+  setActivityId(value: number): CommitActivityRequest;
+
+  getCommitId(): number;
+  setCommitId(value: number): CommitActivityRequest;
+
+  getCommitType(): CommitType;
+  setCommitType(value: CommitType): CommitActivityRequest;
+
+  getRule(): number;
+  setRule(value: number): CommitActivityRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CommitActivityRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CommitActivityRequest): CommitActivityRequest.AsObject;
+  static serializeBinaryToWriter(message: CommitActivityRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CommitActivityRequest;
+  static deserializeBinaryFromReader(message: CommitActivityRequest, reader: jspb.BinaryReader): CommitActivityRequest;
+}
+
+export namespace CommitActivityRequest {
+  export type AsObject = {
+    activityId: number,
+    commitId: number,
+    commitType: CommitType,
+    rule: number,
+  }
+}
+
+export class CommitActivityReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CommitActivityReply.AsObject;
+  static toObject(includeInstance: boolean, msg: CommitActivityReply): CommitActivityReply.AsObject;
+  static serializeBinaryToWriter(message: CommitActivityReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CommitActivityReply;
+  static deserializeBinaryFromReader(message: CommitActivityReply, reader: jspb.BinaryReader): CommitActivityReply;
+}
+
+export namespace CommitActivityReply {
+  export type AsObject = {
+  }
+}
+
 export enum ActivityType { 
   ACTIVITY_TYPE_UNSPECIFIED = 0,
   ACTIVITY_TYPE_RUNNING = 1,
@@ -347,4 +395,10 @@ export enum ActivitySortBy {
   ACTIVITY_SORT_BY_TOTAL_DISTANCE = 2,
   ACTIVITY_SORT_BY_ENERGY = 3,
   ACTIVITY_SORT_BY_DURATION = 4,
+}
+export enum CommitType { 
+  COMMIT_TYPE_UNSPECIFIED = 0,
+  COMMIT_TYPE_PLAN = 1,
+  COMMIT_TYPE_CHALLENGE = 2,
+  COMMIT_TYPE_EVENT = 3,
 }
