@@ -337,7 +337,7 @@ export default function Run({
             : "Paused"
         }
         displayTime={formatForDisplay("time", totalTime)}
-        displayDistance={formatForDisplay("distance", totalDistance)}
+        displayDistance={(totalDistance / 1000).toFixed(2)}
         displayPace={formatForDisplay("pace", pace)}
         displayKcal={0}
       />
