@@ -111,34 +111,7 @@ func (cmu *ChallengeMemberUpdate) ClearChallenge() *ChallengeMemberUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cmu *ChallengeMemberUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(cmu.hooks) == 0 {
-		affected, err = cmu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cmu.mutation = mutation
-			affected, err = cmu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(cmu.hooks) - 1; i >= 0; i-- {
-			if cmu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, cmu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, ChallengeMemberMutation](ctx, cmu.sqlSave, cmu.mutation, cmu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -291,6 +264,7 @@ func (cmu *ChallengeMemberUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		return 0, err
 	}
+	cmu.mutation.done = true
 	return n, nil
 }
 
@@ -391,40 +365,7 @@ func (cmuo *ChallengeMemberUpdateOne) Select(field string, fields ...string) *Ch
 
 // Save executes the query and returns the updated ChallengeMember entity.
 func (cmuo *ChallengeMemberUpdateOne) Save(ctx context.Context) (*ChallengeMember, error) {
-	var (
-		err  error
-		node *ChallengeMember
-	)
-	if len(cmuo.hooks) == 0 {
-		node, err = cmuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cmuo.mutation = mutation
-			node, err = cmuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(cmuo.hooks) - 1; i >= 0; i-- {
-			if cmuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, cmuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*ChallengeMember)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ChallengeMemberMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*ChallengeMember, ChallengeMemberMutation](ctx, cmuo.sqlSave, cmuo.mutation, cmuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -597,5 +538,6 @@ func (cmuo *ChallengeMemberUpdateOne) sqlSave(ctx context.Context) (_node *Chall
 		}
 		return nil, err
 	}
+	cmuo.mutation.done = true
 	return _node, nil
 }

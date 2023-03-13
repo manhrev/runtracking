@@ -104,14 +104,14 @@ func (cmr *ChallengeMemberRule) assignValues(columns []string, values []any) err
 
 // QueryChallengeMember queries the "challenge_member" edge of the ChallengeMemberRule entity.
 func (cmr *ChallengeMemberRule) QueryChallengeMember() *ChallengeMemberQuery {
-	return (&ChallengeMemberRuleClient{config: cmr.config}).QueryChallengeMember(cmr)
+	return NewChallengeMemberRuleClient(cmr.config).QueryChallengeMember(cmr)
 }
 
 // Update returns a builder for updating this ChallengeMemberRule.
 // Note that you need to call ChallengeMemberRule.Unwrap() before calling this method if this ChallengeMemberRule
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (cmr *ChallengeMemberRule) Update() *ChallengeMemberRuleUpdateOne {
-	return (&ChallengeMemberRuleClient{config: cmr.config}).UpdateOne(cmr)
+	return NewChallengeMemberRuleClient(cmr.config).UpdateOne(cmr)
 }
 
 // Unwrap unwraps the ChallengeMemberRule entity that was returned from a transaction after it was closed,

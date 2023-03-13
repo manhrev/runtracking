@@ -129,19 +129,19 @@ func (gr *Groupz) assignValues(columns []string, values []any) error {
 
 // QueryMembers queries the "members" edge of the Groupz entity.
 func (gr *Groupz) QueryMembers() *MemberQuery {
-	return (&GroupzClient{config: gr.config}).QueryMembers(gr)
+	return NewGroupzClient(gr.config).QueryMembers(gr)
 }
 
 // QueryChallenges queries the "challenges" edge of the Groupz entity.
 func (gr *Groupz) QueryChallenges() *ChallengeQuery {
-	return (&GroupzClient{config: gr.config}).QueryChallenges(gr)
+	return NewGroupzClient(gr.config).QueryChallenges(gr)
 }
 
 // Update returns a builder for updating this Groupz.
 // Note that you need to call Groupz.Unwrap() before calling this method if this Groupz
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (gr *Groupz) Update() *GroupzUpdateOne {
-	return (&GroupzClient{config: gr.config}).UpdateOne(gr)
+	return NewGroupzClient(gr.config).UpdateOne(gr)
 }
 
 // Unwrap unwraps the Groupz entity that was returned from a transaction after it was closed,

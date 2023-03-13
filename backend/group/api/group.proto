@@ -12,6 +12,16 @@ service Group {
     rpc GetGroup(GetGroupRequest) returns(GetGroupReply){};
     rpc UpdateGroup(UpdateGroupRequest) returns(UpdateGroupReply){};
     rpc DeleteGroup(DeleteGroupRequest) returns(DeleteGroupReply){};
+    rpc ListMembersOfGroup(ListMembersOfGroupRequest) returns(ListMembersOfGroupReply) {};
+    rpc JoinGroup(JoinGroupRequest) returns(JoinGroupReply){};
+}
+
+message JoinGroupRequest{
+    int64 group_id = 1;
+}
+
+message JoinGroupReply{
+    
 }
 
 
@@ -20,6 +30,27 @@ message CreateGroupRequest{
 }
 
 message CreateGroupReply{}
+
+message ListMembersOfGroupRequest{
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    int64 group_id = 6;
+    MOGSortBy sort_by = 4;
+    string search_by_name = 5;
+    Member.Status status = 7;
+
+    enum MOGSortBy{
+        MOG_SORT_BY_UNSPECIFIED = 0;
+        MOG_SORT_BY_CREATED_TIME = 1; // Sort by time joined
+        MOG_SORT_BY_NAME = 2;
+    }
+}
+
+message ListMembersOfGroupReply{
+    repeated Member members = 1;
+    int64 total = 2;
+}
 
 message ListGroupRequest{
     uint32 limit = 1;
@@ -53,7 +84,7 @@ message GetGroupReply{
 
 
 message UpdateGroupRequest{
-
+    GroupInfo groupInfo = 1;
 }
 
 message UpdateGroupReply{}
@@ -89,6 +120,19 @@ message Member{
     string display_name = 7;
     string username = 2;
     string email = 3;
+    google.protobuf.Timestamp created_at = 6;
+
+    // Joining group status 
+    Status status = 8;
+
+    enum Status{
+        MEMBER_STATUS_UNSPECIFIED = 0;
+        MEMBER_STATUS_WAITING = 1;
+        MEMBER_STATUS_REJECTED = 2;
+        MEMBER_STATUS_ACCEPTED = 3;
+
+    }
+
 }
 
 message ChallengeInfo{

@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"github.com/manhrev/runtracking/backend/group/internal/status"
+	api "github.com/manhrev/runtracking/backend/group/pkg/api"
 	grouppb "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/code"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 	group "github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 type Group interface {
@@ -25,6 +27,10 @@ type Group interface {
 	) (records []*ent.Groupz, total int64, err error)
 	Get(ctx context.Context, groupId int64) (*ent.Groupz, error)
 	Delete(ctx context.Context, userId int64, groupId int64) error
+	Update(ctx context.Context, groupInfo *grouppb.GroupInfo) error
+	ListMember(ctx context.Context,
+		groupId int64,
+		status api.Member_Status) ([]*ent.Member, error)
 	// GetStatistic(
 	// 	ctx context.Context,
 	// 	userId int64,
@@ -113,6 +119,40 @@ func (m *groupImpl) List(
 	}
 
 	return groups, int64(total), nil
+}
+
+func (m *groupImpl) Update(ctx context.Context, groupInfo *grouppb.GroupInfo) error {
+	err := m.entClient.Groupz.UpdateOneID(groupInfo.GetId()).
+		SetBackgroundPicture(groupInfo.GetBackgroundPicture()).
+		SetDescription(groupInfo.GetDescription()).
+		SetName(groupInfo.GetName()).
+		SetLeaderID(groupInfo.GetId()).
+		Exec(ctx)
+
+	if err != nil {
+		return status.Internal(err.Error())
+	}
+
+	return nil
+}
+
+func (m *groupImpl) ListMember(ctx context.Context,
+	groupID int64,
+	statusMember api.Member_Status) ([]*ent.Member, error) {
+	group, err := m.entClient.Groupz.Get(ctx, groupID)
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
+	query := group.QueryMembers().
+		Where(member.StatusEQ(uint32(statusMember)))
+
+	members, err := query.All(ctx)
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
+	return members, nil
 }
 
 func (m *groupImpl) Delete(ctx context.Context, userId int64, groupId int64) error {

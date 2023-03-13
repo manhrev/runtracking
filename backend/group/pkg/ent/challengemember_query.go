@@ -20,11 +20,9 @@ import (
 // ChallengeMemberQuery is the builder for querying ChallengeMember entities.
 type ChallengeMemberQuery struct {
 	config
-	limit                    *int
-	offset                   *int
-	unique                   *bool
+	ctx                      *QueryContext
 	order                    []OrderFunc
-	fields                   []string
+	inters                   []Interceptor
 	predicates               []predicate.ChallengeMember
 	withChallengeMemberRules *ChallengeMemberRuleQuery
 	withChallenge            *ChallengeQuery
@@ -41,26 +39,26 @@ func (cmq *ChallengeMemberQuery) Where(ps ...predicate.ChallengeMember) *Challen
 	return cmq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (cmq *ChallengeMemberQuery) Limit(limit int) *ChallengeMemberQuery {
-	cmq.limit = &limit
+	cmq.ctx.Limit = &limit
 	return cmq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (cmq *ChallengeMemberQuery) Offset(offset int) *ChallengeMemberQuery {
-	cmq.offset = &offset
+	cmq.ctx.Offset = &offset
 	return cmq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (cmq *ChallengeMemberQuery) Unique(unique bool) *ChallengeMemberQuery {
-	cmq.unique = &unique
+	cmq.ctx.Unique = &unique
 	return cmq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (cmq *ChallengeMemberQuery) Order(o ...OrderFunc) *ChallengeMemberQuery {
 	cmq.order = append(cmq.order, o...)
 	return cmq
@@ -68,7 +66,7 @@ func (cmq *ChallengeMemberQuery) Order(o ...OrderFunc) *ChallengeMemberQuery {
 
 // QueryChallengeMemberRules chains the current query on the "challenge_member_rules" edge.
 func (cmq *ChallengeMemberQuery) QueryChallengeMemberRules() *ChallengeMemberRuleQuery {
-	query := &ChallengeMemberRuleQuery{config: cmq.config}
+	query := (&ChallengeMemberRuleClient{config: cmq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cmq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -90,7 +88,7 @@ func (cmq *ChallengeMemberQuery) QueryChallengeMemberRules() *ChallengeMemberRul
 
 // QueryChallenge chains the current query on the "challenge" edge.
 func (cmq *ChallengeMemberQuery) QueryChallenge() *ChallengeQuery {
-	query := &ChallengeQuery{config: cmq.config}
+	query := (&ChallengeClient{config: cmq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cmq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -113,7 +111,7 @@ func (cmq *ChallengeMemberQuery) QueryChallenge() *ChallengeQuery {
 // First returns the first ChallengeMember entity from the query.
 // Returns a *NotFoundError when no ChallengeMember was found.
 func (cmq *ChallengeMemberQuery) First(ctx context.Context) (*ChallengeMember, error) {
-	nodes, err := cmq.Limit(1).All(ctx)
+	nodes, err := cmq.Limit(1).All(setContextOp(ctx, cmq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +134,7 @@ func (cmq *ChallengeMemberQuery) FirstX(ctx context.Context) *ChallengeMember {
 // Returns a *NotFoundError when no ChallengeMember ID was found.
 func (cmq *ChallengeMemberQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = cmq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = cmq.Limit(1).IDs(setContextOp(ctx, cmq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -159,7 +157,7 @@ func (cmq *ChallengeMemberQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one ChallengeMember entity is found.
 // Returns a *NotFoundError when no ChallengeMember entities are found.
 func (cmq *ChallengeMemberQuery) Only(ctx context.Context) (*ChallengeMember, error) {
-	nodes, err := cmq.Limit(2).All(ctx)
+	nodes, err := cmq.Limit(2).All(setContextOp(ctx, cmq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +185,7 @@ func (cmq *ChallengeMemberQuery) OnlyX(ctx context.Context) *ChallengeMember {
 // Returns a *NotFoundError when no entities are found.
 func (cmq *ChallengeMemberQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = cmq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = cmq.Limit(2).IDs(setContextOp(ctx, cmq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -212,10 +210,12 @@ func (cmq *ChallengeMemberQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of ChallengeMembers.
 func (cmq *ChallengeMemberQuery) All(ctx context.Context) ([]*ChallengeMember, error) {
+	ctx = setContextOp(ctx, cmq.ctx, "All")
 	if err := cmq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return cmq.sqlAll(ctx)
+	qr := querierAll[[]*ChallengeMember, *ChallengeMemberQuery]()
+	return withInterceptors[[]*ChallengeMember](ctx, cmq, qr, cmq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -230,6 +230,7 @@ func (cmq *ChallengeMemberQuery) AllX(ctx context.Context) []*ChallengeMember {
 // IDs executes the query and returns a list of ChallengeMember IDs.
 func (cmq *ChallengeMemberQuery) IDs(ctx context.Context) ([]int64, error) {
 	var ids []int64
+	ctx = setContextOp(ctx, cmq.ctx, "IDs")
 	if err := cmq.Select(challengemember.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -247,10 +248,11 @@ func (cmq *ChallengeMemberQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (cmq *ChallengeMemberQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, cmq.ctx, "Count")
 	if err := cmq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return cmq.sqlCount(ctx)
+	return withInterceptors[int](ctx, cmq, querierCount[*ChallengeMemberQuery](), cmq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -264,10 +266,15 @@ func (cmq *ChallengeMemberQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cmq *ChallengeMemberQuery) Exist(ctx context.Context) (bool, error) {
-	if err := cmq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, cmq.ctx, "Exist")
+	switch _, err := cmq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return cmq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -287,23 +294,22 @@ func (cmq *ChallengeMemberQuery) Clone() *ChallengeMemberQuery {
 	}
 	return &ChallengeMemberQuery{
 		config:                   cmq.config,
-		limit:                    cmq.limit,
-		offset:                   cmq.offset,
+		ctx:                      cmq.ctx.Clone(),
 		order:                    append([]OrderFunc{}, cmq.order...),
+		inters:                   append([]Interceptor{}, cmq.inters...),
 		predicates:               append([]predicate.ChallengeMember{}, cmq.predicates...),
 		withChallengeMemberRules: cmq.withChallengeMemberRules.Clone(),
 		withChallenge:            cmq.withChallenge.Clone(),
 		// clone intermediate query.
-		sql:    cmq.sql.Clone(),
-		path:   cmq.path,
-		unique: cmq.unique,
+		sql:  cmq.sql.Clone(),
+		path: cmq.path,
 	}
 }
 
 // WithChallengeMemberRules tells the query-builder to eager-load the nodes that are connected to
 // the "challenge_member_rules" edge. The optional arguments are used to configure the query builder of the edge.
 func (cmq *ChallengeMemberQuery) WithChallengeMemberRules(opts ...func(*ChallengeMemberRuleQuery)) *ChallengeMemberQuery {
-	query := &ChallengeMemberRuleQuery{config: cmq.config}
+	query := (&ChallengeMemberRuleClient{config: cmq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -314,7 +320,7 @@ func (cmq *ChallengeMemberQuery) WithChallengeMemberRules(opts ...func(*Challeng
 // WithChallenge tells the query-builder to eager-load the nodes that are connected to
 // the "challenge" edge. The optional arguments are used to configure the query builder of the edge.
 func (cmq *ChallengeMemberQuery) WithChallenge(opts ...func(*ChallengeQuery)) *ChallengeMemberQuery {
-	query := &ChallengeQuery{config: cmq.config}
+	query := (&ChallengeClient{config: cmq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -338,16 +344,11 @@ func (cmq *ChallengeMemberQuery) WithChallenge(opts ...func(*ChallengeQuery)) *C
 //		Scan(ctx, &v)
 //
 func (cmq *ChallengeMemberQuery) GroupBy(field string, fields ...string) *ChallengeMemberGroupBy {
-	grbuild := &ChallengeMemberGroupBy{config: cmq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := cmq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return cmq.sqlQuery(ctx), nil
-	}
+	cmq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &ChallengeMemberGroupBy{build: cmq}
+	grbuild.flds = &cmq.ctx.Fields
 	grbuild.label = challengemember.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -365,11 +366,11 @@ func (cmq *ChallengeMemberQuery) GroupBy(field string, fields ...string) *Challe
 //		Scan(ctx, &v)
 //
 func (cmq *ChallengeMemberQuery) Select(fields ...string) *ChallengeMemberSelect {
-	cmq.fields = append(cmq.fields, fields...)
-	selbuild := &ChallengeMemberSelect{ChallengeMemberQuery: cmq}
-	selbuild.label = challengemember.Label
-	selbuild.flds, selbuild.scan = &cmq.fields, selbuild.Scan
-	return selbuild
+	cmq.ctx.Fields = append(cmq.ctx.Fields, fields...)
+	sbuild := &ChallengeMemberSelect{ChallengeMemberQuery: cmq}
+	sbuild.label = challengemember.Label
+	sbuild.flds, sbuild.scan = &cmq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a ChallengeMemberSelect configured with the given aggregations.
@@ -378,7 +379,17 @@ func (cmq *ChallengeMemberQuery) Aggregate(fns ...AggregateFunc) *ChallengeMembe
 }
 
 func (cmq *ChallengeMemberQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range cmq.fields {
+	for _, inter := range cmq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, cmq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range cmq.ctx.Fields {
 		if !challengemember.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -492,6 +503,9 @@ func (cmq *ChallengeMemberQuery) loadChallenge(ctx context.Context, query *Chall
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(challenge.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -514,22 +528,11 @@ func (cmq *ChallengeMemberQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(cmq.modifiers) > 0 {
 		_spec.Modifiers = cmq.modifiers
 	}
-	_spec.Node.Columns = cmq.fields
-	if len(cmq.fields) > 0 {
-		_spec.Unique = cmq.unique != nil && *cmq.unique
+	_spec.Node.Columns = cmq.ctx.Fields
+	if len(cmq.ctx.Fields) > 0 {
+		_spec.Unique = cmq.ctx.Unique != nil && *cmq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, cmq.driver, _spec)
-}
-
-func (cmq *ChallengeMemberQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := cmq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (cmq *ChallengeMemberQuery) querySpec() *sqlgraph.QuerySpec {
@@ -545,10 +548,10 @@ func (cmq *ChallengeMemberQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   cmq.sql,
 		Unique: true,
 	}
-	if unique := cmq.unique; unique != nil {
+	if unique := cmq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := cmq.fields; len(fields) > 0 {
+	if fields := cmq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, challengemember.FieldID)
 		for i := range fields {
@@ -564,10 +567,10 @@ func (cmq *ChallengeMemberQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := cmq.limit; limit != nil {
+	if limit := cmq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := cmq.offset; offset != nil {
+	if offset := cmq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := cmq.order; len(ps) > 0 {
@@ -583,7 +586,7 @@ func (cmq *ChallengeMemberQuery) querySpec() *sqlgraph.QuerySpec {
 func (cmq *ChallengeMemberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(cmq.driver.Dialect())
 	t1 := builder.Table(challengemember.Table)
-	columns := cmq.fields
+	columns := cmq.ctx.Fields
 	if len(columns) == 0 {
 		columns = challengemember.Columns
 	}
@@ -592,7 +595,7 @@ func (cmq *ChallengeMemberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = cmq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if cmq.unique != nil && *cmq.unique {
+	if cmq.ctx.Unique != nil && *cmq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range cmq.modifiers {
@@ -604,12 +607,12 @@ func (cmq *ChallengeMemberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range cmq.order {
 		p(selector)
 	}
-	if offset := cmq.offset; offset != nil {
+	if offset := cmq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := cmq.limit; limit != nil {
+	if limit := cmq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -623,13 +626,8 @@ func (cmq *ChallengeMemberQuery) Modify(modifiers ...func(s *sql.Selector)) *Cha
 
 // ChallengeMemberGroupBy is the group-by builder for ChallengeMember entities.
 type ChallengeMemberGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *ChallengeMemberQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -638,58 +636,46 @@ func (cmgb *ChallengeMemberGroupBy) Aggregate(fns ...AggregateFunc) *ChallengeMe
 	return cmgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (cmgb *ChallengeMemberGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := cmgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, cmgb.build.ctx, "GroupBy")
+	if err := cmgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cmgb.sql = query
-	return cmgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*ChallengeMemberQuery, *ChallengeMemberGroupBy](ctx, cmgb.build, cmgb, cmgb.build.inters, v)
 }
 
-func (cmgb *ChallengeMemberGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range cmgb.fields {
-		if !challengemember.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (cmgb *ChallengeMemberGroupBy) sqlScan(ctx context.Context, root *ChallengeMemberQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(cmgb.fns))
+	for _, fn := range cmgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := cmgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*cmgb.flds)+len(cmgb.fns))
+		for _, f := range *cmgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*cmgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cmgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := cmgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (cmgb *ChallengeMemberGroupBy) sqlQuery() *sql.Selector {
-	selector := cmgb.sql.Select()
-	aggregation := make([]string, 0, len(cmgb.fns))
-	for _, fn := range cmgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(cmgb.fields)+len(cmgb.fns))
-		for _, f := range cmgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(cmgb.fields...)...)
-}
-
 // ChallengeMemberSelect is the builder for selecting fields of ChallengeMember entities.
 type ChallengeMemberSelect struct {
 	*ChallengeMemberQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -700,26 +686,27 @@ func (cms *ChallengeMemberSelect) Aggregate(fns ...AggregateFunc) *ChallengeMemb
 
 // Scan applies the selector query and scans the result into the given value.
 func (cms *ChallengeMemberSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, cms.ctx, "Select")
 	if err := cms.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cms.sql = cms.ChallengeMemberQuery.sqlQuery(ctx)
-	return cms.sqlScan(ctx, v)
+	return scanWithInterceptors[*ChallengeMemberQuery, *ChallengeMemberSelect](ctx, cms.ChallengeMemberQuery, cms, cms.inters, v)
 }
 
-func (cms *ChallengeMemberSelect) sqlScan(ctx context.Context, v any) error {
+func (cms *ChallengeMemberSelect) sqlScan(ctx context.Context, root *ChallengeMemberQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(cms.fns))
 	for _, fn := range cms.fns {
-		aggregation = append(aggregation, fn(cms.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*cms.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		cms.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		cms.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := cms.sql.Query()
+	query, args := selector.Query()
 	if err := cms.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

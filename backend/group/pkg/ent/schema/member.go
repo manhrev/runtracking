@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
 type Member struct {
@@ -21,6 +22,10 @@ func (Member) Fields() []ent.Field {
 		field.Time("created_at").
 			Default(time.Now),
 		field.Int64("user_id"),
+		field.Uint32("status").
+			Default(uint32(group.Member_MEMBER_STATUS_UNSPECIFIED)),
+		field.Time("joining_at").
+			Optional(),
 	}
 }
 

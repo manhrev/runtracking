@@ -17,6 +17,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -499,9 +500,24 @@ func (m *ChallengeMutation) Where(ps ...predicate.Challenge) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ChallengeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ChallengeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Challenge, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ChallengeMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ChallengeMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Challenge).
@@ -1093,9 +1109,24 @@ func (m *ChallengeMemberMutation) Where(ps ...predicate.ChallengeMember) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ChallengeMemberMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ChallengeMemberMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ChallengeMember, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ChallengeMemberMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ChallengeMemberMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (ChallengeMember).
@@ -1613,9 +1644,24 @@ func (m *ChallengeMemberRuleMutation) Where(ps ...predicate.ChallengeMemberRule)
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ChallengeMemberRuleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ChallengeMemberRuleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ChallengeMemberRule, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ChallengeMemberRuleMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ChallengeMemberRuleMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (ChallengeMemberRule).
@@ -2318,9 +2364,24 @@ func (m *GroupzMutation) Where(ps ...predicate.Groupz) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the GroupzMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *GroupzMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Groupz, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *GroupzMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *GroupzMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Groupz).
@@ -2646,6 +2707,9 @@ type MemberMutation struct {
 	created_at    *time.Time
 	user_id       *int64
 	adduser_id    *int64
+	status        *uint32
+	addstatus     *int32
+	joining_at    *time.Time
 	clearedFields map[string]struct{}
 	groupz        *int64
 	clearedgroupz bool
@@ -2850,6 +2914,111 @@ func (m *MemberMutation) ResetUserID() {
 	m.adduser_id = nil
 }
 
+// SetStatus sets the "status" field.
+func (m *MemberMutation) SetStatus(u uint32) {
+	m.status = &u
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *MemberMutation) Status() (r uint32, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Member entity.
+// If the Member object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MemberMutation) OldStatus(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds u to the "status" field.
+func (m *MemberMutation) AddStatus(u int32) {
+	if m.addstatus != nil {
+		*m.addstatus += u
+	} else {
+		m.addstatus = &u
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *MemberMutation) AddedStatus() (r int32, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *MemberMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetJoiningAt sets the "joining_at" field.
+func (m *MemberMutation) SetJoiningAt(t time.Time) {
+	m.joining_at = &t
+}
+
+// JoiningAt returns the value of the "joining_at" field in the mutation.
+func (m *MemberMutation) JoiningAt() (r time.Time, exists bool) {
+	v := m.joining_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldJoiningAt returns the old "joining_at" field's value of the Member entity.
+// If the Member object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MemberMutation) OldJoiningAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldJoiningAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldJoiningAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldJoiningAt: %w", err)
+	}
+	return oldValue.JoiningAt, nil
+}
+
+// ClearJoiningAt clears the value of the "joining_at" field.
+func (m *MemberMutation) ClearJoiningAt() {
+	m.joining_at = nil
+	m.clearedFields[member.FieldJoiningAt] = struct{}{}
+}
+
+// JoiningAtCleared returns if the "joining_at" field was cleared in this mutation.
+func (m *MemberMutation) JoiningAtCleared() bool {
+	_, ok := m.clearedFields[member.FieldJoiningAt]
+	return ok
+}
+
+// ResetJoiningAt resets all changes to the "joining_at" field.
+func (m *MemberMutation) ResetJoiningAt() {
+	m.joining_at = nil
+	delete(m.clearedFields, member.FieldJoiningAt)
+}
+
 // SetGroupzID sets the "groupz" edge to the Groupz entity by id.
 func (m *MemberMutation) SetGroupzID(id int64) {
 	m.groupz = &id
@@ -2894,9 +3063,24 @@ func (m *MemberMutation) Where(ps ...predicate.Member) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the MemberMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MemberMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Member, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *MemberMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MemberMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Member).
@@ -2908,12 +3092,18 @@ func (m *MemberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MemberMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 4)
 	if m.created_at != nil {
 		fields = append(fields, member.FieldCreatedAt)
 	}
 	if m.user_id != nil {
 		fields = append(fields, member.FieldUserID)
+	}
+	if m.status != nil {
+		fields = append(fields, member.FieldStatus)
+	}
+	if m.joining_at != nil {
+		fields = append(fields, member.FieldJoiningAt)
 	}
 	return fields
 }
@@ -2927,6 +3117,10 @@ func (m *MemberMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case member.FieldUserID:
 		return m.UserID()
+	case member.FieldStatus:
+		return m.Status()
+	case member.FieldJoiningAt:
+		return m.JoiningAt()
 	}
 	return nil, false
 }
@@ -2940,6 +3134,10 @@ func (m *MemberMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldCreatedAt(ctx)
 	case member.FieldUserID:
 		return m.OldUserID(ctx)
+	case member.FieldStatus:
+		return m.OldStatus(ctx)
+	case member.FieldJoiningAt:
+		return m.OldJoiningAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Member field %s", name)
 }
@@ -2963,6 +3161,20 @@ func (m *MemberMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUserID(v)
 		return nil
+	case member.FieldStatus:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case member.FieldJoiningAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetJoiningAt(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Member field %s", name)
 }
@@ -2974,6 +3186,9 @@ func (m *MemberMutation) AddedFields() []string {
 	if m.adduser_id != nil {
 		fields = append(fields, member.FieldUserID)
 	}
+	if m.addstatus != nil {
+		fields = append(fields, member.FieldStatus)
+	}
 	return fields
 }
 
@@ -2984,6 +3199,8 @@ func (m *MemberMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case member.FieldUserID:
 		return m.AddedUserID()
+	case member.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -3000,6 +3217,13 @@ func (m *MemberMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddUserID(v)
 		return nil
+	case member.FieldStatus:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Member numeric field %s", name)
 }
@@ -3007,7 +3231,11 @@ func (m *MemberMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *MemberMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(member.FieldJoiningAt) {
+		fields = append(fields, member.FieldJoiningAt)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3020,6 +3248,11 @@ func (m *MemberMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *MemberMutation) ClearField(name string) error {
+	switch name {
+	case member.FieldJoiningAt:
+		m.ClearJoiningAt()
+		return nil
+	}
 	return fmt.Errorf("unknown Member nullable field %s", name)
 }
 
@@ -3032,6 +3265,12 @@ func (m *MemberMutation) ResetField(name string) error {
 		return nil
 	case member.FieldUserID:
 		m.ResetUserID()
+		return nil
+	case member.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case member.FieldJoiningAt:
+		m.ResetJoiningAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Member field %s", name)

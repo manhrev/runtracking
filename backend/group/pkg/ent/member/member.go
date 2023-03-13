@@ -15,6 +15,10 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldJoiningAt holds the string denoting the joining_at field in the database.
+	FieldJoiningAt = "joining_at"
 	// EdgeGroupz holds the string denoting the groupz edge name in mutations.
 	EdgeGroupz = "groupz"
 	// Table holds the table name of the member in the database.
@@ -33,6 +37,8 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUserID,
+	FieldStatus,
+	FieldJoiningAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "members"
@@ -59,4 +65,6 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus uint32
 )
