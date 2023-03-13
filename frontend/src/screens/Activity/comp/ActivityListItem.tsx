@@ -1,6 +1,10 @@
 import { StyleSheet, View } from "react-native";
 import { Avatar, Divider, Text, TouchableRipple } from "react-native-paper";
-import { ActivityInfo, ActivityType } from "../../../lib/activity/activity_pb";
+import {
+  ActivityInfo,
+  ActivityType,
+  CommitType,
+} from "../../../lib/activity/activity_pb";
 import { AppTheme, useAppTheme } from "../../../theme";
 import {
   formatDate,
@@ -27,6 +31,7 @@ export default function ActivityListItem(props: ActivityListItemProps) {
     startTime,
     endTime,
     type,
+    commitType,
   } = activityInfo;
   const theme = useAppTheme();
 
@@ -56,6 +61,16 @@ export default function ActivityListItem(props: ActivityListItemProps) {
                   flex: 1,
                 }}
               >
+                {commitType !== CommitType.COMMIT_TYPE_UNSPECIFIED && (
+                  <Text
+                    style={{
+                      alignSelf: "flex-end",
+                      color: theme.colors.primary,
+                    }}
+                  >
+                    Commited
+                  </Text>
+                )}
                 <Text variant="bodyMedium" style={{ alignSelf: "flex-end" }}>
                   {getNameWithActivityType(type)}
                 </Text>
@@ -123,7 +138,7 @@ const styles = (theme: AppTheme) =>
       alignItems: "center",
       flexDirection: "row",
     },
-    listItemValue:{
+    listItemValue: {
       marginTop: 10,
       display: "flex",
       flexDirection: "row",
