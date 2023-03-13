@@ -633,7 +633,9 @@ proto.activity.ActivityInfo.toObject = function(includeInstance, msg) {
     routeList: jspb.Message.toObjectList(msg.getRouteList(),
     proto.activity.TrackPoint.toObject, includeInstance),
     activityName: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    activityNote: jspb.Message.getFieldWithDefault(msg, 10, "")
+    activityNote: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    commitType: jspb.Message.getFieldWithDefault(msg, 12, 0),
+    commitId: jspb.Message.getFieldWithDefault(msg, 13, 0)
   };
 
   if (includeInstance) {
@@ -712,6 +714,14 @@ proto.activity.ActivityInfo.deserializeBinaryFromReader = function(msg, reader) 
     case 10:
       var value = /** @type {string} */ (reader.readString());
       msg.setActivityNote(value);
+      break;
+    case 12:
+      var value = /** @type {!proto.activity.CommitType} */ (reader.readEnum());
+      msg.setCommitType(value);
+      break;
+    case 13:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setCommitId(value);
       break;
     default:
       reader.skipField();
@@ -812,6 +822,20 @@ proto.activity.ActivityInfo.serializeBinaryToWriter = function(message, writer) 
   if (f.length > 0) {
     writer.writeString(
       10,
+      f
+    );
+  }
+  f = message.getCommitType();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      12,
+      f
+    );
+  }
+  f = message.getCommitId();
+  if (f !== 0) {
+    writer.writeInt64(
+      13,
       f
     );
   }
@@ -1053,6 +1077,42 @@ proto.activity.ActivityInfo.prototype.getActivityNote = function() {
  */
 proto.activity.ActivityInfo.prototype.setActivityNote = function(value) {
   return jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * optional CommitType commit_type = 12;
+ * @return {!proto.activity.CommitType}
+ */
+proto.activity.ActivityInfo.prototype.getCommitType = function() {
+  return /** @type {!proto.activity.CommitType} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+};
+
+
+/**
+ * @param {!proto.activity.CommitType} value
+ * @return {!proto.activity.ActivityInfo} returns this
+ */
+proto.activity.ActivityInfo.prototype.setCommitType = function(value) {
+  return jspb.Message.setProto3EnumField(this, 12, value);
+};
+
+
+/**
+ * optional int64 commit_id = 13;
+ * @return {number}
+ */
+proto.activity.ActivityInfo.prototype.getCommitId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 13, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.activity.ActivityInfo} returns this
+ */
+proto.activity.ActivityInfo.prototype.setCommitId = function(value) {
+  return jspb.Message.setProto3IntField(this, 13, value);
 };
 
 

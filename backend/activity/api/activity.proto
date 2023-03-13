@@ -41,6 +41,8 @@ message ActivityInfo {
     repeated TrackPoint route = 8;
     string activity_name = 9;
     string activity_note = 10;
+    CommitType commit_type = 12;
+    int64 commit_id = 13;
 }
 
 message CreateActivityInfoRequest {

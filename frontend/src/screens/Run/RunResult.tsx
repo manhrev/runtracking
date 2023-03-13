@@ -1,6 +1,13 @@
 import { StyleSheet, View, Dimensions } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Divider, Text, List, TextInput, RadioButton, Button } from "react-native-paper";
+import {
+  Divider,
+  Text,
+  List,
+  TextInput,
+  RadioButton,
+  Button,
+} from "react-native-paper";
 
 import { AppTheme, useAppTheme } from "../../theme";
 import { baseStyles } from "../baseStyle";
@@ -13,10 +20,10 @@ import {
   TrackPoint,
 } from "../../lib/activity/activity_pb";
 import { activityClient } from "../../utils/grpc";
-import { LogBox } from 'react-native';
+import { LogBox } from "react-native";
 
 LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
+  "Non-serializable values were found in the navigation state",
 ]);
 
 const windowWidth = Dimensions.get("window").width;
@@ -28,7 +35,9 @@ export default function RunResult({
   const theme = useAppTheme();
   const [activityName, setActivityName] = useState("Sample");
   const [activityNote, setActivityNote] = useState("Sample Note");
-  const [activityType, setActivityType] = useState<ActivityType>(ActivityType.ACTIVITY_TYPE_RUNNING);
+  const [activityType, setActivityType] = useState<ActivityType>(
+    ActivityType.ACTIVITY_TYPE_RUNNING
+  );
 
   // console.log(route.params.savingInfo);
 
@@ -44,18 +53,21 @@ export default function RunResult({
       startTime: route.params.savingInfo.startTime,
       endTime: route.params.savingInfo.endTime,
       id: 0,
+      commitId: 0,
+      commitType: 0,
     };
     // console.log(activityInfo);
     activityClient.createActivityInfo(activityInfo).then((res) => {
-      if(!res.error){
-        if(res.response?.idCreated)
-        {
-          navigation.navigate("RunCommit", {activityId: res.response.idCreated, activityType: activityType, resetRunInfo: route.params.resetRunInfo});
+      if (!res.error) {
+        if (res.response?.idCreated) {
+          navigation.navigate("RunCommit", {
+            activityId: res.response.idCreated,
+            activityType: activityType,
+            resetRunInfo: route.params.resetRunInfo,
+          });
         }
-      }
-      else alert("Failed!");
+      } else alert("Failed!");
     });
-
   };
 
   const deleteActivity = () => {
@@ -64,98 +76,106 @@ export default function RunResult({
 
   return (
     <View style={baseStyles(theme).container}>
-        <List.Item
-          title="Distance (KM)"
-          description=""
-          left={props => <List.Icon {...props} icon="map-marker-distance" />}
-          right={props => <Text>{route.params.display.distance}</Text>}
-        />
-        <List.Item
-          title="Duration"
-          description=""
-          left={props => <List.Icon {...props} icon="timer" />}
-          right={props => <Text>{route.params.display.time}</Text>}
-        />
-        <List.Item
-          title="Pace (MIN/KM)"
-          description=""
-          left={props => <List.Icon {...props} icon="speedometer" />}
-          right={props => <Text>{route.params.display.pace}</Text>}
-        />
-        
-        <List.Item
-          title="KCAL"
-          description=""
-          left={props => <List.Icon {...props} icon="lightning-bolt-circle" />}
-          right={props => <Text>{route.params.display.kcal}</Text>}
-        />
+      <List.Item
+        title="Distance (KM)"
+        description=""
+        left={(props) => <List.Icon {...props} icon="map-marker-distance" />}
+        right={(props) => <Text>{route.params.display.distance}</Text>}
+      />
+      <List.Item
+        title="Duration"
+        description=""
+        left={(props) => <List.Icon {...props} icon="timer" />}
+        right={(props) => <Text>{route.params.display.time}</Text>}
+      />
+      <List.Item
+        title="Pace (MIN/KM)"
+        description=""
+        left={(props) => <List.Icon {...props} icon="speedometer" />}
+        right={(props) => <Text>{route.params.display.pace}</Text>}
+      />
 
-        <TextInput
-          style={styles(theme).titleInput}
-          label="Activity Name"
-          mode="outlined"
-          value={activityName}
-          onChangeText={text => setActivityName(text)}
-        />
+      <List.Item
+        title="KCAL"
+        description=""
+        left={(props) => <List.Icon {...props} icon="lightning-bolt-circle" />}
+        right={(props) => <Text>{route.params.display.kcal}</Text>}
+      />
 
-        
-        <View style={{ marginLeft: 15 }}>
-          <Text style={{ marginTop: 20, marginBottom: 10 }}>Activity Type:</Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <RadioButton
-              value="running"
-              status={activityType === ActivityType.ACTIVITY_TYPE_RUNNING ? "checked" : "unchecked"}
-              onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)}
-            />
-            <Text>Running</Text>
+      <TextInput
+        style={styles(theme).titleInput}
+        label="Activity Name"
+        mode="outlined"
+        value={activityName}
+        onChangeText={(text) => setActivityName(text)}
+      />
 
-            <RadioButton
-              value="walking"
-              status={activityType === ActivityType.ACTIVITY_TYPE_WALKING ? "checked" : "unchecked"}
-              onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)}
-            />
-            <Text>Walking</Text>
+      <View style={{ marginLeft: 15 }}>
+        <Text style={{ marginTop: 20, marginBottom: 10 }}>Activity Type:</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <RadioButton
+            value="running"
+            status={
+              activityType === ActivityType.ACTIVITY_TYPE_RUNNING
+                ? "checked"
+                : "unchecked"
+            }
+            onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)}
+          />
+          <Text>Running</Text>
 
-            <RadioButton
-              value="cycling"
-              status={activityType === ActivityType.ACTIVITY_TYPE_CYCLING ? "checked" : "unchecked"}
-              onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)}
-            />
-            <Text>Cycling</Text>
-          </View>
+          <RadioButton
+            value="walking"
+            status={
+              activityType === ActivityType.ACTIVITY_TYPE_WALKING
+                ? "checked"
+                : "unchecked"
+            }
+            onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)}
+          />
+          <Text>Walking</Text>
+
+          <RadioButton
+            value="cycling"
+            status={
+              activityType === ActivityType.ACTIVITY_TYPE_CYCLING
+                ? "checked"
+                : "unchecked"
+            }
+            onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)}
+          />
+          <Text>Cycling</Text>
         </View>
+      </View>
 
-        <TextInput
-          style={styles(theme).noteInput}
-          multiline={true}
-          numberOfLines={4}
-          label="Note"
-          mode="outlined"
-          value={activityNote}
-          onChangeText={text => setActivityNote(text)}
-        />
+      <TextInput
+        style={styles(theme).noteInput}
+        multiline={true}
+        numberOfLines={4}
+        label="Note"
+        mode="outlined"
+        value={activityNote}
+        onChangeText={(text) => setActivityNote(text)}
+      />
 
+      <View style={styles(theme).btnContainer}>
+        <Button
+          mode="contained"
+          buttonColor="#e82525"
+          onPress={() => deleteActivity()}
+          style={styles(theme).button}
+        >
+          Cancel
+        </Button>
 
-        <View style={styles(theme).btnContainer}>
-            <Button
-              mode="contained"
-              buttonColor="#e82525"
-              onPress={() => deleteActivity()}
-              style={styles(theme).button}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              mode="contained"
-              onPress={() => saveActivity()}
-              style={styles(theme).button}
-            >
-              Save
-            </Button>
-        </View>
-        
-
+        <Button
+          mode="contained"
+          onPress={() => saveActivity()}
+          style={styles(theme).button}
+        >
+          Save
+        </Button>
+      </View>
     </View>
   );
 }
@@ -169,15 +189,15 @@ const styles = (theme: AppTheme) =>
       marginLeft: "auto",
       marginRight: "auto",
     },
-    button : {
+    button: {
       flex: 1,
       margin: 12,
     },
     btnContainer: {
       flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
     },
     noteInput: {
       width: windowWidth * 0.9,

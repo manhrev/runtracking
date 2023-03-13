@@ -76,6 +76,12 @@ export class ActivityInfo extends jspb.Message {
   getActivityNote(): string;
   setActivityNote(value: string): ActivityInfo;
 
+  getCommitType(): CommitType;
+  setCommitType(value: CommitType): ActivityInfo;
+
+  getCommitId(): number;
+  setCommitId(value: number): ActivityInfo;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ActivityInfo.AsObject;
   static toObject(includeInstance: boolean, msg: ActivityInfo): ActivityInfo.AsObject;
@@ -96,6 +102,8 @@ export namespace ActivityInfo {
     routeList: Array<TrackPoint.AsObject>,
     activityName: string,
     activityNote: string,
+    commitType: CommitType,
+    commitId: number,
   }
 }
 
