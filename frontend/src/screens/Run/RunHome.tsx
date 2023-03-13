@@ -22,6 +22,7 @@ import Monitor from "./comp/Monitor";
 
 import { TrackPoint } from "../../lib/activity/activity_pb";
 import * as google_protobuf_timestamp_pb from "google-protobuf/google/protobuf/timestamp_pb";
+import { minimalStyle } from "../../constants/mapstyles";
 
 export default function Run({
   navigation,
@@ -116,8 +117,8 @@ export default function Run({
       }
     }
 
-    console.log("=>>>> Distance: ", totalDistance);
-    console.log("State: ", userState);
+    // console.log("=>>>> Distance: ", totalDistance);
+    // console.log("State: ", userState);
 
     if (focusMode) {
       getLocation(); // move the map to current location
@@ -179,12 +180,13 @@ export default function Run({
 
   const getLocation = () => {
     if (mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: location.latitude,
-        longitude: location.longtitude,
-        latitudeDelta: 0.002,
-        longitudeDelta: 0.003,
-      });
+      if (location.longtitude != 0 && location.latitude != 0)
+        mapRef.current.animateToRegion({
+          latitude: location.latitude,
+          longitude: location.longtitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.003,
+        });
     }
   };
 
@@ -203,7 +205,7 @@ export default function Run({
     } else if (userState == "running") {
       setUserState("paused");
 
-      if(coordinates.length > 0) {
+      if (coordinates.length > 0) {
         // set last coordinate as stop point
         let lastCoordinate: TrackPoint.AsObject = {
           latitude: coordinates[coordinates.length - 1].latitude,
@@ -285,7 +287,7 @@ export default function Run({
     } else if (type == "distance-km") {
       return (value / 1000).toFixed(2);
     } else if (type == "pace") {
-      if(value == 0) return "00:00";
+      if (value == 0) return "00:00";
 
       const paceMin =
         Math.floor(value / 60) < 10
@@ -349,15 +351,29 @@ export default function Run({
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
+        customMapStyle={minimalStyle}
+        onMapLoaded={async (event) => {
+          const { coords } = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+            distanceInterval: 1,
+          });
+          mapRef.current?.animateToRegion({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            latitudeDelta: 0.002,
+            longitudeDelta: 0.003,
+          });
+        }}
+        showsUserLocation
       >
-        <Marker
+        {/* <Marker
           coordinate={{
             latitude: location.latitude,
             longitude: location.longtitude,
           }}
           title="Your Location"
           pinColor="purple"
-        />
+        /> */}
         {arrayToMultiPolyline(coordinates).map((polyline, index) => (
           <Polyline
             key={index}
