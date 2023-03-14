@@ -19,6 +19,7 @@ import {
   calculateCenterAndDelta,
 } from "../../utils/helpers/map";
 import { minimalStyle } from "../../constants/mapstyles";
+import { CommitType } from "../../lib/activity/activity_pb";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -50,6 +51,7 @@ export default function ActivityDetail({
     type,
     endTime,
     startTime,
+    commitType,
   } = activity;
 
   const polylineList = arrayToMultiPolyline(routeList);
@@ -68,6 +70,28 @@ export default function ActivityDetail({
             <Text variant="titleLarge" style={{ fontWeight: "700" }}>
               {activityName}
             </Text>
+
+            {commitType !== CommitType.COMMIT_TYPE_UNSPECIFIED ? (
+              <Text style={{ color: theme.colors.primary }}>Commited</Text>
+            ) : (
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                <Text style={{ color: theme.colors.notification }}>
+                  Not commited
+                </Text>
+                <Text
+                  style={{ color: theme.colors.primary, paddingLeft: 3 }}
+                  onPress={() => {
+                    navigation.navigate("RunCommit", {
+                      activityId: activityId,
+                      activityType: type,
+                      resetRunInfo: () => {},
+                    });
+                  }}
+                >
+                  - Press to commit
+                </Text>
+              </View>
+            )}
           </View>
 
           <Divider />

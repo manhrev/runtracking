@@ -60,6 +60,8 @@ export default function RunResult({
     activityClient.createActivityInfo(activityInfo).then((res) => {
       if (!res.error) {
         if (res.response?.idCreated) {
+          navigation.pop();
+          route.params.resetRunInfo();
           navigation.navigate("RunCommit", {
             activityId: res.response.idCreated,
             activityType: activityType,
