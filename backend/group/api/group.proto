@@ -128,8 +128,10 @@ message Member{
     enum Status{
         MEMBER_STATUS_UNSPECIFIED = 0;
         MEMBER_STATUS_WAITING = 1;
-        MEMBER_STATUS_REJECTED = 2;
-        MEMBER_STATUS_ACCEPTED = 3;
+        MEMBER_STATUS_BANNED = 2;
+        MEMBER_STATUS_ACTIVE = 3;
+        MEMBER_STATUS_REJECTED = 4;
+
 
     }
 
