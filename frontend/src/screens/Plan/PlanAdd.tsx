@@ -112,7 +112,7 @@ export default function PlanAdd({
       endTime: {
         seconds: Math.floor(
           moment
-            .unix(startTime.getTime() / 1000)
+            .unix(endTime.getTime() / 1000)
             .endOf("day")
             .valueOf() / 1000
         ),
