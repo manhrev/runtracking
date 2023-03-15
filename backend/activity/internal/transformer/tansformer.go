@@ -20,6 +20,8 @@ func TransformActivityListEntToActivityList(activityList []*ent.Activity) []*act
 			Route:         activityEnt.Route,
 			ActivityName:  activityEnt.ActivityName,
 			ActivityNote:  activityEnt.ActivityNote,
+			CommitType:    activity.CommitType(activityEnt.CommitType),
+			CommitId:      activityEnt.CommitID,
 		}
 		activityInfoList = append(activityInfoList, activityInfo)
 	}

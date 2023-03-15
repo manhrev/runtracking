@@ -141,84 +141,51 @@ func (au *ActivityUpdate) AppendRoute(ap []*activity.TrackPoint) *ActivityUpdate
 	return au
 }
 
-// SetPlanID sets the "plan_id" field.
-func (au *ActivityUpdate) SetPlanID(i int64) *ActivityUpdate {
-	au.mutation.ResetPlanID()
-	au.mutation.SetPlanID(i)
+// SetCommitID sets the "commit_id" field.
+func (au *ActivityUpdate) SetCommitID(i int64) *ActivityUpdate {
+	au.mutation.ResetCommitID()
+	au.mutation.SetCommitID(i)
 	return au
 }
 
-// SetNillablePlanID sets the "plan_id" field if the given value is not nil.
-func (au *ActivityUpdate) SetNillablePlanID(i *int64) *ActivityUpdate {
+// SetNillableCommitID sets the "commit_id" field if the given value is not nil.
+func (au *ActivityUpdate) SetNillableCommitID(i *int64) *ActivityUpdate {
 	if i != nil {
-		au.SetPlanID(*i)
+		au.SetCommitID(*i)
 	}
 	return au
 }
 
-// AddPlanID adds i to the "plan_id" field.
-func (au *ActivityUpdate) AddPlanID(i int64) *ActivityUpdate {
-	au.mutation.AddPlanID(i)
+// AddCommitID adds i to the "commit_id" field.
+func (au *ActivityUpdate) AddCommitID(i int64) *ActivityUpdate {
+	au.mutation.AddCommitID(i)
 	return au
 }
 
-// ClearPlanID clears the value of the "plan_id" field.
-func (au *ActivityUpdate) ClearPlanID() *ActivityUpdate {
-	au.mutation.ClearPlanID()
+// ClearCommitID clears the value of the "commit_id" field.
+func (au *ActivityUpdate) ClearCommitID() *ActivityUpdate {
+	au.mutation.ClearCommitID()
 	return au
 }
 
-// SetChallengeID sets the "challenge_id" field.
-func (au *ActivityUpdate) SetChallengeID(i int64) *ActivityUpdate {
-	au.mutation.ResetChallengeID()
-	au.mutation.SetChallengeID(i)
+// SetCommitType sets the "commit_type" field.
+func (au *ActivityUpdate) SetCommitType(u uint32) *ActivityUpdate {
+	au.mutation.ResetCommitType()
+	au.mutation.SetCommitType(u)
 	return au
 }
 
-// SetNillableChallengeID sets the "challenge_id" field if the given value is not nil.
-func (au *ActivityUpdate) SetNillableChallengeID(i *int64) *ActivityUpdate {
-	if i != nil {
-		au.SetChallengeID(*i)
+// SetNillableCommitType sets the "commit_type" field if the given value is not nil.
+func (au *ActivityUpdate) SetNillableCommitType(u *uint32) *ActivityUpdate {
+	if u != nil {
+		au.SetCommitType(*u)
 	}
 	return au
 }
 
-// AddChallengeID adds i to the "challenge_id" field.
-func (au *ActivityUpdate) AddChallengeID(i int64) *ActivityUpdate {
-	au.mutation.AddChallengeID(i)
-	return au
-}
-
-// ClearChallengeID clears the value of the "challenge_id" field.
-func (au *ActivityUpdate) ClearChallengeID() *ActivityUpdate {
-	au.mutation.ClearChallengeID()
-	return au
-}
-
-// SetEventID sets the "event_id" field.
-func (au *ActivityUpdate) SetEventID(i int64) *ActivityUpdate {
-	au.mutation.ResetEventID()
-	au.mutation.SetEventID(i)
-	return au
-}
-
-// SetNillableEventID sets the "event_id" field if the given value is not nil.
-func (au *ActivityUpdate) SetNillableEventID(i *int64) *ActivityUpdate {
-	if i != nil {
-		au.SetEventID(*i)
-	}
-	return au
-}
-
-// AddEventID adds i to the "event_id" field.
-func (au *ActivityUpdate) AddEventID(i int64) *ActivityUpdate {
-	au.mutation.AddEventID(i)
-	return au
-}
-
-// ClearEventID clears the value of the "event_id" field.
-func (au *ActivityUpdate) ClearEventID() *ActivityUpdate {
-	au.mutation.ClearEventID()
+// AddCommitType adds u to the "commit_type" field.
+func (au *ActivityUpdate) AddCommitType(u int32) *ActivityUpdate {
+	au.mutation.AddCommitType(u)
 	return au
 }
 
@@ -243,34 +210,7 @@ func (au *ActivityUpdate) Mutation() *ActivityMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *ActivityUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(au.hooks) == 0 {
-		affected, err = au.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ActivityMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			au.mutation = mutation
-			affected, err = au.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(au.hooks) - 1; i >= 0; i-- {
-			if au.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = au.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, au.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, ActivityMutation](ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -302,16 +242,7 @@ func (au *ActivityUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Activ
 }
 
 func (au *ActivityUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   entactivity.Table,
-			Columns: entactivity.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: entactivity.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(entactivity.Table, entactivity.Columns, sqlgraph.NewFieldSpec(entactivity.FieldID, field.TypeInt64))
 	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -369,32 +300,20 @@ func (au *ActivityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, entactivity.FieldRoute, value)
 		})
 	}
-	if value, ok := au.mutation.PlanID(); ok {
-		_spec.SetField(entactivity.FieldPlanID, field.TypeInt64, value)
+	if value, ok := au.mutation.CommitID(); ok {
+		_spec.SetField(entactivity.FieldCommitID, field.TypeInt64, value)
 	}
-	if value, ok := au.mutation.AddedPlanID(); ok {
-		_spec.AddField(entactivity.FieldPlanID, field.TypeInt64, value)
+	if value, ok := au.mutation.AddedCommitID(); ok {
+		_spec.AddField(entactivity.FieldCommitID, field.TypeInt64, value)
 	}
-	if au.mutation.PlanIDCleared() {
-		_spec.ClearField(entactivity.FieldPlanID, field.TypeInt64)
+	if au.mutation.CommitIDCleared() {
+		_spec.ClearField(entactivity.FieldCommitID, field.TypeInt64)
 	}
-	if value, ok := au.mutation.ChallengeID(); ok {
-		_spec.SetField(entactivity.FieldChallengeID, field.TypeInt64, value)
+	if value, ok := au.mutation.CommitType(); ok {
+		_spec.SetField(entactivity.FieldCommitType, field.TypeUint32, value)
 	}
-	if value, ok := au.mutation.AddedChallengeID(); ok {
-		_spec.AddField(entactivity.FieldChallengeID, field.TypeInt64, value)
-	}
-	if au.mutation.ChallengeIDCleared() {
-		_spec.ClearField(entactivity.FieldChallengeID, field.TypeInt64)
-	}
-	if value, ok := au.mutation.EventID(); ok {
-		_spec.SetField(entactivity.FieldEventID, field.TypeInt64, value)
-	}
-	if value, ok := au.mutation.AddedEventID(); ok {
-		_spec.AddField(entactivity.FieldEventID, field.TypeInt64, value)
-	}
-	if au.mutation.EventIDCleared() {
-		_spec.ClearField(entactivity.FieldEventID, field.TypeInt64)
+	if value, ok := au.mutation.AddedCommitType(); ok {
+		_spec.AddField(entactivity.FieldCommitType, field.TypeUint32, value)
 	}
 	if value, ok := au.mutation.CreatedAt(); ok {
 		_spec.SetField(entactivity.FieldCreatedAt, field.TypeTime, value)
@@ -408,6 +327,7 @@ func (au *ActivityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	au.mutation.done = true
 	return n, nil
 }
 
@@ -529,84 +449,51 @@ func (auo *ActivityUpdateOne) AppendRoute(ap []*activity.TrackPoint) *ActivityUp
 	return auo
 }
 
-// SetPlanID sets the "plan_id" field.
-func (auo *ActivityUpdateOne) SetPlanID(i int64) *ActivityUpdateOne {
-	auo.mutation.ResetPlanID()
-	auo.mutation.SetPlanID(i)
+// SetCommitID sets the "commit_id" field.
+func (auo *ActivityUpdateOne) SetCommitID(i int64) *ActivityUpdateOne {
+	auo.mutation.ResetCommitID()
+	auo.mutation.SetCommitID(i)
 	return auo
 }
 
-// SetNillablePlanID sets the "plan_id" field if the given value is not nil.
-func (auo *ActivityUpdateOne) SetNillablePlanID(i *int64) *ActivityUpdateOne {
+// SetNillableCommitID sets the "commit_id" field if the given value is not nil.
+func (auo *ActivityUpdateOne) SetNillableCommitID(i *int64) *ActivityUpdateOne {
 	if i != nil {
-		auo.SetPlanID(*i)
+		auo.SetCommitID(*i)
 	}
 	return auo
 }
 
-// AddPlanID adds i to the "plan_id" field.
-func (auo *ActivityUpdateOne) AddPlanID(i int64) *ActivityUpdateOne {
-	auo.mutation.AddPlanID(i)
+// AddCommitID adds i to the "commit_id" field.
+func (auo *ActivityUpdateOne) AddCommitID(i int64) *ActivityUpdateOne {
+	auo.mutation.AddCommitID(i)
 	return auo
 }
 
-// ClearPlanID clears the value of the "plan_id" field.
-func (auo *ActivityUpdateOne) ClearPlanID() *ActivityUpdateOne {
-	auo.mutation.ClearPlanID()
+// ClearCommitID clears the value of the "commit_id" field.
+func (auo *ActivityUpdateOne) ClearCommitID() *ActivityUpdateOne {
+	auo.mutation.ClearCommitID()
 	return auo
 }
 
-// SetChallengeID sets the "challenge_id" field.
-func (auo *ActivityUpdateOne) SetChallengeID(i int64) *ActivityUpdateOne {
-	auo.mutation.ResetChallengeID()
-	auo.mutation.SetChallengeID(i)
+// SetCommitType sets the "commit_type" field.
+func (auo *ActivityUpdateOne) SetCommitType(u uint32) *ActivityUpdateOne {
+	auo.mutation.ResetCommitType()
+	auo.mutation.SetCommitType(u)
 	return auo
 }
 
-// SetNillableChallengeID sets the "challenge_id" field if the given value is not nil.
-func (auo *ActivityUpdateOne) SetNillableChallengeID(i *int64) *ActivityUpdateOne {
-	if i != nil {
-		auo.SetChallengeID(*i)
+// SetNillableCommitType sets the "commit_type" field if the given value is not nil.
+func (auo *ActivityUpdateOne) SetNillableCommitType(u *uint32) *ActivityUpdateOne {
+	if u != nil {
+		auo.SetCommitType(*u)
 	}
 	return auo
 }
 
-// AddChallengeID adds i to the "challenge_id" field.
-func (auo *ActivityUpdateOne) AddChallengeID(i int64) *ActivityUpdateOne {
-	auo.mutation.AddChallengeID(i)
-	return auo
-}
-
-// ClearChallengeID clears the value of the "challenge_id" field.
-func (auo *ActivityUpdateOne) ClearChallengeID() *ActivityUpdateOne {
-	auo.mutation.ClearChallengeID()
-	return auo
-}
-
-// SetEventID sets the "event_id" field.
-func (auo *ActivityUpdateOne) SetEventID(i int64) *ActivityUpdateOne {
-	auo.mutation.ResetEventID()
-	auo.mutation.SetEventID(i)
-	return auo
-}
-
-// SetNillableEventID sets the "event_id" field if the given value is not nil.
-func (auo *ActivityUpdateOne) SetNillableEventID(i *int64) *ActivityUpdateOne {
-	if i != nil {
-		auo.SetEventID(*i)
-	}
-	return auo
-}
-
-// AddEventID adds i to the "event_id" field.
-func (auo *ActivityUpdateOne) AddEventID(i int64) *ActivityUpdateOne {
-	auo.mutation.AddEventID(i)
-	return auo
-}
-
-// ClearEventID clears the value of the "event_id" field.
-func (auo *ActivityUpdateOne) ClearEventID() *ActivityUpdateOne {
-	auo.mutation.ClearEventID()
+// AddCommitType adds u to the "commit_type" field.
+func (auo *ActivityUpdateOne) AddCommitType(u int32) *ActivityUpdateOne {
+	auo.mutation.AddCommitType(u)
 	return auo
 }
 
@@ -629,6 +516,12 @@ func (auo *ActivityUpdateOne) Mutation() *ActivityMutation {
 	return auo.mutation
 }
 
+// Where appends a list predicates to the ActivityUpdate builder.
+func (auo *ActivityUpdateOne) Where(ps ...predicate.Activity) *ActivityUpdateOne {
+	auo.mutation.Where(ps...)
+	return auo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (auo *ActivityUpdateOne) Select(field string, fields ...string) *ActivityUpdateOne {
@@ -638,40 +531,7 @@ func (auo *ActivityUpdateOne) Select(field string, fields ...string) *ActivityUp
 
 // Save executes the query and returns the updated Activity entity.
 func (auo *ActivityUpdateOne) Save(ctx context.Context) (*Activity, error) {
-	var (
-		err  error
-		node *Activity
-	)
-	if len(auo.hooks) == 0 {
-		node, err = auo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ActivityMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			auo.mutation = mutation
-			node, err = auo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(auo.hooks) - 1; i >= 0; i-- {
-			if auo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = auo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, auo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Activity)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ActivityMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Activity, ActivityMutation](ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -703,16 +563,7 @@ func (auo *ActivityUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *A
 }
 
 func (auo *ActivityUpdateOne) sqlSave(ctx context.Context) (_node *Activity, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   entactivity.Table,
-			Columns: entactivity.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: entactivity.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(entactivity.Table, entactivity.Columns, sqlgraph.NewFieldSpec(entactivity.FieldID, field.TypeInt64))
 	id, ok := auo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Activity.id" for update`)}
@@ -787,32 +638,20 @@ func (auo *ActivityUpdateOne) sqlSave(ctx context.Context) (_node *Activity, err
 			sqljson.Append(u, entactivity.FieldRoute, value)
 		})
 	}
-	if value, ok := auo.mutation.PlanID(); ok {
-		_spec.SetField(entactivity.FieldPlanID, field.TypeInt64, value)
+	if value, ok := auo.mutation.CommitID(); ok {
+		_spec.SetField(entactivity.FieldCommitID, field.TypeInt64, value)
 	}
-	if value, ok := auo.mutation.AddedPlanID(); ok {
-		_spec.AddField(entactivity.FieldPlanID, field.TypeInt64, value)
+	if value, ok := auo.mutation.AddedCommitID(); ok {
+		_spec.AddField(entactivity.FieldCommitID, field.TypeInt64, value)
 	}
-	if auo.mutation.PlanIDCleared() {
-		_spec.ClearField(entactivity.FieldPlanID, field.TypeInt64)
+	if auo.mutation.CommitIDCleared() {
+		_spec.ClearField(entactivity.FieldCommitID, field.TypeInt64)
 	}
-	if value, ok := auo.mutation.ChallengeID(); ok {
-		_spec.SetField(entactivity.FieldChallengeID, field.TypeInt64, value)
+	if value, ok := auo.mutation.CommitType(); ok {
+		_spec.SetField(entactivity.FieldCommitType, field.TypeUint32, value)
 	}
-	if value, ok := auo.mutation.AddedChallengeID(); ok {
-		_spec.AddField(entactivity.FieldChallengeID, field.TypeInt64, value)
-	}
-	if auo.mutation.ChallengeIDCleared() {
-		_spec.ClearField(entactivity.FieldChallengeID, field.TypeInt64)
-	}
-	if value, ok := auo.mutation.EventID(); ok {
-		_spec.SetField(entactivity.FieldEventID, field.TypeInt64, value)
-	}
-	if value, ok := auo.mutation.AddedEventID(); ok {
-		_spec.AddField(entactivity.FieldEventID, field.TypeInt64, value)
-	}
-	if auo.mutation.EventIDCleared() {
-		_spec.ClearField(entactivity.FieldEventID, field.TypeInt64)
+	if value, ok := auo.mutation.AddedCommitType(); ok {
+		_spec.AddField(entactivity.FieldCommitType, field.TypeUint32, value)
 	}
 	if value, ok := auo.mutation.CreatedAt(); ok {
 		_spec.SetField(entactivity.FieldCreatedAt, field.TypeTime, value)
@@ -829,5 +668,6 @@ func (auo *ActivityUpdateOne) sqlSave(ctx context.Context) (_node *Activity, err
 		}
 		return nil, err
 	}
+	auo.mutation.done = true
 	return _node, nil
 }

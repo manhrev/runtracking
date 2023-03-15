@@ -6,33 +6,32 @@
 
 // GENERATED CODE -- DO NOT EDIT!
 
-
 /* eslint-disable */
 // @ts-nocheck
 
+import * as grpcWeb from 'grpc-web'
 
-import * as grpcWeb from 'grpc-web';
-
-import * as plan_pb from './plan_pb';
-
+import * as plan_pb from './plan_pb'
 
 export class PlanClient {
-  client_: grpcWeb.AbstractClientBase;
-  hostname_: string;
-  credentials_: null | { [index: string]: string; };
-  options_: null | { [index: string]: any; };
+  client_: grpcWeb.AbstractClientBase
+  hostname_: string
+  credentials_: null | { [index: string]: string }
+  options_: null | { [index: string]: any }
 
-  constructor (hostname: string,
-               credentials?: null | { [index: string]: string; },
-               options?: null | { [index: string]: any; }) {
-    if (!options) options = {};
-    if (!credentials) credentials = {};
-    options['format'] = 'text';
+  constructor(
+    hostname: string,
+    credentials?: null | { [index: string]: string },
+    options?: null | { [index: string]: any }
+  ) {
+    if (!options) options = {}
+    if (!credentials) credentials = {}
+    options['format'] = 'text'
 
-    this.client_ = new grpcWeb.GrpcWebClientBase(options);
-    this.hostname_ = hostname;
-    this.credentials_ = credentials;
-    this.options_ = options;
+    this.client_ = new grpcWeb.GrpcWebClientBase(options)
+    this.hostname_ = hostname
+    this.credentials_ = credentials
+    this.options_ = options
   }
 
   methodDescriptorCreatePlan = new grpcWeb.MethodDescriptor(
@@ -41,41 +40,45 @@ export class PlanClient {
     plan_pb.CreatePlanRequest,
     plan_pb.CreatePlanReply,
     (request: plan_pb.CreatePlanRequest) => {
-      return request.serializeBinary();
+      return request.serializeBinary()
     },
     plan_pb.CreatePlanReply.deserializeBinary
-  );
+  )
 
   createPlan(
     request: plan_pb.CreatePlanRequest,
-    metadata: grpcWeb.Metadata | null): Promise<plan_pb.CreatePlanReply>;
-
-  createPlan(
-    request: plan_pb.CreatePlanRequest,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.RpcError,
-               response: plan_pb.CreatePlanReply) => void): grpcWeb.ClientReadableStream<plan_pb.CreatePlanReply>;
+    metadata: grpcWeb.Metadata | null
+  ): Promise<plan_pb.CreatePlanReply>
 
   createPlan(
     request: plan_pb.CreatePlanRequest,
     metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.RpcError,
-               response: plan_pb.CreatePlanReply) => void) {
+    callback: (err: grpcWeb.RpcError, response: plan_pb.CreatePlanReply) => void
+  ): grpcWeb.ClientReadableStream<plan_pb.CreatePlanReply>
+
+  createPlan(
+    request: plan_pb.CreatePlanRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (
+      err: grpcWeb.RpcError,
+      response: plan_pb.CreatePlanReply
+    ) => void
+  ) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
-        this.hostname_ +
-          '/plan.Plan/CreatePlan',
+        this.hostname_ + '/plan.Plan/CreatePlan',
         request,
         metadata || {},
         this.methodDescriptorCreatePlan,
-        callback);
+        callback
+      )
     }
     return this.client_.unaryCall(
-    this.hostname_ +
-      '/plan.Plan/CreatePlan',
-    request,
-    metadata || {},
-    this.methodDescriptorCreatePlan);
+      this.hostname_ + '/plan.Plan/CreatePlan',
+      request,
+      metadata || {},
+      this.methodDescriptorCreatePlan
+    )
   }
 
   methodDescriptorListPlan = new grpcWeb.MethodDescriptor(
@@ -84,41 +87,42 @@ export class PlanClient {
     plan_pb.ListPlanRequest,
     plan_pb.ListPlanReply,
     (request: plan_pb.ListPlanRequest) => {
-      return request.serializeBinary();
+      return request.serializeBinary()
     },
     plan_pb.ListPlanReply.deserializeBinary
-  );
+  )
 
   listPlan(
     request: plan_pb.ListPlanRequest,
-    metadata: grpcWeb.Metadata | null): Promise<plan_pb.ListPlanReply>;
-
-  listPlan(
-    request: plan_pb.ListPlanRequest,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.RpcError,
-               response: plan_pb.ListPlanReply) => void): grpcWeb.ClientReadableStream<plan_pb.ListPlanReply>;
+    metadata: grpcWeb.Metadata | null
+  ): Promise<plan_pb.ListPlanReply>
 
   listPlan(
     request: plan_pb.ListPlanRequest,
     metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.RpcError,
-               response: plan_pb.ListPlanReply) => void) {
+    callback: (err: grpcWeb.RpcError, response: plan_pb.ListPlanReply) => void
+  ): grpcWeb.ClientReadableStream<plan_pb.ListPlanReply>
+
+  listPlan(
+    request: plan_pb.ListPlanRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError, response: plan_pb.ListPlanReply) => void
+  ) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
-        this.hostname_ +
-          '/plan.Plan/ListPlan',
+        this.hostname_ + '/plan.Plan/ListPlan',
         request,
         metadata || {},
         this.methodDescriptorListPlan,
-        callback);
+        callback
+      )
     }
     return this.client_.unaryCall(
-    this.hostname_ +
-      '/plan.Plan/ListPlan',
-    request,
-    metadata || {},
-    this.methodDescriptorListPlan);
+      this.hostname_ + '/plan.Plan/ListPlan',
+      request,
+      metadata || {},
+      this.methodDescriptorListPlan
+    )
   }
 
   methodDescriptorDeletePlans = new grpcWeb.MethodDescriptor(
@@ -127,41 +131,48 @@ export class PlanClient {
     plan_pb.DeletePlansRequest,
     plan_pb.DeletePlansReply,
     (request: plan_pb.DeletePlansRequest) => {
-      return request.serializeBinary();
+      return request.serializeBinary()
     },
     plan_pb.DeletePlansReply.deserializeBinary
-  );
+  )
 
   deletePlans(
     request: plan_pb.DeletePlansRequest,
-    metadata: grpcWeb.Metadata | null): Promise<plan_pb.DeletePlansReply>;
-
-  deletePlans(
-    request: plan_pb.DeletePlansRequest,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.RpcError,
-               response: plan_pb.DeletePlansReply) => void): grpcWeb.ClientReadableStream<plan_pb.DeletePlansReply>;
+    metadata: grpcWeb.Metadata | null
+  ): Promise<plan_pb.DeletePlansReply>
 
   deletePlans(
     request: plan_pb.DeletePlansRequest,
     metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.RpcError,
-               response: plan_pb.DeletePlansReply) => void) {
+    callback: (
+      err: grpcWeb.RpcError,
+      response: plan_pb.DeletePlansReply
+    ) => void
+  ): grpcWeb.ClientReadableStream<plan_pb.DeletePlansReply>
+
+  deletePlans(
+    request: plan_pb.DeletePlansRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (
+      err: grpcWeb.RpcError,
+      response: plan_pb.DeletePlansReply
+    ) => void
+  ) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
-        this.hostname_ +
-          '/plan.Plan/DeletePlans',
+        this.hostname_ + '/plan.Plan/DeletePlans',
         request,
         metadata || {},
         this.methodDescriptorDeletePlans,
-        callback);
+        callback
+      )
     }
     return this.client_.unaryCall(
-    this.hostname_ +
-      '/plan.Plan/DeletePlans',
-    request,
-    metadata || {},
-    this.methodDescriptorDeletePlans);
+      this.hostname_ + '/plan.Plan/DeletePlans',
+      request,
+      metadata || {},
+      this.methodDescriptorDeletePlans
+    )
   }
 
   methodDescriptorUpdatePlan = new grpcWeb.MethodDescriptor(
@@ -170,42 +181,44 @@ export class PlanClient {
     plan_pb.UpdatePlanRequest,
     plan_pb.UpdatePlanReply,
     (request: plan_pb.UpdatePlanRequest) => {
-      return request.serializeBinary();
+      return request.serializeBinary()
     },
     plan_pb.UpdatePlanReply.deserializeBinary
-  );
+  )
 
   updatePlan(
     request: plan_pb.UpdatePlanRequest,
-    metadata: grpcWeb.Metadata | null): Promise<plan_pb.UpdatePlanReply>;
-
-  updatePlan(
-    request: plan_pb.UpdatePlanRequest,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.RpcError,
-               response: plan_pb.UpdatePlanReply) => void): grpcWeb.ClientReadableStream<plan_pb.UpdatePlanReply>;
+    metadata: grpcWeb.Metadata | null
+  ): Promise<plan_pb.UpdatePlanReply>
 
   updatePlan(
     request: plan_pb.UpdatePlanRequest,
     metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.RpcError,
-               response: plan_pb.UpdatePlanReply) => void) {
+    callback: (err: grpcWeb.RpcError, response: plan_pb.UpdatePlanReply) => void
+  ): grpcWeb.ClientReadableStream<plan_pb.UpdatePlanReply>
+
+  updatePlan(
+    request: plan_pb.UpdatePlanRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (
+      err: grpcWeb.RpcError,
+      response: plan_pb.UpdatePlanReply
+    ) => void
+  ) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
-        this.hostname_ +
-          '/plan.Plan/UpdatePlan',
+        this.hostname_ + '/plan.Plan/UpdatePlan',
         request,
         metadata || {},
         this.methodDescriptorUpdatePlan,
-        callback);
+        callback
+      )
     }
     return this.client_.unaryCall(
-    this.hostname_ +
-      '/plan.Plan/UpdatePlan',
-    request,
-    metadata || {},
-    this.methodDescriptorUpdatePlan);
+      this.hostname_ + '/plan.Plan/UpdatePlan',
+      request,
+      metadata || {},
+      this.methodDescriptorUpdatePlan
+    )
   }
-
 }
-

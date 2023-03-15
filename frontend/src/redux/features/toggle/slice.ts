@@ -1,34 +1,34 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../reducers";
+import { createSlice } from '@reduxjs/toolkit'
+import { RootState } from '../../reducers'
 
 interface ToggleState {
-  isRightMenuShow: boolean;
-  isNightMode: boolean;
+  isRightMenuShow: boolean
+  isNightMode: boolean
 }
 
 const initialState: ToggleState = {
   isRightMenuShow: false,
   isNightMode: false,
-};
+}
 
 const slice = createSlice({
-  name: "toggle",
+  name: 'toggle',
   initialState,
   reducers: {
     showRightMenu: (state: ToggleState) => {
-      state.isRightMenuShow = true;
+      state.isRightMenuShow = true
     },
     hideRightMenu: (state: ToggleState) => {
-      state.isRightMenuShow = false;
+      state.isRightMenuShow = false
     },
     switchNightMode: (state: ToggleState) => {
-      state.isNightMode = !state.isNightMode;
+      state.isNightMode = !state.isNightMode
     },
   },
-});
+})
 
-export const { showRightMenu, hideRightMenu, switchNightMode } = slice.actions;
+export const { showRightMenu, hideRightMenu, switchNightMode } = slice.actions
 
-export const selectToggleSlice = (state: RootState) => state.toggle;
+export const selectToggleSlice = (state: RootState) => state.toggle
 
-export default slice.reducer;
+export default slice.reducer

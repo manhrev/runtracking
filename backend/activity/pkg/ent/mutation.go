@@ -14,6 +14,7 @@ import (
 	"github.com/manhrev/runtracking/backend/activity/pkg/ent/predicate"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -50,12 +51,10 @@ type ActivityMutation struct {
 	end_time          *time.Time
 	route             *[]*activity.TrackPoint
 	appendroute       []*activity.TrackPoint
-	plan_id           *int64
-	addplan_id        *int64
-	challenge_id      *int64
-	addchallenge_id   *int64
-	event_id          *int64
-	addevent_id       *int64
+	commit_id         *int64
+	addcommit_id      *int64
+	commit_type       *uint32
+	addcommit_type    *int32
 	created_at        *time.Time
 	clearedFields     map[string]struct{}
 	done              bool
@@ -642,214 +641,130 @@ func (m *ActivityMutation) ResetRoute() {
 	m.appendroute = nil
 }
 
-// SetPlanID sets the "plan_id" field.
-func (m *ActivityMutation) SetPlanID(i int64) {
-	m.plan_id = &i
-	m.addplan_id = nil
+// SetCommitID sets the "commit_id" field.
+func (m *ActivityMutation) SetCommitID(i int64) {
+	m.commit_id = &i
+	m.addcommit_id = nil
 }
 
-// PlanID returns the value of the "plan_id" field in the mutation.
-func (m *ActivityMutation) PlanID() (r int64, exists bool) {
-	v := m.plan_id
+// CommitID returns the value of the "commit_id" field in the mutation.
+func (m *ActivityMutation) CommitID() (r int64, exists bool) {
+	v := m.commit_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPlanID returns the old "plan_id" field's value of the Activity entity.
+// OldCommitID returns the old "commit_id" field's value of the Activity entity.
 // If the Activity object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ActivityMutation) OldPlanID(ctx context.Context) (v int64, err error) {
+func (m *ActivityMutation) OldCommitID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPlanID is only allowed on UpdateOne operations")
+		return v, errors.New("OldCommitID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPlanID requires an ID field in the mutation")
+		return v, errors.New("OldCommitID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPlanID: %w", err)
+		return v, fmt.Errorf("querying old value for OldCommitID: %w", err)
 	}
-	return oldValue.PlanID, nil
+	return oldValue.CommitID, nil
 }
 
-// AddPlanID adds i to the "plan_id" field.
-func (m *ActivityMutation) AddPlanID(i int64) {
-	if m.addplan_id != nil {
-		*m.addplan_id += i
+// AddCommitID adds i to the "commit_id" field.
+func (m *ActivityMutation) AddCommitID(i int64) {
+	if m.addcommit_id != nil {
+		*m.addcommit_id += i
 	} else {
-		m.addplan_id = &i
+		m.addcommit_id = &i
 	}
 }
 
-// AddedPlanID returns the value that was added to the "plan_id" field in this mutation.
-func (m *ActivityMutation) AddedPlanID() (r int64, exists bool) {
-	v := m.addplan_id
+// AddedCommitID returns the value that was added to the "commit_id" field in this mutation.
+func (m *ActivityMutation) AddedCommitID() (r int64, exists bool) {
+	v := m.addcommit_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearPlanID clears the value of the "plan_id" field.
-func (m *ActivityMutation) ClearPlanID() {
-	m.plan_id = nil
-	m.addplan_id = nil
-	m.clearedFields[entactivity.FieldPlanID] = struct{}{}
+// ClearCommitID clears the value of the "commit_id" field.
+func (m *ActivityMutation) ClearCommitID() {
+	m.commit_id = nil
+	m.addcommit_id = nil
+	m.clearedFields[entactivity.FieldCommitID] = struct{}{}
 }
 
-// PlanIDCleared returns if the "plan_id" field was cleared in this mutation.
-func (m *ActivityMutation) PlanIDCleared() bool {
-	_, ok := m.clearedFields[entactivity.FieldPlanID]
+// CommitIDCleared returns if the "commit_id" field was cleared in this mutation.
+func (m *ActivityMutation) CommitIDCleared() bool {
+	_, ok := m.clearedFields[entactivity.FieldCommitID]
 	return ok
 }
 
-// ResetPlanID resets all changes to the "plan_id" field.
-func (m *ActivityMutation) ResetPlanID() {
-	m.plan_id = nil
-	m.addplan_id = nil
-	delete(m.clearedFields, entactivity.FieldPlanID)
+// ResetCommitID resets all changes to the "commit_id" field.
+func (m *ActivityMutation) ResetCommitID() {
+	m.commit_id = nil
+	m.addcommit_id = nil
+	delete(m.clearedFields, entactivity.FieldCommitID)
 }
 
-// SetChallengeID sets the "challenge_id" field.
-func (m *ActivityMutation) SetChallengeID(i int64) {
-	m.challenge_id = &i
-	m.addchallenge_id = nil
+// SetCommitType sets the "commit_type" field.
+func (m *ActivityMutation) SetCommitType(u uint32) {
+	m.commit_type = &u
+	m.addcommit_type = nil
 }
 
-// ChallengeID returns the value of the "challenge_id" field in the mutation.
-func (m *ActivityMutation) ChallengeID() (r int64, exists bool) {
-	v := m.challenge_id
+// CommitType returns the value of the "commit_type" field in the mutation.
+func (m *ActivityMutation) CommitType() (r uint32, exists bool) {
+	v := m.commit_type
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldChallengeID returns the old "challenge_id" field's value of the Activity entity.
+// OldCommitType returns the old "commit_type" field's value of the Activity entity.
 // If the Activity object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ActivityMutation) OldChallengeID(ctx context.Context) (v int64, err error) {
+func (m *ActivityMutation) OldCommitType(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldChallengeID is only allowed on UpdateOne operations")
+		return v, errors.New("OldCommitType is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldChallengeID requires an ID field in the mutation")
+		return v, errors.New("OldCommitType requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldChallengeID: %w", err)
+		return v, fmt.Errorf("querying old value for OldCommitType: %w", err)
 	}
-	return oldValue.ChallengeID, nil
+	return oldValue.CommitType, nil
 }
 
-// AddChallengeID adds i to the "challenge_id" field.
-func (m *ActivityMutation) AddChallengeID(i int64) {
-	if m.addchallenge_id != nil {
-		*m.addchallenge_id += i
+// AddCommitType adds u to the "commit_type" field.
+func (m *ActivityMutation) AddCommitType(u int32) {
+	if m.addcommit_type != nil {
+		*m.addcommit_type += u
 	} else {
-		m.addchallenge_id = &i
+		m.addcommit_type = &u
 	}
 }
 
-// AddedChallengeID returns the value that was added to the "challenge_id" field in this mutation.
-func (m *ActivityMutation) AddedChallengeID() (r int64, exists bool) {
-	v := m.addchallenge_id
+// AddedCommitType returns the value that was added to the "commit_type" field in this mutation.
+func (m *ActivityMutation) AddedCommitType() (r int32, exists bool) {
+	v := m.addcommit_type
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearChallengeID clears the value of the "challenge_id" field.
-func (m *ActivityMutation) ClearChallengeID() {
-	m.challenge_id = nil
-	m.addchallenge_id = nil
-	m.clearedFields[entactivity.FieldChallengeID] = struct{}{}
-}
-
-// ChallengeIDCleared returns if the "challenge_id" field was cleared in this mutation.
-func (m *ActivityMutation) ChallengeIDCleared() bool {
-	_, ok := m.clearedFields[entactivity.FieldChallengeID]
-	return ok
-}
-
-// ResetChallengeID resets all changes to the "challenge_id" field.
-func (m *ActivityMutation) ResetChallengeID() {
-	m.challenge_id = nil
-	m.addchallenge_id = nil
-	delete(m.clearedFields, entactivity.FieldChallengeID)
-}
-
-// SetEventID sets the "event_id" field.
-func (m *ActivityMutation) SetEventID(i int64) {
-	m.event_id = &i
-	m.addevent_id = nil
-}
-
-// EventID returns the value of the "event_id" field in the mutation.
-func (m *ActivityMutation) EventID() (r int64, exists bool) {
-	v := m.event_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEventID returns the old "event_id" field's value of the Activity entity.
-// If the Activity object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ActivityMutation) OldEventID(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEventID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEventID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEventID: %w", err)
-	}
-	return oldValue.EventID, nil
-}
-
-// AddEventID adds i to the "event_id" field.
-func (m *ActivityMutation) AddEventID(i int64) {
-	if m.addevent_id != nil {
-		*m.addevent_id += i
-	} else {
-		m.addevent_id = &i
-	}
-}
-
-// AddedEventID returns the value that was added to the "event_id" field in this mutation.
-func (m *ActivityMutation) AddedEventID() (r int64, exists bool) {
-	v := m.addevent_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearEventID clears the value of the "event_id" field.
-func (m *ActivityMutation) ClearEventID() {
-	m.event_id = nil
-	m.addevent_id = nil
-	m.clearedFields[entactivity.FieldEventID] = struct{}{}
-}
-
-// EventIDCleared returns if the "event_id" field was cleared in this mutation.
-func (m *ActivityMutation) EventIDCleared() bool {
-	_, ok := m.clearedFields[entactivity.FieldEventID]
-	return ok
-}
-
-// ResetEventID resets all changes to the "event_id" field.
-func (m *ActivityMutation) ResetEventID() {
-	m.event_id = nil
-	m.addevent_id = nil
-	delete(m.clearedFields, entactivity.FieldEventID)
+// ResetCommitType resets all changes to the "commit_type" field.
+func (m *ActivityMutation) ResetCommitType() {
+	m.commit_type = nil
+	m.addcommit_type = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -893,9 +808,24 @@ func (m *ActivityMutation) Where(ps ...predicate.Activity) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ActivityMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ActivityMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Activity, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ActivityMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ActivityMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Activity).
@@ -907,7 +837,7 @@ func (m *ActivityMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ActivityMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 13)
 	if m.activity_name != nil {
 		fields = append(fields, entactivity.FieldActivityName)
 	}
@@ -938,14 +868,11 @@ func (m *ActivityMutation) Fields() []string {
 	if m.route != nil {
 		fields = append(fields, entactivity.FieldRoute)
 	}
-	if m.plan_id != nil {
-		fields = append(fields, entactivity.FieldPlanID)
+	if m.commit_id != nil {
+		fields = append(fields, entactivity.FieldCommitID)
 	}
-	if m.challenge_id != nil {
-		fields = append(fields, entactivity.FieldChallengeID)
-	}
-	if m.event_id != nil {
-		fields = append(fields, entactivity.FieldEventID)
+	if m.commit_type != nil {
+		fields = append(fields, entactivity.FieldCommitType)
 	}
 	if m.created_at != nil {
 		fields = append(fields, entactivity.FieldCreatedAt)
@@ -978,12 +905,10 @@ func (m *ActivityMutation) Field(name string) (ent.Value, bool) {
 		return m.EndTime()
 	case entactivity.FieldRoute:
 		return m.Route()
-	case entactivity.FieldPlanID:
-		return m.PlanID()
-	case entactivity.FieldChallengeID:
-		return m.ChallengeID()
-	case entactivity.FieldEventID:
-		return m.EventID()
+	case entactivity.FieldCommitID:
+		return m.CommitID()
+	case entactivity.FieldCommitType:
+		return m.CommitType()
 	case entactivity.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -1015,12 +940,10 @@ func (m *ActivityMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldEndTime(ctx)
 	case entactivity.FieldRoute:
 		return m.OldRoute(ctx)
-	case entactivity.FieldPlanID:
-		return m.OldPlanID(ctx)
-	case entactivity.FieldChallengeID:
-		return m.OldChallengeID(ctx)
-	case entactivity.FieldEventID:
-		return m.OldEventID(ctx)
+	case entactivity.FieldCommitID:
+		return m.OldCommitID(ctx)
+	case entactivity.FieldCommitType:
+		return m.OldCommitType(ctx)
 	case entactivity.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -1102,26 +1025,19 @@ func (m *ActivityMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRoute(v)
 		return nil
-	case entactivity.FieldPlanID:
+	case entactivity.FieldCommitID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPlanID(v)
+		m.SetCommitID(v)
 		return nil
-	case entactivity.FieldChallengeID:
-		v, ok := value.(int64)
+	case entactivity.FieldCommitType:
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetChallengeID(v)
-		return nil
-	case entactivity.FieldEventID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEventID(v)
+		m.SetCommitType(v)
 		return nil
 	case entactivity.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1153,14 +1069,11 @@ func (m *ActivityMutation) AddedFields() []string {
 	if m.addduration != nil {
 		fields = append(fields, entactivity.FieldDuration)
 	}
-	if m.addplan_id != nil {
-		fields = append(fields, entactivity.FieldPlanID)
+	if m.addcommit_id != nil {
+		fields = append(fields, entactivity.FieldCommitID)
 	}
-	if m.addchallenge_id != nil {
-		fields = append(fields, entactivity.FieldChallengeID)
-	}
-	if m.addevent_id != nil {
-		fields = append(fields, entactivity.FieldEventID)
+	if m.addcommit_type != nil {
+		fields = append(fields, entactivity.FieldCommitType)
 	}
 	return fields
 }
@@ -1180,12 +1093,10 @@ func (m *ActivityMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedKcal()
 	case entactivity.FieldDuration:
 		return m.AddedDuration()
-	case entactivity.FieldPlanID:
-		return m.AddedPlanID()
-	case entactivity.FieldChallengeID:
-		return m.AddedChallengeID()
-	case entactivity.FieldEventID:
-		return m.AddedEventID()
+	case entactivity.FieldCommitID:
+		return m.AddedCommitID()
+	case entactivity.FieldCommitType:
+		return m.AddedCommitType()
 	}
 	return nil, false
 }
@@ -1230,26 +1141,19 @@ func (m *ActivityMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddDuration(v)
 		return nil
-	case entactivity.FieldPlanID:
+	case entactivity.FieldCommitID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddPlanID(v)
+		m.AddCommitID(v)
 		return nil
-	case entactivity.FieldChallengeID:
-		v, ok := value.(int64)
+	case entactivity.FieldCommitType:
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddChallengeID(v)
-		return nil
-	case entactivity.FieldEventID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddEventID(v)
+		m.AddCommitType(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Activity numeric field %s", name)
@@ -1259,14 +1163,8 @@ func (m *ActivityMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ActivityMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(entactivity.FieldPlanID) {
-		fields = append(fields, entactivity.FieldPlanID)
-	}
-	if m.FieldCleared(entactivity.FieldChallengeID) {
-		fields = append(fields, entactivity.FieldChallengeID)
-	}
-	if m.FieldCleared(entactivity.FieldEventID) {
-		fields = append(fields, entactivity.FieldEventID)
+	if m.FieldCleared(entactivity.FieldCommitID) {
+		fields = append(fields, entactivity.FieldCommitID)
 	}
 	return fields
 }
@@ -1282,14 +1180,8 @@ func (m *ActivityMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ActivityMutation) ClearField(name string) error {
 	switch name {
-	case entactivity.FieldPlanID:
-		m.ClearPlanID()
-		return nil
-	case entactivity.FieldChallengeID:
-		m.ClearChallengeID()
-		return nil
-	case entactivity.FieldEventID:
-		m.ClearEventID()
+	case entactivity.FieldCommitID:
+		m.ClearCommitID()
 		return nil
 	}
 	return fmt.Errorf("unknown Activity nullable field %s", name)
@@ -1329,14 +1221,11 @@ func (m *ActivityMutation) ResetField(name string) error {
 	case entactivity.FieldRoute:
 		m.ResetRoute()
 		return nil
-	case entactivity.FieldPlanID:
-		m.ResetPlanID()
+	case entactivity.FieldCommitID:
+		m.ResetCommitID()
 		return nil
-	case entactivity.FieldChallengeID:
-		m.ResetChallengeID()
-		return nil
-	case entactivity.FieldEventID:
-		m.ResetEventID()
+	case entactivity.FieldCommitType:
+		m.ResetCommitType()
 		return nil
 	case entactivity.FieldCreatedAt:
 		m.ResetCreatedAt()

@@ -19,8 +19,12 @@ func init() {
 	entactivityDescType := entactivityFields[4].Descriptor()
 	// entactivity.DefaultType holds the default value on creation for the type field.
 	entactivity.DefaultType = entactivityDescType.Default.(uint32)
+	// entactivityDescCommitType is the schema descriptor for commit_type field.
+	entactivityDescCommitType := entactivityFields[12].Descriptor()
+	// entactivity.DefaultCommitType holds the default value on creation for the commit_type field.
+	entactivity.DefaultCommitType = entactivityDescCommitType.Default.(uint32)
 	// entactivityDescCreatedAt is the schema descriptor for created_at field.
-	entactivityDescCreatedAt := entactivityFields[14].Descriptor()
+	entactivityDescCreatedAt := entactivityFields[13].Descriptor()
 	// entactivity.DefaultCreatedAt holds the default value on creation for the created_at field.
 	entactivity.DefaultCreatedAt = entactivityDescCreatedAt.Default.(time.Time)
 }

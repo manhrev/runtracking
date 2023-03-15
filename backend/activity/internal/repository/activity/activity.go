@@ -210,17 +210,16 @@ func (m *activityImpl) SetCommit(
 	targetId int64,
 ) error {
 	query := m.entClient.Activity.UpdateOneID(activityId)
-	switch commitType {
-	case activitypb.CommitType_COMMIT_TYPE_CHALLENGE:
-		query.SetChallengeID(targetId)
-	case activitypb.CommitType_COMMIT_TYPE_PLAN:
-		query.SetPlanID(targetId)
-	case activitypb.CommitType_COMMIT_TYPE_EVENT:
-		query.SetEventID(targetId)
+	if commitType == activitypb.CommitType_COMMIT_TYPE_UNSPECIFIED {
+		log.Printf("Error while SetCommit: Commit type not satisfied")
+		return status.Internal("Commit type not satisfied")
 	}
+	query.SetCommitType(uint32(commitType)).SetCommitID(targetId)
+
 	_, err := query.Save(ctx)
 	if err != nil {
 		log.Printf("Error while SetCommit: %v", err)
+		return status.Internal(fmt.Sprintf("Error while SetCommit: %v", err))
 	}
 
 	return nil

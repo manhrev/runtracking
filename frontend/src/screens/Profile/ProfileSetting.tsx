@@ -1,18 +1,18 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { StyleSheet, View } from "react-native";
-import { RootBaseStackParamList } from "../../navigators/BaseStack";
-import { selectUserSlice } from "../../redux/features/user/slice";
-import { useAppSelector } from "../../redux/store";
-import { AppTheme, useAppTheme } from "../../theme";
-import SettingItem from "./comp/SettingItem";
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { StyleSheet, View } from 'react-native'
+import { RootBaseStackParamList } from '../../navigators/BaseStack'
+import { selectUserSlice } from '../../redux/features/user/slice'
+import { useAppSelector } from '../../redux/store'
+import { AppTheme, useAppTheme } from '../../theme'
+import SettingItem from './comp/SettingItem'
 
 export default function ProfileSetting({
   navigation,
   route,
-}: NativeStackScreenProps<RootBaseStackParamList, "ProfileSetting">) {
-  const theme = useAppTheme();
+}: NativeStackScreenProps<RootBaseStackParamList, 'ProfileSetting'>) {
+  const theme = useAppTheme()
   const { displayName, email, height, phoneNumber, username, weight } =
-    useAppSelector(selectUserSlice);
+    useAppSelector(selectUserSlice)
   return (
     <View style={styles(theme).container}>
       <View style={styles(theme).settingGroup}>
@@ -33,18 +33,18 @@ export default function ProfileSetting({
       <View style={styles(theme).settingGroup}>
         <SettingItem
           left="Height"
-          right={height.toString() + " cm"}
+          right={height.toString() + ' cm'}
           topDivider={true}
           onPress={() => {}}
         />
         <SettingItem
           left="Weight"
-          right={weight.toString() + " kg"}
+          right={weight.toString() + ' kg'}
           onPress={() => {}}
         />
       </View>
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -56,4 +56,4 @@ const styles = (theme: AppTheme) =>
     settingGroup: {
       marginTop: 20,
     },
-  });
+  })

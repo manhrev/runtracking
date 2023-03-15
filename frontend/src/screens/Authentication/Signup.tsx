@@ -1,61 +1,61 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useState } from 'react'
+import { Image, StyleSheet, View } from 'react-native'
 import {
   Button,
   Checkbox,
   IconButton,
   Text,
   TextInput,
-} from "react-native-paper";
-import { RootBaseStackParamList } from "../../navigators/BaseStack";
+} from 'react-native-paper'
+import { RootBaseStackParamList } from '../../navigators/BaseStack'
 
-import { useAppDispatch } from "../../redux/store";
-import { AppTheme, useAppTheme } from "../../theme";
-import { authClient, KEY_ACCESS_TOKEN } from "../../utils/grpc";
-import { baseStyles } from "../baseStyle";
+import { useAppDispatch } from '../../redux/store'
+import { AppTheme, useAppTheme } from '../../theme'
+import { authClient, KEY_ACCESS_TOKEN } from '../../utils/grpc'
+import { baseStyles } from '../baseStyle'
 
 export default function Signup({
   navigation,
   route,
-}: NativeStackScreenProps<RootBaseStackParamList, "Signup">) {
-  const theme = useAppTheme();
-  const [username, setUsername] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [checked, setChecked] = useState(false);
+}: NativeStackScreenProps<RootBaseStackParamList, 'Signup'>) {
+  const theme = useAppTheme()
+  const [username, setUsername] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [checked, setChecked] = useState(false)
   const handleContinue = async () => {
     if (
-      displayName == "" ||
-      password == "" ||
-      confirmPassword == "" ||
-      displayName == ""
+      displayName == '' ||
+      password == '' ||
+      confirmPassword == '' ||
+      displayName == ''
     ) {
-      alert("Please input");
-      return;
+      alert('Please input')
+      return
     }
 
     if (password != confirmPassword) {
-      alert("Password confirm mismatch!");
-      return;
+      alert('Password confirm mismatch!')
+      return
     }
 
     const { error, response } = await authClient.signUp({
       displayName: displayName,
       password: password,
       userName: username,
-    });
+    })
 
     if (error) {
-      alert("An error occurred, please try again");
+      alert('An error occurred, please try again')
     } else {
-      const token = response?.tokenInfo?.accessToken || "";
-      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token);
-      navigation.navigate("GetInfo");
+      const token = response?.tokenInfo?.accessToken || ''
+      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token)
+      navigation.navigate('GetInfo')
     }
-  };
+  }
   return (
     <>
       <View style={baseStyles(theme).homeContainer}>
@@ -63,8 +63,8 @@ export default function Signup({
           <View
             style={{
               paddingVertical: 20,
-              display: "flex",
-              flexDirection: "row",
+              display: 'flex',
+              flexDirection: 'row',
             }}
           >
             <View style={{ flex: 1 }}>
@@ -72,13 +72,13 @@ export default function Signup({
                 icon="arrow-left"
                 size={24}
                 onPress={() => navigation.goBack()}
-                style={{ position: "relative" }}
+                style={{ position: 'relative' }}
               />
             </View>
-            <View style={{ flex: 1, alignItems: "center" }}>
+            <View style={{ flex: 1, alignItems: 'center' }}>
               <Text
                 variant="displaySmall"
-                style={{ fontWeight: "bold", alignSelf: "center" }}
+                style={{ fontWeight: 'bold', alignSelf: 'center' }}
               >
                 Sign Up
               </Text>
@@ -87,8 +87,8 @@ export default function Signup({
           </View>
           <View>
             <Image
-              style={{ width: "100%", height: 140 }}
-              source={require("./../../../assets/Banners/signup_banner.jpg")}
+              style={{ width: '100%', height: 140 }}
+              source={require('./../../../assets/Banners/signup_banner.jpg')}
             />
           </View>
 
@@ -129,17 +129,17 @@ export default function Signup({
             />
           </View>
           <View
-            style={{ display: "flex", flexDirection: "row", marginTop: 15 }}
+            style={{ display: 'flex', flexDirection: 'row', marginTop: 15 }}
           >
             <Checkbox
-              status={checked ? "checked" : "unchecked"}
+              status={checked ? 'checked' : 'unchecked'}
               onPress={() => {
-                setChecked(!checked);
+                setChecked(!checked)
               }}
             />
             <Text
               variant="bodyLarge"
-              style={{ fontWeight: "bold", lineHeight: 18, paddingTop: 6 }}
+              style={{ fontWeight: 'bold', lineHeight: 18, paddingTop: 6 }}
             >
               I would like to receive your newsletter and other promotional
               information.
@@ -153,7 +153,7 @@ export default function Signup({
           >
             <Text
               variant="titleMedium"
-              style={{ color: theme.colors.primary, fontWeight: "bold" }}
+              style={{ color: theme.colors.primary, fontWeight: 'bold' }}
             >
               Continue
             </Text>
@@ -161,7 +161,7 @@ export default function Signup({
         </View>
       </View>
     </>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -169,4 +169,4 @@ const styles = (theme: AppTheme) =>
     inputStyle: {
       marginBottom: 10,
     },
-  });
+  })

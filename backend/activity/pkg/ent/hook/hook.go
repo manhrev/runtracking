@@ -15,11 +15,10 @@ type ActivityFunc func(context.Context, *ent.ActivityMutation) (ent.Value, error
 
 // Mutate calls f(ctx, m).
 func (f ActivityFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ActivityMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ActivityMutation", m)
+	if mv, ok := m.(*ent.ActivityMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ActivityMutation", m)
 }
 
 // Condition is a hook condition function.
