@@ -63,6 +63,10 @@ static_resources:
                             host_rewrite_literal: auth-jzg35jprna-as.a.run.app
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
+                          typed_per_filter_config:
+                            envoy.filters.http.ext_authz:
+                              "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                              disabled: true
 
                         # - match:
                         #     prefix: /group.Group
@@ -103,11 +107,9 @@ static_resources:
                       grpc_service:
                         envoy_grpc:
                           cluster_name: auth_cluster
-                          timeout: 0s
-                          host_rewrite_literal: auth-jzg35jprna-as.a.run.app
-                          max_stream_duration:
-                            grpc_timeout_header_max: 0s
                         timeout: 0.250s
+
+                      failure_mode_allow: false
                       transport_api_version: V3
                   - name: envoy.filters.http.router
 
