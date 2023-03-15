@@ -38,6 +38,13 @@ import {
 import { activityClient } from "../../utils/grpc";
 import { Icon } from "react-native-paper/lib/typescript/components/Avatar/Avatar";
 
+import {
+  displayValue,
+  getProgressOfDailyActivity,
+  isDailyActivity,
+  toDate,
+} from "../../utils/helpers";
+
 const windowWidth = Dimensions.get("window").width;
 
 export default function RunCommit({
@@ -80,17 +87,6 @@ export default function RunCommit({
     fetchData();
   }, []);
 
-  const toDate = (seconds: number) => {
-    // dd/mm/yyyy
-    const date = new Date(seconds * 1000);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day < 10 ? "0" + day : day}/${
-      month < 10 ? "0" + month : month
-    }/${year}`;
-  };
-
   const commitActivity = async () => {
     const commitObj: CommitActivityRequest.AsObject = {
       activityId: route.params.activityId,
@@ -119,34 +115,6 @@ export default function RunCommit({
       item.status === RuleStatus.RULE_STATUS_INPROGRESS &&
       item.activityType == route.params.activityType
   );
-
-  const isDailyActivity = (planRule: Rule) => {
-    return (
-      planRule === Rule.RULE_TOTAL_DISTANCE_DAILY ||
-      planRule === Rule.RULE_TOTAL_TIME_DAILY ||
-      planRule === Rule.RULE_TOTAL_ACTIVITY_DAILY ||
-      planRule === Rule.RULE_TOTAL_CALORIES_DAILY
-    );
-  };
-
-  const getProgressOfDailyActivity = (
-    progressList: Array<PlanProgress.AsObject>
-  ) => {
-    if (progressList.length > 0) {
-      const today = new Date().getDate();
-      var value = -1;
-      progressList.map((element: any) => {
-        // if the date is today -> get this element value
-        const date = new Date(element.timestamp.seconds * 1000);
-        if (date.getDate() === today) {
-          value = Number(element.value);
-        }
-      });
-      if (value === -1) return 0;
-      else return value;
-    }
-    return 0;
-  };
 
   return (
     <>
@@ -179,11 +147,11 @@ export default function RunCommit({
                     {isDailyActivity(item.rule) ? (
                       <Text style={{ marginBottom: 3 }}>
                         Today: {getProgressOfDailyActivity(item.progressList)} /{" "}
-                        {item.goal}
+                        {displayValue(item.rule, item.goal)}
                       </Text>
                     ) : (
                       <Text style={{ marginBottom: 3 }}>
-                        Progress: {item.total} / {item.goal}
+                        Progress: {displayValue(item.rule, item.total)} / {displayValue(item.rule, item.goal)}
                       </Text>
                     )}
                     <Progress.Bar

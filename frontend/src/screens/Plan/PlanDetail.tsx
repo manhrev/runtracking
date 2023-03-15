@@ -6,6 +6,7 @@ import { useAppSelector } from "../../redux/store";
 import { useState, useEffect } from "react";
 import { useAppDispatch } from "../../redux/store";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {TimePicker, ValueMap} from 'react-native-simple-time-picker';
 
 import {
     isPlanListLoading,
@@ -30,6 +31,12 @@ import {
 
 import { baseStyles } from "../baseStyle";
 import { RootHomeTabsParamList } from "../../navigators/HomeTab";
+
+import {
+    displayValue,
+    toDate,
+    getTextFromRule,
+} from "../../utils/helpers";
 
 
 const windowWidth = Dimensions.get("window").width;
@@ -65,6 +72,18 @@ export default function PlanDetail({
     const [editMode, setEditMode] = useState(false);
     const [showEndTimePicker, setShowEndTimePicker] = useState(false);
 
+    const [timeGoalPickerValue, setTimeGoalPickerValue] = useState<ValueMap>({
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    });
+
+    const [newGoalValue, setNewGoalValue] = useState(1);
+
+    const handleTimeGoalChange = (newValue: ValueMap) => {
+        setTimeGoalPickerValue(newValue);
+    };
+
     const setEnd = (event: any, date: any) => {
         setShowEndTimePicker(false);
         if (date) {
@@ -76,15 +95,6 @@ export default function PlanDetail({
                 }
             });
         }
-    }
-
-    const toDate = (seconds: number) => {
-        // dd/mm/yyyy
-        const date = new Date(seconds * 1000);
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
     }
 
     const toNewDate = (seconds: number) => {
@@ -105,37 +115,14 @@ export default function PlanDetail({
         }
     }
 
-    const getTextFromRule = (rule: number) => {
-        switch (rule) {
-            case Rule.RULE_TOTAL_DISTANCE:
-                return "Total Km";
-            case Rule.RULE_TOTAL_DISTANCE_DAILY:
-                return "Km per day";
-            case Rule.RULE_TOTAL_TIME:
-                return "Total time";
-            case Rule.RULE_TOTAL_TIME_DAILY:
-                return "Time per day";
-            case Rule.RULE_TOTAL_ACTIVITY:
-                return "Total activities";
-            case Rule.RULE_TOTAL_ACTIVITY_DAILY:
-                return "Activities per day";
-            case Rule.RULE_TOTAL_CALORIES:
-                return "Total calories";
-            case Rule.RULE_TOTAL_CALORIES_DAILY:
-                return "Calories per day";
-            default:
-                return "Unknown";
-        }
-    }
-
     const goalNumberOnChange = (text: string) => {
         if(text === "") {
-            setSelectedPlan({...selectedPlan, goal: 0});
+            setNewGoalValue(0);
             return;
         }
         // remove all non-number characters
         const number = text.replace(/[^0-9]/g, "");
-        setSelectedPlan({...selectedPlan, goal: parseInt(number)});
+        setNewGoalValue(parseInt(number));
     }
 
     const isDayAfterDay = (day1Sec: number, day2Sec: number) => {
@@ -146,6 +133,17 @@ export default function PlanDetail({
         const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
         return diffDays > 0;
     }
+
+    const returnGoal = () => {
+        if(selectedPlan?.rule === Rule.RULE_TOTAL_TIME || selectedPlan?.rule === Rule.RULE_TOTAL_TIME_DAILY) {
+            return timeGoalPickerValue.minutes * 60 + timeGoalPickerValue.seconds; // total seconds
+        }
+        else if(selectedPlan?.rule === Rule.RULE_TOTAL_DISTANCE || selectedPlan?.rule === Rule.RULE_TOTAL_DISTANCE_DAILY) {
+            return newGoalValue * 1000; // total meters
+        }
+        else return newGoalValue;
+    }
+
     
 
     const updatePlan = (planId: number | undefined) => {
@@ -155,7 +153,7 @@ export default function PlanDetail({
               seconds: selectedPlan?.endTime?.seconds || 0,
               nanos: 0
             },
-            goal: selectedPlan?.goal || 0,
+            goal: returnGoal(),
             name: selectedPlan?.name || "",
             note: selectedPlan?.note || "",
         }
@@ -176,6 +174,8 @@ export default function PlanDetail({
                 return;
             }
 
+            console.log("updateInfo", updateInfo);
+
             dispatch(updatePlanThunk(updateInfo)).unwrap();
             alert("Plan updated");
             navigation.goBack();
@@ -186,6 +186,18 @@ export default function PlanDetail({
     useEffect(() => {
         setSelectedPlan(planList.find(plan => plan.id === route.params.planId));
     }, []);
+
+    useEffect(() => {
+        if(selectedPlan?.rule === Rule.RULE_TOTAL_TIME || selectedPlan?.rule === Rule.RULE_TOTAL_TIME_DAILY) {
+            const minutes = Math.floor(selectedPlan?.goal / 60);
+            const seconds = selectedPlan?.goal % 60;
+            setTimeGoalPickerValue({
+                hours: 0,
+                minutes: minutes,
+                seconds: seconds
+            });
+        }
+    }, [selectedPlan?.goal]);
 
     return (
         <>
@@ -242,17 +254,33 @@ export default function PlanDetail({
                     <Text style={styles(theme).title}>Total: </Text>
                     <TextInput
                         mode="outlined"
-                        value={selectedPlan?.total.toString()}
+                        value={displayValue(selectedPlan?.rule || 0, selectedPlan?.total || 0).toString()}
                         editable={false}
                     />
-                    <Text style={editMode ? styles(theme).editModeTitle : styles(theme).title}>Goal: </Text>
+                    <Text style={styles(theme).title}>Goal: </Text>
                     <TextInput
                         mode="outlined"
-                        value={selectedPlan?.goal.toString()}
+                        value={displayValue(selectedPlan?.rule || 0, selectedPlan?.goal || 0).toString()}
+                        label={getTextFromRule(selectedPlan?.rule || 0)}
+                        editable={false}
+                    />
+                    {editMode && <Text style={editMode ? styles(theme).editModeTitle : styles(theme).title}>New Goal: </Text>}
+                    
+                    {editMode && (selectedPlan?.rule === Rule.RULE_TOTAL_TIME || selectedPlan?.rule === Rule.RULE_TOTAL_TIME_DAILY) &&
+                    <TimePicker
+                        value={timeGoalPickerValue}
+                        onChange={handleTimeGoalChange}
+                        pickerShows={["minutes", "seconds"]}
+                    />}
+                    {editMode && !(selectedPlan?.rule === Rule.RULE_TOTAL_TIME || selectedPlan?.rule === Rule.RULE_TOTAL_TIME_DAILY) &&
+                    <TextInput
+                        mode="outlined"
+                        value={newGoalValue.toString()}
                         label={getTextFromRule(selectedPlan?.rule || 0)}
                         onChangeText={text => goalNumberOnChange(text)}
                         editable={editMode}
-                    />
+                    />}
+
                     <Text style={editMode ? styles(theme).editModeTitle : styles(theme).title}>Note: </Text>
                     <TextInput
                         style={styles(theme).noteInput}

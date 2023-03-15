@@ -6,6 +6,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppTheme, useAppTheme } from "../../theme";
 import { useAppDispatch } from "../../redux/store";
+import {TimePicker, ValueMap} from 'react-native-simple-time-picker';
 
 import {
   createPlanThunk,
@@ -54,6 +55,16 @@ export default function PlanAdd({
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
 
+  const [timeGoalPickerValue, setTimeGoalPickerValue] = useState<ValueMap>({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  const handleTimeGoalChange = (newValue: ValueMap) => {
+      setTimeGoalPickerValue(newValue);
+  };
+
   const [name, setName] = useState<string>("Example Plan");
   const [activityType, setActivityType] = useState<ActivityType>(
     ActivityType.ACTIVITY_TYPE_RUNNING
@@ -95,6 +106,16 @@ export default function PlanAdd({
     setGoal(parseInt(number));
   };
 
+  const returnGoal = () => {
+    if (Number(rule) === Rule.RULE_TOTAL_TIME || Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) {
+      return timeGoalPickerValue.minutes * 60 + timeGoalPickerValue.seconds;
+    }
+    else if(Number(rule) === Rule.RULE_TOTAL_DISTANCE || Number(rule) === Rule.RULE_TOTAL_DISTANCE_DAILY) {
+      return goal * 1000;
+    }
+    else return goal;
+  }
+
   const savePlan = async () => {
     const planData: CreatePlanRequest.AsObject = {
       name: name,
@@ -118,7 +139,7 @@ export default function PlanAdd({
         ),
         nanos: 0,
       },
-      goal: goal,
+      goal: returnGoal(),
       note: note,
       timeZone: 7,
     };
@@ -279,12 +300,22 @@ export default function PlanAdd({
             />
           )}
           <Text style={styles(theme).title}>Goal: </Text>
-          <TextInput
-            mode="outlined"
-            value={goal.toString()}
-            onChangeText={(text) => goalNumberOnChange(text)}
-            label={getLabel(rule)}
-          />
+          {!(Number(rule) === Rule.RULE_TOTAL_TIME || Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) &&
+            <TextInput
+              mode="outlined"
+              value={goal.toString()}
+              onChangeText={(text) => goalNumberOnChange(text)}
+              label={getLabel(rule)}
+            />
+          }
+          
+          {(Number(rule) === Rule.RULE_TOTAL_TIME || Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) &&
+            <TimePicker
+                value={timeGoalPickerValue}
+                onChange={handleTimeGoalChange}
+                pickerShows={["minutes", "seconds"]}
+            />
+          }
 
           <Text style={styles(theme).title}>Note: </Text>
           <TextInput

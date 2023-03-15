@@ -34,6 +34,13 @@ import { deletePlansThunk } from "../../redux/features/planList/thunk";
 
 import { ActivityType } from "../../lib/activity/activity_pb";
 
+import {
+  displayValue,
+  getProgressOfDailyActivity,
+  isDailyActivity,
+  toDate,
+} from "../../utils/helpers";
+
 const windowWidth = Dimensions.get("window").width;
 
 export default function Plan({
@@ -75,17 +82,6 @@ export default function Plan({
     setSelectedAll(false);
     setDeleteListId([]);
   }, [tabState, filteredActivityType]);
-
-  const toDate = (seconds: number) => {
-    // dd/mm/yyyy
-    const date = new Date(seconds * 1000);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day < 10 ? "0" + day : day}/${
-      month < 10 ? "0" + month : month
-    }/${year}`;
-  };
 
   const addOrRemoveFromDeleteList = (id: number) => {
     if (deleteListId.includes(id)) {
@@ -129,34 +125,6 @@ export default function Plan({
     setSelectedAll(false);
   };
 
-  const isDailyActivity = (planRule: Rule) => {
-    return (
-      planRule === Rule.RULE_TOTAL_DISTANCE_DAILY ||
-      planRule === Rule.RULE_TOTAL_TIME_DAILY ||
-      planRule === Rule.RULE_TOTAL_ACTIVITY_DAILY ||
-      planRule === Rule.RULE_TOTAL_CALORIES_DAILY
-    );
-  };
-
-  const getProgressOfDailyActivity = (
-    progressList: Array<PlanProgress.AsObject>
-  ) => {
-    if (progressList.length > 0) {
-      const today = new Date().getDate();
-      var value = -1;
-      progressList.map((element: any) => {
-        // if the date is today -> get this element value
-        const date = new Date(element.timestamp.seconds * 1000);
-        if (date.getDate() === today) {
-          value = Number(element.value);
-        }
-      });
-      if (value === -1) return 0;
-      else return value;
-    }
-    return 0;
-  };
-
   const selectOrUnselectAll = () => {
     if (selectedAll) {
       setSelectedAll(false);
@@ -180,6 +148,8 @@ export default function Plan({
       (filteredActivityType === ActivityType.ACTIVITY_TYPE_UNSPECIFIED ||
         item.activityType === filteredActivityType)
   );
+
+
 
   return (
     <>
@@ -317,11 +287,11 @@ export default function Plan({
                   {isDailyActivity(item.rule) ? (
                     <Text style={{ marginBottom: 3 }}>
                       Today: {getProgressOfDailyActivity(item.progressList)} /{" "}
-                      {item.goal}
+                      {displayValue(item.rule, item.goal)}
                     </Text>
                   ) : (
                     <Text style={{ marginBottom: 3 }}>
-                      Progress: {item.total} / {item.goal}
+                      Progress: {displayValue(item.rule, item.total)} / {displayValue(item.rule, item.goal)}
                     </Text>
                   )}
                   <Progress.Bar
