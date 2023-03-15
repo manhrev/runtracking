@@ -1,36 +1,36 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
-import { StyleSheet, View, StatusBar, ScrollView } from "react-native";
-import { Avatar, Button, Divider, IconButton, Text } from "react-native-paper";
-import { RootHomeTabsParamList } from "../../navigators/HomeTab";
-import { selectUserSlice } from "../../redux/features/user/slice";
-import { getMeThunk } from "../../redux/features/user/thunk";
-import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { AppTheme, useAppTheme } from "../../theme";
-import { baseStyles } from "../baseStyle";
-import ProfileAchievement from "./comp/ProfileAchievement";
-import ProfileInfo from "./comp/ProfileInfo";
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useEffect, useState } from 'react'
+import { StyleSheet, View, StatusBar, ScrollView } from 'react-native'
+import { Avatar, Button, Divider, IconButton, Text } from 'react-native-paper'
+import { RootHomeTabsParamList } from '../../navigators/HomeTab'
+import { selectUserSlice } from '../../redux/features/user/slice'
+import { getMeThunk } from '../../redux/features/user/thunk'
+import { useAppDispatch, useAppSelector } from '../../redux/store'
+import { AppTheme, useAppTheme } from '../../theme'
+import { baseStyles } from '../baseStyle'
+import ProfileAchievement from './comp/ProfileAchievement'
+import ProfileInfo from './comp/ProfileInfo'
 
 export default function ProfileHome({
   navigation,
   route,
-}: NativeStackScreenProps<RootHomeTabsParamList, "ProfileHome">) {
-  const theme = useAppTheme();
-  const dispatch = useAppDispatch();
-  const { displayName } = useAppSelector(selectUserSlice);
-  const [isInfoSelected, setIsInfoSelected] = useState(true);
+}: NativeStackScreenProps<RootHomeTabsParamList, 'ProfileHome'>) {
+  const theme = useAppTheme()
+  const dispatch = useAppDispatch()
+  const { displayName } = useAppSelector(selectUserSlice)
+  const [isInfoSelected, setIsInfoSelected] = useState(true)
   const handleEditYourProfile = () => {
-    navigation.navigate("ProfileSetting");
-  };
+    navigation.navigate('ProfileSetting')
+  }
   const handleSettingApp = () => {
-    navigation.navigate("AppSetting");
-  };
+    navigation.navigate('AppSetting')
+  }
   const handleViewNofification = () => {
-    navigation.navigate("NotificationList", {});
-  };
+    navigation.navigate('NotificationList', {})
+  }
   useEffect(() => {
-    dispatch(getMeThunk());
-  }, []);
+    dispatch(getMeThunk())
+  }, [])
   return (
     <>
       <ScrollView
@@ -49,18 +49,18 @@ export default function ProfileHome({
           <View style={baseStyles(theme).innerWrapper}>
             <Text
               variant="headlineMedium"
-              style={{ fontWeight: "bold", marginBottom: 15 }}
+              style={{ fontWeight: 'bold', marginBottom: 15 }}
             >
               {displayName}
             </Text>
-            <View style={{ display: "flex", flexDirection: "row" }}>
-              <View style={{ justifyContent: "center", flex: 1 }}>
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
+              <View style={{ justifyContent: 'center', flex: 1 }}>
                 <Button
                   icon="lead-pencil"
                   mode="contained-tonal"
                   onPress={handleEditYourProfile}
                 >
-                  <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
+                  <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
                     Edit your profile
                   </Text>
                 </Button>
@@ -88,21 +88,21 @@ export default function ProfileHome({
           <View style={baseStyles(theme).innerWrapper}>
             <View
               style={{
-                display: "flex",
-                flexDirection: "row",
+                display: 'flex',
+                flexDirection: 'row',
                 paddingVertical: 10,
               }}
             >
               <Button
-                mode={isInfoSelected ? "elevated" : "text"}
+                mode={isInfoSelected ? 'elevated' : 'text'}
                 onPress={() => {
-                  setIsInfoSelected(true);
+                  setIsInfoSelected(true)
                 }}
               >
                 Info
               </Button>
               <Button
-                mode={!isInfoSelected ? "elevated" : "text"}
+                mode={!isInfoSelected ? 'elevated' : 'text'}
                 style={{ marginLeft: 4 }}
                 onPress={() => setIsInfoSelected(false)}
               >
@@ -115,7 +115,7 @@ export default function ProfileHome({
         <View>{isInfoSelected ? <ProfileInfo /> : <ProfileAchievement />}</View>
       </ScrollView>
     </>
-  );
+  )
 }
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
@@ -128,7 +128,7 @@ const styles = (theme: AppTheme) =>
     profileBackgroundContainer: {
       backgroundColor: theme.colors.tertiaryContainer,
       height: 220,
-      justifyContent: "flex-end",
+      justifyContent: 'flex-end',
       zIndex: 1,
     },
     profilePicture: {
@@ -140,9 +140,9 @@ const styles = (theme: AppTheme) =>
       width: 180,
       height: 180,
       backgroundColor: theme.colors.onPrimary,
-      position: "relative",
+      position: 'relative',
       borderRadius: 100,
       top: 38,
       left: 13,
     },
-  });
+  })

@@ -1,40 +1,40 @@
-import { StyleSheet, View } from "react-native";
-import { Button, Text } from "react-native-paper";
-import { AppTheme, useAppTheme } from "../theme";
-import { authClient } from "../utils/grpc/index";
-import { useAppDispatch, useAppSelector } from "../redux/store";
-import { selectCommonSlice, setData } from "../redux/features/common/slice";
-import UpperRightMenu from "../comp/UpperRightMenu";
-import { useIsFocused } from "@react-navigation/native";
+import { StyleSheet, View } from 'react-native'
+import { Button, Text } from 'react-native-paper'
+import { AppTheme, useAppTheme } from '../theme'
+import { authClient } from '../utils/grpc/index'
+import { useAppDispatch, useAppSelector } from '../redux/store'
+import { selectCommonSlice, setData } from '../redux/features/common/slice'
+import UpperRightMenu from '../comp/UpperRightMenu'
+import { useIsFocused } from '@react-navigation/native'
 import {
   selectToggleSlice,
   switchNightMode,
-} from "../redux/features/toggle/slice";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootBaseStackParamList } from "../navigators/BaseStack";
-import { logoutThunk } from "../redux/features/user/thunk";
+} from '../redux/features/toggle/slice'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { RootBaseStackParamList } from '../navigators/BaseStack'
+import { logoutThunk } from '../redux/features/user/thunk'
 
 export default function ExampleScreen({
   navigation,
   route,
 }: NativeStackScreenProps<RootBaseStackParamList>) {
-  const dispatch = useAppDispatch();
-  const theme = useAppTheme();
-  const isFocused = useIsFocused();
-  const { data } = useAppSelector(selectCommonSlice);
-  const { isNightMode } = useAppSelector(selectToggleSlice);
+  const dispatch = useAppDispatch()
+  const theme = useAppTheme()
+  const isFocused = useIsFocused()
+  const { data } = useAppSelector(selectCommonSlice)
+  const { isNightMode } = useAppSelector(selectToggleSlice)
 
   const logout = async () => {
-    dispatch(logoutThunk());
-  };
+    dispatch(logoutThunk())
+  }
 
   const handleCommon = () => {
-    dispatch(setData());
-  };
+    dispatch(setData())
+  }
 
   const handleChangeNightMode = () => {
-    dispatch(switchNightMode());
-  };
+    dispatch(switchNightMode())
+  }
 
   return (
     <View style={styles(theme).container}>
@@ -42,14 +42,14 @@ export default function ExampleScreen({
         <UpperRightMenu
           menuList={[
             {
-              menuItem: "menu 1",
+              menuItem: 'menu 1',
               callback: () => {
-                console.log("menu 1 clicked");
+                console.log('menu 1 clicked')
               },
-              icon: "egg",
+              icon: 'egg',
             },
             {
-              menuItem: "menu 2",
+              menuItem: 'menu 2',
               callback: () => {},
             },
           ]}
@@ -66,19 +66,19 @@ export default function ExampleScreen({
         Change
       </Button>
       <Button mode="outlined" onPress={handleChangeNightMode}>
-        {isNightMode ? "Switch to normal" : "Switch to night mode"}
+        {isNightMode ? 'Switch to normal' : 'Switch to night mode'}
       </Button>
-      <Button mode="contained" onPress={() => navigation.navigate("Intro")}>
+      <Button mode="contained" onPress={() => navigation.navigate('Intro')}>
         Go to landing page
       </Button>
-      <Button mode="contained" onPress={() => navigation.navigate("Login")}>
+      <Button mode="contained" onPress={() => navigation.navigate('Login')}>
         Go to login page
       </Button>
-      <Button mode="contained" onPress={() => navigation.navigate("Signup")}>
+      <Button mode="contained" onPress={() => navigation.navigate('Signup')}>
         Go to signup page
       </Button>
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -86,7 +86,7 @@ const styles = (theme: AppTheme) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-  });
+  })

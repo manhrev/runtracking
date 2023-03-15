@@ -1,19 +1,19 @@
-import { View } from "react-native";
-import { Divider, Text, TouchableRipple } from "react-native-paper";
-import { useAppTheme } from "../../../theme";
+import { View } from 'react-native'
+import { Divider, Text, TouchableRipple } from 'react-native-paper'
+import { useAppTheme } from '../../../theme'
 
 interface SettingItemProps {
-  topDivider?: boolean;
-  left: string;
-  right?: string;
-  color?: string;
-  onPress: Function;
+  topDivider?: boolean
+  left: string
+  right?: string
+  color?: string
+  onPress: Function
 }
 
 export default function SettingItem(props: SettingItemProps) {
-  const theme = useAppTheme();
-  const { left, right, topDivider, color, onPress } = props;
-  let action = () => {};
+  const theme = useAppTheme()
+  const { left, right, topDivider, color, onPress } = props
+  let action = () => {}
 
   return (
     <TouchableRipple
@@ -24,8 +24,8 @@ export default function SettingItem(props: SettingItemProps) {
         {topDivider && <Divider bold />}
         <View
           style={{
-            display: "flex",
-            flexDirection: "row",
+            display: 'flex',
+            flexDirection: 'row',
             paddingHorizontal: 24,
             paddingVertical: 10,
           }}
@@ -34,19 +34,19 @@ export default function SettingItem(props: SettingItemProps) {
             <Text
               variant="titleMedium"
               style={{
-                fontWeight: "bold",
+                fontWeight: 'bold',
                 color: color ? color : theme.colors.onBackground,
               }}
             >
               {left}
             </Text>
           </View>
-          <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <Text variant="titleMedium">{right}</Text>
           </View>
         </View>
         <Divider bold />
       </>
     </TouchableRipple>
-  );
+  )
 }

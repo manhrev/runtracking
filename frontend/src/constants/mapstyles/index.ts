@@ -1,34 +1,34 @@
 export const minimalStyle = [
   {
-    featureType: "poi.attraction",
+    featureType: 'poi.attraction',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "poi.business",
+    featureType: 'poi.business',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "poi.medical",
+    featureType: 'poi.medical',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "transit",
+    featureType: 'transit',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
-];
+]

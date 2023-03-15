@@ -1,26 +1,26 @@
-import { StyleSheet, View } from "react-native";
-import { Avatar, Divider, Text, TouchableRipple } from "react-native-paper";
+import { StyleSheet, View } from 'react-native'
+import { Avatar, Divider, Text, TouchableRipple } from 'react-native-paper'
 import {
   ActivityInfo,
   ActivityType,
   CommitType,
-} from "../../../lib/activity/activity_pb";
-import { AppTheme, useAppTheme } from "../../../theme";
+} from '../../../lib/activity/activity_pb'
+import { AppTheme, useAppTheme } from '../../../theme'
 import {
   formatDate,
   getIconWithActivityType,
   getNameWithActivityType,
   minutesPerKilometer,
   secondsToMinutes,
-} from "../../../utils/helpers";
+} from '../../../utils/helpers'
 
 interface ActivityListItemProps {
-  activityInfo: ActivityInfo.AsObject;
-  onPress: Function;
+  activityInfo: ActivityInfo.AsObject
+  onPress: Function
 }
 
 export default function ActivityListItem(props: ActivityListItemProps) {
-  const { activityInfo, onPress } = props;
+  const { activityInfo, onPress } = props
   const {
     id,
     activityName,
@@ -32,8 +32,8 @@ export default function ActivityListItem(props: ActivityListItemProps) {
     endTime,
     type,
     commitType,
-  } = activityInfo;
-  const theme = useAppTheme();
+  } = activityInfo
+  const theme = useAppTheme()
 
   return (
     <>
@@ -44,34 +44,34 @@ export default function ActivityListItem(props: ActivityListItemProps) {
             <Avatar.Icon size={40} icon={getIconWithActivityType(type)} />
             <View
               style={{
-                display: "flex",
-                flexDirection: "row",
+                display: 'flex',
+                flexDirection: 'row',
                 flex: 1,
               }}
             >
               <View style={{ marginLeft: 12 }}>
-                <Text variant="titleMedium" style={{ fontWeight: "700" }}>
+                <Text variant="titleMedium" style={{ fontWeight: '700' }}>
                   {activityName}
                 </Text>
                 <Text variant="bodyMedium">{formatDate(endTime)}</Text>
               </View>
               <View
                 style={{
-                  justifyContent: "flex-end",
+                  justifyContent: 'flex-end',
                   flex: 1,
                 }}
               >
                 {commitType !== CommitType.COMMIT_TYPE_UNSPECIFIED && (
                   <Text
                     style={{
-                      alignSelf: "flex-end",
+                      alignSelf: 'flex-end',
                       color: theme.colors.primary,
                     }}
                   >
                     Commited
                   </Text>
                 )}
-                <Text variant="bodyMedium" style={{ alignSelf: "flex-end" }}>
+                <Text variant="bodyMedium" style={{ alignSelf: 'flex-end' }}>
                   {getNameWithActivityType(type)}
                 </Text>
               </View>
@@ -82,13 +82,13 @@ export default function ActivityListItem(props: ActivityListItemProps) {
               <Text
                 variant="titleMedium"
                 style={{
-                  textAlign: "center",
+                  textAlign: 'center',
                   color: theme.colors.secondary,
                 }}
               >
                 {(totalDistance / 1000.0).toFixed(2)}
               </Text>
-              <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+              <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
                 Kilometers
               </Text>
             </View>
@@ -96,13 +96,13 @@ export default function ActivityListItem(props: ActivityListItemProps) {
               <Text
                 variant="titleMedium"
                 style={{
-                  textAlign: "center",
+                  textAlign: 'center',
                   color: theme.colors.secondary,
                 }}
               >
                 {minutesPerKilometer(duration, totalDistance)}
               </Text>
-              <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+              <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
                 Avg Pace
               </Text>
             </View>
@@ -110,13 +110,13 @@ export default function ActivityListItem(props: ActivityListItemProps) {
               <Text
                 variant="titleMedium"
                 style={{
-                  textAlign: "center",
+                  textAlign: 'center',
                   color: theme.colors.secondary,
                 }}
               >
                 {secondsToMinutes(duration)}
               </Text>
-              <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+              <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
                 Minutes
               </Text>
             </View>
@@ -124,7 +124,7 @@ export default function ActivityListItem(props: ActivityListItemProps) {
         </View>
       </TouchableRipple>
     </>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -134,18 +134,18 @@ const styles = (theme: AppTheme) =>
       paddingHorizontal: 8,
     },
     listItemTilte: {
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "row",
+      display: 'flex',
+      alignItems: 'center',
+      flexDirection: 'row',
     },
     listItemValue: {
       marginTop: 10,
-      display: "flex",
-      flexDirection: "row",
-      textAlign: "center",
+      display: 'flex',
+      flexDirection: 'row',
+      textAlign: 'center',
     },
 
     listItemValueBox: {
-      width: "33.333%",
+      width: '33.333%',
     },
-  });
+  })
