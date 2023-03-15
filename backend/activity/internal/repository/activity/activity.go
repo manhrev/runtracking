@@ -249,6 +249,17 @@ func (m *activityImpl) GetStatistic(
 			CAST(CAST(CONVERT_TZ(%s, "+00:00", "%s") as DATE) as DATETIME)
 		`, "end_time", GetTimeZoneStr(int32(tz)))
 
+		switch groupBy {
+		case activitypb.GetActivityStatisticRequest_GORUP_BY_MONTH:
+			groupByStr = fmt.Sprintf(`
+				CAST(STR_TO_DATE(DATE_FORMAT(CONVERT_TZ(%s, "+00:00", "%s"),'01/%%m/%%Y'),'%%d/%%m/%%Y') as DATETIME)
+			`, "end_time", GetTimeZoneStr(int32(tz)))
+		case activitypb.GetActivityStatisticRequest_GORUP_BY_YEAR:
+			groupByStr = fmt.Sprintf(`
+				CAST(STR_TO_DATE(DATE_FORMAT(CONVERT_TZ(%s, "+00:00", "%s"),'01/01/%%Y'),'%%d/%%m/%%Y') as DATETIME)
+			`, "end_time", GetTimeZoneStr(int32(tz)))
+		}
+
 		s.Select(
 			sql.As(groupByStr, "date_time"),
 			sql.As(sql.Count(activityTable.C(activity.FieldID)), "number_of_activities"),
@@ -296,7 +307,6 @@ func (m *activityImpl) GetStatistic(
 		log.Printf("error while listactivity statistic %v", err.Error())
 		return nil, status.Internal(err.Error())
 	}
-	log.Println(sliceOfPointers)
 
 	return sliceOfPointers, nil
 }
