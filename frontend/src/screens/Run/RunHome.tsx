@@ -22,10 +22,11 @@ import Monitor from './comp/Monitor'
 
 import { ActivityType, TrackPoint } from '../../lib/activity/activity_pb'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
-import { minimalStyle } from '../../constants/mapstyles'
+import { minimalStyle, minimalStyleDark } from '../../constants/mapstyles'
 import { kCaloriesBurned } from '../../utils/calories'
 import { useAppSelector } from '../../redux/store'
 import { selectUserSlice } from '../../redux/features/user/slice'
+import { selectToggleSlice } from '../../redux/features/toggle/slice'
 
 export default function Run({
   navigation,
@@ -33,7 +34,7 @@ export default function Run({
 }: NativeStackScreenProps<RootHomeTabsParamList, 'RunHome'>) {
   const theme = useAppTheme()
   const { weight } = useAppSelector(selectUserSlice)
-
+  const { isNightMode } = useAppSelector(selectToggleSlice)
   const [coordinates, setCoordinates] = useState<Array<TrackPoint.AsObject>>([
     {
       latitude: 0,
@@ -362,7 +363,7 @@ export default function Run({
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-        customMapStyle={minimalStyle}
+        customMapStyle={isNightMode ? minimalStyleDark : minimalStyle}
         onMapLoaded={async (event) => {
           const { coords } = await Location.getCurrentPositionAsync({
             accuracy: Location.Accuracy.Balanced,
