@@ -57,7 +57,7 @@ export default function PlanAdd({
 
   const [timeGoalPickerValue, setTimeGoalPickerValue] = useState<ValueMap>({
     hours: 0,
-    minutes: 0,
+    minutes: 5,
     seconds: 0,
   });
 
@@ -311,11 +311,12 @@ export default function PlanAdd({
           
           {(Number(rule) === Rule.RULE_TOTAL_TIME || Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) &&
             <TimePicker
-                value={timeGoalPickerValue}
-                onChange={handleTimeGoalChange}
-                pickerShows={["minutes", "seconds"]}
-            />
-          }
+              value={timeGoalPickerValue}
+              onChange={handleTimeGoalChange}
+              pickerShows={["minutes", "seconds"]}
+              minutesUnit="m"
+              secondsUnit="s"
+          />}
 
           <Text style={styles(theme).title}>Note: </Text>
           <TextInput

@@ -246,7 +246,6 @@ export default function PlanDetail({
                         <DateTimePicker
                             value={toNewDate(selectedPlan?.endTime?.seconds || 0)}
                             mode="date"
-                            display="default"
                             minimumDate={toNewDate(selectedPlan?.startTime?.seconds + 86400 || 0)}
                             onChange={setEnd}
                         />
@@ -271,6 +270,8 @@ export default function PlanDetail({
                         value={timeGoalPickerValue}
                         onChange={handleTimeGoalChange}
                         pickerShows={["minutes", "seconds"]}
+                        minutesUnit="m"
+                        secondsUnit="s"
                     />}
                     {editMode && !(selectedPlan?.rule === Rule.RULE_TOTAL_TIME || selectedPlan?.rule === Rule.RULE_TOTAL_TIME_DAILY) &&
                     <TextInput
