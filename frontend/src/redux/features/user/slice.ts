@@ -21,7 +21,7 @@ type UserState = {
 export const initialState: UserState = {
   isSignedIn: false,
   status: StatusEnum.LOADING,
-  email: "",
+  email: '',
   height: 0,
   weight: 0,
   username: "",
@@ -32,19 +32,19 @@ export const initialState: UserState = {
 };
 
 const slice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getMeThunk.pending, (state) => {
-      state.status = StatusEnum.LOADING;
-    });
+      state.status = StatusEnum.LOADING
+    })
     builder.addCase(getMeThunk.fulfilled, (state, { payload }) => {
-      const { response, error } = payload;
+      const { response, error } = payload
       if (error) {
-        state.status = StatusEnum.SUCCEEDED;
-        state.isSignedIn = false;
-        return;
+        state.status = StatusEnum.SUCCEEDED
+        state.isSignedIn = false
+        return
       }
       state.weight = response?.user?.weight || 0;
       state.height = response?.user?.height || 0;
@@ -55,19 +55,19 @@ const slice = createSlice({
       state.age = response?.user?.age || 0;
       state.userId = response?.user?.userId || 0;
 
-      state.status = StatusEnum.SUCCEEDED;
-      state.isSignedIn = true;
-    });
+      state.status = StatusEnum.SUCCEEDED
+      state.isSignedIn = true
+    })
     builder.addCase(loginThunk.fulfilled, (state, { payload }) => {
-      const { response, error } = payload;
+      const { response, error } = payload
       if (error) {
-        state.isSignedIn = false;
-        return;
+        state.isSignedIn = false
+        return
       }
-      const token = response?.accessToken || "";
-      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token);
-      state.isSignedIn = true;
-    });
+      const token = response?.accessToken || ''
+      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token)
+      state.isSignedIn = true
+    })
     builder.addCase(logoutThunk.fulfilled, (state, { payload }) => {
       state.isSignedIn = false;
       AsyncStorage.removeItem(KEY_ACCESS_TOKEN);
@@ -87,10 +87,10 @@ const slice = createSlice({
       state.userId = updateData.getUserInfo()?.getUserId() || 0;
     });
   },
-});
+})
 
-export const selectUserSlice = (state: RootState) => state.user;
+export const selectUserSlice = (state: RootState) => state.user
 export const isUserSliceLoading = (state: RootState) =>
-  state.user.status === StatusEnum.LOADING;
+  state.user.status === StatusEnum.LOADING
 
-export default slice.reducer;
+export default slice.reducer

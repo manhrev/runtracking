@@ -1,26 +1,26 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../reducers";
+import { createSlice } from '@reduxjs/toolkit'
+import { RootState } from '../../reducers'
 
 interface CommonState {
-  data: string;
+  data: string
 }
 
 const initialState: CommonState = {
-  data: "heelo",
-};
+  data: 'heelo',
+}
 
 const slice = createSlice({
-  name: "common",
+  name: 'common',
   initialState,
   reducers: {
     setData: (state: CommonState) => {
-      state.data = "set";
+      state.data = 'set'
     },
   },
-});
+})
 
-export const { setData } = slice.actions;
+export const { setData } = slice.actions
 
-export const selectCommonSlice = (state: RootState) => state.common;
+export const selectCommonSlice = (state: RootState) => state.common
 
-export default slice.reducer;
+export default slice.reducer

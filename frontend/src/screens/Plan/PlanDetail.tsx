@@ -386,4 +386,3 @@ const styles = (theme: AppTheme) =>
         justifyContent: "center",
     },
 });
-

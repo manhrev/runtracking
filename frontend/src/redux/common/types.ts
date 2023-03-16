@@ -1,6 +1,6 @@
-import { StatusEnum } from "../constant";
+import { StatusEnum } from '../constant'
 
 export interface CommonState {
-  error?: string;
-  status: StatusEnum;
+  error?: string
+  status: StatusEnum
 }

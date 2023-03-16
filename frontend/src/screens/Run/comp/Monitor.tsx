@@ -1,18 +1,18 @@
-import { autoBatchEnhancer } from "@reduxjs/toolkit";
-import { timeConversion } from "geolib";
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import { autoBatchEnhancer } from '@reduxjs/toolkit'
+import { timeConversion } from 'geolib'
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
 import {
   Button,
   Divider,
   IconButton,
   SegmentedButtons,
   Text,
-} from "react-native-paper";
-import { AppTheme, useAppTheme } from "../../../theme";
+} from 'react-native-paper'
+import { AppTheme, useAppTheme } from '../../../theme'
 
 export default function Monitor(props: any) {
-  const theme = useAppTheme();
+  const theme = useAppTheme()
 
   return (
     <View style={styles(theme).container}>
@@ -24,24 +24,24 @@ export default function Monitor(props: any) {
       <View style={styles(theme).secondCtn}>
         <Text style={styles(theme).text}>
           {props.displayDistance}
-          {"\n"}
+          {'\n'}
           <Text style={styles(theme).unit}>KM</Text>
         </Text>
 
         <Text style={styles(theme).text}>
           {props.displayPace}
-          {"\n"}
+          {'\n'}
           <Text style={styles(theme).unit}>PACE(MIN/KM)</Text>
         </Text>
 
         <Text style={styles(theme).text}>
           {props.displayKcal}
-          {"\n"}
+          {'\n'}
           <Text style={styles(theme).unit}>KCAL</Text>
         </Text>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -51,15 +51,15 @@ const styles = (theme: AppTheme) =>
       marginBottom: 10,
     },
     timer: {
-      textAlign: "center",
+      textAlign: 'center',
       fontSize: 40,
-      fontWeight: "bold",
+      fontWeight: 'bold',
     },
     text: {
       fontSize: 25,
-      fontWeight: "bold",
-      textAlign: "center",
-      alignSelf: "flex-end",
+      fontWeight: 'bold',
+      textAlign: 'center',
+      alignSelf: 'flex-end',
       flex: 2, // 2:2:2
     },
     unit: {
@@ -67,14 +67,14 @@ const styles = (theme: AppTheme) =>
     },
     firstCtn: {
       // col
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     secondCtn: {
       // row
-      flexDirection: "row",
-      justifyContent: "space-around",
-      alignItems: "center",
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
     },
-  });
+  })

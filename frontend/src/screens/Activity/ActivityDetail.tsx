@@ -1,44 +1,44 @@
-import { StyleSheet, View, Dimensions, ScrollView } from "react-native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Divider, Text } from "react-native-paper";
+import { StyleSheet, View, Dimensions, ScrollView } from 'react-native'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Divider, Text } from 'react-native-paper'
 
-import { AppTheme, useAppTheme } from "../../theme";
-import { baseStyles } from "../baseStyle";
-import { RootBaseStackParamList } from "../../navigators/BaseStack";
-import { useAppSelector } from "../../redux/store";
-import { selectActivityList } from "../../redux/features/activityList/slice";
+import { AppTheme, useAppTheme } from '../../theme'
+import { baseStyles } from '../baseStyle'
+import { RootBaseStackParamList } from '../../navigators/BaseStack'
+import { useAppSelector } from '../../redux/store'
+import { selectActivityList } from '../../redux/features/activityList/slice'
 import {
   formatDate,
   getNameWithActivityType,
   minutesPerKilometer,
   secondsToMinutes,
-} from "../../utils/helpers";
-import MapView, { Marker, Polyline } from "react-native-maps";
+} from '../../utils/helpers'
+import MapView, { Marker, Polyline } from 'react-native-maps'
 import {
   arrayToMultiPolyline,
   calculateCenterAndDelta,
-} from "../../utils/helpers/map";
-import { minimalStyle } from "../../constants/mapstyles";
-import { CommitType } from "../../lib/activity/activity_pb";
+} from '../../utils/helpers/map'
+import { minimalStyle } from '../../constants/mapstyles'
+import { CommitType } from '../../lib/activity/activity_pb'
 
-const windowWidth = Dimensions.get("window").width;
+const windowWidth = Dimensions.get('window').width
 
 export default function ActivityDetail({
   navigation,
   route,
-}: NativeStackScreenProps<RootBaseStackParamList, "ActivityDetail">) {
-  const theme = useAppTheme();
-  const { activityId } = route.params;
-  const { activityList } = useAppSelector(selectActivityList);
+}: NativeStackScreenProps<RootBaseStackParamList, 'ActivityDetail'>) {
+  const theme = useAppTheme()
+  const { activityId } = route.params
+  const { activityList } = useAppSelector(selectActivityList)
 
   const activity = activityList.find((activity) => {
-    return activity.id == activityId;
-  });
+    return activity.id == activityId
+  })
 
-  console.log(activity);
+  console.log(activity)
 
   if (!activity) {
-    return <></>;
+    return <></>
   }
   const {
     activityName,
@@ -52,11 +52,11 @@ export default function ActivityDetail({
     endTime,
     startTime,
     commitType,
-  } = activity;
+  } = activity
 
-  const polylineList = arrayToMultiPolyline(routeList);
-  const { center, delta } = calculateCenterAndDelta(routeList);
-  console.log(polylineList);
+  const polylineList = arrayToMultiPolyline(routeList)
+  const { center, delta } = calculateCenterAndDelta(routeList)
+  console.log(polylineList)
   return (
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
@@ -64,28 +64,28 @@ export default function ActivityDetail({
           <View style={{ marginVertical: 10 }}>
             <Text variant="bodyMedium">
               {formatDate(endTime)}
-              {"\n"}
+              {'\n'}
               {getNameWithActivityType(type)} activity
             </Text>
-            <Text variant="titleLarge" style={{ fontWeight: "700" }}>
+            <Text variant="titleLarge" style={{ fontWeight: '700' }}>
               {activityName}
             </Text>
 
             {commitType !== CommitType.COMMIT_TYPE_UNSPECIFIED ? (
               <Text style={{ color: theme.colors.primary }}>Commited</Text>
             ) : (
-              <View style={{ display: "flex", flexDirection: "row" }}>
+              <View style={{ display: 'flex', flexDirection: 'row' }}>
                 <Text style={{ color: theme.colors.notification }}>
                   Not commited
                 </Text>
                 <Text
                   style={{ color: theme.colors.primary, paddingLeft: 3 }}
                   onPress={() => {
-                    navigation.navigate("RunCommit", {
+                    navigation.navigate('RunCommit', {
                       activityId: activityId,
                       activityType: type,
                       resetRunInfo: () => {},
-                    });
+                    })
                   }}
                 >
                   - Press to commit
@@ -99,15 +99,15 @@ export default function ActivityDetail({
             style={{
               marginVertical: 20,
               width: windowWidth - 60,
-              alignSelf: "center",
+              alignSelf: 'center',
             }}
           >
             <View>
               <Text
                 variant="displayLarge"
                 style={{
-                  fontStyle: "italic",
-                  fontWeight: "700",
+                  fontStyle: 'italic',
+                  fontWeight: '700',
                   marginBottom: -6,
                 }}
               >
@@ -150,7 +150,7 @@ export default function ActivityDetail({
                     __
                   </Text>
                   <Text variant="bodyLarge" style={styles(theme).unit}>
-                    Elevation{"\n"}Gain
+                    Elevation{'\n'}Gain
                   </Text>
                 </View>
                 <View style={styles(theme).valueBox}>
@@ -158,7 +158,7 @@ export default function ActivityDetail({
                     __
                   </Text>
                   <Text variant="bodyLarge" style={styles(theme).unit}>
-                    Heart{"\n"}rate
+                    Heart{'\n'}rate
                   </Text>
                 </View>
               </View>
@@ -166,7 +166,7 @@ export default function ActivityDetail({
           </View>
 
           <View style={{ marginVertical: 10 }}>
-            <Text variant="titleLarge" style={{ fontWeight: "700" }}>
+            <Text variant="titleLarge" style={{ fontWeight: '700' }}>
               Notes
             </Text>
           </View>
@@ -176,7 +176,7 @@ export default function ActivityDetail({
           </Text>
 
           <View style={{ marginVertical: 10 }}>
-            <Text variant="titleLarge" style={{ fontWeight: "700" }}>
+            <Text variant="titleLarge" style={{ fontWeight: '700' }}>
               Route
             </Text>
             {polylineList.length > 0 ? (
@@ -191,7 +191,7 @@ export default function ActivityDetail({
                     longitudeDelta: delta,
                   }}
                   style={{
-                    width: "100%",
+                    width: '100%',
                     height: 500,
                   }}
                   customMapStyle={minimalStyle}
@@ -214,13 +214,13 @@ export default function ActivityDetail({
         </ScrollView>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
     unit: {
-      fontWeight: "700",
+      fontWeight: '700',
       color: theme.colors.secondary,
     },
     value: {},
@@ -229,10 +229,10 @@ const styles = (theme: AppTheme) =>
     },
     valueContainer: {
       marginTop: 15,
-      display: "flex",
-      flexDirection: "row",
+      display: 'flex',
+      flexDirection: 'row',
     },
     valueBox: {
-      width: "33.333%",
+      width: '33.333%',
     },
-  });
+  })

@@ -1,7 +1,7 @@
-import { Dimensions, StatusBar, StyleSheet } from "react-native";
-import { AppTheme } from "../theme";
+import { Dimensions, StatusBar, StyleSheet } from 'react-native'
+import { AppTheme } from '../theme'
 
-const windowWidth = Dimensions.get("window").width;
+const windowWidth = Dimensions.get('window').width
 export const baseStyles = (theme: AppTheme) =>
   StyleSheet.create({
     homeContainer: {
@@ -13,6 +13,6 @@ export const baseStyles = (theme: AppTheme) =>
     },
     innerWrapper: {
       width: windowWidth - 26,
-      alignSelf: "center",
+      alignSelf: 'center',
     },
-  });
+  })
