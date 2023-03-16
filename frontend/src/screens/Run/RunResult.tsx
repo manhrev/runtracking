@@ -1,5 +1,5 @@
-import { StyleSheet, View, Dimensions } from 'react-native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { StyleSheet, View, Dimensions } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   Divider,
   Text,
@@ -7,37 +7,37 @@ import {
   TextInput,
   RadioButton,
   Button,
-} from 'react-native-paper'
+} from "react-native-paper";
 
-import { AppTheme, useAppTheme } from '../../theme'
-import { baseStyles } from '../baseStyle'
-import { RootBaseStackParamList } from '../../navigators/BaseStack'
-import React, { useState } from 'react'
+import { AppTheme, useAppTheme } from "../../theme";
+import { baseStyles } from "../baseStyle";
+import { RootBaseStackParamList } from "../../navigators/BaseStack";
+import React, { useState } from "react";
 import {
   ActivityInfo,
   ActivityType,
   CreateActivityInfoRequest,
   TrackPoint,
-} from '../../lib/activity/activity_pb'
-import { activityClient } from '../../utils/grpc'
-import { LogBox } from 'react-native'
+} from "../../lib/activity/activity_pb";
+import { activityClient } from "../../utils/grpc";
+import { LogBox } from "react-native";
 
 LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
-])
+  "Non-serializable values were found in the navigation state",
+]);
 
-const windowWidth = Dimensions.get('window').width
+const windowWidth = Dimensions.get("window").width;
 
 export default function RunResult({
   navigation,
   route,
-}: NativeStackScreenProps<RootBaseStackParamList, 'RunResult'>) {
-  const theme = useAppTheme()
-  const [activityName, setActivityName] = useState('Sample')
-  const [activityNote, setActivityNote] = useState('Sample Note')
+}: NativeStackScreenProps<RootBaseStackParamList, "RunResult">) {
+  const theme = useAppTheme();
+  const [activityName, setActivityName] = useState("Sample");
+  const [activityNote, setActivityNote] = useState("Sample Note");
   const [activityType, setActivityType] = useState<ActivityType>(
     ActivityType.ACTIVITY_TYPE_RUNNING
-  )
+  );
 
   // console.log(route.params.savingInfo);
 
@@ -55,26 +55,26 @@ export default function RunResult({
       id: 0,
       commitId: 0,
       commitType: 0,
-    }
+    };
     // console.log(activityInfo);
     activityClient.createActivityInfo(activityInfo).then((res) => {
       if (!res.error) {
         if (res.response?.idCreated) {
-          navigation.pop()
-          route.params.resetRunInfo()
-          navigation.navigate('RunCommit', {
+          navigation.pop();
+          route.params.resetRunInfo();
+          navigation.navigate("RunCommit", {
             activityId: res.response.idCreated,
             activityType: activityType,
             resetRunInfo: route.params.resetRunInfo,
-          })
+          });
         }
-      } else alert('Failed!')
-    })
-  }
+      } else alert("Failed!");
+    });
+  };
 
   const deleteActivity = () => {
-    navigation.goBack()
-  }
+    navigation.goBack();
+  };
 
   return (
     <View style={baseStyles(theme).container}>
@@ -114,13 +114,13 @@ export default function RunResult({
 
       <View style={{ marginLeft: 15 }}>
         <Text style={{ marginTop: 20, marginBottom: 10 }}>Activity Type:</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <RadioButton
             value="running"
             status={
               activityType === ActivityType.ACTIVITY_TYPE_RUNNING
-                ? 'checked'
-                : 'unchecked'
+                ? "checked"
+                : "unchecked"
             }
             onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)}
           />
@@ -130,8 +130,8 @@ export default function RunResult({
             value="walking"
             status={
               activityType === ActivityType.ACTIVITY_TYPE_WALKING
-                ? 'checked'
-                : 'unchecked'
+                ? "checked"
+                : "unchecked"
             }
             onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)}
           />
@@ -141,8 +141,8 @@ export default function RunResult({
             value="cycling"
             status={
               activityType === ActivityType.ACTIVITY_TYPE_CYCLING
-                ? 'checked'
-                : 'unchecked'
+                ? "checked"
+                : "unchecked"
             }
             onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)}
           />
@@ -179,7 +179,7 @@ export default function RunResult({
         </Button>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = (theme: AppTheme) =>
@@ -188,8 +188,8 @@ const styles = (theme: AppTheme) =>
       width: windowWidth * 0.9,
       marginTop: 10,
       // center
-      marginLeft: 'auto',
-      marginRight: 'auto',
+      marginLeft: "auto",
+      marginRight: "auto",
     },
     button: {
       flex: 1,
@@ -197,16 +197,16 @@ const styles = (theme: AppTheme) =>
     },
     btnContainer: {
       flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
     },
     noteInput: {
       width: windowWidth * 0.9,
       marginTop: 10,
       // center
-      marginLeft: 'auto',
-      marginRight: 'auto',
+      marginLeft: "auto",
+      marginRight: "auto",
       maxHeight: 100,
     },
-  })
+  });
