@@ -286,7 +286,7 @@ export default function Plan({
                   </Text>
                   {isDailyActivity(item.rule) ? (
                     <Text style={{ marginBottom: 3 }}>
-                      Today: {getProgressOfDailyActivity(item.progressList)} /{" "}
+                      Today: {displayValue(item.rule, getProgressOfDailyActivity(item.progressList))} /{" "}
                       {displayValue(item.rule, item.goal)}
                     </Text>
                   ) : (
