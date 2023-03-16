@@ -6,6 +6,9 @@ import {
   SignUpReply,
   MeReply,
   HealthRecordRequest,
+  UpdateUserInfoRequest,
+  UpdateUserInfoReply,
+  UserInfo,
 } from "../../../lib/auth/auth_pb";
 
 import { GRPCClientConfig } from "../abstract/types";
@@ -50,6 +53,13 @@ class rpcAuthClient extends gRPCClientAbstract {
     req.setHeight(param.height);
     req.setWeight(param.weight);
     return await this.gRPCClientRequest<Empty.AsObject>("setHealthRecord", req);
+  }
+
+  async updateUserInfo(param: UpdateUserInfoRequest) {
+    return await this.gRPCClientRequest<UpdateUserInfoReply.AsObject>(
+      "updateUserInfo",
+      param
+    );
   }
 }
 

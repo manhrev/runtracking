@@ -81,7 +81,10 @@ export function displayValue(rule: Rule, value: number) {
   else if (rule === Rule.RULE_TOTAL_TIME || rule === Rule.RULE_TOTAL_TIME_DAILY) {
     const minutes = Math.floor(value / 60);
     const seconds = value % 60;
-    return `${minutes}:${seconds}`;
+    if(seconds < 10)
+      return `${minutes}:0${seconds}`;
+    else
+      return `${minutes}:${seconds}`;
   }
   return value;
 };

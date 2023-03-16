@@ -13,6 +13,7 @@ service Auth {
     rpc SetHealthRecord(HealthRecordRequest) returns (google.protobuf.Empty) {};
     rpc GetAllUsers(google.protobuf.Empty) returns (GetAllUsersReply) {};
     rpc GetUserById(GetByIdRequest) returns (UserInfo) {};
+    rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoReply) {};
 }
 
 
@@ -76,3 +77,9 @@ message UserInfo{
     float weight = 6;
     int32 age = 8;
 }
+
+message UpdateUserInfoRequest{
+    UserInfo user_info = 1;
+}
+
+message UpdateUserInfoReply{}
