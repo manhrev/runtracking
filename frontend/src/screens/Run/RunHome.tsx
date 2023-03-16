@@ -20,15 +20,19 @@ import * as Location from 'expo-location'
 import { getDistance } from 'geolib'
 import Monitor from './comp/Monitor'
 
-import { TrackPoint } from '../../lib/activity/activity_pb'
+import { ActivityType, TrackPoint } from '../../lib/activity/activity_pb'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
 import { minimalStyle } from '../../constants/mapstyles'
+import { kCaloriesBurned } from '../../utils/calories'
+import { useAppSelector } from '../../redux/store'
+import { selectUserSlice } from '../../redux/features/user/slice'
 
 export default function Run({
   navigation,
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, 'RunHome'>) {
   const theme = useAppTheme()
+  const { weight } = useAppSelector(selectUserSlice)
 
   const [coordinates, setCoordinates] = useState<Array<TrackPoint.AsObject>>([
     {
@@ -68,6 +72,13 @@ export default function Run({
       nanos: 0,
     })
 
+  const kcalBurned = kCaloriesBurned(
+    ActivityType.ACTIVITY_TYPE_RUNNING,
+    totalDistance,
+    totalTime,
+    weight
+  )
+  console.log(kcalBurned)
   // dialog
   const [visible, setVisible] = useState(false)
 
@@ -232,7 +243,7 @@ export default function Run({
         distance: formatForDisplay('distance-km', totalDistance),
         time: formatForDisplay('time', totalTime),
         pace: formatForDisplay('pace', pace),
-        kcal: '0',
+        kcal: kcalBurned.toFixed(3),
       },
       savingInfo: {
         duration: totalTime,
@@ -339,7 +350,7 @@ export default function Run({
         displayTime={formatForDisplay('time', totalTime)}
         displayDistance={(totalDistance / 1000).toFixed(2)}
         displayPace={formatForDisplay('pace', pace)}
-        displayKcal={0}
+        displayKcal={isNaN(kcalBurned) ? 0 : kcalBurned.toFixed(3)}
       />
       <Divider style={{ height: 1 }} />
       <MapView

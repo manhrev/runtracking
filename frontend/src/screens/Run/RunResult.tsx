@@ -21,6 +21,8 @@ import {
 } from '../../lib/activity/activity_pb'
 import { activityClient } from '../../utils/grpc'
 import { LogBox } from 'react-native'
+import { useAppSelector } from '../../redux/store'
+import { selectUserSlice } from '../../redux/features/user/slice'
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -39,19 +41,22 @@ export default function RunResult({
     ActivityType.ACTIVITY_TYPE_RUNNING
   )
 
-  // console.log(route.params.savingInfo);
+  const { weight } = useAppSelector(selectUserSlice)
 
+  // console.log(route.params.savingInfo);
+  const { duration, endTime, routeList, startTime, totalDistance, kcal } =
+    route.params.savingInfo
   const saveActivity = () => {
     const activityInfo: ActivityInfo.AsObject = {
       activityName: activityName,
       activityNote: activityNote,
-      duration: route.params.savingInfo.duration,
-      kcal: route.params.savingInfo.kcal,
-      routeList: route.params.savingInfo.routeList,
-      totalDistance: route.params.savingInfo.totalDistance,
+      duration: duration,
+      kcal: kcal,
+      routeList: routeList,
+      totalDistance: totalDistance,
       type: activityType,
-      startTime: route.params.savingInfo.startTime,
-      endTime: route.params.savingInfo.endTime,
+      startTime: startTime,
+      endTime: endTime,
       id: 0,
       commitId: 0,
       commitType: 0,

@@ -103,6 +103,17 @@ export default function StatisticSection() {
           }
           setMomentList(getDaysArrayThisMonth)
           break
+        case 'year':
+          from = {
+            seconds: moment().startOf('year').startOf('day').unix(),
+            nanos: 0,
+          }
+          to = {
+            seconds: moment().endOf('year').endOf('day').unix(),
+            nanos: 0,
+          }
+          setMomentList(getFirstDayMonthArrayThisYear)
+          break
       }
       fetchActivityStatistic(from, to)
     }, [filterByValue, activityType])
@@ -134,7 +145,7 @@ export default function StatisticSection() {
               value: 'year',
               label: 'Year',
             },
-            { value: 'all', label: 'All' },
+            //      { value: 'all', label: 'All' },
           ]}
         />
         <View
@@ -231,7 +242,23 @@ export default function StatisticSection() {
             <BarChart
               yAxisSuffix=""
               data={{
-                labels: convertMomentListToDayInMonthList(momentList),
+                labels:
+                  filterByValue === 'year'
+                    ? [
+                        '1',
+                        '2',
+                        '3',
+                        '4',
+                        '5',
+                        '6',
+                        '7',
+                        '8',
+                        '9',
+                        '10',
+                        '11',
+                        '12',
+                      ]
+                    : convertMomentListToDayInMonthList(momentList),
 
                 datasets: [
                   {
@@ -252,15 +279,13 @@ export default function StatisticSection() {
 
                 color: () => theme.colors.primary,
               }}
-              hidePointsAtIndex={Array.from({ length: 30 }, (v, k) =>
-                k % 3 !== 0 ? k : 999
-              )}
+              hidePointsAtIndex={hideIndex(filterByValue)}
               style={{
                 borderRadius: 16,
                 alignSelf: 'center',
               }}
-              withInnerLines={false}
-              showValuesOnTopOfBars
+              withInnerLines={true}
+              //           showValuesOnTopOfBars
             />
           </>
         )}
@@ -311,6 +336,14 @@ function getGroupByType(
   }
 }
 
+function hideIndex(filterByType: string): number[] {
+  switch (filterByType) {
+    case 'month':
+      return Array.from({ length: 31 }, (v, k) => (k % 5 !== 0 ? k : 999))
+  }
+  return []
+}
+
 function getGeneralInfo(list: ActivityStatisticData.AsObject[]): GeneralInfo {
   const info: GeneralInfo = {
     numberOfActivity: 0,
@@ -323,6 +356,26 @@ function getGeneralInfo(list: ActivityStatisticData.AsObject[]): GeneralInfo {
     info.totalDuration += data.totalDuration
   })
   return info
+}
+
+function getFirstDayMonthArrayThisYear() {
+  // create a moment object for the first day of the current year
+  const firstDayOfYear = moment().startOf('year')
+
+  // create an empty array to store the moments for the first day of each month
+  const firstDaysOfMonth = []
+
+  // loop through the past 12 months, starting with the current month
+  for (let i = 0; i < 12; i++) {
+    // create a moment object for the first day of the current month
+    const firstDayOfMonth = moment(firstDayOfYear)
+      .add(i, 'months')
+      .startOf('month')
+    // add the moment object to the array
+    firstDaysOfMonth.push(firstDayOfMonth)
+  }
+
+  return firstDaysOfMonth
 }
 
 function getDaysArrayThisMonth() {
@@ -348,12 +401,6 @@ function getDaysArrayThisWeek() {
     arrDays.push(current)
     endDayThisWeek--
   }
-
-  // while (daysInMonth) {
-  //   var current = moment().date(daysInMonth);
-  //   arrDays.push(current);
-  //   daysInMonth--;
-  // }
 
   return arrDays.reverse()
 }
