@@ -1,6 +1,10 @@
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb'
-import moment from 'moment'
-import { ActivityType } from '../../lib/activity/activity_pb'
+import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
+import moment from "moment";
+import { ActivityType } from "../../lib/activity/activity_pb";
+import { 
+  Rule,
+  PlanProgress
+} from "../../lib/plan/plan_pb";
 
 export function getIconWithActivityType(activityType: ActivityType) {
   return {
@@ -66,4 +70,81 @@ export function minutesPerKilometer(seconds: number, meters: number): string {
   const min = seconds / 60
   const km = meters / 1000
   return secondsToMinutes(Math.floor(min / km))
+}
+
+
+// plan helper
+export function displayValue(rule: Rule, value: number) {
+  if (rule === Rule.RULE_TOTAL_DISTANCE || rule === Rule.RULE_TOTAL_DISTANCE_DAILY) {
+    return (value / 1000 == Math.floor(value / 1000)) ? value / 1000 : (value / 1000).toFixed(2);
+  }
+  else if (rule === Rule.RULE_TOTAL_TIME || rule === Rule.RULE_TOTAL_TIME_DAILY) {
+    const minutes = Math.floor(value / 60);
+    const seconds = value % 60;
+    if(seconds < 10)
+      return `${minutes}:0${seconds}`;
+    else
+      return `${minutes}:${seconds}`;
+  }
+  return value;
+};
+
+export function getProgressOfDailyActivity(progressList: Array<PlanProgress.AsObject>) {
+  if (progressList.length > 0) {
+    const today = new Date().getDate();
+    var value = -1;
+    progressList.map((element: any) => {
+      // if the date is today -> get this element value
+      const date = new Date(element.timestamp.seconds * 1000);
+      if (date.getDate() === today) {
+        value = Number(element.value);
+      }
+    });
+    if (value === -1) return 0;
+    else return value;
+  }
+  return 0;
+};
+
+export function isDailyActivity(planRule: Rule) {
+  return (
+    planRule === Rule.RULE_TOTAL_DISTANCE_DAILY ||
+    planRule === Rule.RULE_TOTAL_TIME_DAILY ||
+    planRule === Rule.RULE_TOTAL_ACTIVITY_DAILY ||
+    planRule === Rule.RULE_TOTAL_CALORIES_DAILY
+  );
+};
+
+export function toDate(seconds: number) {
+  // dd/mm/yyyy
+  const date = new Date(seconds * 1000);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${day < 10 ? "0" + day : day}/${
+    month < 10 ? "0" + month : month
+  }/${year}`;
+};
+
+export function getTextFromRule(rule: number) {
+  switch (rule) {
+      case Rule.RULE_TOTAL_DISTANCE:
+          return "Total Km";
+      case Rule.RULE_TOTAL_DISTANCE_DAILY:
+          return "Km per day";
+      case Rule.RULE_TOTAL_TIME:
+          return "Total time";
+      case Rule.RULE_TOTAL_TIME_DAILY:
+          return "Time per day";
+      case Rule.RULE_TOTAL_ACTIVITY:
+          return "Total activities";
+      case Rule.RULE_TOTAL_ACTIVITY_DAILY:
+          return "Activities per day";
+      case Rule.RULE_TOTAL_CALORIES:
+          return "Total calories";
+      case Rule.RULE_TOTAL_CALORIES_DAILY:
+          return "Calories per day";
+      default:
+          return "Unknown";
+  }
 }
