@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notification"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/notificationuser"
@@ -19,8 +20,9 @@ import (
 // NotificationUpdate is the builder for updating Notification entities.
 type NotificationUpdate struct {
 	config
-	hooks    []Hook
-	mutation *NotificationMutation
+	hooks     []Hook
+	mutation  *NotificationMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the NotificationUpdate builder.
@@ -49,57 +51,75 @@ func (nu *NotificationUpdate) ClearMessage() *NotificationUpdate {
 	return nu
 }
 
-// SetType sets the "type" field.
-func (nu *NotificationUpdate) SetType(i int64) *NotificationUpdate {
-	nu.mutation.ResetType()
-	nu.mutation.SetType(i)
+// SetSourceType sets the "source_type" field.
+func (nu *NotificationUpdate) SetSourceType(i int64) *NotificationUpdate {
+	nu.mutation.ResetSourceType()
+	nu.mutation.SetSourceType(i)
 	return nu
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableType(i *int64) *NotificationUpdate {
+// SetNillableSourceType sets the "source_type" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableSourceType(i *int64) *NotificationUpdate {
 	if i != nil {
-		nu.SetType(*i)
+		nu.SetSourceType(*i)
 	}
 	return nu
 }
 
-// AddType adds i to the "type" field.
-func (nu *NotificationUpdate) AddType(i int64) *NotificationUpdate {
-	nu.mutation.AddType(i)
+// AddSourceType adds i to the "source_type" field.
+func (nu *NotificationUpdate) AddSourceType(i int64) *NotificationUpdate {
+	nu.mutation.AddSourceType(i)
 	return nu
 }
 
-// ClearType clears the value of the "type" field.
-func (nu *NotificationUpdate) ClearType() *NotificationUpdate {
-	nu.mutation.ClearType()
+// ClearSourceType clears the value of the "source_type" field.
+func (nu *NotificationUpdate) ClearSourceType() *NotificationUpdate {
+	nu.mutation.ClearSourceType()
 	return nu
 }
 
-// SetReceivedID sets the "received_id" field.
-func (nu *NotificationUpdate) SetReceivedID(i int64) *NotificationUpdate {
-	nu.mutation.ResetReceivedID()
-	nu.mutation.SetReceivedID(i)
+// SetSourceID sets the "source_id" field.
+func (nu *NotificationUpdate) SetSourceID(i int64) *NotificationUpdate {
+	nu.mutation.ResetSourceID()
+	nu.mutation.SetSourceID(i)
 	return nu
 }
 
-// SetNillableReceivedID sets the "received_id" field if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableReceivedID(i *int64) *NotificationUpdate {
+// SetNillableSourceID sets the "source_id" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableSourceID(i *int64) *NotificationUpdate {
 	if i != nil {
-		nu.SetReceivedID(*i)
+		nu.SetSourceID(*i)
 	}
 	return nu
 }
 
-// AddReceivedID adds i to the "received_id" field.
-func (nu *NotificationUpdate) AddReceivedID(i int64) *NotificationUpdate {
-	nu.mutation.AddReceivedID(i)
+// AddSourceID adds i to the "source_id" field.
+func (nu *NotificationUpdate) AddSourceID(i int64) *NotificationUpdate {
+	nu.mutation.AddSourceID(i)
 	return nu
 }
 
-// ClearReceivedID clears the value of the "received_id" field.
-func (nu *NotificationUpdate) ClearReceivedID() *NotificationUpdate {
-	nu.mutation.ClearReceivedID()
+// ClearSourceID clears the value of the "source_id" field.
+func (nu *NotificationUpdate) ClearSourceID() *NotificationUpdate {
+	nu.mutation.ClearSourceID()
+	return nu
+}
+
+// SetReceiveIds sets the "receive_ids" field.
+func (nu *NotificationUpdate) SetReceiveIds(i []int64) *NotificationUpdate {
+	nu.mutation.SetReceiveIds(i)
+	return nu
+}
+
+// AppendReceiveIds appends i to the "receive_ids" field.
+func (nu *NotificationUpdate) AppendReceiveIds(i []int64) *NotificationUpdate {
+	nu.mutation.AppendReceiveIds(i)
+	return nu
+}
+
+// ClearReceiveIds clears the value of the "receive_ids" field.
+func (nu *NotificationUpdate) ClearReceiveIds() *NotificationUpdate {
+	nu.mutation.ClearReceiveIds()
 	return nu
 }
 
@@ -191,6 +211,12 @@ func (nu *NotificationUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (nu *NotificationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUpdate {
+	nu.modifiers = append(nu.modifiers, modifiers...)
+	return nu
+}
+
 func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -215,23 +241,34 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nu.mutation.MessageCleared() {
 		_spec.ClearField(notification.FieldMessage, field.TypeString)
 	}
-	if value, ok := nu.mutation.GetType(); ok {
-		_spec.SetField(notification.FieldType, field.TypeInt64, value)
+	if value, ok := nu.mutation.SourceType(); ok {
+		_spec.SetField(notification.FieldSourceType, field.TypeInt64, value)
 	}
-	if value, ok := nu.mutation.AddedType(); ok {
-		_spec.AddField(notification.FieldType, field.TypeInt64, value)
+	if value, ok := nu.mutation.AddedSourceType(); ok {
+		_spec.AddField(notification.FieldSourceType, field.TypeInt64, value)
 	}
-	if nu.mutation.TypeCleared() {
-		_spec.ClearField(notification.FieldType, field.TypeInt64)
+	if nu.mutation.SourceTypeCleared() {
+		_spec.ClearField(notification.FieldSourceType, field.TypeInt64)
 	}
-	if value, ok := nu.mutation.ReceivedID(); ok {
-		_spec.SetField(notification.FieldReceivedID, field.TypeInt64, value)
+	if value, ok := nu.mutation.SourceID(); ok {
+		_spec.SetField(notification.FieldSourceID, field.TypeInt64, value)
 	}
-	if value, ok := nu.mutation.AddedReceivedID(); ok {
-		_spec.AddField(notification.FieldReceivedID, field.TypeInt64, value)
+	if value, ok := nu.mutation.AddedSourceID(); ok {
+		_spec.AddField(notification.FieldSourceID, field.TypeInt64, value)
 	}
-	if nu.mutation.ReceivedIDCleared() {
-		_spec.ClearField(notification.FieldReceivedID, field.TypeInt64)
+	if nu.mutation.SourceIDCleared() {
+		_spec.ClearField(notification.FieldSourceID, field.TypeInt64)
+	}
+	if value, ok := nu.mutation.ReceiveIds(); ok {
+		_spec.SetField(notification.FieldReceiveIds, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedReceiveIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, notification.FieldReceiveIds, value)
+		})
+	}
+	if nu.mutation.ReceiveIdsCleared() {
+		_spec.ClearField(notification.FieldReceiveIds, field.TypeJSON)
 	}
 	if value, ok := nu.mutation.ScheduledTime(); ok {
 		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
@@ -293,6 +330,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.AddModifiers(nu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{notification.Label}
@@ -308,9 +346,10 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 // NotificationUpdateOne is the builder for updating a single Notification entity.
 type NotificationUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *NotificationMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *NotificationMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetMessage sets the "message" field.
@@ -333,57 +372,75 @@ func (nuo *NotificationUpdateOne) ClearMessage() *NotificationUpdateOne {
 	return nuo
 }
 
-// SetType sets the "type" field.
-func (nuo *NotificationUpdateOne) SetType(i int64) *NotificationUpdateOne {
-	nuo.mutation.ResetType()
-	nuo.mutation.SetType(i)
+// SetSourceType sets the "source_type" field.
+func (nuo *NotificationUpdateOne) SetSourceType(i int64) *NotificationUpdateOne {
+	nuo.mutation.ResetSourceType()
+	nuo.mutation.SetSourceType(i)
 	return nuo
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableType(i *int64) *NotificationUpdateOne {
+// SetNillableSourceType sets the "source_type" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableSourceType(i *int64) *NotificationUpdateOne {
 	if i != nil {
-		nuo.SetType(*i)
+		nuo.SetSourceType(*i)
 	}
 	return nuo
 }
 
-// AddType adds i to the "type" field.
-func (nuo *NotificationUpdateOne) AddType(i int64) *NotificationUpdateOne {
-	nuo.mutation.AddType(i)
+// AddSourceType adds i to the "source_type" field.
+func (nuo *NotificationUpdateOne) AddSourceType(i int64) *NotificationUpdateOne {
+	nuo.mutation.AddSourceType(i)
 	return nuo
 }
 
-// ClearType clears the value of the "type" field.
-func (nuo *NotificationUpdateOne) ClearType() *NotificationUpdateOne {
-	nuo.mutation.ClearType()
+// ClearSourceType clears the value of the "source_type" field.
+func (nuo *NotificationUpdateOne) ClearSourceType() *NotificationUpdateOne {
+	nuo.mutation.ClearSourceType()
 	return nuo
 }
 
-// SetReceivedID sets the "received_id" field.
-func (nuo *NotificationUpdateOne) SetReceivedID(i int64) *NotificationUpdateOne {
-	nuo.mutation.ResetReceivedID()
-	nuo.mutation.SetReceivedID(i)
+// SetSourceID sets the "source_id" field.
+func (nuo *NotificationUpdateOne) SetSourceID(i int64) *NotificationUpdateOne {
+	nuo.mutation.ResetSourceID()
+	nuo.mutation.SetSourceID(i)
 	return nuo
 }
 
-// SetNillableReceivedID sets the "received_id" field if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableReceivedID(i *int64) *NotificationUpdateOne {
+// SetNillableSourceID sets the "source_id" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableSourceID(i *int64) *NotificationUpdateOne {
 	if i != nil {
-		nuo.SetReceivedID(*i)
+		nuo.SetSourceID(*i)
 	}
 	return nuo
 }
 
-// AddReceivedID adds i to the "received_id" field.
-func (nuo *NotificationUpdateOne) AddReceivedID(i int64) *NotificationUpdateOne {
-	nuo.mutation.AddReceivedID(i)
+// AddSourceID adds i to the "source_id" field.
+func (nuo *NotificationUpdateOne) AddSourceID(i int64) *NotificationUpdateOne {
+	nuo.mutation.AddSourceID(i)
 	return nuo
 }
 
-// ClearReceivedID clears the value of the "received_id" field.
-func (nuo *NotificationUpdateOne) ClearReceivedID() *NotificationUpdateOne {
-	nuo.mutation.ClearReceivedID()
+// ClearSourceID clears the value of the "source_id" field.
+func (nuo *NotificationUpdateOne) ClearSourceID() *NotificationUpdateOne {
+	nuo.mutation.ClearSourceID()
+	return nuo
+}
+
+// SetReceiveIds sets the "receive_ids" field.
+func (nuo *NotificationUpdateOne) SetReceiveIds(i []int64) *NotificationUpdateOne {
+	nuo.mutation.SetReceiveIds(i)
+	return nuo
+}
+
+// AppendReceiveIds appends i to the "receive_ids" field.
+func (nuo *NotificationUpdateOne) AppendReceiveIds(i []int64) *NotificationUpdateOne {
+	nuo.mutation.AppendReceiveIds(i)
+	return nuo
+}
+
+// ClearReceiveIds clears the value of the "receive_ids" field.
+func (nuo *NotificationUpdateOne) ClearReceiveIds() *NotificationUpdateOne {
+	nuo.mutation.ClearReceiveIds()
 	return nuo
 }
 
@@ -482,6 +539,12 @@ func (nuo *NotificationUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (nuo *NotificationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUpdateOne {
+	nuo.modifiers = append(nuo.modifiers, modifiers...)
+	return nuo
+}
+
 func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notification, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -523,23 +586,34 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 	if nuo.mutation.MessageCleared() {
 		_spec.ClearField(notification.FieldMessage, field.TypeString)
 	}
-	if value, ok := nuo.mutation.GetType(); ok {
-		_spec.SetField(notification.FieldType, field.TypeInt64, value)
+	if value, ok := nuo.mutation.SourceType(); ok {
+		_spec.SetField(notification.FieldSourceType, field.TypeInt64, value)
 	}
-	if value, ok := nuo.mutation.AddedType(); ok {
-		_spec.AddField(notification.FieldType, field.TypeInt64, value)
+	if value, ok := nuo.mutation.AddedSourceType(); ok {
+		_spec.AddField(notification.FieldSourceType, field.TypeInt64, value)
 	}
-	if nuo.mutation.TypeCleared() {
-		_spec.ClearField(notification.FieldType, field.TypeInt64)
+	if nuo.mutation.SourceTypeCleared() {
+		_spec.ClearField(notification.FieldSourceType, field.TypeInt64)
 	}
-	if value, ok := nuo.mutation.ReceivedID(); ok {
-		_spec.SetField(notification.FieldReceivedID, field.TypeInt64, value)
+	if value, ok := nuo.mutation.SourceID(); ok {
+		_spec.SetField(notification.FieldSourceID, field.TypeInt64, value)
 	}
-	if value, ok := nuo.mutation.AddedReceivedID(); ok {
-		_spec.AddField(notification.FieldReceivedID, field.TypeInt64, value)
+	if value, ok := nuo.mutation.AddedSourceID(); ok {
+		_spec.AddField(notification.FieldSourceID, field.TypeInt64, value)
 	}
-	if nuo.mutation.ReceivedIDCleared() {
-		_spec.ClearField(notification.FieldReceivedID, field.TypeInt64)
+	if nuo.mutation.SourceIDCleared() {
+		_spec.ClearField(notification.FieldSourceID, field.TypeInt64)
+	}
+	if value, ok := nuo.mutation.ReceiveIds(); ok {
+		_spec.SetField(notification.FieldReceiveIds, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedReceiveIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, notification.FieldReceiveIds, value)
+		})
+	}
+	if nuo.mutation.ReceiveIdsCleared() {
+		_spec.ClearField(notification.FieldReceiveIds, field.TypeJSON)
 	}
 	if value, ok := nuo.mutation.ScheduledTime(); ok {
 		_spec.SetField(notification.FieldScheduledTime, field.TypeTime, value)
@@ -601,6 +675,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.AddModifiers(nuo.modifiers...)
 	_node = &Notification{config: nuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -18,10 +19,12 @@ type Notification struct {
 	ID int64 `json:"id,omitempty"`
 	// Message holds the value of the "message" field.
 	Message string `json:"message,omitempty"`
-	// Type holds the value of the "type" field.
-	Type int64 `json:"type,omitempty"`
-	// ReceivedID holds the value of the "received_id" field.
-	ReceivedID int64 `json:"received_id,omitempty"`
+	// SourceType holds the value of the "source_type" field.
+	SourceType int64 `json:"source_type,omitempty"`
+	// SourceID holds the value of the "source_id" field.
+	SourceID int64 `json:"source_id,omitempty"`
+	// ReceiveIds holds the value of the "receive_ids" field.
+	ReceiveIds []int64 `json:"receive_ids,omitempty"`
 	// ScheduledTime holds the value of the "scheduled_time" field.
 	ScheduledTime time.Time `json:"scheduled_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -52,7 +55,9 @@ func (*Notification) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case notification.FieldID, notification.FieldType, notification.FieldReceivedID:
+		case notification.FieldReceiveIds:
+			values[i] = new([]byte)
+		case notification.FieldID, notification.FieldSourceType, notification.FieldSourceID:
 			values[i] = new(sql.NullInt64)
 		case notification.FieldMessage:
 			values[i] = new(sql.NullString)
@@ -85,17 +90,25 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.Message = value.String
 			}
-		case notification.FieldType:
+		case notification.FieldSourceType:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
+				return fmt.Errorf("unexpected type %T for field source_type", values[i])
 			} else if value.Valid {
-				n.Type = value.Int64
+				n.SourceType = value.Int64
 			}
-		case notification.FieldReceivedID:
+		case notification.FieldSourceID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field received_id", values[i])
+				return fmt.Errorf("unexpected type %T for field source_id", values[i])
 			} else if value.Valid {
-				n.ReceivedID = value.Int64
+				n.SourceID = value.Int64
+			}
+		case notification.FieldReceiveIds:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field receive_ids", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.ReceiveIds); err != nil {
+					return fmt.Errorf("unmarshal field receive_ids: %w", err)
+				}
 			}
 		case notification.FieldScheduledTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -139,11 +152,14 @@ func (n *Notification) String() string {
 	builder.WriteString("message=")
 	builder.WriteString(n.Message)
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", n.Type))
+	builder.WriteString("source_type=")
+	builder.WriteString(fmt.Sprintf("%v", n.SourceType))
 	builder.WriteString(", ")
-	builder.WriteString("received_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.ReceivedID))
+	builder.WriteString("source_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.SourceID))
+	builder.WriteString(", ")
+	builder.WriteString("receive_ids=")
+	builder.WriteString(fmt.Sprintf("%v", n.ReceiveIds))
 	builder.WriteString(", ")
 	builder.WriteString("scheduled_time=")
 	builder.WriteString(n.ScheduledTime.Format(time.ANSIC))

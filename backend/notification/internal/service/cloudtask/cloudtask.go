@@ -25,10 +25,11 @@ type cloudTask struct {
 }
 
 type NotificationTransfer struct {
-	Id               int    `json:"id"`
-	Message          string `json:"message"`
-	ReceivedId       int    `json:"received_id"`
-	NotificationType int    `json:"notification_type"`
+	Id          int    `json:"id"`
+	Message     string `json:"message"`
+	ReceivedIds []int  `json:"received_ids"`
+	SourceType  int    `json:"source_type"`
+	SourceId    int    `json:"source_id"`
 }
 
 var (

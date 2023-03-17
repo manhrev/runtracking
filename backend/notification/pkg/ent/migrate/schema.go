@@ -12,8 +12,9 @@ var (
 	NotificationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "message", Type: field.TypeString, Nullable: true},
-		{Name: "type", Type: field.TypeInt64, Nullable: true},
-		{Name: "received_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "source_type", Type: field.TypeInt64, Nullable: true},
+		{Name: "source_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "receive_ids", Type: field.TypeJSON, Nullable: true},
 		{Name: "scheduled_time", Type: field.TypeTime, Nullable: true},
 	}
 	// NotificationsTable holds the schema information for the "notifications" table.

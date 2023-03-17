@@ -39,10 +39,12 @@ type NotificationMutation struct {
 	typ                       string
 	id                        *int64
 	message                   *string
-	_type                     *int64
-	add_type                  *int64
-	received_id               *int64
-	addreceived_id            *int64
+	source_type               *int64
+	addsource_type            *int64
+	source_id                 *int64
+	addsource_id              *int64
+	receive_ids               *[]int64
+	appendreceive_ids         []int64
 	scheduled_time            *time.Time
 	clearedFields             map[string]struct{}
 	notification_users        map[int64]struct{}
@@ -206,144 +208,209 @@ func (m *NotificationMutation) ResetMessage() {
 	delete(m.clearedFields, notification.FieldMessage)
 }
 
-// SetType sets the "type" field.
-func (m *NotificationMutation) SetType(i int64) {
-	m._type = &i
-	m.add_type = nil
+// SetSourceType sets the "source_type" field.
+func (m *NotificationMutation) SetSourceType(i int64) {
+	m.source_type = &i
+	m.addsource_type = nil
 }
 
-// GetType returns the value of the "type" field in the mutation.
-func (m *NotificationMutation) GetType() (r int64, exists bool) {
-	v := m._type
+// SourceType returns the value of the "source_type" field in the mutation.
+func (m *NotificationMutation) SourceType() (r int64, exists bool) {
+	v := m.source_type
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldType returns the old "type" field's value of the Notification entity.
+// OldSourceType returns the old "source_type" field's value of the Notification entity.
 // If the Notification object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NotificationMutation) OldType(ctx context.Context) (v int64, err error) {
+func (m *NotificationMutation) OldSourceType(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldType is only allowed on UpdateOne operations")
+		return v, errors.New("OldSourceType is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldType requires an ID field in the mutation")
+		return v, errors.New("OldSourceType requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
+		return v, fmt.Errorf("querying old value for OldSourceType: %w", err)
 	}
-	return oldValue.Type, nil
+	return oldValue.SourceType, nil
 }
 
-// AddType adds i to the "type" field.
-func (m *NotificationMutation) AddType(i int64) {
-	if m.add_type != nil {
-		*m.add_type += i
+// AddSourceType adds i to the "source_type" field.
+func (m *NotificationMutation) AddSourceType(i int64) {
+	if m.addsource_type != nil {
+		*m.addsource_type += i
 	} else {
-		m.add_type = &i
+		m.addsource_type = &i
 	}
 }
 
-// AddedType returns the value that was added to the "type" field in this mutation.
-func (m *NotificationMutation) AddedType() (r int64, exists bool) {
-	v := m.add_type
+// AddedSourceType returns the value that was added to the "source_type" field in this mutation.
+func (m *NotificationMutation) AddedSourceType() (r int64, exists bool) {
+	v := m.addsource_type
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearType clears the value of the "type" field.
-func (m *NotificationMutation) ClearType() {
-	m._type = nil
-	m.add_type = nil
-	m.clearedFields[notification.FieldType] = struct{}{}
+// ClearSourceType clears the value of the "source_type" field.
+func (m *NotificationMutation) ClearSourceType() {
+	m.source_type = nil
+	m.addsource_type = nil
+	m.clearedFields[notification.FieldSourceType] = struct{}{}
 }
 
-// TypeCleared returns if the "type" field was cleared in this mutation.
-func (m *NotificationMutation) TypeCleared() bool {
-	_, ok := m.clearedFields[notification.FieldType]
+// SourceTypeCleared returns if the "source_type" field was cleared in this mutation.
+func (m *NotificationMutation) SourceTypeCleared() bool {
+	_, ok := m.clearedFields[notification.FieldSourceType]
 	return ok
 }
 
-// ResetType resets all changes to the "type" field.
-func (m *NotificationMutation) ResetType() {
-	m._type = nil
-	m.add_type = nil
-	delete(m.clearedFields, notification.FieldType)
+// ResetSourceType resets all changes to the "source_type" field.
+func (m *NotificationMutation) ResetSourceType() {
+	m.source_type = nil
+	m.addsource_type = nil
+	delete(m.clearedFields, notification.FieldSourceType)
 }
 
-// SetReceivedID sets the "received_id" field.
-func (m *NotificationMutation) SetReceivedID(i int64) {
-	m.received_id = &i
-	m.addreceived_id = nil
+// SetSourceID sets the "source_id" field.
+func (m *NotificationMutation) SetSourceID(i int64) {
+	m.source_id = &i
+	m.addsource_id = nil
 }
 
-// ReceivedID returns the value of the "received_id" field in the mutation.
-func (m *NotificationMutation) ReceivedID() (r int64, exists bool) {
-	v := m.received_id
+// SourceID returns the value of the "source_id" field in the mutation.
+func (m *NotificationMutation) SourceID() (r int64, exists bool) {
+	v := m.source_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldReceivedID returns the old "received_id" field's value of the Notification entity.
+// OldSourceID returns the old "source_id" field's value of the Notification entity.
 // If the Notification object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NotificationMutation) OldReceivedID(ctx context.Context) (v int64, err error) {
+func (m *NotificationMutation) OldSourceID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldReceivedID is only allowed on UpdateOne operations")
+		return v, errors.New("OldSourceID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldReceivedID requires an ID field in the mutation")
+		return v, errors.New("OldSourceID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldReceivedID: %w", err)
+		return v, fmt.Errorf("querying old value for OldSourceID: %w", err)
 	}
-	return oldValue.ReceivedID, nil
+	return oldValue.SourceID, nil
 }
 
-// AddReceivedID adds i to the "received_id" field.
-func (m *NotificationMutation) AddReceivedID(i int64) {
-	if m.addreceived_id != nil {
-		*m.addreceived_id += i
+// AddSourceID adds i to the "source_id" field.
+func (m *NotificationMutation) AddSourceID(i int64) {
+	if m.addsource_id != nil {
+		*m.addsource_id += i
 	} else {
-		m.addreceived_id = &i
+		m.addsource_id = &i
 	}
 }
 
-// AddedReceivedID returns the value that was added to the "received_id" field in this mutation.
-func (m *NotificationMutation) AddedReceivedID() (r int64, exists bool) {
-	v := m.addreceived_id
+// AddedSourceID returns the value that was added to the "source_id" field in this mutation.
+func (m *NotificationMutation) AddedSourceID() (r int64, exists bool) {
+	v := m.addsource_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearReceivedID clears the value of the "received_id" field.
-func (m *NotificationMutation) ClearReceivedID() {
-	m.received_id = nil
-	m.addreceived_id = nil
-	m.clearedFields[notification.FieldReceivedID] = struct{}{}
+// ClearSourceID clears the value of the "source_id" field.
+func (m *NotificationMutation) ClearSourceID() {
+	m.source_id = nil
+	m.addsource_id = nil
+	m.clearedFields[notification.FieldSourceID] = struct{}{}
 }
 
-// ReceivedIDCleared returns if the "received_id" field was cleared in this mutation.
-func (m *NotificationMutation) ReceivedIDCleared() bool {
-	_, ok := m.clearedFields[notification.FieldReceivedID]
+// SourceIDCleared returns if the "source_id" field was cleared in this mutation.
+func (m *NotificationMutation) SourceIDCleared() bool {
+	_, ok := m.clearedFields[notification.FieldSourceID]
 	return ok
 }
 
-// ResetReceivedID resets all changes to the "received_id" field.
-func (m *NotificationMutation) ResetReceivedID() {
-	m.received_id = nil
-	m.addreceived_id = nil
-	delete(m.clearedFields, notification.FieldReceivedID)
+// ResetSourceID resets all changes to the "source_id" field.
+func (m *NotificationMutation) ResetSourceID() {
+	m.source_id = nil
+	m.addsource_id = nil
+	delete(m.clearedFields, notification.FieldSourceID)
+}
+
+// SetReceiveIds sets the "receive_ids" field.
+func (m *NotificationMutation) SetReceiveIds(i []int64) {
+	m.receive_ids = &i
+	m.appendreceive_ids = nil
+}
+
+// ReceiveIds returns the value of the "receive_ids" field in the mutation.
+func (m *NotificationMutation) ReceiveIds() (r []int64, exists bool) {
+	v := m.receive_ids
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReceiveIds returns the old "receive_ids" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldReceiveIds(ctx context.Context) (v []int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReceiveIds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReceiveIds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReceiveIds: %w", err)
+	}
+	return oldValue.ReceiveIds, nil
+}
+
+// AppendReceiveIds adds i to the "receive_ids" field.
+func (m *NotificationMutation) AppendReceiveIds(i []int64) {
+	m.appendreceive_ids = append(m.appendreceive_ids, i...)
+}
+
+// AppendedReceiveIds returns the list of values that were appended to the "receive_ids" field in this mutation.
+func (m *NotificationMutation) AppendedReceiveIds() ([]int64, bool) {
+	if len(m.appendreceive_ids) == 0 {
+		return nil, false
+	}
+	return m.appendreceive_ids, true
+}
+
+// ClearReceiveIds clears the value of the "receive_ids" field.
+func (m *NotificationMutation) ClearReceiveIds() {
+	m.receive_ids = nil
+	m.appendreceive_ids = nil
+	m.clearedFields[notification.FieldReceiveIds] = struct{}{}
+}
+
+// ReceiveIdsCleared returns if the "receive_ids" field was cleared in this mutation.
+func (m *NotificationMutation) ReceiveIdsCleared() bool {
+	_, ok := m.clearedFields[notification.FieldReceiveIds]
+	return ok
+}
+
+// ResetReceiveIds resets all changes to the "receive_ids" field.
+func (m *NotificationMutation) ResetReceiveIds() {
+	m.receive_ids = nil
+	m.appendreceive_ids = nil
+	delete(m.clearedFields, notification.FieldReceiveIds)
 }
 
 // SetScheduledTime sets the "scheduled_time" field.
@@ -483,15 +550,18 @@ func (m *NotificationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NotificationMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.message != nil {
 		fields = append(fields, notification.FieldMessage)
 	}
-	if m._type != nil {
-		fields = append(fields, notification.FieldType)
+	if m.source_type != nil {
+		fields = append(fields, notification.FieldSourceType)
 	}
-	if m.received_id != nil {
-		fields = append(fields, notification.FieldReceivedID)
+	if m.source_id != nil {
+		fields = append(fields, notification.FieldSourceID)
+	}
+	if m.receive_ids != nil {
+		fields = append(fields, notification.FieldReceiveIds)
 	}
 	if m.scheduled_time != nil {
 		fields = append(fields, notification.FieldScheduledTime)
@@ -506,10 +576,12 @@ func (m *NotificationMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case notification.FieldMessage:
 		return m.Message()
-	case notification.FieldType:
-		return m.GetType()
-	case notification.FieldReceivedID:
-		return m.ReceivedID()
+	case notification.FieldSourceType:
+		return m.SourceType()
+	case notification.FieldSourceID:
+		return m.SourceID()
+	case notification.FieldReceiveIds:
+		return m.ReceiveIds()
 	case notification.FieldScheduledTime:
 		return m.ScheduledTime()
 	}
@@ -523,10 +595,12 @@ func (m *NotificationMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case notification.FieldMessage:
 		return m.OldMessage(ctx)
-	case notification.FieldType:
-		return m.OldType(ctx)
-	case notification.FieldReceivedID:
-		return m.OldReceivedID(ctx)
+	case notification.FieldSourceType:
+		return m.OldSourceType(ctx)
+	case notification.FieldSourceID:
+		return m.OldSourceID(ctx)
+	case notification.FieldReceiveIds:
+		return m.OldReceiveIds(ctx)
 	case notification.FieldScheduledTime:
 		return m.OldScheduledTime(ctx)
 	}
@@ -545,19 +619,26 @@ func (m *NotificationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetMessage(v)
 		return nil
-	case notification.FieldType:
+	case notification.FieldSourceType:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetType(v)
+		m.SetSourceType(v)
 		return nil
-	case notification.FieldReceivedID:
+	case notification.FieldSourceID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetReceivedID(v)
+		m.SetSourceID(v)
+		return nil
+	case notification.FieldReceiveIds:
+		v, ok := value.([]int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReceiveIds(v)
 		return nil
 	case notification.FieldScheduledTime:
 		v, ok := value.(time.Time)
@@ -574,11 +655,11 @@ func (m *NotificationMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *NotificationMutation) AddedFields() []string {
 	var fields []string
-	if m.add_type != nil {
-		fields = append(fields, notification.FieldType)
+	if m.addsource_type != nil {
+		fields = append(fields, notification.FieldSourceType)
 	}
-	if m.addreceived_id != nil {
-		fields = append(fields, notification.FieldReceivedID)
+	if m.addsource_id != nil {
+		fields = append(fields, notification.FieldSourceID)
 	}
 	return fields
 }
@@ -588,10 +669,10 @@ func (m *NotificationMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *NotificationMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case notification.FieldType:
-		return m.AddedType()
-	case notification.FieldReceivedID:
-		return m.AddedReceivedID()
+	case notification.FieldSourceType:
+		return m.AddedSourceType()
+	case notification.FieldSourceID:
+		return m.AddedSourceID()
 	}
 	return nil, false
 }
@@ -601,19 +682,19 @@ func (m *NotificationMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *NotificationMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case notification.FieldType:
+	case notification.FieldSourceType:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddType(v)
+		m.AddSourceType(v)
 		return nil
-	case notification.FieldReceivedID:
+	case notification.FieldSourceID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddReceivedID(v)
+		m.AddSourceID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Notification numeric field %s", name)
@@ -626,11 +707,14 @@ func (m *NotificationMutation) ClearedFields() []string {
 	if m.FieldCleared(notification.FieldMessage) {
 		fields = append(fields, notification.FieldMessage)
 	}
-	if m.FieldCleared(notification.FieldType) {
-		fields = append(fields, notification.FieldType)
+	if m.FieldCleared(notification.FieldSourceType) {
+		fields = append(fields, notification.FieldSourceType)
 	}
-	if m.FieldCleared(notification.FieldReceivedID) {
-		fields = append(fields, notification.FieldReceivedID)
+	if m.FieldCleared(notification.FieldSourceID) {
+		fields = append(fields, notification.FieldSourceID)
+	}
+	if m.FieldCleared(notification.FieldReceiveIds) {
+		fields = append(fields, notification.FieldReceiveIds)
 	}
 	if m.FieldCleared(notification.FieldScheduledTime) {
 		fields = append(fields, notification.FieldScheduledTime)
@@ -652,11 +736,14 @@ func (m *NotificationMutation) ClearField(name string) error {
 	case notification.FieldMessage:
 		m.ClearMessage()
 		return nil
-	case notification.FieldType:
-		m.ClearType()
+	case notification.FieldSourceType:
+		m.ClearSourceType()
 		return nil
-	case notification.FieldReceivedID:
-		m.ClearReceivedID()
+	case notification.FieldSourceID:
+		m.ClearSourceID()
+		return nil
+	case notification.FieldReceiveIds:
+		m.ClearReceiveIds()
 		return nil
 	case notification.FieldScheduledTime:
 		m.ClearScheduledTime()
@@ -672,11 +759,14 @@ func (m *NotificationMutation) ResetField(name string) error {
 	case notification.FieldMessage:
 		m.ResetMessage()
 		return nil
-	case notification.FieldType:
-		m.ResetType()
+	case notification.FieldSourceType:
+		m.ResetSourceType()
 		return nil
-	case notification.FieldReceivedID:
-		m.ResetReceivedID()
+	case notification.FieldSourceID:
+		m.ResetSourceID()
+		return nil
+	case notification.FieldReceiveIds:
+		m.ResetReceiveIds()
 		return nil
 	case notification.FieldScheduledTime:
 		m.ResetScheduledTime()

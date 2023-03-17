@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/manhrev/runtracking/backend/notification/helper/query"
 	"github.com/manhrev/runtracking/backend/notification/internal/service/cloudtask"
+	receiver "github.com/manhrev/runtracking/backend/notification/internal/service/receiver"
 	"github.com/manhrev/runtracking/backend/notification/internal/status"
 	noti "github.com/manhrev/runtracking/backend/notification/pkg/api"
 )
@@ -17,18 +17,9 @@ func (s *notificationIHttpServer) PushNotification(w http.ResponseWriter, r *htt
 	var message cloudtask.NotificationTransfer
 	err := json.Unmarshal(reqBody, &message)
 
-	var q query.Query
+	receiverService := receiver.GetReceiver(noti.SOURCE_TYPE(message.SourceType), s.authClient)
 
-	switch message.NotificationType {
-	case int(noti.NOTIFICATION_TYPE_ALLUSERS):
-		q = query.AllUsersQuery(s.authClient)
-	case int(noti.NOTIFICATION_TYPE_ONLYUSER):
-		q = query.OnlyUserQuery(s.authClient)
-	default:
-		q = query.AllUsersQuery(s.authClient)
-	}
-
-	userInfos, err := q.GetAllUsers(r.Context(), int64(message.ReceivedId))
+	userInfos, err := receiverService.GetAllUsers(r.Context(), message)
 	log.Println(userInfos)
 	if err != nil {
 		panic(err)
