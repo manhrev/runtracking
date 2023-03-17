@@ -46,6 +46,9 @@ export default function Login({
       const { error } = await dispatch(
         checkIfExistOrSaveExpoPushTokenThunk(req.toObject())
       ).unwrap()
+      if (error) {
+        alert('An error occured!')
+      }
     }
   }
   return (

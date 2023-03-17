@@ -18,8 +18,9 @@ import {
   arrayToMultiPolyline,
   calculateCenterAndDelta,
 } from '../../utils/helpers/map'
-import { minimalStyle } from '../../constants/mapstyles'
+import { minimalStyle, minimalStyleDark } from '../../constants/mapstyles'
 import { CommitType } from '../../lib/activity/activity_pb'
+import { selectToggleSlice } from '../../redux/features/toggle/slice'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -30,6 +31,7 @@ export default function ActivityDetail({
   const theme = useAppTheme()
   const { activityId } = route.params
   const { activityList } = useAppSelector(selectActivityList)
+  const { isNightMode } = useAppSelector(selectToggleSlice)
 
   const activity = activityList.find((activity) => {
     return activity.id == activityId
@@ -137,7 +139,7 @@ export default function ActivityDetail({
                 </View>
                 <View style={styles(theme).valueBox}>
                   <Text variant="titleLarge" style={styles(theme).value}>
-                    {kcal.toFixed(2)}
+                    {kcal.toFixed(3)}
                   </Text>
                   <Text variant="bodyLarge" style={styles(theme).unit}>
                     KCalories
@@ -194,7 +196,7 @@ export default function ActivityDetail({
                     width: '100%',
                     height: 500,
                   }}
-                  customMapStyle={minimalStyle}
+                  customMapStyle={isNightMode ? minimalStyleDark : minimalStyle}
                   mapType="mutedStandard"
                 >
                   {polylineList.map((polyline, index) => (
