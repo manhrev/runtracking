@@ -12,7 +12,7 @@ import (
 
 func NewHttpServer(entClient *ent.Client,
 	router *mux.Router,
-	authClient auth.AuthClient,
+	authClient auth.AuthIClient,
 	expopush expopush.ExpoPush) *notificationIHttpServer {
 	return &notificationIHttpServer{
 		entClient:  entClient,
@@ -25,7 +25,7 @@ func NewHttpServer(entClient *ent.Client,
 
 func RegisterRouteHttpServer(entClient *ent.Client,
 	router *mux.Router,
-	authClient auth.AuthClient,
+	authClient auth.AuthIClient,
 	expoPush expopush.ExpoPush) {
 	s := NewHttpServer(entClient, router, authClient, expoPush)
 	s.router.HandleFunc("/notification/pushnotification", s.PushNotification).Methods(http.MethodPost)
@@ -35,7 +35,7 @@ type notificationIHttpServer struct {
 	entClient *ent.Client
 	// Other service client connection, db adapter go here
 	router     *mux.Router
-	authClient auth.AuthClient
+	authClient auth.AuthIClient
 	expoPush   expopush.ExpoPush
 	repository *repository.Repository
 }

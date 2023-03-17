@@ -17,9 +17,11 @@ func (Notification) Fields() []ent.Field {
 			Unique(),
 		field.String("message").
 			Optional(),
-		field.Int64("type").
+		field.Int64("source_type").
 			Optional(),
-		field.Int64("received_id").
+		field.Int64("source_id").
+			Optional(),
+		field.JSON("receive_ids", []int64{}).
 			Optional(),
 		field.Time("scheduled_time").
 			Optional(),

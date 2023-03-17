@@ -19,8 +19,9 @@ import (
 // NotificationUserUpdate is the builder for updating NotificationUser entities.
 type NotificationUserUpdate struct {
 	config
-	hooks    []Hook
-	mutation *NotificationUserMutation
+	hooks     []Hook
+	mutation  *NotificationUserMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the NotificationUserUpdate builder.
@@ -133,6 +134,12 @@ func (nuu *NotificationUserUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (nuu *NotificationUserUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUserUpdate {
+	nuu.modifiers = append(nuu.modifiers, modifiers...)
+	return nuu
+}
+
 func (nuu *NotificationUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -201,6 +208,7 @@ func (nuu *NotificationUserUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.AddModifiers(nuu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, nuu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{notificationuser.Label}
@@ -216,9 +224,10 @@ func (nuu *NotificationUserUpdate) sqlSave(ctx context.Context) (n int, err erro
 // NotificationUserUpdateOne is the builder for updating a single NotificationUser entity.
 type NotificationUserUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *NotificationUserMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *NotificationUserMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -332,6 +341,12 @@ func (nuuo *NotificationUserUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (nuuo *NotificationUserUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUserUpdateOne {
+	nuuo.modifiers = append(nuuo.modifiers, modifiers...)
+	return nuuo
+}
+
 func (nuuo *NotificationUserUpdateOne) sqlSave(ctx context.Context) (_node *NotificationUser, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -417,6 +432,7 @@ func (nuuo *NotificationUserUpdateOne) sqlSave(ctx context.Context) (_node *Noti
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.AddModifiers(nuuo.modifiers...)
 	_node = &NotificationUser{config: nuuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
