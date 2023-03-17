@@ -1,5 +1,7 @@
 module github.com/manhrev/runtracking/backend/notification
 
+replace github.com/manhrev/runtracking/backend/auth => ../auth
+
 go 1.18
 
 require (

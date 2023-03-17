@@ -24,6 +24,7 @@ type NotificationUserQuery struct {
 	predicates       []predicate.NotificationUser
 	withNotification *NotificationQuery
 	withFKs          bool
+	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -390,6 +391,9 @@ func (nuq *NotificationUserQuery) sqlAll(ctx context.Context, hooks ...queryHook
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(nuq.modifiers) > 0 {
+		_spec.Modifiers = nuq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -443,6 +447,9 @@ func (nuq *NotificationUserQuery) loadNotification(ctx context.Context, query *N
 
 func (nuq *NotificationUserQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := nuq.querySpec()
+	if len(nuq.modifiers) > 0 {
+		_spec.Modifiers = nuq.modifiers
+	}
 	_spec.Node.Columns = nuq.ctx.Fields
 	if len(nuq.ctx.Fields) > 0 {
 		_spec.Unique = nuq.ctx.Unique != nil && *nuq.ctx.Unique
@@ -513,6 +520,9 @@ func (nuq *NotificationUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if nuq.ctx.Unique != nil && *nuq.ctx.Unique {
 		selector.Distinct()
 	}
+	for _, m := range nuq.modifiers {
+		m(selector)
+	}
 	for _, p := range nuq.predicates {
 		p(selector)
 	}
@@ -528,6 +538,12 @@ func (nuq *NotificationUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (nuq *NotificationUserQuery) Modify(modifiers ...func(s *sql.Selector)) *NotificationUserSelect {
+	nuq.modifiers = append(nuq.modifiers, modifiers...)
+	return nuq.Select()
 }
 
 // NotificationUserGroupBy is the group-by builder for NotificationUser entities.
@@ -618,4 +634,10 @@ func (nus *NotificationUserSelect) sqlScan(ctx context.Context, root *Notificati
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (nus *NotificationUserSelect) Modify(modifiers ...func(s *sql.Selector)) *NotificationUserSelect {
+	nus.modifiers = append(nus.modifiers, modifiers...)
+	return nus
 }
