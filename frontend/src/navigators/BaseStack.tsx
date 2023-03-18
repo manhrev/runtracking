@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import ExampleScreen from '../screens/ExampleScreen'
 import { CustomNavBar } from '../comp/NavBar'
 import ActivityDetail from '../screens/Activity/ActivityDetail'
 import ActivityList from '../screens/Activity/ActivityList'
@@ -13,32 +12,15 @@ import GetInfo from '../screens/Authentication/GetInfo'
 import RunResult from '../screens/Run/RunResult'
 import PlanDetail from '../screens/Plan/PlanDetail'
 import PlanAdd from '../screens/Plan/PlanAdd'
-import RunHome from '../screens/Run/RunHome'
 import RunCommit from '../screens/Run/RunCommit'
-import { notificationClient } from '../utils/grpc'
-import * as Device from 'expo-device'
-import * as Notifications from 'expo-notifications'
-import { Subscription } from 'expo-modules-core'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
-import {
-  CreateActivityInfoRequest,
-  CreateActivityInfoReply,
-  ActivityInfo,
-  TrackPoint,
-  ActivityType,
-} from '../lib/activity/activity_pb'
+import { TrackPoint, ActivityType } from '../lib/activity/activity_pb'
 import { useAppDispatch, useAppSelector } from '../redux/store'
-import {
-  isUserSliceLoading,
-  selectUserSlice,
-} from '../redux/features/user/slice'
-import { View, Platform } from 'react-native'
-import { Text } from 'react-native-paper'
-import { useEffect, useRef, useState } from 'react'
+import { selectUserSlice } from '../redux/features/user/slice'
+import { useEffect } from 'react'
 import { getMeThunk } from '../redux/features/user/thunk'
-import ComingSoon from '../screens/ComingSoon'
-import { ExpoPushTokenRequest } from '../lib/notification/notification_pb'
 import NotificationList from '../screens/Profile/NotificationList'
+import { toast } from '../utils/toast/toast'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -107,7 +89,7 @@ export const BaseStack = () => {
   const getMe = async () => {
     const { response, error } = await dispatch(getMeThunk()).unwrap()
     if (error) {
-      alert('Un authenticated!')
+      toast.error({ message: 'Unauthenticated!' })
     }
   }
 

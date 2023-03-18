@@ -11,9 +11,9 @@ import {
 } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
 
-import { useAppDispatch } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
 import { authClient, KEY_ACCESS_TOKEN } from '../../utils/grpc'
+import { toast } from '../../utils/toast/toast'
 import { baseStyles } from '../baseStyle'
 
 export default function Signup({
@@ -33,12 +33,12 @@ export default function Signup({
       confirmPassword == '' ||
       displayName == ''
     ) {
-      alert('Please input')
+      toast.error({ message: 'Please input' })
       return
     }
 
     if (password != confirmPassword) {
-      alert('Password confirm mismatch!')
+      toast.error({ message: 'Password confirm mismatch!' })
       return
     }
 
@@ -49,7 +49,7 @@ export default function Signup({
     })
 
     if (error) {
-      alert('An error occurred, please try again')
+      toast.error({ message: 'An error occurred, please try again' })
     } else {
       const token = response?.tokenInfo?.accessToken || ''
       AsyncStorage.setItem(KEY_ACCESS_TOKEN, token)

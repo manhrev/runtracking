@@ -9,6 +9,7 @@ import { logoutThunk } from '../../redux/features/user/thunk'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
 import SettingItem from './comp/SettingItem'
+import { toast } from '../../utils/toast/toast'
 
 export default function AppSetting({
   navigation,
@@ -18,7 +19,7 @@ export default function AppSetting({
   const dispatch = useAppDispatch()
   const handleLogout = async () => {
     dispatch(logoutThunk())
-    alert('Logged out!')
+    toast.success({ message: 'Logged out!' })
   }
   const { isNightMode } = useAppSelector(selectToggleSlice)
 
@@ -45,7 +46,12 @@ export default function AppSetting({
         </View>
         <View style={styles(theme).settingGroup}>
           <SettingItem left="Notification" topDivider onPress={() => {}} />
-          <SettingItem left="Privacy" onPress={() => {}} />
+          <SettingItem
+            left="Privacy"
+            onPress={() => {
+              toast.error({ message: 'Success!' })
+            }}
+          />
         </View>
         <View style={styles(theme).settingGroup}>
           <SettingItem left="Country/Region" topDivider onPress={() => {}} />

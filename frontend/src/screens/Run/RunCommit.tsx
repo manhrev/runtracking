@@ -1,63 +1,40 @@
-import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
-import {
-  Button,
-  IconButton,
-  SegmentedButtons,
-  Text,
-  List,
-  Divider,
-} from "react-native-paper";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AppTheme, useAppTheme } from "../../theme";
-import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { baseStyles } from "../baseStyle";
-import { RootHomeTabsParamList } from "../../navigators/HomeTab";
-import { useState, useEffect } from "react";
-import * as Progress from "react-native-progress";
-
-import {
-  isPlanListLoading,
-  getPlanList,
-} from "../../redux/features/planList/slice";
-
-import { listPlanThunk } from "../../redux/features/planList/thunk";
-
-import {
-  PlanInfo,
-  RuleStatus,
-  DeletePlansRequest,
-  Rule,
-  PlanProgress,
-} from "../../lib/plan/plan_pb";
-
+import { Dimensions, ScrollView, StyleSheet, View } from 'react-native'
+import { Button, IconButton, Text, List } from 'react-native-paper'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { AppTheme, useAppTheme } from '../../theme'
+import { useAppDispatch, useAppSelector } from '../../redux/store'
+import { RootHomeTabsParamList } from '../../navigators/HomeTab'
+import { useState, useEffect } from 'react'
+import * as Progress from 'react-native-progress'
+import { getPlanList } from '../../redux/features/planList/slice'
+import { listPlanThunk } from '../../redux/features/planList/thunk'
+import { PlanInfo, RuleStatus } from '../../lib/plan/plan_pb'
 import {
   ActivityType,
   CommitActivityRequest,
-} from "../../lib/activity/activity_pb";
-
-import { activityClient } from "../../utils/grpc";
-import { Icon } from "react-native-paper/lib/typescript/components/Avatar/Avatar";
-
+} from '../../lib/activity/activity_pb'
+import { activityClient } from '../../utils/grpc'
 import {
   displayValue,
   getProgressOfDailyActivity,
   isDailyActivity,
   toDate,
-} from "../../utils/helpers";
+} from '../../utils/helpers'
+import { toast } from '../../utils/toast/toast'
 
-const windowWidth = Dimensions.get("window").width;
+const windowWidth = Dimensions.get('window').width
 
 export default function RunCommit({
   navigation,
   route,
-}: NativeStackScreenProps<RootHomeTabsParamList, "RunCommit">) {
-  const theme = useAppTheme();
-  const dispatch = useAppDispatch();
+}: NativeStackScreenProps<RootHomeTabsParamList, 'RunCommit'>) {
+  const theme = useAppTheme()
+  const dispatch = useAppDispatch()
 
-  const { planList } = useAppSelector(getPlanList);
+  const { planList } = useAppSelector(getPlanList)
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo.AsObject>(
     {} as PlanInfo.AsObject
-  );
+  )
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,7 +46,7 @@ export default function RunCommit({
           offset: 0,
           sortBy: 1,
         })
-      ).unwrap();
+      ).unwrap()
 
       if (planList.length > 0) {
         // check each plan, if it is in progress and has the same activity type as the current activity, select it
@@ -78,14 +55,14 @@ export default function RunCommit({
             planList[i].status === RuleStatus.RULE_STATUS_INPROGRESS &&
             planList[i].activityType == route.params.activityType
           ) {
-            setSelectedPlan(planList[i]);
-            break;
+            setSelectedPlan(planList[i])
+            break
           }
         }
       }
-    };
-    fetchData();
-  }, []);
+    }
+    fetchData()
+  }, [])
 
   const commitActivity = async () => {
     const commitObj: CommitActivityRequest.AsObject = {
@@ -93,28 +70,29 @@ export default function RunCommit({
       commitId: selectedPlan.id,
       commitType: 1, // 1: plan
       rule: selectedPlan.rule,
-    };
-    console.log(commitObj);
+    }
+    console.log(commitObj)
 
     activityClient.commitActivity(commitObj).then((res) => {
       if (!res.error) {
-        alert("Commited to plan ID: " + selectedPlan.id);
+        toast.success({ message: 'Commited to plan successfully!' })
+        // alert("Commited to plan ID: " + selectedPlan.id);
 
-        navigation.goBack();
-      } else alert("Failed!");
-    });
-  };
+        navigation.goBack()
+      } else toast.error({ message: 'Failed to commit to plan!' })
+    })
+  }
 
   const backToHome = () => {
-    route.params.resetRunInfo();
-    navigation.popToTop();
-  };
+    route.params.resetRunInfo()
+    navigation.popToTop()
+  }
 
   const filteredPlanList = planList.filter(
     (item) =>
       item.status === RuleStatus.RULE_STATUS_INPROGRESS &&
       item.activityType == route.params.activityType
-  );
+  )
 
   return (
     <>
@@ -124,7 +102,7 @@ export default function RunCommit({
             icon="check-circle"
             size={100}
             iconColor={theme.colors.primary}
-            style={{ alignSelf: "center" }}
+            style={{ alignSelf: 'center' }}
           />
           <Text style={styles(theme).title}>
             Your activity has been recorded !!!
@@ -141,17 +119,22 @@ export default function RunCommit({
                 description={
                   <View>
                     <Text>
-                      St: {toDate(item.startTime.seconds)} - End:{" "}
+                      St: {toDate(item.startTime.seconds)} - End:{' '}
                       {toDate(item.endTime.seconds)}
                     </Text>
                     {isDailyActivity(item.rule) ? (
                       <Text style={{ marginBottom: 3 }}>
-                        Today: {displayValue(item.rule, getProgressOfDailyActivity(item.progressList))} /{" "}
-                        {displayValue(item.rule, item.goal)}
+                        Today:{' '}
+                        {displayValue(
+                          item.rule,
+                          getProgressOfDailyActivity(item.progressList)
+                        )}{' '}
+                        / {displayValue(item.rule, item.goal)}
                       </Text>
                     ) : (
                       <Text style={{ marginBottom: 3 }}>
-                        Progress: {displayValue(item.rule, item.total)} / {displayValue(item.rule, item.goal)}
+                        Progress: {displayValue(item.rule, item.total)} /{' '}
+                        {displayValue(item.rule, item.goal)}
                       </Text>
                     )}
                     <Progress.Bar
@@ -175,14 +158,14 @@ export default function RunCommit({
                     {...props}
                     icon={
                       item.activityType === ActivityType.ACTIVITY_TYPE_RUNNING
-                        ? "run-fast"
+                        ? 'run-fast'
                         : item.activityType ===
                           ActivityType.ACTIVITY_TYPE_WALKING
-                        ? "walk"
-                        : "bike"
+                        ? 'walk'
+                        : 'bike'
                     }
                     style={{
-                      alignSelf: "center",
+                      alignSelf: 'center',
                       marginLeft: 20,
                     }}
                   />
@@ -192,20 +175,20 @@ export default function RunCommit({
                     {...props}
                     icon={
                       selectedPlan.id === item.id
-                        ? "checkbox-marked"
-                        : "checkbox-blank-outline"
+                        ? 'checkbox-marked'
+                        : 'checkbox-blank-outline'
                     }
                     iconColor={
                       selectedPlan.id === item.id
                         ? theme.colors.primary
-                        : "#969696"
+                        : '#969696'
                     }
                     size={27}
                     onPress={() => setSelectedPlan(item)}
                   />
                 )}
                 onPress={() =>
-                  navigation.navigate("PlanDetail", {
+                  navigation.navigate('PlanDetail', {
                     planId: item.id,
                     canEdit: false,
                   })
@@ -214,7 +197,7 @@ export default function RunCommit({
             ))
           ) : (
             <>
-              <Text style={{ textAlign: "center" }}>
+              <Text style={{ textAlign: 'center' }}>
                 No plan is in progress
               </Text>
               <Button
@@ -244,7 +227,7 @@ export default function RunCommit({
         </ScrollView>
       </View>
     </>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -255,31 +238,31 @@ const styles = (theme: AppTheme) =>
     },
     title: {
       fontSize: 20,
-      fontWeight: "bold",
-      textAlign: "center",
+      fontWeight: 'bold',
+      textAlign: 'center',
     },
     planName: {
       fontSize: 18,
-      fontWeight: "bold",
+      fontWeight: 'bold',
     },
     curPlan: {
       // bottom divider
-      width: "100%",
+      width: '100%',
       borderBottomWidth: 1,
-      borderBottomColor: "#b5b7ba",
+      borderBottomColor: '#b5b7ba',
     },
     commitBtn: {
-      alignSelf: "flex-end",
+      alignSelf: 'flex-end',
       marginRight: 20,
       marginTop: 10,
     },
     backToHomeBtn: {
-      alignItems: "center",
+      alignItems: 'center',
       marginTop: 30,
     },
     segmentedBtn: {
       marginTop: 10,
       marginBottom: 10,
-      alignSelf: "center",
+      alignSelf: 'center',
     },
-  });
+  })
