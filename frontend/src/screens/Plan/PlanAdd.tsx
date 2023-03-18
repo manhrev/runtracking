@@ -1,119 +1,121 @@
-import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
-import { useState } from "react";
-import { Button, Text, TextInput, RadioButton } from "react-native-paper";
-import { Dropdown } from "react-native-element-dropdown";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AppTheme, useAppTheme } from "../../theme";
-import { useAppDispatch } from "../../redux/store";
-import {TimePicker, ValueMap} from 'react-native-simple-time-picker';
+import { Dimensions, ScrollView, StyleSheet, View } from 'react-native'
+import { useState } from 'react'
+import { Button, Text, TextInput, RadioButton } from 'react-native-paper'
+import { Dropdown } from 'react-native-element-dropdown'
+import DateTimePicker from '@react-native-community/datetimepicker'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { AppTheme, useAppTheme } from '../../theme'
+import { useAppDispatch } from '../../redux/store'
+import { TimePicker, ValueMap } from 'react-native-simple-time-picker'
 
 import {
   createPlanThunk,
   listPlanThunk,
-} from "../../redux/features/planList/thunk";
+} from '../../redux/features/planList/thunk'
 
-import { baseStyles } from "../baseStyle";
-import { RootHomeTabsParamList } from "../../navigators/HomeTab";
+import { RootHomeTabsParamList } from '../../navigators/HomeTab'
 
-import { ActivityType } from "../../lib/activity/activity_pb";
+import { ActivityType } from '../../lib/activity/activity_pb'
 
-import { Rule, CreatePlanRequest } from "../../lib/plan/plan_pb";
-import moment from "moment";
-
-const windowWidth = Dimensions.get("window").width;
+import { Rule, CreatePlanRequest } from '../../lib/plan/plan_pb'
+import moment from 'moment'
+import { toast } from '../../utils/toast/toast'
 
 export default function PlanAdd({
   navigation,
   route,
-}: NativeStackScreenProps<RootHomeTabsParamList, "PlanAdd">) {
-  const theme = useAppTheme();
-  const dispatch = useAppDispatch();
+}: NativeStackScreenProps<RootHomeTabsParamList, 'PlanAdd'>) {
+  const theme = useAppTheme()
+  const dispatch = useAppDispatch()
 
   const data = [
-    { label: "Total Km", value: Rule.RULE_TOTAL_DISTANCE.toString() },
-    { label: "Km per day", value: Rule.RULE_TOTAL_DISTANCE_DAILY.toString() },
-    { label: "Total time", value: Rule.RULE_TOTAL_TIME.toString() },
-    { label: "Time per day", value: Rule.RULE_TOTAL_TIME_DAILY.toString() },
-    { label: "Total activities", value: Rule.RULE_TOTAL_ACTIVITY.toString() },
+    { label: 'Total Km', value: Rule.RULE_TOTAL_DISTANCE.toString() },
+    { label: 'Km per day', value: Rule.RULE_TOTAL_DISTANCE_DAILY.toString() },
+    { label: 'Total time', value: Rule.RULE_TOTAL_TIME.toString() },
+    { label: 'Time per day', value: Rule.RULE_TOTAL_TIME_DAILY.toString() },
+    { label: 'Total activities', value: Rule.RULE_TOTAL_ACTIVITY.toString() },
     {
-      label: "Activities per day",
+      label: 'Activities per day',
       value: Rule.RULE_TOTAL_ACTIVITY_DAILY.toString(),
     },
-    { label: "Total calories", value: Rule.RULE_TOTAL_CALORIES.toString() },
+    { label: 'Total calories', value: Rule.RULE_TOTAL_CALORIES.toString() },
     {
-      label: "Calories per day",
+      label: 'Calories per day',
       value: Rule.RULE_TOTAL_CALORIES_DAILY.toString(),
     },
-  ];
+  ]
 
   const getLabel = (value: any) => {
-    const item = data.find((item) => item.value === value);
-    return item ? item.label : "";
-  };
+    const item = data.find((item) => item.value === value)
+    return item ? item.label : ''
+  }
 
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false)
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false)
 
   const [timeGoalPickerValue, setTimeGoalPickerValue] = useState<ValueMap>({
     hours: 0,
     minutes: 5,
     seconds: 0,
-  });
+  })
 
   const handleTimeGoalChange = (newValue: ValueMap) => {
-      setTimeGoalPickerValue(newValue);
-  };
+    setTimeGoalPickerValue(newValue)
+  }
 
-  const [name, setName] = useState<string>("Example Plan");
+  const [name, setName] = useState<string>('Example Plan')
   const [activityType, setActivityType] = useState<ActivityType>(
     ActivityType.ACTIVITY_TYPE_RUNNING
-  );
-  const [rule, setRule] = useState(Rule.RULE_TOTAL_DISTANCE.toString());
-  const [startTime, setStartTime] = useState(new Date());
+  )
+  const [rule, setRule] = useState(Rule.RULE_TOTAL_DISTANCE.toString())
+  const [startTime, setStartTime] = useState(new Date())
   const [endTime, setEndTime] = useState(
     new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
-  ); // 1 day after
-  const [goal, setGoal] = useState(1);
-  const [note, setNote] = useState("Example Note");
+  ) // 1 day after
+  const [goal, setGoal] = useState(1)
+  const [note, setNote] = useState('Example Note')
 
   const setStart = (event: any, date: any) => {
-    setShowStartTimePicker(false);
-    setStartTime(date);
-  };
+    setShowStartTimePicker(false)
+    setStartTime(date)
+  }
 
   const setEnd = (event: any, date: any) => {
-    setShowEndTimePicker(false);
-    setEndTime(date);
-  };
+    setShowEndTimePicker(false)
+    setEndTime(date)
+  }
 
   const isDayAfterDay = (day1Sec: number, day2Sec: number) => {
     // how many days = day1 - day2
-    const day1 = new Date(day1Sec * 1000);
-    const day2 = new Date(day2Sec * 1000);
-    const diff = day1.getTime() - day2.getTime();
-    const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
-    return diffDays > 0;
-  };
+    const day1 = new Date(day1Sec * 1000)
+    const day2 = new Date(day2Sec * 1000)
+    const diff = day1.getTime() - day2.getTime()
+    const diffDays = Math.ceil(diff / (1000 * 3600 * 24))
+    return diffDays > 0
+  }
 
   const goalNumberOnChange = (text: string) => {
-    if (text === "") {
-      setGoal(0);
-      return;
+    if (text === '') {
+      setGoal(0)
+      return
     }
     // remove all non-number characters
-    const number = text.replace(/[^0-9]/g, "");
-    setGoal(parseInt(number));
-  };
+    const number = text.replace(/[^0-9]/g, '')
+    setGoal(parseInt(number))
+  }
 
   const returnGoal = () => {
-    if (Number(rule) === Rule.RULE_TOTAL_TIME || Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) {
-      return timeGoalPickerValue.minutes * 60 + timeGoalPickerValue.seconds;
-    }
-    else if(Number(rule) === Rule.RULE_TOTAL_DISTANCE || Number(rule) === Rule.RULE_TOTAL_DISTANCE_DAILY) {
-      return goal * 1000;
-    }
-    else return goal;
+    if (
+      Number(rule) === Rule.RULE_TOTAL_TIME ||
+      Number(rule) === Rule.RULE_TOTAL_TIME_DAILY
+    ) {
+      return timeGoalPickerValue.minutes * 60 + timeGoalPickerValue.seconds
+    } else if (
+      Number(rule) === Rule.RULE_TOTAL_DISTANCE ||
+      Number(rule) === Rule.RULE_TOTAL_DISTANCE_DAILY
+    ) {
+      return goal * 1000
+    } else return goal
   }
 
   const savePlan = async () => {
@@ -125,7 +127,7 @@ export default function PlanAdd({
         seconds: Math.floor(
           moment
             .unix(startTime.getTime() / 1000)
-            .startOf("day")
+            .startOf('day')
             .valueOf() / 1000
         ),
         nanos: 0,
@@ -134,7 +136,7 @@ export default function PlanAdd({
         seconds: Math.floor(
           moment
             .unix(endTime.getTime() / 1000)
-            .endOf("day")
+            .endOf('day')
             .valueOf() / 1000
         ),
         nanos: 0,
@@ -142,11 +144,11 @@ export default function PlanAdd({
       goal: returnGoal(),
       note: note,
       timeZone: 7,
-    };
+    }
 
-    if (planData.name === "") {
-      alert("Plan name cannot be empty!");
-      return;
+    if (planData.name === '') {
+      toast.error({ message: 'Plan name cannot be empty!' })
+      return
     }
 
     if (
@@ -155,16 +157,16 @@ export default function PlanAdd({
         planData.startTime?.seconds || 0
       )
     ) {
-      alert("End time must be after start time!");
-      return;
+      toast.error({ message: 'End time must be after start time!' })
+      return
     }
 
     if (planData.goal <= 0) {
-      alert("Goal must be greater than 0!");
-      return;
+      toast.error({ message: 'Goal must be greater than 0!' })
+      return
     }
 
-    const { error } = await dispatch(createPlanThunk(planData)).unwrap();
+    const { error } = await dispatch(createPlanThunk(planData)).unwrap()
 
     const list = await dispatch(
       listPlanThunk({
@@ -174,12 +176,12 @@ export default function PlanAdd({
         offset: 0,
         sortBy: 1,
       })
-    ).unwrap();
+    ).unwrap()
     if (!error) {
-      alert("Plan created!");
-      navigation.goBack();
-    } else alert("An error occured, please try again");
-  };
+      toast.success({ message: 'Plan created!' })
+      navigation.goBack()
+    } else toast.error({ message: 'An error occured, please try again!' })
+  }
 
   return (
     <>
@@ -193,13 +195,13 @@ export default function PlanAdd({
           />
 
           <Text style={styles(theme).title}>Activity Type:</Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <RadioButton
               value="running"
               status={
                 activityType === ActivityType.ACTIVITY_TYPE_RUNNING
-                  ? "checked"
-                  : "unchecked"
+                  ? 'checked'
+                  : 'unchecked'
               }
               onPress={() =>
                 setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)
@@ -211,8 +213,8 @@ export default function PlanAdd({
               value="walking"
               status={
                 activityType === ActivityType.ACTIVITY_TYPE_WALKING
-                  ? "checked"
-                  : "unchecked"
+                  ? 'checked'
+                  : 'unchecked'
               }
               onPress={() =>
                 setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)
@@ -224,8 +226,8 @@ export default function PlanAdd({
               value="cycling"
               status={
                 activityType === ActivityType.ACTIVITY_TYPE_CYCLING
-                  ? "checked"
-                  : "unchecked"
+                  ? 'checked'
+                  : 'unchecked'
               }
               onPress={() =>
                 setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)
@@ -250,7 +252,7 @@ export default function PlanAdd({
             searchPlaceholder="Search..."
             value={rule.toString()}
             onChange={(item) => {
-              setRule(item.value);
+              setRule(item.value)
             }}
           />
 
@@ -300,23 +302,28 @@ export default function PlanAdd({
             />
           )}
           <Text style={styles(theme).title}>Goal: </Text>
-          {!(Number(rule) === Rule.RULE_TOTAL_TIME || Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) &&
+          {!(
+            Number(rule) === Rule.RULE_TOTAL_TIME ||
+            Number(rule) === Rule.RULE_TOTAL_TIME_DAILY
+          ) && (
             <TextInput
               mode="outlined"
               value={goal.toString()}
               onChangeText={(text) => goalNumberOnChange(text)}
               label={getLabel(rule)}
             />
-          }
-          
-          {(Number(rule) === Rule.RULE_TOTAL_TIME || Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) &&
+          )}
+
+          {(Number(rule) === Rule.RULE_TOTAL_TIME ||
+            Number(rule) === Rule.RULE_TOTAL_TIME_DAILY) && (
             <TimePicker
               value={timeGoalPickerValue}
               onChange={handleTimeGoalChange}
-              pickerShows={["minutes", "seconds"]}
+              pickerShows={['minutes', 'seconds']}
               minutesUnit="m"
               secondsUnit="s"
-          />}
+            />
+          )}
 
           <Text style={styles(theme).title}>Note: </Text>
           <TextInput
@@ -349,7 +356,7 @@ export default function PlanAdd({
         </ScrollView>
       </View>
     </>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -362,17 +369,17 @@ const styles = (theme: AppTheme) =>
     title: {
       marginTop: 10,
       marginBottom: 5,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       fontSize: 16,
     },
     addPlanBtn: {
-      alignSelf: "flex-end",
+      alignSelf: 'flex-end',
       marginRight: 20,
     },
     dropdown: {
       marginBottom: 7,
       height: 50,
-      borderColor: "gray",
+      borderColor: 'gray',
       borderWidth: 1,
       borderRadius: 5,
     },
@@ -400,12 +407,12 @@ const styles = (theme: AppTheme) =>
     },
     btnContainer: {
       flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     noteInput: {
-      width: "100%",
+      width: '100%',
       maxHeight: 100,
     },
-  });
+  })

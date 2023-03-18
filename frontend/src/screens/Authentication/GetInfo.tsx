@@ -1,21 +1,15 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useState } from 'react'
 import { Image, StyleSheet, View } from 'react-native'
-import {
-  Button,
-  Checkbox,
-  IconButton,
-  Text,
-  TextInput,
-} from 'react-native-paper'
+import { Button, IconButton, Text, TextInput } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
 import { AppTheme, useAppTheme } from '../../theme'
 import { authClient } from '../../utils/grpc'
+import { toast } from '../../utils/toast/toast'
 import { baseStyles } from '../baseStyle'
 
 export default function GetInfo({
   navigation,
-  route,
 }: NativeStackScreenProps<RootBaseStackParamList, 'GetInfo'>) {
   const theme = useAppTheme()
   const [age, setAge] = useState('')
@@ -24,7 +18,7 @@ export default function GetInfo({
 
   const handleContinue = async () => {
     if (age == '' || height == '' || weight == '') {
-      alert('Please input')
+      toast.error({ message: 'Please fill all fields' })
       return
     }
 
@@ -35,9 +29,9 @@ export default function GetInfo({
     })
 
     if (error) {
-      alert('An error occurred, please try again')
+      toast.error({ message: 'An error occurred, please try again' })
     } else {
-      alert('Create account successfully, please login')
+      toast.success({ message: 'Create account successfully, please login' })
       navigation.navigate('Login')
     }
   }

@@ -1,21 +1,18 @@
-import { Dimensions, ScrollView, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import {
   Button,
   Divider,
   IconButton,
-  SegmentedButtons,
   Text,
   Dialog,
   Portal,
-  Paragraph,
 } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
-import { baseStyles } from '../baseStyle'
 import { RootHomeTabsParamList } from '../../navigators/HomeTab'
 
-import React, { useState, useEffect, useRef } from 'react'
-import MapView, { Marker, Polyline } from 'react-native-maps'
+import { useState, useEffect, useRef } from 'react'
+import MapView, { Polyline } from 'react-native-maps'
 import * as Location from 'expo-location'
 import { getDistance } from 'geolib'
 import Monitor from './comp/Monitor'

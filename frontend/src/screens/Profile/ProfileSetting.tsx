@@ -1,34 +1,38 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { StyleSheet, View } from "react-native";
-import { RootBaseStackParamList } from "../../navigators/BaseStack";
-import { selectUserSlice } from "../../redux/features/user/slice";
-import { useAppSelector } from "../../redux/store";
-import { AppTheme, useAppTheme } from "../../theme";
-import SettingItem from "./comp/SettingItem";
-import { useEffect, useState } from "react";
-import { Button, TextInput } from "react-native-paper";
-import { useAppDispatch } from "../../redux/store";
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { StyleSheet, View } from 'react-native'
+import { RootBaseStackParamList } from '../../navigators/BaseStack'
+import { selectUserSlice } from '../../redux/features/user/slice'
+import { useAppSelector } from '../../redux/store'
+import { AppTheme, useAppTheme } from '../../theme'
+import SettingItem from './comp/SettingItem'
+import { useEffect, useState } from 'react'
+import { Button, TextInput } from 'react-native-paper'
+import { useAppDispatch } from '../../redux/store'
 
-import {
-  UserInfo,
-  UpdateUserInfoRequest,
-} from "../../lib/auth/auth_pb";
+import { UserInfo, UpdateUserInfoRequest } from '../../lib/auth/auth_pb'
 
-import {
-  updateUserInfoThunk
-} from "../../redux/features/user/thunk";
+import { updateUserInfoThunk } from '../../redux/features/user/thunk'
+import { toast } from '../../utils/toast/toast'
 
 export default function ProfileSetting({
   navigation,
   route,
-}: NativeStackScreenProps<RootBaseStackParamList, "ProfileSetting">) {
-  const theme = useAppTheme();
-  const { displayName, email, height, phoneNumber, username, weight, age, userId } =
-    useAppSelector(selectUserSlice);
+}: NativeStackScreenProps<RootBaseStackParamList, 'ProfileSetting'>) {
+  const theme = useAppTheme()
+  const {
+    displayName,
+    email,
+    height,
+    phoneNumber,
+    username,
+    weight,
+    age,
+    userId,
+  } = useAppSelector(selectUserSlice)
 
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(false)
 
   const [userInfo, setUserInfo] = useState<UserInfo.AsObject>({
     userId: userId,
@@ -39,53 +43,52 @@ export default function ProfileSetting({
     height: height,
     weight: weight,
     age: age,
-  });
+  })
 
   const updateUserInfo = () => {
-    if(userInfo.userId) {
+    if (userInfo.userId) {
       // check if empty input
-      if(!userInfo.displayName || !userInfo.phoneNumber || !userInfo.email) {
-        alert("Please fill all the fields!");
-        return;
+      if (!userInfo.displayName || !userInfo.phoneNumber || !userInfo.email) {
+        toast.error({ message: 'Please fill all the fields!' })
+        return
       }
       // mail regex
-      if(!userInfo.email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
-        alert("Invalid email!");
-        return;
+      if (!userInfo.email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+        toast.error({ message: 'Invalid email!' })
+        return
       }
       // check if height and weight are valid
-      if(userInfo.height <= 0 || userInfo.weight <= 0) {
-        alert("Height and weight must be greater than 0!");
-        return;
+      if (userInfo.height <= 0 || userInfo.weight <= 0) {
+        toast.error({ message: 'Height and weight must be greater than 0!' })
+        return
       }
 
-      const info = new UserInfo();
-      info.setUserId(userInfo.userId);
-      info.setDisplayName(userInfo.displayName);
-      info.setUsername(userInfo.username);
-      info.setEmail(userInfo.email);
-      info.setPhoneNumber(userInfo.phoneNumber);
-      info.setHeight(userInfo.height);
-      info.setWeight(userInfo.weight);
-      info.setAge(userInfo.age);
+      const info = new UserInfo()
+      info.setUserId(userInfo.userId)
+      info.setDisplayName(userInfo.displayName)
+      info.setUsername(userInfo.username)
+      info.setEmail(userInfo.email)
+      info.setPhoneNumber(userInfo.phoneNumber)
+      info.setHeight(userInfo.height)
+      info.setWeight(userInfo.weight)
+      info.setAge(userInfo.age)
 
-      const req = new UpdateUserInfoRequest();
-      req.setUserInfo(info);
-      dispatch(updateUserInfoThunk(req)).unwrap();
-      alert("Update successfully!");
-      setEditMode(false);
-    }
-    else alert("Invalid user id!");
-  };
+      const req = new UpdateUserInfoRequest()
+      req.setUserInfo(info)
+      dispatch(updateUserInfoThunk(req)).unwrap()
+      toast.success({ message: 'Update successfully!' })
+      setEditMode(false)
+    } else toast.error({ message: 'Invalid user id!' })
+  }
 
   const onChangeNumberInput = (text: string, key: string) => {
-    if(text === "") {
-      setUserInfo({ ...userInfo, [key]: 0 });
-      return;
+    if (text === '') {
+      setUserInfo({ ...userInfo, [key]: 0 })
+      return
     }
 
-    if(!isNaN(Number(text))) {
-      setUserInfo({ ...userInfo, [key]: Number(text) });
+    if (!isNaN(Number(text))) {
+      setUserInfo({ ...userInfo, [key]: Number(text) })
     }
   }
 
@@ -99,21 +102,26 @@ export default function ProfileSetting({
       height: height,
       weight: weight,
       age: age,
-    });
-  }, [editMode]);
+    })
+  }, [editMode])
 
   return (
     <View style={styles(theme).container}>
       <View style={styles(theme).settingGroup}>
         <SettingItem
           left="Fullname"
-          right={editMode ?
-            <TextInput
-              style={styles(theme).inputStyle}
-              value={userInfo.displayName}
-              onChangeText={(text) => setUserInfo({ ...userInfo, displayName: text })}
-            />
-            : displayName
+          right={
+            editMode ? (
+              <TextInput
+                style={styles(theme).inputStyle}
+                value={userInfo.displayName}
+                onChangeText={(text) =>
+                  setUserInfo({ ...userInfo, displayName: text })
+                }
+              />
+            ) : (
+              displayName
+            )
           }
           editMode={editMode}
           topDivider
@@ -121,38 +129,56 @@ export default function ProfileSetting({
         />
         <SettingItem
           left="Username"
-          right={editMode ?
-            <TextInput
-              style={styles(theme).inputStyle}
-              value={userInfo.username}
-              onChangeText={(text) => setUserInfo({ ...userInfo, username: text })}
-              disabled={true}
-            />
-            : username}
+          right={
+            editMode ? (
+              <TextInput
+                style={styles(theme).inputStyle}
+                value={userInfo.username}
+                onChangeText={(text) =>
+                  setUserInfo({ ...userInfo, username: text })
+                }
+                disabled={true}
+              />
+            ) : (
+              username
+            )
+          }
           editMode={editMode}
           onPress={() => {}}
         />
         <SettingItem
           left="Phone number"
-          right={editMode ?
-            <TextInput
-              style={styles(theme).inputStyle}
-              value={userInfo.phoneNumber}
-              onChangeText={(text) => setUserInfo({ ...userInfo, phoneNumber: text })}
-            />
-            : phoneNumber}
+          right={
+            editMode ? (
+              <TextInput
+                style={styles(theme).inputStyle}
+                value={userInfo.phoneNumber}
+                onChangeText={(text) =>
+                  setUserInfo({ ...userInfo, phoneNumber: text })
+                }
+              />
+            ) : (
+              phoneNumber
+            )
+          }
           editMode={editMode}
           onPress={() => {}}
         />
         <SettingItem
           left="Email"
-          right={editMode ?
-            <TextInput
-              style={styles(theme).inputStyle}
-              value={userInfo.email}
-              onChangeText={(text) => setUserInfo({ ...userInfo, email: text })}
-            />
-            : email}
+          right={
+            editMode ? (
+              <TextInput
+                style={styles(theme).inputStyle}
+                value={userInfo.email}
+                onChangeText={(text) =>
+                  setUserInfo({ ...userInfo, email: text })
+                }
+              />
+            ) : (
+              email
+            )
+          }
           editMode={editMode}
           onPress={() => {}}
         />
@@ -160,33 +186,41 @@ export default function ProfileSetting({
       <View style={styles(theme).settingGroup}>
         <SettingItem
           left="Height(cm)"
-          right={editMode ?
-            <TextInput
-              style={styles(theme).inputStyle}
-              value={userInfo.height.toString()}
-              onChangeText={(text) => onChangeNumberInput(text, "height")}
-            />
-            : height.toString()}
+          right={
+            editMode ? (
+              <TextInput
+                style={styles(theme).inputStyle}
+                value={userInfo.height.toString()}
+                onChangeText={(text) => onChangeNumberInput(text, 'height')}
+              />
+            ) : (
+              height.toString()
+            )
+          }
           editMode={editMode}
           topDivider={true}
           onPress={() => {}}
         />
         <SettingItem
           left="Weight(kg)"
-          right={editMode ?
-            <TextInput
-              style={styles(theme).inputStyle}
-              value={userInfo.weight.toString()}
-              onChangeText={(text) => onChangeNumberInput(text, "weight")}
-            />
-            : weight.toString()}
+          right={
+            editMode ? (
+              <TextInput
+                style={styles(theme).inputStyle}
+                value={userInfo.weight.toString()}
+                onChangeText={(text) => onChangeNumberInput(text, 'weight')}
+              />
+            ) : (
+              weight.toString()
+            )
+          }
           editMode={editMode}
           onPress={() => {}}
         />
       </View>
 
       <View style={styles(theme).btnGroup}>
-        {editMode &&
+        {editMode && (
           <Button
             mode="contained"
             onPress={() => updateUserInfo()}
@@ -194,21 +228,19 @@ export default function ProfileSetting({
           >
             SAVE PROFILE
           </Button>
-        }
+        )}
 
         <Button
           mode="contained"
           onPress={() => setEditMode(!editMode)}
-          buttonColor={editMode ? "#e82525" : theme.colors.primary}
+          buttonColor={editMode ? '#e82525' : theme.colors.primary}
           style={editMode ? styles(theme).redBtn : styles(theme).greenBtn}
         >
-          {editMode ? "CANCEL" : "EDIT PROFILE"}
+          {editMode ? 'CANCEL' : 'EDIT PROFILE'}
         </Button>
-        
       </View>
-
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -221,16 +253,16 @@ const styles = (theme: AppTheme) =>
       marginTop: 20,
     },
     inputStyle: {
-      backgroundColor: "white",
+      backgroundColor: 'white',
       height: 35,
       marginLeft: 10,
-      alignSelf: "flex-end",
+      alignSelf: 'flex-end',
       flex: 1,
       borderRadius: 10,
     },
     btnGroup: {
-      flexDirection: "row",
-      justifyContent: "flex-end"
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
     },
     greenBtn: {
       marginTop: 20,
@@ -239,6 +271,6 @@ const styles = (theme: AppTheme) =>
     redBtn: {
       marginTop: 20,
       marginRight: 10,
-      color: "red",
-    }
-  });
+      color: 'red',
+    },
+  })

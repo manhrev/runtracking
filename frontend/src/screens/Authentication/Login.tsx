@@ -8,16 +8,15 @@ import { checkIfExistOrSaveExpoPushTokenThunk } from '../../redux/features/notif
 import { useAppDispatch } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
 import { baseStyles } from '../baseStyle'
-import { notificationClient } from '../../utils/grpc'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { ExpoPushTokenRequest } from '../../lib/notification/notification_pb'
 import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { EXPO_PUSH_TOKEN } from '../../utils/grpc'
+import { toast } from '../../utils/toast/toast'
 export default function Login({
   navigation,
-  route,
 }: NativeStackScreenProps<RootBaseStackParamList, 'Login'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
@@ -32,9 +31,9 @@ export default function Login({
     ).unwrap()
 
     if (error) {
-      alert('Cannot login, please try again')
+      toast.error({ message: 'Cannot login, please try again' })
     } else {
-      alert('Logged in!')
+      toast.success({ message: 'Logged in' })
       let expoPushToken = await registerForPushNotificationsAsync()
       let req = new ExpoPushTokenRequest()
       if (expoPushToken != undefined) {
@@ -47,7 +46,7 @@ export default function Login({
         checkIfExistOrSaveExpoPushTokenThunk(req.toObject())
       ).unwrap()
       if (error) {
-        alert('An error occured!')
+        toast.error({ message: 'An error occured!' })
       }
     }
   }
@@ -161,13 +160,15 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status
     }
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!')
+      toast.error({
+        message: 'Failed to get push token for push notification!',
+      })
       return
     }
     token = (await Notifications.getExpoPushTokenAsync()).data
     console.log(token)
   } else {
-    alert('Must use physical device for Push Notifications')
+    toast.error({ message: 'Must use physical device for Push Notifications' })
   }
 
   return token

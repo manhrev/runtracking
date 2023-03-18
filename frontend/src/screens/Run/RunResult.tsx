@@ -1,28 +1,17 @@
 import { StyleSheet, View, Dimensions } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import {
-  Divider,
-  Text,
-  List,
-  TextInput,
-  RadioButton,
-  Button,
-} from 'react-native-paper'
+import { Text, List, TextInput, RadioButton, Button } from 'react-native-paper'
 
 import { AppTheme, useAppTheme } from '../../theme'
 import { baseStyles } from '../baseStyle'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
-import React, { useState } from 'react'
-import {
-  ActivityInfo,
-  ActivityType,
-  CreateActivityInfoRequest,
-  TrackPoint,
-} from '../../lib/activity/activity_pb'
+import { useState } from 'react'
+import { ActivityInfo, ActivityType } from '../../lib/activity/activity_pb'
 import { activityClient } from '../../utils/grpc'
 import { LogBox } from 'react-native'
 import { useAppSelector } from '../../redux/store'
 import { selectUserSlice } from '../../redux/features/user/slice'
+import { toast } from '../../utils/toast/toast'
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -73,7 +62,7 @@ export default function RunResult({
             resetRunInfo: route.params.resetRunInfo,
           })
         }
-      } else alert('Failed!')
+      } else toast.error({ message: 'Failed!' })
     })
   }
 
