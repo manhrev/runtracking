@@ -30,7 +30,7 @@ func checkIfPlanExpired(
 			log.Printf("Error update plan status when check if plan expired: %v", err)
 			return err
 		}
-		notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID)
+		notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
 		return nil
 	}
 
@@ -49,7 +49,7 @@ func checkIfPlanExpired(
 
 		// check progress
 		if len(currentProgress) == 0 {
-			notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID)
+			notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
 			updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
 			err := updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED)).Exec(ctx)
 			if err != nil {
@@ -65,11 +65,11 @@ func checkIfPlanExpired(
 
 			if today != newestProgressTime {
 				updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
-				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID)
+				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
 				return nil
 			} else if currentProgress[maxIdx].Value < planned.Goal {
 				updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
-				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID)
+				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
 				return nil
 			}
 			err := updateQuery.Exec(ctx)
@@ -89,6 +89,7 @@ func notifyUserAboutPlan(
 	notificationIClient notification.NotificationIClient,
 	message string,
 	userId int64,
+	planId int64,
 ) error {
 	if notificationIClient == nil {
 		log.Printf(message)
@@ -96,9 +97,10 @@ func notifyUserAboutPlan(
 	}
 	_, err := notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
 		Messeage:      message,
-		Type:          notification.NOTIFICATION_TYPE_ONLYUSER,
+		SourceType:    notification.SOURCE_TYPE_PERSONAL,
 		ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 10)),
-		ReceivedId:    userId,
+		ReceiveIds:    []int64{userId},
+		SourceId:      planId,
 	})
 	if err != nil {
 		log.Printf("Error when push notification: %v", err)
