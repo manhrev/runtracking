@@ -7,7 +7,7 @@ require (
 	github.com/envoyproxy/go-control-plane v0.10.3
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gogo/googleapis v1.4.1
-	github.com/manhrev/runtracking/backend/notification v0.0.0-20230317163204-5646aaef0392
+	github.com/manhrev/runtracking/backend/notification v0.0.0-20230318025930-6277a26aa1b5
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
