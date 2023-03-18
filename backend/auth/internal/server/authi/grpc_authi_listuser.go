@@ -3,7 +3,7 @@ package authi
 import (
 	"context"
 
-	"github.com/manhrev/runtracking/backend/auth/internal/repository/transformer"
+	"github.com/manhrev/runtracking/backend/auth/internal/transformer"
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 )
 

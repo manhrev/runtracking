@@ -20,11 +20,14 @@ type Group interface {
 	) (*ent.Groupz, error)
 	List(
 		ctx context.Context,
+		userId int64,
 		sortBy grouppb.GroupSortBy,
+		searchByName string,
+		filterBy grouppb.ListGroupRequest_FilterBy,
 		ascending bool,
 		limit uint32,
 		offset uint64,
-	) (records []*ent.Groupz, total int64, err error)
+	) ([]*ent.Groupz, int64, error)
 	Get(ctx context.Context, groupId int64) (*ent.Groupz, error)
 	Delete(ctx context.Context, userId int64, groupId int64) error
 	Update(ctx context.Context, groupInfo *grouppb.GroupInfo) error
@@ -66,18 +69,30 @@ func (m *groupImpl) Create(ctx context.Context, userId int64, groupInfo *grouppb
 	return newGroup, nil
 }
 
-func (m *groupImpl) List(
-	ctx context.Context,
+func (m *groupImpl) List(ctx context.Context,
+	userId int64,
 	sortBy grouppb.GroupSortBy,
+	searchByName string,
+	filterBy grouppb.ListGroupRequest_FilterBy,
 	ascending bool,
 	limit uint32,
-	offset uint64,
-) ([]*ent.Groupz, int64, error) {
+	offset uint64) ([]*ent.Groupz, int64, error) {
 	var (
 		byField string
 	)
 
 	query := m.entClient.Groupz.Query()
+
+	if searchByName != "" {
+		query.Where(group.NameContainsFold(searchByName))
+	}
+
+	switch filterBy {
+	case api.ListGroupRequest_FILTER_BY_IS_MEMBER:
+		query.Where(group.HasMembersWith(member.UserIDEQ(userId), member.StatusEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE))))
+	case api.ListGroupRequest_FILTER_BY_IS_NOT_MEMBER:
+		query.Where(group.HasMembersWith(member.UserIDNEQ(userId), member.StatusNEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE))))
+	}
 
 	// sort by type
 	switch sortBy {

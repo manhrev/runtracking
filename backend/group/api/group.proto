@@ -14,7 +14,31 @@ service Group {
     rpc DeleteGroup(DeleteGroupRequest) returns(DeleteGroupReply){};
     rpc ListMembersOfGroup(ListMembersOfGroupRequest) returns(ListMembersOfGroupReply) {};
     rpc JoinGroup(JoinGroupRequest) returns(JoinGroupReply){};
+    rpc AcceptMember(AcceptMemberRequest) returns(AcceptMemberReply) {};
+    rpc BanMember(BanMemberRequest) returns (BanMemberReply) {};
+    rpc LeaveGroup(LeaveGroupRequest) returns(LeaveGroupReply){};
 }
+
+message LeaveGroupRequest{
+    int64 group_id = 1;
+}
+message LeaveGroupReply{
+}
+message BanMemberRequest{
+    int64 member_id = 1;
+    int64 group_id = 2;
+} 
+
+message BanMemberReply{
+
+}
+
+message AcceptMemberRequest{
+    int64 group_id = 1;
+    int64 member_id = 2;
+}
+
+message AcceptMemberReply{}
 
 message JoinGroupRequest{
     int64 group_id = 1;
@@ -56,6 +80,15 @@ message ListGroupRequest{
     uint32 limit = 1;
     uint64 offset = 2;
     bool ascending = 3;
+    
+    string search_by_name = 5;
+    FilterBy filter_by = 6;
+    
+    enum FilterBy{
+        FILTER_BY_UNSPECIFIED = 0;
+        FILTER_BY_IS_MEMBER = 1;
+        FILTER_BY_IS_NOT_MEMBER = 2;
+    }
     GroupSortBy sort_by = 4;
 }
 
@@ -117,6 +150,7 @@ enum GroupSortBy {
 
 message Member{
     int64 user_id = 1;
+    int64 member_id = 9;
     string display_name = 7;
     string username = 2;
     string email = 3;

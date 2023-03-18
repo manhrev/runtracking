@@ -22,7 +22,10 @@ type Group interface {
 	) (*ent.Groupz, error)
 	Delete(ctx context.Context, userId int64, groupId int64) error
 	List(ctx context.Context,
+		userId int64,
 		sortBy grouppb.GroupSortBy,
+		searchByName string,
+		filterBy grouppb.ListGroupRequest_FilterBy,
 		ascending bool,
 		limit uint32,
 		offset uint64) (*group.ListGroupReply, error)
@@ -71,12 +74,15 @@ func (m *groupImpl) Create(ctx context.Context, userId int64, groupInfo *grouppb
 }
 
 func (m *groupImpl) List(ctx context.Context,
+	userId int64,
 	sortBy grouppb.GroupSortBy,
+	searchByName string,
+	filterBy grouppb.ListGroupRequest_FilterBy,
 	ascending bool,
 	limit uint32,
 	offset uint64) (*group.ListGroupReply, error) {
 
-	groupEntList, total, err := m.repository.Group.List(ctx, sortBy, ascending, limit, offset)
+	groupEntList, total, err := m.repository.Group.List(ctx, userId, sortBy, searchByName, filterBy, ascending, limit, offset)
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}

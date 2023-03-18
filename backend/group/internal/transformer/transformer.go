@@ -26,6 +26,7 @@ func TransformUserInfoListToMemberList(userInfoList []*auth.UserInfo, memberMap 
 	for _, userInfo := range userInfoList {
 		member := &group.Member{
 			UserId:      userInfo.GetUserId(),
+			MemberId:    memberMap[userInfo.GetUserId()].ID,
 			DisplayName: userInfo.GetDisplayName(),
 			Username:    userInfo.GetUsername(),
 			Email:       userInfo.GetEmail(),
