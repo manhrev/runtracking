@@ -7,6 +7,7 @@ import RunHome from '../screens/Run/RunHome'
 import { RootBaseStackParamList } from './BaseStack'
 import ComingSoon from '../screens/ComingSoon'
 import PlanHome from '../screens/Plan/PlanHome'
+import GroupTopTabs from './GroupTopTab'
 
 export type RootHomeTabsParamList = {
   ActivityHome: undefined
@@ -27,7 +28,7 @@ export default function HomeTabs() {
     >
       <Tab.Screen
         name="GroupHome"
-        component={ComingSoon}
+        component={GroupTopTabs}
         options={{ tabBarIcon: 'account-group' }}
       />
       <Tab.Screen
