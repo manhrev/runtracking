@@ -187,6 +187,11 @@ export class ListPlanRequest extends jspb.Message {
   hasTo(): boolean;
   clearTo(): ListPlanRequest;
 
+  getIdsList(): Array<number>;
+  setIdsList(value: Array<number>): ListPlanRequest;
+  clearIdsList(): ListPlanRequest;
+  addIds(value: number, index?: number): ListPlanRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListPlanRequest.AsObject;
   static toObject(includeInstance: boolean, msg: ListPlanRequest): ListPlanRequest.AsObject;
@@ -204,6 +209,7 @@ export namespace ListPlanRequest {
     activityType: ActivityType,
     from?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     to?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    idsList: Array<number>,
   }
 }
 

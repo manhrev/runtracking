@@ -45,6 +45,7 @@ type Plan interface {
 		acitvityType plan_pb.ActivityType,
 		from *timestamppb.Timestamp,
 		to *timestamppb.Timestamp,
+		ids []int64,
 	) ([]*ent.Plan, int64, error)
 	Update(
 		ctx context.Context,
@@ -146,6 +147,7 @@ func (p *planImpl) List(
 	acitvityType plan_pb.ActivityType,
 	from *timestamppb.Timestamp,
 	to *timestamppb.Timestamp,
+	ids []int64,
 ) ([]*ent.Plan, int64, error) {
 	var (
 		byField string
@@ -153,6 +155,10 @@ func (p *planImpl) List(
 
 	query := p.entClient.Plan.Query().
 		Where(plan.UserIDEQ(userId))
+
+	if len(ids) > 0 {
+		query.Where(plan.IDIn(ids...))
+	}
 
 	if acitvityType != plan_pb.ActivityType_ACTIVITY_TYPE_UNSPECIFIED {
 		query.Where(plan.ActivityTypeEQ(int64(acitvityType)))

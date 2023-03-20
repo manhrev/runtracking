@@ -25,7 +25,7 @@ func (s *planIServer) UpdatePlanProgress(ctx context.Context, request *plan.Upda
 	if len(notificationMessage) > 0 {
 		_, err = s.notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
 			Messeage:      notificationMessage,
-			SourceType:    notification.SOURCE_TYPE_PERSONAL,
+			SourceType:    notification.SOURCE_TYPE_PLAN,
 			ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 10)),
 			ReceiveIds:    []int64{userId},
 			SourceId:      request.PlanId,
