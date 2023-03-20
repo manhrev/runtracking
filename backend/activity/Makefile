@@ -15,11 +15,12 @@ generate-code:
 		./api/activity_code.proto
 
 generate-ts:
-	mkdir -p ./npm/code
-	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/activity.proto
-	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/activity_code.proto
+	mkdir -p ./pkg/ts
+	protoc -I=./api --js_out=import_style=commonjs:./pkg/ts --grpc-web_out=import_style=typescript,mode=grpcwebtext:./pkg/ts ./api/activity.proto
+	protoc -I=./api --js_out=import_style=commonjs:./pkg/ts --grpc-web_out=import_style=typescript,mode=grpcwebtext:./pkg/ts ./api/activity_code.proto
 
 generate-ent:
+	rm -rf ./pkg/ent
 	mkdir -p ./pkg/ent
 	cp -R ./schema ./pkg/ent/schema
 	go run -mod=mod entgo.io/ent/cmd/ent generate ./pkg/ent/schema --feature sql/modifier

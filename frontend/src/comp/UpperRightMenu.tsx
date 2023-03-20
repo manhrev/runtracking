@@ -1,29 +1,29 @@
-import { Menu } from "react-native-paper";
-import { Dimensions } from "react-native";
+import { Menu } from 'react-native-paper'
+import { Dimensions } from 'react-native'
 import {
   hideRightMenu,
   selectToggleSlice,
-} from "../redux/features/toggle/slice";
-import { useAppDispatch, useAppSelector } from "../redux/store";
+} from '../redux/features/toggle/slice'
+import { useAppDispatch, useAppSelector } from '../redux/store'
 
-const windowWidth = Dimensions.get("window").width;
+const windowWidth = Dimensions.get('window').width
 
 export interface MenuItemWithCallback {
-  menuItem: string;
-  callback: Function;
-  icon?: string;
+  menuItem: string
+  callback: Function
+  icon?: string
 }
 export interface UpperRightMenuConfig {
-  menuList: Array<MenuItemWithCallback>;
-  leadingIcon?: boolean;
+  menuList: Array<MenuItemWithCallback>
+  leadingIcon?: boolean
 }
 
 export default function UpperRightMenu(props: UpperRightMenuConfig) {
-  const dispatch = useAppDispatch();
-  const { isRightMenuShow } = useAppSelector(selectToggleSlice);
+  const dispatch = useAppDispatch()
+  const { isRightMenuShow } = useAppSelector(selectToggleSlice)
   const closeMenu = () => {
-    dispatch(hideRightMenu());
-  };
+    dispatch(hideRightMenu())
+  }
 
   return (
     <Menu
@@ -41,7 +41,7 @@ export default function UpperRightMenu(props: UpperRightMenuConfig) {
               onPress={() => amenu.callback()}
               title={amenu.menuItem}
             />
-          );
+          )
         } else {
           return (
             <Menu.Item
@@ -50,9 +50,9 @@ export default function UpperRightMenu(props: UpperRightMenuConfig) {
               onPress={() => amenu.callback()}
               title={amenu.menuItem}
             />
-          );
+          )
         }
       })}
     </Menu>
-  );
+  )
 }

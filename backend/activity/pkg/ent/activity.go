@@ -33,12 +33,16 @@ type Activity struct {
 	Kcal float32 `json:"kcal,omitempty"`
 	// StartTime holds the value of the "start_time" field.
 	StartTime time.Time `json:"start_time,omitempty"`
-	// EndTime holds the value of the "end_time" field.
-	EndTime time.Time `json:"end_time,omitempty"`
 	// Duration holds the value of the "duration" field.
 	Duration uint64 `json:"duration,omitempty"`
+	// EndTime holds the value of the "end_time" field.
+	EndTime time.Time `json:"end_time,omitempty"`
 	// Route holds the value of the "route" field.
 	Route []*activity.TrackPoint `json:"route,omitempty"`
+	// CommitID holds the value of the "commit_id" field.
+	CommitID int64 `json:"commit_id,omitempty"`
+	// CommitType holds the value of the "commit_type" field.
+	CommitType uint32 `json:"commit_type,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
@@ -52,7 +56,7 @@ func (*Activity) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case entactivity.FieldTotalDistance, entactivity.FieldKcal:
 			values[i] = new(sql.NullFloat64)
-		case entactivity.FieldID, entactivity.FieldUserID, entactivity.FieldType, entactivity.FieldDuration:
+		case entactivity.FieldID, entactivity.FieldUserID, entactivity.FieldType, entactivity.FieldDuration, entactivity.FieldCommitID, entactivity.FieldCommitType:
 			values[i] = new(sql.NullInt64)
 		case entactivity.FieldActivityName, entactivity.FieldActivityNote:
 			values[i] = new(sql.NullString)
@@ -121,17 +125,17 @@ func (a *Activity) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.StartTime = value.Time
 			}
-		case entactivity.FieldEndTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field end_time", values[i])
-			} else if value.Valid {
-				a.EndTime = value.Time
-			}
 		case entactivity.FieldDuration:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field duration", values[i])
 			} else if value.Valid {
 				a.Duration = uint64(value.Int64)
+			}
+		case entactivity.FieldEndTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field end_time", values[i])
+			} else if value.Valid {
+				a.EndTime = value.Time
 			}
 		case entactivity.FieldRoute:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -140,6 +144,18 @@ func (a *Activity) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &a.Route); err != nil {
 					return fmt.Errorf("unmarshal field route: %w", err)
 				}
+			}
+		case entactivity.FieldCommitID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field commit_id", values[i])
+			} else if value.Valid {
+				a.CommitID = value.Int64
+			}
+		case entactivity.FieldCommitType:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field commit_type", values[i])
+			} else if value.Valid {
+				a.CommitType = uint32(value.Int64)
 			}
 		case entactivity.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -156,7 +172,7 @@ func (a *Activity) assignValues(columns []string, values []any) error {
 // Note that you need to call Activity.Unwrap() before calling this method if this Activity
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (a *Activity) Update() *ActivityUpdateOne {
-	return (&ActivityClient{config: a.config}).UpdateOne(a)
+	return NewActivityClient(a.config).UpdateOne(a)
 }
 
 // Unwrap unwraps the Activity entity that was returned from a transaction after it was closed,
@@ -196,14 +212,20 @@ func (a *Activity) String() string {
 	builder.WriteString("start_time=")
 	builder.WriteString(a.StartTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("end_time=")
-	builder.WriteString(a.EndTime.Format(time.ANSIC))
-	builder.WriteString(", ")
 	builder.WriteString("duration=")
 	builder.WriteString(fmt.Sprintf("%v", a.Duration))
 	builder.WriteString(", ")
+	builder.WriteString("end_time=")
+	builder.WriteString(a.EndTime.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("route=")
 	builder.WriteString(fmt.Sprintf("%v", a.Route))
+	builder.WriteString(", ")
+	builder.WriteString("commit_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.CommitID))
+	builder.WriteString(", ")
+	builder.WriteString("commit_type=")
+	builder.WriteString(fmt.Sprintf("%v", a.CommitType))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
@@ -213,9 +235,3 @@ func (a *Activity) String() string {
 
 // Activities is a parsable slice of Activity.
 type Activities []*Activity
-
-func (a Activities) config(cfg config) {
-	for _i := range a {
-		a[_i].config = cfg
-	}
-}

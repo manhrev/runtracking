@@ -1,10 +1,10 @@
-import { StyleSheet, View } from "react-native";
-import { Divider, Text } from "react-native-paper";
-import { AppTheme, useAppTheme } from "../../../theme";
-import { baseStyles } from "../../baseStyle";
+import { StyleSheet, View } from 'react-native'
+import { Divider, Text } from 'react-native-paper'
+import { AppTheme, useAppTheme } from '../../../theme'
+import { baseStyles } from '../../baseStyle'
 
 export default function ProfileAchievement() {
-  const theme = useAppTheme();
+  const theme = useAppTheme()
   return (
     <View style={styles(theme).extendedBaseContainer}>
       <View style={baseStyles(theme).innerWrapper}>
@@ -12,7 +12,7 @@ export default function ProfileAchievement() {
           <Text
             variant="titleMedium"
             style={{
-              fontWeight: "bold",
+              fontWeight: 'bold',
               color: theme.colors.primary,
               marginVertical: 12,
             }}
@@ -21,14 +21,14 @@ export default function ProfileAchievement() {
           </Text>
           <View
             style={{
-              display: "flex",
-              flexDirection: "row",
+              display: 'flex',
+              flexDirection: 'row',
             }}
           >
             <View style={styles(theme).achievementBoxLeft}>
               <Text
                 variant="displayMedium"
-                style={{ fontStyle: "italic", fontWeight: "bold" }}
+                style={{ fontStyle: 'italic', fontWeight: 'bold' }}
               >
                 0
               </Text>
@@ -37,7 +37,7 @@ export default function ProfileAchievement() {
             <View style={styles(theme).achievementBoxRight}>
               <Text
                 variant="displayMedium"
-                style={{ fontStyle: "italic", fontWeight: "bold" }}
+                style={{ fontStyle: 'italic', fontWeight: 'bold' }}
               >
                 0
               </Text>
@@ -122,7 +122,7 @@ export default function ProfileAchievement() {
         </View>*/}
       </View>
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -149,4 +149,4 @@ const styles = (theme: AppTheme) =>
       padding: 10,
       marginLeft: 8,
     },
-  });
+  })

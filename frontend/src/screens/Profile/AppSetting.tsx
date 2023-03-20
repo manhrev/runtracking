@@ -1,30 +1,31 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { ScrollView, StyleSheet, View } from "react-native";
-import { RootBaseStackParamList } from "../../navigators/BaseStack";
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { ScrollView, StyleSheet, View } from 'react-native'
+import { RootBaseStackParamList } from '../../navigators/BaseStack'
 import {
   selectToggleSlice,
   switchNightMode,
-} from "../../redux/features/toggle/slice";
-import { logoutThunk } from "../../redux/features/user/thunk";
-import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { AppTheme, useAppTheme } from "../../theme";
-import SettingItem from "./comp/SettingItem";
+} from '../../redux/features/toggle/slice'
+import { logoutThunk } from '../../redux/features/user/thunk'
+import { useAppDispatch, useAppSelector } from '../../redux/store'
+import { AppTheme, useAppTheme } from '../../theme'
+import SettingItem from './comp/SettingItem'
+import { toast } from '../../utils/toast/toast'
 
 export default function AppSetting({
   navigation,
   route,
-}: NativeStackScreenProps<RootBaseStackParamList, "AppSetting">) {
-  const theme = useAppTheme();
-  const dispatch = useAppDispatch();
+}: NativeStackScreenProps<RootBaseStackParamList, 'AppSetting'>) {
+  const theme = useAppTheme()
+  const dispatch = useAppDispatch()
   const handleLogout = async () => {
-    dispatch(logoutThunk());
-    alert("Logged out!");
-  };
-  const { isNightMode } = useAppSelector(selectToggleSlice);
+    dispatch(logoutThunk())
+    toast.success({ message: 'Logged out!' })
+  }
+  const { isNightMode } = useAppSelector(selectToggleSlice)
 
   const handleChangeNightMode = () => {
-    dispatch(switchNightMode());
-  };
+    dispatch(switchNightMode())
+  }
   return (
     <View style={styles(theme).container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -33,19 +34,24 @@ export default function AppSetting({
             left="Profile"
             topDivider
             onPress={() => {
-              navigation.navigate("ProfileSetting");
+              navigation.navigate('ProfileSetting')
             }}
           />
           <SettingItem left="Units of Measure" onPress={() => {}} />
           <SettingItem
             left="Night mode"
-            right={isNightMode ? "Yes" : "No"}
+            right={isNightMode ? 'Yes' : 'No'}
             onPress={handleChangeNightMode}
           />
         </View>
         <View style={styles(theme).settingGroup}>
           <SettingItem left="Notification" topDivider onPress={() => {}} />
-          <SettingItem left="Privacy" onPress={() => {}} />
+          <SettingItem
+            left="Privacy"
+            onPress={() => {
+              toast.error({ message: 'Success!' })
+            }}
+          />
         </View>
         <View style={styles(theme).settingGroup}>
           <SettingItem left="Country/Region" topDivider onPress={() => {}} />
@@ -79,7 +85,7 @@ export default function AppSetting({
         </View>
       </ScrollView>
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -91,4 +97,4 @@ const styles = (theme: AppTheme) =>
     settingGroup: {
       marginTop: 20,
     },
-  });
+  })

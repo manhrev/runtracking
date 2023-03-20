@@ -84,7 +84,7 @@ func Test_ListStatistic(t *testing.T) {
 		activitypb.ActivityType_ACTIVITY_TYPE_RUNNING,
 		nil,
 		nil,
-		0,
+		activitypb.GetActivityStatisticRequest_GORUP_BY_MONTH,
 		7,
 	)
 }

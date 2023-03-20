@@ -18,9 +18,11 @@ var (
 		{Name: "total_distance", Type: field.TypeFloat64},
 		{Name: "kcal", Type: field.TypeFloat32},
 		{Name: "start_time", Type: field.TypeTime},
-		{Name: "end_time", Type: field.TypeTime},
 		{Name: "duration", Type: field.TypeUint64},
+		{Name: "end_time", Type: field.TypeTime},
 		{Name: "route", Type: field.TypeJSON},
+		{Name: "commit_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "commit_type", Type: field.TypeUint32, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// ActivitiesTable holds the schema information for the "activities" table.

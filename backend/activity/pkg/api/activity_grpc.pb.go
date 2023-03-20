@@ -26,6 +26,7 @@ type ActivityClient interface {
 	ListActivityInfo(ctx context.Context, in *ListActivityInfoRequest, opts ...grpc.CallOption) (*ListActivityInfoReply, error)
 	DeleteActivityInfo(ctx context.Context, in *DeleteActivityInfoRequest, opts ...grpc.CallOption) (*DeleteActivityInfoReply, error)
 	GetActivityStatistic(ctx context.Context, in *GetActivityStatisticRequest, opts ...grpc.CallOption) (*GetActivityStatisticReply, error)
+	CommitActivity(ctx context.Context, in *CommitActivityRequest, opts ...grpc.CallOption) (*CommitActivityReply, error)
 }
 
 type activityClient struct {
@@ -72,6 +73,15 @@ func (c *activityClient) GetActivityStatistic(ctx context.Context, in *GetActivi
 	return out, nil
 }
 
+func (c *activityClient) CommitActivity(ctx context.Context, in *CommitActivityRequest, opts ...grpc.CallOption) (*CommitActivityReply, error) {
+	out := new(CommitActivityReply)
+	err := c.cc.Invoke(ctx, "/activity.Activity/CommitActivity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ActivityServer is the server API for Activity service.
 // All implementations must embed UnimplementedActivityServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type ActivityServer interface {
 	ListActivityInfo(context.Context, *ListActivityInfoRequest) (*ListActivityInfoReply, error)
 	DeleteActivityInfo(context.Context, *DeleteActivityInfoRequest) (*DeleteActivityInfoReply, error)
 	GetActivityStatistic(context.Context, *GetActivityStatisticRequest) (*GetActivityStatisticReply, error)
+	CommitActivity(context.Context, *CommitActivityRequest) (*CommitActivityReply, error)
 	mustEmbedUnimplementedActivityServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedActivityServer) DeleteActivityInfo(context.Context, *DeleteAc
 }
 func (UnimplementedActivityServer) GetActivityStatistic(context.Context, *GetActivityStatisticRequest) (*GetActivityStatisticReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActivityStatistic not implemented")
+}
+func (UnimplementedActivityServer) CommitActivity(context.Context, *CommitActivityRequest) (*CommitActivityReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CommitActivity not implemented")
 }
 func (UnimplementedActivityServer) mustEmbedUnimplementedActivityServer() {}
 
@@ -184,6 +198,24 @@ func _Activity_GetActivityStatistic_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Activity_CommitActivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommitActivityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActivityServer).CommitActivity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/activity.Activity/CommitActivity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActivityServer).CommitActivity(ctx, req.(*CommitActivityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Activity_ServiceDesc is the grpc.ServiceDesc for Activity service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var Activity_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetActivityStatistic",
 			Handler:    _Activity_GetActivityStatistic_Handler,
+		},
+		{
+			MethodName: "CommitActivity",
+			Handler:    _Activity_CommitActivity_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

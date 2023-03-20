@@ -1,40 +1,40 @@
-import { Button, Divider, IconButton, Menu, Text } from "react-native-paper";
-import { ScrollView, StyleSheet, View } from "react-native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AppTheme, useAppTheme } from "../../theme";
-import { baseStyles } from "../baseStyle";
-import ActivityListItem from "./comp/ActivityListItem";
-import { RootBaseStackParamList } from "../../navigators/BaseStack";
-import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { Button, Divider, IconButton, Menu, Text } from 'react-native-paper'
+import { ScrollView, StyleSheet, View } from 'react-native'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { AppTheme, useAppTheme } from '../../theme'
+import { baseStyles } from '../baseStyle'
+import ActivityListItem from './comp/ActivityListItem'
+import { RootBaseStackParamList } from '../../navigators/BaseStack'
+import { useAppDispatch, useAppSelector } from '../../redux/store'
 import {
   isActivityListLoading,
   selectActivityList,
-} from "../../redux/features/activityList/slice";
+} from '../../redux/features/activityList/slice'
 import {
   listActivityInfoThunk,
   listMoreActivityInfoThunk,
-} from "../../redux/features/activityList/thunk";
-import { ActivitySortBy, ActivityType } from "../../lib/activity/activity_pb";
-import { useState } from "react";
-import { getNameWithActivityType } from "../../utils/helpers";
+} from '../../redux/features/activityList/thunk'
+import { ActivitySortBy, ActivityType } from '../../lib/activity/activity_pb'
+import { useState } from 'react'
+import { getNameWithActivityType } from '../../utils/helpers'
 
 export default function ActivityList({
   navigation,
   route,
-}: NativeStackScreenProps<RootBaseStackParamList, "ActivityList">) {
-  const theme = useAppTheme();
-  const dispatch = useAppDispatch();
-  const { activityList } = useAppSelector(selectActivityList);
-  const isLoading = useAppSelector(isActivityListLoading);
-  const [currentOffset, setCurrentOffset] = useState(0);
-  const [canLoadmore, setCanLoadmore] = useState(true);
+}: NativeStackScreenProps<RootBaseStackParamList, 'ActivityList'>) {
+  const theme = useAppTheme()
+  const dispatch = useAppDispatch()
+  const { activityList } = useAppSelector(selectActivityList)
+  const isLoading = useAppSelector(isActivityListLoading)
+  const [currentOffset, setCurrentOffset] = useState(0)
+  const [canLoadmore, setCanLoadmore] = useState(true)
 
   const [activityType, setActivityType] = useState(
     ActivityType.ACTIVITY_TYPE_UNSPECIFIED
-  );
-  const [visible, setVisible] = useState(false);
-  const openActivityTypeMenu = () => setVisible(true);
-  const closeActivityTypeMenu = () => setVisible(false);
+  )
+  const [visible, setVisible] = useState(false)
+  const openActivityTypeMenu = () => setVisible(true)
+  const closeActivityTypeMenu = () => setVisible(false)
 
   const fetchListActivity = async (activityType: ActivityType) => {
     const { response } = await dispatch(
@@ -45,12 +45,12 @@ export default function ActivityList({
         offset: 0,
         sortBy: ActivitySortBy.ACTIVITY_SORT_BY_END_TIME,
       })
-    ).unwrap();
+    ).unwrap()
     if (response) {
-      if (response.activityListList.length >= 10) setCanLoadmore(true);
-      else setCanLoadmore(false);
-    } else setCanLoadmore(false);
-  };
+      if (response.activityListList.length >= 10) setCanLoadmore(true)
+      else setCanLoadmore(false)
+    } else setCanLoadmore(false)
+  }
   const fetchMore = async () => {
     const res: any = await dispatch(
       listMoreActivityInfoThunk({
@@ -60,36 +60,36 @@ export default function ActivityList({
         offset: currentOffset + 10,
         sortBy: ActivitySortBy.ACTIVITY_SORT_BY_END_TIME,
       })
-    );
+    )
 
     if (!res.payload.error) {
       if (currentOffset + 20 > activityList.length) {
-        setCanLoadmore(false);
+        setCanLoadmore(false)
       }
-      setCurrentOffset(currentOffset + 10);
+      setCurrentOffset(currentOffset + 10)
     }
-  };
+  }
   return (
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
         <View
           style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-start",
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
           }}
         >
           <Text
             variant="bodyLarge"
             style={{
-              fontWeight: "bold",
-              textAlignVertical: "center",
+              fontWeight: 'bold',
+              textAlignVertical: 'center',
               color: theme.colors.secondary,
             }}
           >
-            Activity type:{" "}
+            Activity type:{' '}
             {activityType == ActivityType.ACTIVITY_TYPE_UNSPECIFIED
-              ? "All"
+              ? 'All'
               : getNameWithActivityType(activityType)}
           </Text>
           <Menu
@@ -106,17 +106,17 @@ export default function ActivityList({
           >
             <Menu.Item
               onPress={() => {
-                setActivityType(ActivityType.ACTIVITY_TYPE_UNSPECIFIED);
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_UNSPECIFIED);
-                closeActivityTypeMenu();
+                setActivityType(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
+                fetchListActivity(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
+                closeActivityTypeMenu()
               }}
-              title={"All"}
+              title={'All'}
             />
             <Menu.Item
               onPress={() => {
-                setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING);
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_RUNNING);
-                closeActivityTypeMenu();
+                setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)
+                fetchListActivity(ActivityType.ACTIVITY_TYPE_RUNNING)
+                closeActivityTypeMenu()
               }}
               title={getNameWithActivityType(
                 ActivityType.ACTIVITY_TYPE_RUNNING
@@ -124,9 +124,9 @@ export default function ActivityList({
             />
             <Menu.Item
               onPress={() => {
-                setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING);
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_CYCLING);
-                closeActivityTypeMenu();
+                setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)
+                fetchListActivity(ActivityType.ACTIVITY_TYPE_CYCLING)
+                closeActivityTypeMenu()
               }}
               title={getNameWithActivityType(
                 ActivityType.ACTIVITY_TYPE_CYCLING
@@ -134,9 +134,9 @@ export default function ActivityList({
             />
             <Menu.Item
               onPress={() => {
-                setActivityType(ActivityType.ACTIVITY_TYPE_WALKING);
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_WALKING);
-                closeActivityTypeMenu();
+                setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)
+                fetchListActivity(ActivityType.ACTIVITY_TYPE_WALKING)
+                closeActivityTypeMenu()
               }}
               title={getNameWithActivityType(
                 ActivityType.ACTIVITY_TYPE_WALKING
@@ -150,13 +150,13 @@ export default function ActivityList({
               <ActivityListItem
                 key={activity.id}
                 onPress={() =>
-                  navigation.navigate("ActivityDetail", {
+                  navigation.navigate('ActivityDetail', {
                     activityId: activity.id,
                   })
                 }
                 activityInfo={activity}
               />
-            ) 
+            )
           })}
 
           <Button
@@ -171,7 +171,7 @@ export default function ActivityList({
         </ScrollView>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = (theme: AppTheme) => StyleSheet.create({});
+const styles = (theme: AppTheme) => StyleSheet.create({})

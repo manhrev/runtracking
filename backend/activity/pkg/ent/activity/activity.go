@@ -25,12 +25,16 @@ const (
 	FieldKcal = "kcal"
 	// FieldStartTime holds the string denoting the start_time field in the database.
 	FieldStartTime = "start_time"
-	// FieldEndTime holds the string denoting the end_time field in the database.
-	FieldEndTime = "end_time"
 	// FieldDuration holds the string denoting the duration field in the database.
 	FieldDuration = "duration"
+	// FieldEndTime holds the string denoting the end_time field in the database.
+	FieldEndTime = "end_time"
 	// FieldRoute holds the string denoting the route field in the database.
 	FieldRoute = "route"
+	// FieldCommitID holds the string denoting the commit_id field in the database.
+	FieldCommitID = "commit_id"
+	// FieldCommitType holds the string denoting the commit_type field in the database.
+	FieldCommitType = "commit_type"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// Table holds the table name of the activity in the database.
@@ -47,9 +51,11 @@ var Columns = []string{
 	FieldTotalDistance,
 	FieldKcal,
 	FieldStartTime,
-	FieldEndTime,
 	FieldDuration,
+	FieldEndTime,
 	FieldRoute,
+	FieldCommitID,
+	FieldCommitType,
 	FieldCreatedAt,
 }
 
@@ -66,6 +72,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultType holds the default value on creation for the "type" field.
 	DefaultType uint32
+	// DefaultCommitType holds the default value on creation for the "commit_type" field.
+	DefaultCommitType uint32
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt time.Time
 )

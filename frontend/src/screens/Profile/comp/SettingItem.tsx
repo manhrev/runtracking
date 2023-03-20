@@ -4,15 +4,16 @@ import { useAppTheme } from "../../../theme";
 
 interface SettingItemProps {
   topDivider?: boolean;
+  editMode?: boolean;
   left: string;
-  right?: string;
+  right?: string | JSX.Element; // right is string or text input
   color?: string;
   onPress: Function;
 }
 
 export default function SettingItem(props: SettingItemProps) {
   const theme = useAppTheme();
-  const { left, right, topDivider, color, onPress } = props;
+  const { editMode, left, right, topDivider, color, onPress } = props;
   let action = () => {};
 
   return (
@@ -41,9 +42,11 @@ export default function SettingItem(props: SettingItemProps) {
               {left}
             </Text>
           </View>
-          <View style={{ flex: 1, alignItems: "flex-end" }}>
-            <Text variant="titleMedium">{right}</Text>
-          </View>
+          {editMode ? right :
+            <View style={{ flex: 1, alignItems: "flex-end" }}>
+              <Text variant="titleMedium">{right}</Text>
+            </View>
+          }
         </View>
         <Divider bold />
       </>

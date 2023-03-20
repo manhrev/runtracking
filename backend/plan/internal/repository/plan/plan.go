@@ -2,9 +2,11 @@ package plan
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/internal/status"
 	plan_pb "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"github.com/manhrev/runtracking/backend/plan/pkg/ent"
@@ -58,16 +60,19 @@ type Plan interface {
 		plan_id int64,
 		value_increment int64,
 		timestamp *timestamppb.Timestamp,
-	) error
+	) (int64, string, error)
+	CheckProgressDaily(ctx context.Context, timeCheck time.Time) error
 }
 
 type planImpl struct {
-	entClient *ent.Client
+	entClient           *ent.Client
+	notificationIClient notification.NotificationIClient
 }
 
-func New(entClient *ent.Client) Plan {
+func New(entClient *ent.Client, notificationIClient notification.NotificationIClient) Plan {
 	return &planImpl{
-		entClient: entClient,
+		entClient:           entClient,
+		notificationIClient: notificationIClient,
 	}
 }
 
@@ -219,9 +224,11 @@ func (p *planImpl) Update(
 	)
 
 	if newEndTime != nil {
-		query.Where(
-			plan.EndTimeLT(newEndTime.AsTime()),
-		).SetEndTime(newEndTime.AsTime())
+		// query.Where(
+		// 	plan.EndTimeLTE(newEndTime.AsTime()),
+		// ).SetEndTime(newEndTime.AsTime())
+		query.SetEndTime(newEndTime.AsTime())
+
 	}
 
 	if newGoal != 0 {
@@ -250,39 +257,42 @@ func (p *planImpl) UpdateProgress(
 	plan_id int64,
 	value_increment int64,
 	timestamp *timestamppb.Timestamp,
-) error {
+) (int64, string, error) {
+	pushNotifyMessage := ""
 	// get current plan
 	planned, err := p.entClient.Plan.Get(ctx, plan_id)
+
 	if err != nil {
 		log.Printf("Error update plan progress: cannot get plan: %v", err)
-		return status.Internal(err.Error())
+		return 0, "", status.Internal(err.Error())
 	}
-
+	userId := planned.UserID
 	rule := plan_pb.Rule(planned.Rule)
 
 	// if plan status is failed, reject
 	if planned.Status == int64(plan_pb.RuleStatus_RULE_STATUS_FAILED) {
 		log.Printf("Error update plan progress: plan failed")
-		return status.Internal("plan failed")
+		return userId, "", status.Internal("plan failed")
 	}
 
 	// check plan ended but not completed -> change to failed
+	// NOTIFY?
 	if planned.Status == int64(plan_pb.RuleStatus_RULE_STATUS_INPROGRESS) && time.Now().After(planned.EndTime) {
 		err := p.entClient.Plan.UpdateOne(planned).SetStatus(int64(plan_pb.RuleStatus_RULE_STATUS_FAILED)).Exec(ctx)
 		if err != nil {
 			log.Printf("Error update plan progress: cannot update plan status: %v", err)
-			return status.Internal(err.Error())
+			return userId, "", status.Internal(err.Error())
 		}
-
+		pushNotifyMessage = fmt.Sprintf("Plan '%v' failed!", planned.Name)
 		log.Printf("Error update plan progress: plan failed")
-		return status.Internal("plan failed")
+		return userId, pushNotifyMessage, status.Internal("plan failed")
 	}
 
 	// check if new progress day is in planned time range and /*before now*/
 	newProgessTime := timestamp.AsTime()
 	if newProgessTime.Before(planned.StartTime) || newProgessTime.After(planned.EndTime) /*|| newProgessTime.After(time.Now())*/ {
 		log.Printf("Error update plan progress: new progress time is not in planned time range")
-		return status.Internal("new progress time is not in planned time range")
+		return userId, "", status.Internal("new progress time is not in planned time range")
 	}
 
 	// plan rule normal
@@ -295,13 +305,15 @@ func (p *planImpl) UpdateProgress(
 
 		// if finished or not
 		if (planned.Total + value_increment) >= planned.Goal {
+			// NOTIFY?
+			pushNotifyMessage = fmt.Sprintf("Plan '%v' completed!", planned.Name)
 			updateQuery.SetStatus(int64(plan_pb.RuleStatus_RULE_STATUS_COMPLETED))
 		}
 
 		err = updateQuery.Exec(ctx)
 		if err != nil {
 			log.Printf("Error update plan progress: total type: %v", err)
-			return status.Internal(err.Error())
+			return userId, "", status.Internal(err.Error())
 		}
 	}
 
@@ -355,15 +367,34 @@ func (p *planImpl) UpdateProgress(
 		todayProgress := currentProgress[len(currentProgress)-1]
 		if todayProgress.Timestamp.AsTime().In(time.FixedZone("UTC+7", 7*60*60)).Day() == planned.EndTime.In(time.FixedZone("UTC+7", 7*60*60)).Day() &&
 			todayProgress.Value >= planned.Goal {
+			// NOTIFY?
+			pushNotifyMessage = fmt.Sprintf("Plan %v completed!", planned.Name)
 			updateQuery.SetStatus(int64(plan_pb.RuleStatus_RULE_STATUS_COMPLETED))
 		}
 
 		err = updateQuery.Exec(ctx)
 		if err != nil {
 			log.Printf("Error update plan progress: daily type: %v", err)
-			return status.Internal(err.Error())
+			return userId, "", status.Internal(err.Error())
 		}
 	}
 
+	return userId, pushNotifyMessage, nil
+}
+
+// timeCheck to specify exact time to check plan expired (23h59)
+func (p *planImpl) CheckProgressDaily(ctx context.Context, timeCheck time.Time) error {
+	// get all unfinished plans
+	planlist, err := p.entClient.Plan.Query().
+		Where(plan.StatusEQ(int64(plan_pb.RuleStatus_RULE_STATUS_INPROGRESS))).
+		All(ctx)
+	if err != nil {
+		log.Printf("Error while query plan to check progress daily: %v", err)
+		return status.Internal(err.Error())
+	}
+
+	for _, planInfo := range planlist {
+		_ = checkIfPlanExpired(ctx, p.entClient, planInfo, p.notificationIClient, timeCheck)
+	}
 	return nil
 }

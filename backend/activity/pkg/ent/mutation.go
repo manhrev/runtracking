@@ -14,6 +14,7 @@ import (
 	"github.com/manhrev/runtracking/backend/activity/pkg/ent/predicate"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -45,11 +46,15 @@ type ActivityMutation struct {
 	kcal              *float32
 	addkcal           *float32
 	start_time        *time.Time
-	end_time          *time.Time
 	duration          *uint64
 	addduration       *int64
+	end_time          *time.Time
 	route             *[]*activity.TrackPoint
 	appendroute       []*activity.TrackPoint
+	commit_id         *int64
+	addcommit_id      *int64
+	commit_type       *uint32
+	addcommit_type    *int32
 	created_at        *time.Time
 	clearedFields     map[string]struct{}
 	done              bool
@@ -493,42 +498,6 @@ func (m *ActivityMutation) ResetStartTime() {
 	m.start_time = nil
 }
 
-// SetEndTime sets the "end_time" field.
-func (m *ActivityMutation) SetEndTime(t time.Time) {
-	m.end_time = &t
-}
-
-// EndTime returns the value of the "end_time" field in the mutation.
-func (m *ActivityMutation) EndTime() (r time.Time, exists bool) {
-	v := m.end_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEndTime returns the old "end_time" field's value of the Activity entity.
-// If the Activity object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ActivityMutation) OldEndTime(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEndTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEndTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEndTime: %w", err)
-	}
-	return oldValue.EndTime, nil
-}
-
-// ResetEndTime resets all changes to the "end_time" field.
-func (m *ActivityMutation) ResetEndTime() {
-	m.end_time = nil
-}
-
 // SetDuration sets the "duration" field.
 func (m *ActivityMutation) SetDuration(u uint64) {
 	m.duration = &u
@@ -585,6 +554,42 @@ func (m *ActivityMutation) ResetDuration() {
 	m.addduration = nil
 }
 
+// SetEndTime sets the "end_time" field.
+func (m *ActivityMutation) SetEndTime(t time.Time) {
+	m.end_time = &t
+}
+
+// EndTime returns the value of the "end_time" field in the mutation.
+func (m *ActivityMutation) EndTime() (r time.Time, exists bool) {
+	v := m.end_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndTime returns the old "end_time" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldEndTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndTime: %w", err)
+	}
+	return oldValue.EndTime, nil
+}
+
+// ResetEndTime resets all changes to the "end_time" field.
+func (m *ActivityMutation) ResetEndTime() {
+	m.end_time = nil
+}
+
 // SetRoute sets the "route" field.
 func (m *ActivityMutation) SetRoute(ap []*activity.TrackPoint) {
 	m.route = &ap
@@ -636,6 +641,132 @@ func (m *ActivityMutation) ResetRoute() {
 	m.appendroute = nil
 }
 
+// SetCommitID sets the "commit_id" field.
+func (m *ActivityMutation) SetCommitID(i int64) {
+	m.commit_id = &i
+	m.addcommit_id = nil
+}
+
+// CommitID returns the value of the "commit_id" field in the mutation.
+func (m *ActivityMutation) CommitID() (r int64, exists bool) {
+	v := m.commit_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCommitID returns the old "commit_id" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldCommitID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCommitID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCommitID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCommitID: %w", err)
+	}
+	return oldValue.CommitID, nil
+}
+
+// AddCommitID adds i to the "commit_id" field.
+func (m *ActivityMutation) AddCommitID(i int64) {
+	if m.addcommit_id != nil {
+		*m.addcommit_id += i
+	} else {
+		m.addcommit_id = &i
+	}
+}
+
+// AddedCommitID returns the value that was added to the "commit_id" field in this mutation.
+func (m *ActivityMutation) AddedCommitID() (r int64, exists bool) {
+	v := m.addcommit_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCommitID clears the value of the "commit_id" field.
+func (m *ActivityMutation) ClearCommitID() {
+	m.commit_id = nil
+	m.addcommit_id = nil
+	m.clearedFields[entactivity.FieldCommitID] = struct{}{}
+}
+
+// CommitIDCleared returns if the "commit_id" field was cleared in this mutation.
+func (m *ActivityMutation) CommitIDCleared() bool {
+	_, ok := m.clearedFields[entactivity.FieldCommitID]
+	return ok
+}
+
+// ResetCommitID resets all changes to the "commit_id" field.
+func (m *ActivityMutation) ResetCommitID() {
+	m.commit_id = nil
+	m.addcommit_id = nil
+	delete(m.clearedFields, entactivity.FieldCommitID)
+}
+
+// SetCommitType sets the "commit_type" field.
+func (m *ActivityMutation) SetCommitType(u uint32) {
+	m.commit_type = &u
+	m.addcommit_type = nil
+}
+
+// CommitType returns the value of the "commit_type" field in the mutation.
+func (m *ActivityMutation) CommitType() (r uint32, exists bool) {
+	v := m.commit_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCommitType returns the old "commit_type" field's value of the Activity entity.
+// If the Activity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivityMutation) OldCommitType(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCommitType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCommitType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCommitType: %w", err)
+	}
+	return oldValue.CommitType, nil
+}
+
+// AddCommitType adds u to the "commit_type" field.
+func (m *ActivityMutation) AddCommitType(u int32) {
+	if m.addcommit_type != nil {
+		*m.addcommit_type += u
+	} else {
+		m.addcommit_type = &u
+	}
+}
+
+// AddedCommitType returns the value that was added to the "commit_type" field in this mutation.
+func (m *ActivityMutation) AddedCommitType() (r int32, exists bool) {
+	v := m.addcommit_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCommitType resets all changes to the "commit_type" field.
+func (m *ActivityMutation) ResetCommitType() {
+	m.commit_type = nil
+	m.addcommit_type = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ActivityMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -677,9 +808,24 @@ func (m *ActivityMutation) Where(ps ...predicate.Activity) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ActivityMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ActivityMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Activity, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ActivityMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ActivityMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Activity).
@@ -691,7 +837,7 @@ func (m *ActivityMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ActivityMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 13)
 	if m.activity_name != nil {
 		fields = append(fields, entactivity.FieldActivityName)
 	}
@@ -713,14 +859,20 @@ func (m *ActivityMutation) Fields() []string {
 	if m.start_time != nil {
 		fields = append(fields, entactivity.FieldStartTime)
 	}
-	if m.end_time != nil {
-		fields = append(fields, entactivity.FieldEndTime)
-	}
 	if m.duration != nil {
 		fields = append(fields, entactivity.FieldDuration)
 	}
+	if m.end_time != nil {
+		fields = append(fields, entactivity.FieldEndTime)
+	}
 	if m.route != nil {
 		fields = append(fields, entactivity.FieldRoute)
+	}
+	if m.commit_id != nil {
+		fields = append(fields, entactivity.FieldCommitID)
+	}
+	if m.commit_type != nil {
+		fields = append(fields, entactivity.FieldCommitType)
 	}
 	if m.created_at != nil {
 		fields = append(fields, entactivity.FieldCreatedAt)
@@ -747,12 +899,16 @@ func (m *ActivityMutation) Field(name string) (ent.Value, bool) {
 		return m.Kcal()
 	case entactivity.FieldStartTime:
 		return m.StartTime()
-	case entactivity.FieldEndTime:
-		return m.EndTime()
 	case entactivity.FieldDuration:
 		return m.Duration()
+	case entactivity.FieldEndTime:
+		return m.EndTime()
 	case entactivity.FieldRoute:
 		return m.Route()
+	case entactivity.FieldCommitID:
+		return m.CommitID()
+	case entactivity.FieldCommitType:
+		return m.CommitType()
 	case entactivity.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -778,12 +934,16 @@ func (m *ActivityMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldKcal(ctx)
 	case entactivity.FieldStartTime:
 		return m.OldStartTime(ctx)
-	case entactivity.FieldEndTime:
-		return m.OldEndTime(ctx)
 	case entactivity.FieldDuration:
 		return m.OldDuration(ctx)
+	case entactivity.FieldEndTime:
+		return m.OldEndTime(ctx)
 	case entactivity.FieldRoute:
 		return m.OldRoute(ctx)
+	case entactivity.FieldCommitID:
+		return m.OldCommitID(ctx)
+	case entactivity.FieldCommitType:
+		return m.OldCommitType(ctx)
 	case entactivity.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -844,13 +1004,6 @@ func (m *ActivityMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStartTime(v)
 		return nil
-	case entactivity.FieldEndTime:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEndTime(v)
-		return nil
 	case entactivity.FieldDuration:
 		v, ok := value.(uint64)
 		if !ok {
@@ -858,12 +1011,33 @@ func (m *ActivityMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDuration(v)
 		return nil
+	case entactivity.FieldEndTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndTime(v)
+		return nil
 	case entactivity.FieldRoute:
 		v, ok := value.([]*activity.TrackPoint)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRoute(v)
+		return nil
+	case entactivity.FieldCommitID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCommitID(v)
+		return nil
+	case entactivity.FieldCommitType:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCommitType(v)
 		return nil
 	case entactivity.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -895,6 +1069,12 @@ func (m *ActivityMutation) AddedFields() []string {
 	if m.addduration != nil {
 		fields = append(fields, entactivity.FieldDuration)
 	}
+	if m.addcommit_id != nil {
+		fields = append(fields, entactivity.FieldCommitID)
+	}
+	if m.addcommit_type != nil {
+		fields = append(fields, entactivity.FieldCommitType)
+	}
 	return fields
 }
 
@@ -913,6 +1093,10 @@ func (m *ActivityMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedKcal()
 	case entactivity.FieldDuration:
 		return m.AddedDuration()
+	case entactivity.FieldCommitID:
+		return m.AddedCommitID()
+	case entactivity.FieldCommitType:
+		return m.AddedCommitType()
 	}
 	return nil, false
 }
@@ -957,6 +1141,20 @@ func (m *ActivityMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddDuration(v)
 		return nil
+	case entactivity.FieldCommitID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCommitID(v)
+		return nil
+	case entactivity.FieldCommitType:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCommitType(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Activity numeric field %s", name)
 }
@@ -964,7 +1162,11 @@ func (m *ActivityMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ActivityMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(entactivity.FieldCommitID) {
+		fields = append(fields, entactivity.FieldCommitID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -977,6 +1179,11 @@ func (m *ActivityMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ActivityMutation) ClearField(name string) error {
+	switch name {
+	case entactivity.FieldCommitID:
+		m.ClearCommitID()
+		return nil
+	}
 	return fmt.Errorf("unknown Activity nullable field %s", name)
 }
 
@@ -1005,14 +1212,20 @@ func (m *ActivityMutation) ResetField(name string) error {
 	case entactivity.FieldStartTime:
 		m.ResetStartTime()
 		return nil
-	case entactivity.FieldEndTime:
-		m.ResetEndTime()
-		return nil
 	case entactivity.FieldDuration:
 		m.ResetDuration()
 		return nil
+	case entactivity.FieldEndTime:
+		m.ResetEndTime()
+		return nil
 	case entactivity.FieldRoute:
 		m.ResetRoute()
+		return nil
+	case entactivity.FieldCommitID:
+		m.ResetCommitID()
+		return nil
+	case entactivity.FieldCommitType:
+		m.ResetCommitType()
 		return nil
 	case entactivity.FieldCreatedAt:
 		m.ResetCreatedAt()

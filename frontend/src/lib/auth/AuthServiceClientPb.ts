@@ -251,6 +251,135 @@ export class AuthClient {
     this.methodDescriptorSetHealthRecord);
   }
 
+  methodDescriptorGetAllUsers = new grpcWeb.MethodDescriptor(
+    '/auth.Auth/GetAllUsers',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_empty_pb.Empty,
+    auth_pb.GetAllUsersReply,
+    (request: google_protobuf_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    auth_pb.GetAllUsersReply.deserializeBinary
+  );
+
+  getAllUsers(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<auth_pb.GetAllUsersReply>;
+
+  getAllUsers(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: auth_pb.GetAllUsersReply) => void): grpcWeb.ClientReadableStream<auth_pb.GetAllUsersReply>;
+
+  getAllUsers(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: auth_pb.GetAllUsersReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.Auth/GetAllUsers',
+        request,
+        metadata || {},
+        this.methodDescriptorGetAllUsers,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.Auth/GetAllUsers',
+    request,
+    metadata || {},
+    this.methodDescriptorGetAllUsers);
+  }
+
+  methodDescriptorGetUserById = new grpcWeb.MethodDescriptor(
+    '/auth.Auth/GetUserById',
+    grpcWeb.MethodType.UNARY,
+    auth_pb.GetByIdRequest,
+    auth_pb.UserInfo,
+    (request: auth_pb.GetByIdRequest) => {
+      return request.serializeBinary();
+    },
+    auth_pb.UserInfo.deserializeBinary
+  );
+
+  getUserById(
+    request: auth_pb.GetByIdRequest,
+    metadata: grpcWeb.Metadata | null): Promise<auth_pb.UserInfo>;
+
+  getUserById(
+    request: auth_pb.GetByIdRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: auth_pb.UserInfo) => void): grpcWeb.ClientReadableStream<auth_pb.UserInfo>;
+
+  getUserById(
+    request: auth_pb.GetByIdRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: auth_pb.UserInfo) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.Auth/GetUserById',
+        request,
+        metadata || {},
+        this.methodDescriptorGetUserById,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.Auth/GetUserById',
+    request,
+    metadata || {},
+    this.methodDescriptorGetUserById);
+  }
+
+  methodDescriptorUpdateUserInfo = new grpcWeb.MethodDescriptor(
+    '/auth.Auth/UpdateUserInfo',
+    grpcWeb.MethodType.UNARY,
+    auth_pb.UpdateUserInfoRequest,
+    auth_pb.UpdateUserInfoReply,
+    (request: auth_pb.UpdateUserInfoRequest) => {
+      return request.serializeBinary();
+    },
+    auth_pb.UpdateUserInfoReply.deserializeBinary
+  );
+
+  updateUserInfo(
+    request: auth_pb.UpdateUserInfoRequest,
+    metadata: grpcWeb.Metadata | null): Promise<auth_pb.UpdateUserInfoReply>;
+
+  updateUserInfo(
+    request: auth_pb.UpdateUserInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: auth_pb.UpdateUserInfoReply) => void): grpcWeb.ClientReadableStream<auth_pb.UpdateUserInfoReply>;
+
+  updateUserInfo(
+    request: auth_pb.UpdateUserInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: auth_pb.UpdateUserInfoReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.Auth/UpdateUserInfo',
+        request,
+        metadata || {},
+        this.methodDescriptorUpdateUserInfo,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.Auth/UpdateUserInfo',
+    request,
+    metadata || {},
+    this.methodDescriptorUpdateUserInfo);
+  }
+
 }
 
 export class UserClient {

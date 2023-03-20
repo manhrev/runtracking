@@ -1,28 +1,28 @@
-import { StatusCode as grpcStatusCode } from "grpc-web";
+import { StatusCode as grpcStatusCode } from 'grpc-web'
 
-import { GRPCClientResponse, ErrorHandler, GRPCClientConfig } from "./types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GRPCClientResponse, ErrorHandler, GRPCClientConfig } from './types'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const KEY_ACCESS_TOKEN = "accessToken";
-export const QUERY_PARAM_ACCESS_TOKEN = "token";
-export const EXPO_PUSH_TOKEN = "expoPushToken"
-export const IGNORE_TOAST_CODES = [grpcStatusCode.UNAUTHENTICATED];
+export const KEY_ACCESS_TOKEN = 'accessToken'
+export const QUERY_PARAM_ACCESS_TOKEN = 'token'
+export const EXPO_PUSH_TOKEN = 'expoPushToken'
+export const IGNORE_TOAST_CODES = [grpcStatusCode.UNAUTHENTICATED]
 
 class gRPCClientAbstract {
-  client: any = null;
-  clientName: string = "";
-  serviceName: string;
-  onError?: ErrorHandler;
+  client: any = null
+  clientName: string = ''
+  serviceName: string
+  onError?: ErrorHandler
 
   constructor(Client: any, config: GRPCClientConfig) {
-    this.clientName = Client?.name || "NoClientName";
-    this.client = new Client(config.hostname);
-    this.onError = config.onError;
-    this.serviceName = config.serviceName || "UNNAMED";
+    this.clientName = Client?.name || 'NoClientName'
+    this.client = new Client(config.hostname)
+    this.onError = config.onError
+    this.serviceName = config.serviceName || 'UNNAMED'
   }
 
   logFuncName(funcName: string) {
-    return `${this.clientName}.${funcName}`;
+    return `${this.clientName}.${funcName}`
   }
 
   async gRPCClientRequest<T>(
@@ -30,38 +30,38 @@ class gRPCClientAbstract {
     request: any,
     option: any = {}
   ): Promise<GRPCClientResponse<T>> {
-    var access_token = "";
+    var access_token = ''
     try {
-      const token = await AsyncStorage.getItem(KEY_ACCESS_TOKEN);
+      const token = await AsyncStorage.getItem(KEY_ACCESS_TOKEN)
       if (token != null) {
-        access_token = token;
+        access_token = token
       }
     } catch (e) {
-      console.log("Cannot connect to async storage");
+      console.log('Cannot connect to async storage')
     }
 
     try {
-      option = { ...option, Authorization: `Bearer ${access_token}` };
+      option = { ...option, Authorization: `Bearer ${access_token}` }
 
       console.log(
         `%c gRPCClientRequest -> [${this.logFuncName(func)}] -> REQUEST:`,
-        "background-color: #deeb34; color: #000; font-size: 14px"
-      );
-      console.log(">>> request:", request.toObject());
-      console.log(">>> option:", option);
+        'background-color: #deeb34; color: #000; font-size: 14px'
+      )
+      console.log('>>> request:', request.toObject())
+      console.log('>>> option:', option)
 
-      const response = await this.client[func](request, option);
+      const response = await this.client[func](request, option)
 
       console.log(
         `%c>>>>> gRPCClientResponse -> [${this.logFuncName(func)}] -> SUCCESS:`,
-        "background-color: #23d947; color: #000; font-size: 14px",
+        'background-color: #23d947; color: #000; font-size: 14px',
         response.toObject()
-      );
+      )
 
       return {
         error: null,
         response: response.toObject(),
-      };
+      }
     } catch (error: any) {
       switch (error?.code) {
         case grpcStatusCode.UNAUTHENTICATED:
@@ -69,10 +69,10 @@ class gRPCClientAbstract {
             `%c>>>>> gRPCClientResponse -> [${this.logFuncName(
               func
             )}] -> ERROR -> UNAUTHENTICATED: `,
-            "background-color: #c0392b; color: #000; font-size: 14px",
+            'background-color: #c0392b; color: #000; font-size: 14px',
             error
-          );
-          break;
+          )
+          break
 
         case grpcStatusCode.UNKNOWN:
         case grpcStatusCode.UNIMPLEMENTED:
@@ -82,30 +82,30 @@ class gRPCClientAbstract {
             `%c>>>>> gRPCClientResponse -> [${this.logFuncName(
               func
             )}] -> ERROR: `,
-            "background-color: #c0392b; color: #000; font-size: 14px",
+            'background-color: #c0392b; color: #000; font-size: 14px',
             error
-          );
-          break;
+          )
+          break
 
         default:
           console.log(
             `%c>>>>> gRPCClientResponse  -> [${this.logFuncName(
               func
             )}] -> ERROR: `,
-            "background-color: #c0392b; color: #000; font-size: 14px",
+            'background-color: #c0392b; color: #000; font-size: 14px',
             error
-          );
-          break;
+          )
+          break
       }
 
-      this.onError && this.onError(error, this.serviceName);
+      this.onError && this.onError(error, this.serviceName)
 
       return {
         error,
         response: null,
-      };
+      }
     }
   }
 }
 
-export default gRPCClientAbstract;
+export default gRPCClientAbstract

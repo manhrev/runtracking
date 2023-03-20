@@ -11,6 +11,9 @@ service Auth {
     rpc LogOut(google.protobuf.Empty) returns (google.protobuf.Empty) {};
     rpc Me(google.protobuf.Empty) returns (MeReply) {};
     rpc SetHealthRecord(HealthRecordRequest) returns (google.protobuf.Empty) {};
+    rpc GetAllUsers(google.protobuf.Empty) returns (GetAllUsersReply) {};
+    rpc GetUserById(GetByIdRequest) returns (UserInfo) {};
+    rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoReply) {};
 }
 
 
@@ -19,12 +22,19 @@ service User {
     rpc Me(google.protobuf.Empty) returns (MeReply) {};
 }
 
-
+message GetAllUsersReply{
+    repeated UserInfo users = 1;
+}
 message HealthRecordRequest{
     int32 age = 3;
     float height = 1;
     float weight = 2;
 }
+
+message GetByIdRequest{
+    int64 id = 1;
+}
+
 
 
 message LoginRequest {
@@ -69,3 +79,9 @@ message UserInfo{
     float weight = 6;
     int32 age = 8;
 }
+
+message UpdateUserInfoRequest{
+    UserInfo user_info = 1;
+}
+
+message UpdateUserInfoReply{}

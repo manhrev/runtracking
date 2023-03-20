@@ -43,6 +43,17 @@ type Activity interface {
 		groupBy activitypb.GetActivityStatisticRequest_GroupBy,
 		tz uint32,
 	) ([]*ActivityStatisticData, error)
+	GetById(
+		ctx context.Context,
+		userId int64,
+		activityId int64,
+	) (*ent.Activity, error)
+	SetCommit( // set commit state for activity
+		ctx context.Context,
+		activityId int64,
+		commitType activitypb.CommitType,
+		targetId int64, // challenge id or plan id or ... id
+	) error
 }
 
 type activityImpl struct {
@@ -76,6 +87,24 @@ func (m *activityImpl) Create(ctx context.Context, userId int64, activityInfo *a
 	return newActivity, nil
 }
 
+func (m *activityImpl) GetById(
+	ctx context.Context,
+	userId int64,
+	activityId int64,
+) (*ent.Activity, error) {
+	activity, err := m.entClient.Activity.Query().Where(
+		activity.UserIDEQ(userId),
+		activity.IDEQ(activityId),
+	).Only(ctx)
+
+	if err != nil {
+		log.Printf("Error while getting activity by id: %v", err)
+		return nil, status.Internal(err.Error())
+	}
+
+	return activity, nil
+}
+
 func (m *activityImpl) List(
 	ctx context.Context,
 	userId int64,
@@ -102,8 +131,10 @@ func (m *activityImpl) List(
 
 	// sort by type
 	switch sortBy {
-	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_DURATION:
+	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_END_TIME:
 		byField = activity.FieldEndTime
+	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_DURATION:
+		byField = activity.FieldDuration
 	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_ENERGY:
 		byField = activity.FieldKcal
 	case activitypb.ActivitySortBy_ACTIVITY_SORT_BY_TOTAL_DISTANCE:
@@ -161,13 +192,34 @@ func (m *activityImpl) Delete(ctx context.Context, userId int64, activityIdList 
 			activity.IDIn(activityIdList...),
 		).
 		Exec(ctx)
-	log.Println(deletedCount)
 	if err != nil {
 		return status.Internal(err.Error())
 	}
 
 	if deletedCount == 0 {
 		return status.Internal("no records were deleted")
+	}
+
+	return nil
+}
+
+func (m *activityImpl) SetCommit(
+	ctx context.Context,
+	activityId int64,
+	commitType activitypb.CommitType,
+	targetId int64,
+) error {
+	query := m.entClient.Activity.UpdateOneID(activityId)
+	if commitType == activitypb.CommitType_COMMIT_TYPE_UNSPECIFIED {
+		log.Printf("Error while SetCommit: Commit type not satisfied")
+		return status.Internal("Commit type not satisfied")
+	}
+	query.SetCommitType(uint32(commitType)).SetCommitID(targetId)
+
+	_, err := query.Save(ctx)
+	if err != nil {
+		log.Printf("Error while SetCommit: %v", err)
+		return status.Internal(fmt.Sprintf("Error while SetCommit: %v", err))
 	}
 
 	return nil
@@ -196,6 +248,17 @@ func (m *activityImpl) GetStatistic(
 		groupByStr := fmt.Sprintf(`
 			CAST(CAST(CONVERT_TZ(%s, "+00:00", "%s") as DATE) as DATETIME)
 		`, "end_time", GetTimeZoneStr(int32(tz)))
+
+		switch groupBy {
+		case activitypb.GetActivityStatisticRequest_GORUP_BY_MONTH:
+			groupByStr = fmt.Sprintf(`
+				CAST(STR_TO_DATE(DATE_FORMAT(CONVERT_TZ(%s, "+00:00", "%s"),'01/%%m/%%Y'),'%%d/%%m/%%Y') as DATETIME)
+			`, "end_time", GetTimeZoneStr(int32(tz)))
+		case activitypb.GetActivityStatisticRequest_GORUP_BY_YEAR:
+			groupByStr = fmt.Sprintf(`
+				CAST(STR_TO_DATE(DATE_FORMAT(CONVERT_TZ(%s, "+00:00", "%s"),'01/01/%%Y'),'%%d/%%m/%%Y') as DATETIME)
+			`, "end_time", GetTimeZoneStr(int32(tz)))
+		}
 
 		s.Select(
 			sql.As(groupByStr, "date_time"),
@@ -244,7 +307,6 @@ func (m *activityImpl) GetStatistic(
 		log.Printf("error while listactivity statistic %v", err.Error())
 		return nil, status.Internal(err.Error())
 	}
-	log.Println(sliceOfPointers)
 
 	return sliceOfPointers, nil
 }

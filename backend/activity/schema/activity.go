@@ -26,6 +26,8 @@ func (Activity) Fields() []ent.Field {
 		field.Uint64("duration"),
 		field.Time("end_time"),
 		field.JSON("route", []*activity.TrackPoint{}),
+		field.Int64("commit_id").Optional(),
+		field.Uint32("commit_type").Default(uint32(activity.CommitType_COMMIT_TYPE_UNSPECIFIED)),
 		field.Time("created_at").Default(time.Now()),
 	}
 }
