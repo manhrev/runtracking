@@ -1,10 +1,6 @@
 import { StyleSheet, View } from 'react-native'
 import { Avatar, Divider, Text, TouchableRipple } from 'react-native-paper'
-import {
-  ActivityInfo,
-  ActivityType,
-  CommitType,
-} from '../../../lib/activity/activity_pb'
+import { ActivityInfo, CommitType } from '../../../lib/activity/activity_pb'
 import { AppTheme, useAppTheme } from '../../../theme'
 import {
   formatDate,

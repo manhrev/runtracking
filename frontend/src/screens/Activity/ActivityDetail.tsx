@@ -37,8 +37,6 @@ export default function ActivityDetail({
     return activity.id == activityId
   })
 
-  console.log(activity)
-
   if (!activity) {
     return <></>
   }

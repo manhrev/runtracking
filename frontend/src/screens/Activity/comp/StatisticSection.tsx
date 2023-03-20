@@ -1,13 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Dimensions, StyleSheet, View } from 'react-native'
 import { BarChart } from 'react-native-chart-kit'
 import {
   ActivityIndicator,
-  Button,
-  Divider,
   IconButton,
   Menu,
-  Provider,
   SegmentedButtons,
   Text,
 } from 'react-native-paper'
@@ -34,15 +31,18 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb'
 import { useFocusEffect } from '@react-navigation/native'
 
 const windowWidth = Dimensions.get('window').width
-const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+// const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
+interface StatisticSectionProps {
+  reload: boolean
+}
 interface GeneralInfo {
   numberOfActivity: number
   totalDistance: number
   totalDuration: number
 }
 
-export default function StatisticSection() {
+export default function StatisticSection({ reload }: StatisticSectionProps) {
   const [momentList, setMomentList] = useState<moment.Moment[]>(
     getDaysArrayThisWeek()
   )
@@ -116,7 +116,7 @@ export default function StatisticSection() {
           break
       }
       fetchActivityStatistic(from, to)
-    }, [filterByValue, activityType])
+    }, [filterByValue, activityType, reload])
   )
   return (
     <View style={styles(theme).analyticContainer}>
