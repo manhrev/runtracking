@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useCallback, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { Button } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
@@ -16,6 +16,7 @@ import { AppTheme, useAppTheme } from '../../theme'
 import NotificationListItem from './comp/NotificationListItem'
 import { useFocusEffect } from '@react-navigation/native'
 import { baseStyles } from '../baseStyle'
+import { RefreshControl } from 'react-native-gesture-handler'
 
 export default function NotificationList({
   navigation,
@@ -57,16 +58,22 @@ export default function NotificationList({
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchNotificationList()
-    }, [])
-  )
+  useEffect(() => {
+    fetchNotificationList()
+  }, [])
 
   return (
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={fetchNotificationList}
+            />
+          }
+        >
           {notificationList.map((notification) => {
             return (
               <NotificationListItem

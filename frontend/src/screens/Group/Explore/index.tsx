@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState } from 'react'
 import { ScrollView, View } from 'react-native'
+import { RefreshControl } from 'react-native-gesture-handler'
 import { Button, Divider, Searchbar, Text } from 'react-native-paper'
 import { GroupSortBy, ListGroupRequest } from '../../../lib/group/group_pb'
 import { RootGroupTopTabsParamList } from '../../../navigators/GroupTopTab'
@@ -106,7 +107,15 @@ export default function Explore({
           setSortBy={setSortBy}
         />
         <Divider />
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={groupListLoading}
+              onRefresh={fetchListGroup}
+            />
+          }
+        >
           {noData && (
             <Text
               variant="bodyLarge"
