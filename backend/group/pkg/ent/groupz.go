@@ -24,6 +24,8 @@ type Groupz struct {
 	BackgroundPicture string `json:"background_picture,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// LeaderID holds the value of the "leader_id" field.
 	LeaderID int64 `json:"leader_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -69,7 +71,7 @@ func (*Groupz) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case groupz.FieldName, groupz.FieldDescription, groupz.FieldBackgroundPicture:
 			values[i] = new(sql.NullString)
-		case groupz.FieldCreatedAt:
+		case groupz.FieldCreatedAt, groupz.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Groupz", columns[i])
@@ -115,6 +117,12 @@ func (gr *Groupz) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				gr.CreatedAt = value.Time
+			}
+		case groupz.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				gr.UpdatedAt = value.Time
 			}
 		case groupz.FieldLeaderID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -171,6 +179,9 @@ func (gr *Groupz) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(gr.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(gr.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("leader_id=")
 	builder.WriteString(fmt.Sprintf("%v", gr.LeaderID))

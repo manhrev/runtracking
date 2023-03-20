@@ -2,6 +2,7 @@ package group
 
 import (
 	"context"
+	"log"
 	"sort"
 
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
@@ -88,6 +89,29 @@ func (m *groupImpl) List(ctx context.Context,
 	}
 
 	groupInfoList := transformer.TransformGroupListEntToGroupList(groupEntList)
+
+	members, err := m.repository.Member.ListMemberByUserId(ctx, userId, grouppb.Member_MEMBER_STATUS_ACTIVE)
+	if err != nil {
+		return nil, err
+	}
+	log.Println("here1")
+	//Get status of current member with group list
+	statusMemberMap := make(map[int64]grouppb.Member_Status)
+	for _, mem := range members {
+		statusMemberMap[mem.Edges.Groupz.ID] = grouppb.Member_Status(mem.Status)
+	}
+	log.Println("here2")
+
+	for i, groupInfo := range groupInfoList {
+
+		//member status of current user
+		memberStatus, ok := statusMemberMap[groupInfo.Id]
+		if ok {
+			groupInfoList[i].MemberStatus = memberStatus
+		} else {
+			groupInfoList[i].MemberStatus = group.Member_MEMBER_STATUS_UNSPECIFIED
+		}
+	}
 	return &grouppb.ListGroupReply{
 		GroupList: groupInfoList,
 		Total:     total,

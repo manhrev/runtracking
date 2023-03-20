@@ -25,6 +25,9 @@ func (Groupz) Fields() []ent.Field {
 			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
 		field.Time("created_at").
 			Default(time.Now),
+		field.Time("updated_at").
+			Default(time.Now).
+			UpdateDefault(time.Now),
 		field.Int64("leader_id"),
 	}
 }

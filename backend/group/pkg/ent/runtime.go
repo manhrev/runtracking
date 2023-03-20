@@ -31,6 +31,12 @@ func init() {
 	groupzDescCreatedAt := groupzFields[4].Descriptor()
 	// groupz.DefaultCreatedAt holds the default value on creation for the created_at field.
 	groupz.DefaultCreatedAt = groupzDescCreatedAt.Default.(func() time.Time)
+	// groupzDescUpdatedAt is the schema descriptor for updated_at field.
+	groupzDescUpdatedAt := groupzFields[5].Descriptor()
+	// groupz.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	groupz.DefaultUpdatedAt = groupzDescUpdatedAt.Default.(func() time.Time)
+	// groupz.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	groupz.UpdateDefaultUpdatedAt = groupzDescUpdatedAt.UpdateDefault.(func() time.Time)
 	memberFields := schema.Member{}.Fields()
 	_ = memberFields
 	// memberDescCreatedAt is the schema descriptor for created_at field.

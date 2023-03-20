@@ -1907,6 +1907,7 @@ type GroupzMutation struct {
 	description        *string
 	background_picture *string
 	created_at         *time.Time
+	updated_at         *time.Time
 	leader_id          *int64
 	addleader_id       *int64
 	clearedFields      map[string]struct{}
@@ -2195,6 +2196,42 @@ func (m *GroupzMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (m *GroupzMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *GroupzMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Groupz entity.
+// If the Groupz object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupzMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *GroupzMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
 // SetLeaderID sets the "leader_id" field.
 func (m *GroupzMutation) SetLeaderID(i int64) {
 	m.leader_id = &i
@@ -2393,7 +2430,7 @@ func (m *GroupzMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GroupzMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, groupz.FieldName)
 	}
@@ -2405,6 +2442,9 @@ func (m *GroupzMutation) Fields() []string {
 	}
 	if m.created_at != nil {
 		fields = append(fields, groupz.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, groupz.FieldUpdatedAt)
 	}
 	if m.leader_id != nil {
 		fields = append(fields, groupz.FieldLeaderID)
@@ -2425,6 +2465,8 @@ func (m *GroupzMutation) Field(name string) (ent.Value, bool) {
 		return m.BackgroundPicture()
 	case groupz.FieldCreatedAt:
 		return m.CreatedAt()
+	case groupz.FieldUpdatedAt:
+		return m.UpdatedAt()
 	case groupz.FieldLeaderID:
 		return m.LeaderID()
 	}
@@ -2444,6 +2486,8 @@ func (m *GroupzMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldBackgroundPicture(ctx)
 	case groupz.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case groupz.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	case groupz.FieldLeaderID:
 		return m.OldLeaderID(ctx)
 	}
@@ -2482,6 +2526,13 @@ func (m *GroupzMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case groupz.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
 		return nil
 	case groupz.FieldLeaderID:
 		v, ok := value.(int64)
@@ -2580,6 +2631,9 @@ func (m *GroupzMutation) ResetField(name string) error {
 		return nil
 	case groupz.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case groupz.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
 	case groupz.FieldLeaderID:
 		m.ResetLeaderID()
