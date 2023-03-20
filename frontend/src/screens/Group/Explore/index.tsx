@@ -77,7 +77,7 @@ export default function Explore({
     ).unwrap()
 
     if (response) {
-      if (currentOffset + 20 > response.total) {
+      if (currentOffset + 20 >= response.total) {
         setCanLoadmore(false)
       }
       setCurrentOffset(currentOffset + 10)
@@ -91,22 +91,6 @@ export default function Explore({
   return (
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
-        <Searchbar
-          style={{ marginTop: 20, height: 45 }}
-          placeholder="Search group name"
-          onChangeText={onChangeSearch}
-          value={searchQuery}
-          onSubmitEditing={() => {
-            setSearchByName(searchQuery)
-          }}
-        />
-        <Filter
-          asc={asc}
-          switchAsc={setAsc}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-        />
-        <Divider />
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -116,6 +100,23 @@ export default function Explore({
             />
           }
         >
+          <Searchbar
+            style={{ marginTop: 20, height: 45 }}
+            placeholder="Search group name"
+            onChangeText={onChangeSearch}
+            value={searchQuery}
+            onSubmitEditing={() => {
+              setSearchByName(searchQuery)
+            }}
+          />
+          <Filter
+            asc={asc}
+            switchAsc={setAsc}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+          />
+          <Divider />
+
           {noData && (
             <Text
               variant="bodyLarge"
@@ -136,7 +137,7 @@ export default function Explore({
           })}
           {!noData && (
             <Button
-              style={{ marginTop: 10, marginBottom: 140 }}
+              style={{ marginTop: 10, marginBottom: 20 }}
               mode="elevated"
               onPress={fetchMore}
               loading={groupListLoading}
