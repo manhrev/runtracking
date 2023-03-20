@@ -55,7 +55,10 @@ services:
       DB_HOST: group_db
       DB_PORT: 3306
       DB_NAME: group
-
+      AUTH_SERVICE: auth
+      AUTH_PORT: 8080
+    
+  
   activity:
     build:
       context: backend/activity

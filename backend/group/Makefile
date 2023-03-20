@@ -5,14 +5,14 @@ generate-proto:
 		--go_opt=paths=source_relative \
 		--go-grpc_out=./pkg \
 		--go-grpc_opt=paths=source_relative \
-		./api/activity.proto
+		./api/group.proto
 
 generate-code:
 	mkdir -p ./pkg/code
 	protoc \
 		--go_out=./pkg/code \
 		--go-grpc_out=./pkg/code  \
-		./api/activity_code.proto
+		./api/group_code.proto
 
 generate-ts:
 	mkdir -p ./npm/code

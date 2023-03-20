@@ -101,34 +101,7 @@ func (cmru *ChallengeMemberRuleUpdate) ClearChallengeMember() *ChallengeMemberRu
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cmru *ChallengeMemberRuleUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(cmru.hooks) == 0 {
-		affected, err = cmru.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberRuleMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cmru.mutation = mutation
-			affected, err = cmru.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(cmru.hooks) - 1; i >= 0; i-- {
-			if cmru.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmru.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, cmru.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, ChallengeMemberRuleMutation](ctx, cmru.sqlSave, cmru.mutation, cmru.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -236,6 +209,7 @@ func (cmru *ChallengeMemberRuleUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		return 0, err
 	}
+	cmru.mutation.done = true
 	return n, nil
 }
 
@@ -327,40 +301,7 @@ func (cmruo *ChallengeMemberRuleUpdateOne) Select(field string, fields ...string
 
 // Save executes the query and returns the updated ChallengeMemberRule entity.
 func (cmruo *ChallengeMemberRuleUpdateOne) Save(ctx context.Context) (*ChallengeMemberRule, error) {
-	var (
-		err  error
-		node *ChallengeMemberRule
-	)
-	if len(cmruo.hooks) == 0 {
-		node, err = cmruo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberRuleMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cmruo.mutation = mutation
-			node, err = cmruo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(cmruo.hooks) - 1; i >= 0; i-- {
-			if cmruo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmruo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, cmruo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*ChallengeMemberRule)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ChallengeMemberRuleMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*ChallengeMemberRule, ChallengeMemberRuleMutation](ctx, cmruo.sqlSave, cmruo.mutation, cmruo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -488,5 +429,6 @@ func (cmruo *ChallengeMemberRuleUpdateOne) sqlSave(ctx context.Context) (_node *
 		}
 		return nil, err
 	}
+	cmruo.mutation.done = true
 	return _node, nil
 }

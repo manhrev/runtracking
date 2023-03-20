@@ -8,10 +8,12 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/internal/server/group"
 	pb "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -20,6 +22,9 @@ var (
 	db_domain    string = os.Getenv("DB_HOST")
 	db_port      string = os.Getenv("DB_PORT")
 	db_name      string = os.Getenv("DB_NAME")
+
+	auth_service string = os.Getenv("AUTH_SERVICE")
+	auth_port    string = os.Getenv("AUTH_PORT")
 
 	listen_port string = os.Getenv("LISTEN_PORT")
 )
@@ -49,8 +54,14 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", auth_service, auth_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("error while create connect to sample service: %v", err)
+	}
+	authClient := auth.NewAuthIClient(conn)
+
 	// register main and other server servers
-	pb.RegisterGroupServer(server, group.NewServer(entClient))
+	pb.RegisterGroupServer(server, group.NewServer(entClient, authClient))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {

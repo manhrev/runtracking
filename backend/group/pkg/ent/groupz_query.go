@@ -20,11 +20,9 @@ import (
 // GroupzQuery is the builder for querying Groupz entities.
 type GroupzQuery struct {
 	config
-	limit          *int
-	offset         *int
-	unique         *bool
+	ctx            *QueryContext
 	order          []OrderFunc
-	fields         []string
+	inters         []Interceptor
 	predicates     []predicate.Groupz
 	withMembers    *MemberQuery
 	withChallenges *ChallengeQuery
@@ -40,26 +38,26 @@ func (gq *GroupzQuery) Where(ps ...predicate.Groupz) *GroupzQuery {
 	return gq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (gq *GroupzQuery) Limit(limit int) *GroupzQuery {
-	gq.limit = &limit
+	gq.ctx.Limit = &limit
 	return gq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (gq *GroupzQuery) Offset(offset int) *GroupzQuery {
-	gq.offset = &offset
+	gq.ctx.Offset = &offset
 	return gq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (gq *GroupzQuery) Unique(unique bool) *GroupzQuery {
-	gq.unique = &unique
+	gq.ctx.Unique = &unique
 	return gq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (gq *GroupzQuery) Order(o ...OrderFunc) *GroupzQuery {
 	gq.order = append(gq.order, o...)
 	return gq
@@ -67,7 +65,7 @@ func (gq *GroupzQuery) Order(o ...OrderFunc) *GroupzQuery {
 
 // QueryMembers chains the current query on the "members" edge.
 func (gq *GroupzQuery) QueryMembers() *MemberQuery {
-	query := &MemberQuery{config: gq.config}
+	query := (&MemberClient{config: gq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := gq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -89,7 +87,7 @@ func (gq *GroupzQuery) QueryMembers() *MemberQuery {
 
 // QueryChallenges chains the current query on the "challenges" edge.
 func (gq *GroupzQuery) QueryChallenges() *ChallengeQuery {
-	query := &ChallengeQuery{config: gq.config}
+	query := (&ChallengeClient{config: gq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := gq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -112,7 +110,7 @@ func (gq *GroupzQuery) QueryChallenges() *ChallengeQuery {
 // First returns the first Groupz entity from the query.
 // Returns a *NotFoundError when no Groupz was found.
 func (gq *GroupzQuery) First(ctx context.Context) (*Groupz, error) {
-	nodes, err := gq.Limit(1).All(ctx)
+	nodes, err := gq.Limit(1).All(setContextOp(ctx, gq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +133,7 @@ func (gq *GroupzQuery) FirstX(ctx context.Context) *Groupz {
 // Returns a *NotFoundError when no Groupz ID was found.
 func (gq *GroupzQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = gq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = gq.Limit(1).IDs(setContextOp(ctx, gq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -158,7 +156,7 @@ func (gq *GroupzQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one Groupz entity is found.
 // Returns a *NotFoundError when no Groupz entities are found.
 func (gq *GroupzQuery) Only(ctx context.Context) (*Groupz, error) {
-	nodes, err := gq.Limit(2).All(ctx)
+	nodes, err := gq.Limit(2).All(setContextOp(ctx, gq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +184,7 @@ func (gq *GroupzQuery) OnlyX(ctx context.Context) *Groupz {
 // Returns a *NotFoundError when no entities are found.
 func (gq *GroupzQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = gq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = gq.Limit(2).IDs(setContextOp(ctx, gq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -211,10 +209,12 @@ func (gq *GroupzQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of Groupzs.
 func (gq *GroupzQuery) All(ctx context.Context) ([]*Groupz, error) {
+	ctx = setContextOp(ctx, gq.ctx, "All")
 	if err := gq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return gq.sqlAll(ctx)
+	qr := querierAll[[]*Groupz, *GroupzQuery]()
+	return withInterceptors[[]*Groupz](ctx, gq, qr, gq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -229,6 +229,7 @@ func (gq *GroupzQuery) AllX(ctx context.Context) []*Groupz {
 // IDs executes the query and returns a list of Groupz IDs.
 func (gq *GroupzQuery) IDs(ctx context.Context) ([]int64, error) {
 	var ids []int64
+	ctx = setContextOp(ctx, gq.ctx, "IDs")
 	if err := gq.Select(groupz.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -246,10 +247,11 @@ func (gq *GroupzQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (gq *GroupzQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, gq.ctx, "Count")
 	if err := gq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return gq.sqlCount(ctx)
+	return withInterceptors[int](ctx, gq, querierCount[*GroupzQuery](), gq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -263,10 +265,15 @@ func (gq *GroupzQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (gq *GroupzQuery) Exist(ctx context.Context) (bool, error) {
-	if err := gq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, gq.ctx, "Exist")
+	switch _, err := gq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return gq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -286,23 +293,22 @@ func (gq *GroupzQuery) Clone() *GroupzQuery {
 	}
 	return &GroupzQuery{
 		config:         gq.config,
-		limit:          gq.limit,
-		offset:         gq.offset,
+		ctx:            gq.ctx.Clone(),
 		order:          append([]OrderFunc{}, gq.order...),
+		inters:         append([]Interceptor{}, gq.inters...),
 		predicates:     append([]predicate.Groupz{}, gq.predicates...),
 		withMembers:    gq.withMembers.Clone(),
 		withChallenges: gq.withChallenges.Clone(),
 		// clone intermediate query.
-		sql:    gq.sql.Clone(),
-		path:   gq.path,
-		unique: gq.unique,
+		sql:  gq.sql.Clone(),
+		path: gq.path,
 	}
 }
 
 // WithMembers tells the query-builder to eager-load the nodes that are connected to
 // the "members" edge. The optional arguments are used to configure the query builder of the edge.
 func (gq *GroupzQuery) WithMembers(opts ...func(*MemberQuery)) *GroupzQuery {
-	query := &MemberQuery{config: gq.config}
+	query := (&MemberClient{config: gq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -313,7 +319,7 @@ func (gq *GroupzQuery) WithMembers(opts ...func(*MemberQuery)) *GroupzQuery {
 // WithChallenges tells the query-builder to eager-load the nodes that are connected to
 // the "challenges" edge. The optional arguments are used to configure the query builder of the edge.
 func (gq *GroupzQuery) WithChallenges(opts ...func(*ChallengeQuery)) *GroupzQuery {
-	query := &ChallengeQuery{config: gq.config}
+	query := (&ChallengeClient{config: gq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -337,16 +343,11 @@ func (gq *GroupzQuery) WithChallenges(opts ...func(*ChallengeQuery)) *GroupzQuer
 //		Scan(ctx, &v)
 //
 func (gq *GroupzQuery) GroupBy(field string, fields ...string) *GroupzGroupBy {
-	grbuild := &GroupzGroupBy{config: gq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := gq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return gq.sqlQuery(ctx), nil
-	}
+	gq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &GroupzGroupBy{build: gq}
+	grbuild.flds = &gq.ctx.Fields
 	grbuild.label = groupz.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -364,11 +365,11 @@ func (gq *GroupzQuery) GroupBy(field string, fields ...string) *GroupzGroupBy {
 //		Scan(ctx, &v)
 //
 func (gq *GroupzQuery) Select(fields ...string) *GroupzSelect {
-	gq.fields = append(gq.fields, fields...)
-	selbuild := &GroupzSelect{GroupzQuery: gq}
-	selbuild.label = groupz.Label
-	selbuild.flds, selbuild.scan = &gq.fields, selbuild.Scan
-	return selbuild
+	gq.ctx.Fields = append(gq.ctx.Fields, fields...)
+	sbuild := &GroupzSelect{GroupzQuery: gq}
+	sbuild.label = groupz.Label
+	sbuild.flds, sbuild.scan = &gq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a GroupzSelect configured with the given aggregations.
@@ -377,7 +378,17 @@ func (gq *GroupzQuery) Aggregate(fns ...AggregateFunc) *GroupzSelect {
 }
 
 func (gq *GroupzQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range gq.fields {
+	for _, inter := range gq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, gq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range gq.ctx.Fields {
 		if !groupz.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -507,22 +518,11 @@ func (gq *GroupzQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(gq.modifiers) > 0 {
 		_spec.Modifiers = gq.modifiers
 	}
-	_spec.Node.Columns = gq.fields
-	if len(gq.fields) > 0 {
-		_spec.Unique = gq.unique != nil && *gq.unique
+	_spec.Node.Columns = gq.ctx.Fields
+	if len(gq.ctx.Fields) > 0 {
+		_spec.Unique = gq.ctx.Unique != nil && *gq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, gq.driver, _spec)
-}
-
-func (gq *GroupzQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := gq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (gq *GroupzQuery) querySpec() *sqlgraph.QuerySpec {
@@ -538,10 +538,10 @@ func (gq *GroupzQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   gq.sql,
 		Unique: true,
 	}
-	if unique := gq.unique; unique != nil {
+	if unique := gq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := gq.fields; len(fields) > 0 {
+	if fields := gq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, groupz.FieldID)
 		for i := range fields {
@@ -557,10 +557,10 @@ func (gq *GroupzQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := gq.limit; limit != nil {
+	if limit := gq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := gq.offset; offset != nil {
+	if offset := gq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := gq.order; len(ps) > 0 {
@@ -576,7 +576,7 @@ func (gq *GroupzQuery) querySpec() *sqlgraph.QuerySpec {
 func (gq *GroupzQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(gq.driver.Dialect())
 	t1 := builder.Table(groupz.Table)
-	columns := gq.fields
+	columns := gq.ctx.Fields
 	if len(columns) == 0 {
 		columns = groupz.Columns
 	}
@@ -585,7 +585,7 @@ func (gq *GroupzQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = gq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if gq.unique != nil && *gq.unique {
+	if gq.ctx.Unique != nil && *gq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range gq.modifiers {
@@ -597,12 +597,12 @@ func (gq *GroupzQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range gq.order {
 		p(selector)
 	}
-	if offset := gq.offset; offset != nil {
+	if offset := gq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := gq.limit; limit != nil {
+	if limit := gq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -616,13 +616,8 @@ func (gq *GroupzQuery) Modify(modifiers ...func(s *sql.Selector)) *GroupzSelect 
 
 // GroupzGroupBy is the group-by builder for Groupz entities.
 type GroupzGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *GroupzQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -631,58 +626,46 @@ func (ggb *GroupzGroupBy) Aggregate(fns ...AggregateFunc) *GroupzGroupBy {
 	return ggb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (ggb *GroupzGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := ggb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, ggb.build.ctx, "GroupBy")
+	if err := ggb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	ggb.sql = query
-	return ggb.sqlScan(ctx, v)
+	return scanWithInterceptors[*GroupzQuery, *GroupzGroupBy](ctx, ggb.build, ggb, ggb.build.inters, v)
 }
 
-func (ggb *GroupzGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range ggb.fields {
-		if !groupz.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (ggb *GroupzGroupBy) sqlScan(ctx context.Context, root *GroupzQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(ggb.fns))
+	for _, fn := range ggb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := ggb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*ggb.flds)+len(ggb.fns))
+		for _, f := range *ggb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*ggb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := ggb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := ggb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (ggb *GroupzGroupBy) sqlQuery() *sql.Selector {
-	selector := ggb.sql.Select()
-	aggregation := make([]string, 0, len(ggb.fns))
-	for _, fn := range ggb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(ggb.fields)+len(ggb.fns))
-		for _, f := range ggb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(ggb.fields...)...)
-}
-
 // GroupzSelect is the builder for selecting fields of Groupz entities.
 type GroupzSelect struct {
 	*GroupzQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -693,26 +676,27 @@ func (gs *GroupzSelect) Aggregate(fns ...AggregateFunc) *GroupzSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (gs *GroupzSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, gs.ctx, "Select")
 	if err := gs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	gs.sql = gs.GroupzQuery.sqlQuery(ctx)
-	return gs.sqlScan(ctx, v)
+	return scanWithInterceptors[*GroupzQuery, *GroupzSelect](ctx, gs.GroupzQuery, gs, gs.inters, v)
 }
 
-func (gs *GroupzSelect) sqlScan(ctx context.Context, v any) error {
+func (gs *GroupzSelect) sqlScan(ctx context.Context, root *GroupzQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(gs.fns))
 	for _, fn := range gs.fns {
-		aggregation = append(aggregation, fn(gs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*gs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		gs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		gs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := gs.sql.Query()
+	query, args := selector.Query()
 	if err := gs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

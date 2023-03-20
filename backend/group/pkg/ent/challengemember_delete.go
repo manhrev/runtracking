@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (cmd *ChallengeMemberDelete) Where(ps ...predicate.ChallengeMember) *Challe
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (cmd *ChallengeMemberDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(cmd.hooks) == 0 {
-		affected, err = cmd.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cmd.mutation = mutation
-			affected, err = cmd.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(cmd.hooks) - 1; i >= 0; i-- {
-			if cmd.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmd.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, cmd.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, ChallengeMemberMutation](ctx, cmd.sqlExec, cmd.mutation, cmd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -88,12 +60,19 @@ func (cmd *ChallengeMemberDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	cmd.mutation.done = true
 	return affected, err
 }
 
 // ChallengeMemberDeleteOne is the builder for deleting a single ChallengeMember entity.
 type ChallengeMemberDeleteOne struct {
 	cmd *ChallengeMemberDelete
+}
+
+// Where appends a list predicates to the ChallengeMemberDelete builder.
+func (cmdo *ChallengeMemberDeleteOne) Where(ps ...predicate.ChallengeMember) *ChallengeMemberDeleteOne {
+	cmdo.cmd.mutation.Where(ps...)
+	return cmdo
 }
 
 // Exec executes the deletion query.
@@ -111,5 +90,7 @@ func (cmdo *ChallengeMemberDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (cmdo *ChallengeMemberDeleteOne) ExecX(ctx context.Context) {
-	cmdo.cmd.ExecX(ctx)
+	if err := cmdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

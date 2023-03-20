@@ -41,6 +41,34 @@ func (mc *MemberCreate) SetUserID(i int64) *MemberCreate {
 	return mc
 }
 
+// SetStatus sets the "status" field.
+func (mc *MemberCreate) SetStatus(u uint32) *MemberCreate {
+	mc.mutation.SetStatus(u)
+	return mc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (mc *MemberCreate) SetNillableStatus(u *uint32) *MemberCreate {
+	if u != nil {
+		mc.SetStatus(*u)
+	}
+	return mc
+}
+
+// SetJoiningAt sets the "joining_at" field.
+func (mc *MemberCreate) SetJoiningAt(t time.Time) *MemberCreate {
+	mc.mutation.SetJoiningAt(t)
+	return mc
+}
+
+// SetNillableJoiningAt sets the "joining_at" field if the given value is not nil.
+func (mc *MemberCreate) SetNillableJoiningAt(t *time.Time) *MemberCreate {
+	if t != nil {
+		mc.SetJoiningAt(*t)
+	}
+	return mc
+}
+
 // SetID sets the "id" field.
 func (mc *MemberCreate) SetID(i int64) *MemberCreate {
 	mc.mutation.SetID(i)
@@ -73,50 +101,8 @@ func (mc *MemberCreate) Mutation() *MemberMutation {
 
 // Save creates the Member in the database.
 func (mc *MemberCreate) Save(ctx context.Context) (*Member, error) {
-	var (
-		err  error
-		node *Member
-	)
 	mc.defaults()
-	if len(mc.hooks) == 0 {
-		if err = mc.check(); err != nil {
-			return nil, err
-		}
-		node, err = mc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*MemberMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = mc.check(); err != nil {
-				return nil, err
-			}
-			mc.mutation = mutation
-			if node, err = mc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(mc.hooks) - 1; i >= 0; i-- {
-			if mc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = mc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, mc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Member)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from MemberMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Member, MemberMutation](ctx, mc.sqlSave, mc.mutation, mc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -147,6 +133,10 @@ func (mc *MemberCreate) defaults() {
 		v := member.DefaultCreatedAt()
 		mc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := mc.mutation.Status(); !ok {
+		v := member.DefaultStatus
+		mc.mutation.SetStatus(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -157,10 +147,16 @@ func (mc *MemberCreate) check() error {
 	if _, ok := mc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Member.user_id"`)}
 	}
+	if _, ok := mc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Member.status"`)}
+	}
 	return nil
 }
 
 func (mc *MemberCreate) sqlSave(ctx context.Context) (*Member, error) {
+	if err := mc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := mc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, mc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -172,6 +168,8 @@ func (mc *MemberCreate) sqlSave(ctx context.Context) (*Member, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int64(id)
 	}
+	mc.mutation.id = &_node.ID
+	mc.mutation.done = true
 	return _node, nil
 }
 
@@ -197,6 +195,14 @@ func (mc *MemberCreate) createSpec() (*Member, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.UserID(); ok {
 		_spec.SetField(member.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
+	}
+	if value, ok := mc.mutation.Status(); ok {
+		_spec.SetField(member.FieldStatus, field.TypeUint32, value)
+		_node.Status = value
+	}
+	if value, ok := mc.mutation.JoiningAt(); ok {
+		_spec.SetField(member.FieldJoiningAt, field.TypeTime, value)
+		_node.JoiningAt = value
 	}
 	if nodes := mc.mutation.GroupzIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

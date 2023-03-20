@@ -9,6 +9,26 @@ import "api/auth.proto";
 service AuthI {
     rpc GetAllUsers(google.protobuf.Empty) returns (GetAllUsersReply) {};
     rpc GetUsersByIds(GetByIdsRequest) returns (GetAllUsersReply) {};
+    rpc ListUser(ListUserRequest) returns (ListUserReply) {};
+}
+
+message ListUserRequest{
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    UserSortBy sort_by = 4;
+    repeated int64 user_ids = 6;
+    string search_by_name = 5;
+
+    enum UserSortBy{
+        USER_SORT_BY_UNSPECIFIED = 0;
+        USER_SORT_BY_NAME = 1;
+    }
+}
+
+message ListUserReply{
+    repeated UserInfo users = 1;
+    int64 total = 2;
 }
 
 message GetByIdsRequest{

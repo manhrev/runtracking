@@ -18,11 +18,9 @@ import (
 // ChallengeMemberRuleQuery is the builder for querying ChallengeMemberRule entities.
 type ChallengeMemberRuleQuery struct {
 	config
-	limit               *int
-	offset              *int
-	unique              *bool
+	ctx                 *QueryContext
 	order               []OrderFunc
-	fields              []string
+	inters              []Interceptor
 	predicates          []predicate.ChallengeMemberRule
 	withChallengeMember *ChallengeMemberQuery
 	withFKs             bool
@@ -38,26 +36,26 @@ func (cmrq *ChallengeMemberRuleQuery) Where(ps ...predicate.ChallengeMemberRule)
 	return cmrq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (cmrq *ChallengeMemberRuleQuery) Limit(limit int) *ChallengeMemberRuleQuery {
-	cmrq.limit = &limit
+	cmrq.ctx.Limit = &limit
 	return cmrq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (cmrq *ChallengeMemberRuleQuery) Offset(offset int) *ChallengeMemberRuleQuery {
-	cmrq.offset = &offset
+	cmrq.ctx.Offset = &offset
 	return cmrq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (cmrq *ChallengeMemberRuleQuery) Unique(unique bool) *ChallengeMemberRuleQuery {
-	cmrq.unique = &unique
+	cmrq.ctx.Unique = &unique
 	return cmrq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (cmrq *ChallengeMemberRuleQuery) Order(o ...OrderFunc) *ChallengeMemberRuleQuery {
 	cmrq.order = append(cmrq.order, o...)
 	return cmrq
@@ -65,7 +63,7 @@ func (cmrq *ChallengeMemberRuleQuery) Order(o ...OrderFunc) *ChallengeMemberRule
 
 // QueryChallengeMember chains the current query on the "challenge_member" edge.
 func (cmrq *ChallengeMemberRuleQuery) QueryChallengeMember() *ChallengeMemberQuery {
-	query := &ChallengeMemberQuery{config: cmrq.config}
+	query := (&ChallengeMemberClient{config: cmrq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cmrq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -88,7 +86,7 @@ func (cmrq *ChallengeMemberRuleQuery) QueryChallengeMember() *ChallengeMemberQue
 // First returns the first ChallengeMemberRule entity from the query.
 // Returns a *NotFoundError when no ChallengeMemberRule was found.
 func (cmrq *ChallengeMemberRuleQuery) First(ctx context.Context) (*ChallengeMemberRule, error) {
-	nodes, err := cmrq.Limit(1).All(ctx)
+	nodes, err := cmrq.Limit(1).All(setContextOp(ctx, cmrq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +109,7 @@ func (cmrq *ChallengeMemberRuleQuery) FirstX(ctx context.Context) *ChallengeMemb
 // Returns a *NotFoundError when no ChallengeMemberRule ID was found.
 func (cmrq *ChallengeMemberRuleQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = cmrq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = cmrq.Limit(1).IDs(setContextOp(ctx, cmrq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +132,7 @@ func (cmrq *ChallengeMemberRuleQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one ChallengeMemberRule entity is found.
 // Returns a *NotFoundError when no ChallengeMemberRule entities are found.
 func (cmrq *ChallengeMemberRuleQuery) Only(ctx context.Context) (*ChallengeMemberRule, error) {
-	nodes, err := cmrq.Limit(2).All(ctx)
+	nodes, err := cmrq.Limit(2).All(setContextOp(ctx, cmrq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +160,7 @@ func (cmrq *ChallengeMemberRuleQuery) OnlyX(ctx context.Context) *ChallengeMembe
 // Returns a *NotFoundError when no entities are found.
 func (cmrq *ChallengeMemberRuleQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = cmrq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = cmrq.Limit(2).IDs(setContextOp(ctx, cmrq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,10 +185,12 @@ func (cmrq *ChallengeMemberRuleQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of ChallengeMemberRules.
 func (cmrq *ChallengeMemberRuleQuery) All(ctx context.Context) ([]*ChallengeMemberRule, error) {
+	ctx = setContextOp(ctx, cmrq.ctx, "All")
 	if err := cmrq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return cmrq.sqlAll(ctx)
+	qr := querierAll[[]*ChallengeMemberRule, *ChallengeMemberRuleQuery]()
+	return withInterceptors[[]*ChallengeMemberRule](ctx, cmrq, qr, cmrq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -205,6 +205,7 @@ func (cmrq *ChallengeMemberRuleQuery) AllX(ctx context.Context) []*ChallengeMemb
 // IDs executes the query and returns a list of ChallengeMemberRule IDs.
 func (cmrq *ChallengeMemberRuleQuery) IDs(ctx context.Context) ([]int64, error) {
 	var ids []int64
+	ctx = setContextOp(ctx, cmrq.ctx, "IDs")
 	if err := cmrq.Select(challengememberrule.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -222,10 +223,11 @@ func (cmrq *ChallengeMemberRuleQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (cmrq *ChallengeMemberRuleQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, cmrq.ctx, "Count")
 	if err := cmrq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return cmrq.sqlCount(ctx)
+	return withInterceptors[int](ctx, cmrq, querierCount[*ChallengeMemberRuleQuery](), cmrq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -239,10 +241,15 @@ func (cmrq *ChallengeMemberRuleQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cmrq *ChallengeMemberRuleQuery) Exist(ctx context.Context) (bool, error) {
-	if err := cmrq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, cmrq.ctx, "Exist")
+	switch _, err := cmrq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return cmrq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -262,22 +269,21 @@ func (cmrq *ChallengeMemberRuleQuery) Clone() *ChallengeMemberRuleQuery {
 	}
 	return &ChallengeMemberRuleQuery{
 		config:              cmrq.config,
-		limit:               cmrq.limit,
-		offset:              cmrq.offset,
+		ctx:                 cmrq.ctx.Clone(),
 		order:               append([]OrderFunc{}, cmrq.order...),
+		inters:              append([]Interceptor{}, cmrq.inters...),
 		predicates:          append([]predicate.ChallengeMemberRule{}, cmrq.predicates...),
 		withChallengeMember: cmrq.withChallengeMember.Clone(),
 		// clone intermediate query.
-		sql:    cmrq.sql.Clone(),
-		path:   cmrq.path,
-		unique: cmrq.unique,
+		sql:  cmrq.sql.Clone(),
+		path: cmrq.path,
 	}
 }
 
 // WithChallengeMember tells the query-builder to eager-load the nodes that are connected to
 // the "challenge_member" edge. The optional arguments are used to configure the query builder of the edge.
 func (cmrq *ChallengeMemberRuleQuery) WithChallengeMember(opts ...func(*ChallengeMemberQuery)) *ChallengeMemberRuleQuery {
-	query := &ChallengeMemberQuery{config: cmrq.config}
+	query := (&ChallengeMemberClient{config: cmrq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -301,16 +307,11 @@ func (cmrq *ChallengeMemberRuleQuery) WithChallengeMember(opts ...func(*Challeng
 //		Scan(ctx, &v)
 //
 func (cmrq *ChallengeMemberRuleQuery) GroupBy(field string, fields ...string) *ChallengeMemberRuleGroupBy {
-	grbuild := &ChallengeMemberRuleGroupBy{config: cmrq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := cmrq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return cmrq.sqlQuery(ctx), nil
-	}
+	cmrq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &ChallengeMemberRuleGroupBy{build: cmrq}
+	grbuild.flds = &cmrq.ctx.Fields
 	grbuild.label = challengememberrule.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -328,11 +329,11 @@ func (cmrq *ChallengeMemberRuleQuery) GroupBy(field string, fields ...string) *C
 //		Scan(ctx, &v)
 //
 func (cmrq *ChallengeMemberRuleQuery) Select(fields ...string) *ChallengeMemberRuleSelect {
-	cmrq.fields = append(cmrq.fields, fields...)
-	selbuild := &ChallengeMemberRuleSelect{ChallengeMemberRuleQuery: cmrq}
-	selbuild.label = challengememberrule.Label
-	selbuild.flds, selbuild.scan = &cmrq.fields, selbuild.Scan
-	return selbuild
+	cmrq.ctx.Fields = append(cmrq.ctx.Fields, fields...)
+	sbuild := &ChallengeMemberRuleSelect{ChallengeMemberRuleQuery: cmrq}
+	sbuild.label = challengememberrule.Label
+	sbuild.flds, sbuild.scan = &cmrq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a ChallengeMemberRuleSelect configured with the given aggregations.
@@ -341,7 +342,17 @@ func (cmrq *ChallengeMemberRuleQuery) Aggregate(fns ...AggregateFunc) *Challenge
 }
 
 func (cmrq *ChallengeMemberRuleQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range cmrq.fields {
+	for _, inter := range cmrq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, cmrq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range cmrq.ctx.Fields {
 		if !challengememberrule.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -414,6 +425,9 @@ func (cmrq *ChallengeMemberRuleQuery) loadChallengeMember(ctx context.Context, q
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(challengemember.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -436,22 +450,11 @@ func (cmrq *ChallengeMemberRuleQuery) sqlCount(ctx context.Context) (int, error)
 	if len(cmrq.modifiers) > 0 {
 		_spec.Modifiers = cmrq.modifiers
 	}
-	_spec.Node.Columns = cmrq.fields
-	if len(cmrq.fields) > 0 {
-		_spec.Unique = cmrq.unique != nil && *cmrq.unique
+	_spec.Node.Columns = cmrq.ctx.Fields
+	if len(cmrq.ctx.Fields) > 0 {
+		_spec.Unique = cmrq.ctx.Unique != nil && *cmrq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, cmrq.driver, _spec)
-}
-
-func (cmrq *ChallengeMemberRuleQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := cmrq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (cmrq *ChallengeMemberRuleQuery) querySpec() *sqlgraph.QuerySpec {
@@ -467,10 +470,10 @@ func (cmrq *ChallengeMemberRuleQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   cmrq.sql,
 		Unique: true,
 	}
-	if unique := cmrq.unique; unique != nil {
+	if unique := cmrq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := cmrq.fields; len(fields) > 0 {
+	if fields := cmrq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, challengememberrule.FieldID)
 		for i := range fields {
@@ -486,10 +489,10 @@ func (cmrq *ChallengeMemberRuleQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := cmrq.limit; limit != nil {
+	if limit := cmrq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := cmrq.offset; offset != nil {
+	if offset := cmrq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := cmrq.order; len(ps) > 0 {
@@ -505,7 +508,7 @@ func (cmrq *ChallengeMemberRuleQuery) querySpec() *sqlgraph.QuerySpec {
 func (cmrq *ChallengeMemberRuleQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(cmrq.driver.Dialect())
 	t1 := builder.Table(challengememberrule.Table)
-	columns := cmrq.fields
+	columns := cmrq.ctx.Fields
 	if len(columns) == 0 {
 		columns = challengememberrule.Columns
 	}
@@ -514,7 +517,7 @@ func (cmrq *ChallengeMemberRuleQuery) sqlQuery(ctx context.Context) *sql.Selecto
 		selector = cmrq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if cmrq.unique != nil && *cmrq.unique {
+	if cmrq.ctx.Unique != nil && *cmrq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range cmrq.modifiers {
@@ -526,12 +529,12 @@ func (cmrq *ChallengeMemberRuleQuery) sqlQuery(ctx context.Context) *sql.Selecto
 	for _, p := range cmrq.order {
 		p(selector)
 	}
-	if offset := cmrq.offset; offset != nil {
+	if offset := cmrq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := cmrq.limit; limit != nil {
+	if limit := cmrq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -545,13 +548,8 @@ func (cmrq *ChallengeMemberRuleQuery) Modify(modifiers ...func(s *sql.Selector))
 
 // ChallengeMemberRuleGroupBy is the group-by builder for ChallengeMemberRule entities.
 type ChallengeMemberRuleGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *ChallengeMemberRuleQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -560,58 +558,46 @@ func (cmrgb *ChallengeMemberRuleGroupBy) Aggregate(fns ...AggregateFunc) *Challe
 	return cmrgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (cmrgb *ChallengeMemberRuleGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := cmrgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, cmrgb.build.ctx, "GroupBy")
+	if err := cmrgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cmrgb.sql = query
-	return cmrgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*ChallengeMemberRuleQuery, *ChallengeMemberRuleGroupBy](ctx, cmrgb.build, cmrgb, cmrgb.build.inters, v)
 }
 
-func (cmrgb *ChallengeMemberRuleGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range cmrgb.fields {
-		if !challengememberrule.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (cmrgb *ChallengeMemberRuleGroupBy) sqlScan(ctx context.Context, root *ChallengeMemberRuleQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(cmrgb.fns))
+	for _, fn := range cmrgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := cmrgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*cmrgb.flds)+len(cmrgb.fns))
+		for _, f := range *cmrgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*cmrgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cmrgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := cmrgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (cmrgb *ChallengeMemberRuleGroupBy) sqlQuery() *sql.Selector {
-	selector := cmrgb.sql.Select()
-	aggregation := make([]string, 0, len(cmrgb.fns))
-	for _, fn := range cmrgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(cmrgb.fields)+len(cmrgb.fns))
-		for _, f := range cmrgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(cmrgb.fields...)...)
-}
-
 // ChallengeMemberRuleSelect is the builder for selecting fields of ChallengeMemberRule entities.
 type ChallengeMemberRuleSelect struct {
 	*ChallengeMemberRuleQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -622,26 +608,27 @@ func (cmrs *ChallengeMemberRuleSelect) Aggregate(fns ...AggregateFunc) *Challeng
 
 // Scan applies the selector query and scans the result into the given value.
 func (cmrs *ChallengeMemberRuleSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, cmrs.ctx, "Select")
 	if err := cmrs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cmrs.sql = cmrs.ChallengeMemberRuleQuery.sqlQuery(ctx)
-	return cmrs.sqlScan(ctx, v)
+	return scanWithInterceptors[*ChallengeMemberRuleQuery, *ChallengeMemberRuleSelect](ctx, cmrs.ChallengeMemberRuleQuery, cmrs, cmrs.inters, v)
 }
 
-func (cmrs *ChallengeMemberRuleSelect) sqlScan(ctx context.Context, v any) error {
+func (cmrs *ChallengeMemberRuleSelect) sqlScan(ctx context.Context, root *ChallengeMemberRuleQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(cmrs.fns))
 	for _, fn := range cmrs.fns {
-		aggregation = append(aggregation, fn(cmrs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*cmrs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		cmrs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		cmrs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := cmrs.sql.Query()
+	query, args := selector.Query()
 	if err := cmrs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

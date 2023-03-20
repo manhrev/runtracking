@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (cmrd *ChallengeMemberRuleDelete) Where(ps ...predicate.ChallengeMemberRule
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (cmrd *ChallengeMemberRuleDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(cmrd.hooks) == 0 {
-		affected, err = cmrd.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberRuleMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cmrd.mutation = mutation
-			affected, err = cmrd.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(cmrd.hooks) - 1; i >= 0; i-- {
-			if cmrd.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmrd.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, cmrd.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, ChallengeMemberRuleMutation](ctx, cmrd.sqlExec, cmrd.mutation, cmrd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -88,12 +60,19 @@ func (cmrd *ChallengeMemberRuleDelete) sqlExec(ctx context.Context) (int, error)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	cmrd.mutation.done = true
 	return affected, err
 }
 
 // ChallengeMemberRuleDeleteOne is the builder for deleting a single ChallengeMemberRule entity.
 type ChallengeMemberRuleDeleteOne struct {
 	cmrd *ChallengeMemberRuleDelete
+}
+
+// Where appends a list predicates to the ChallengeMemberRuleDelete builder.
+func (cmrdo *ChallengeMemberRuleDeleteOne) Where(ps ...predicate.ChallengeMemberRule) *ChallengeMemberRuleDeleteOne {
+	cmrdo.cmrd.mutation.Where(ps...)
+	return cmrdo
 }
 
 // Exec executes the deletion query.
@@ -111,5 +90,7 @@ func (cmrdo *ChallengeMemberRuleDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (cmrdo *ChallengeMemberRuleDeleteOne) ExecX(ctx context.Context) {
-	cmrdo.cmrd.ExecX(ctx)
+	if err := cmrdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

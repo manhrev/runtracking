@@ -31,10 +31,11 @@ message HealthRecordRequest{
     float weight = 2;
 }
 
-
 message GetByIdRequest{
     int64 id = 1;
 }
+
+
 
 message LoginRequest {
     string user_name = 1;

@@ -37,4 +37,8 @@ func init() {
 	memberDescCreatedAt := memberFields[1].Descriptor()
 	// member.DefaultCreatedAt holds the default value on creation for the created_at field.
 	member.DefaultCreatedAt = memberDescCreatedAt.Default.(func() time.Time)
+	// memberDescStatus is the schema descriptor for status field.
+	memberDescStatus := memberFields[3].Descriptor()
+	// member.DefaultStatus holds the default value on creation for the status field.
+	member.DefaultStatus = memberDescStatus.Default.(uint32)
 }

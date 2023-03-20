@@ -12,215 +12,237 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Member(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Member(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Member(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Member(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Member(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Member(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Member(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Member(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Member(sql.FieldLTE(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Member(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserID), v))
-	})
+	return predicate.Member(sql.FieldEQ(FieldUserID, v))
+}
+
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v uint32) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldStatus, v))
+}
+
+// JoiningAt applies equality check predicate on the "joining_at" field. It's identical to JoiningAtEQ.
+func JoiningAt(v time.Time) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldJoiningAt, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Member(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Member(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Member {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Member(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Member {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Member(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Member(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Member(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Member(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Member(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
 func UserIDEQ(v int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserID), v))
-	})
+	return predicate.Member(sql.FieldEQ(FieldUserID, v))
 }
 
 // UserIDNEQ applies the NEQ predicate on the "user_id" field.
 func UserIDNEQ(v int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUserID), v))
-	})
+	return predicate.Member(sql.FieldNEQ(FieldUserID, v))
 }
 
 // UserIDIn applies the In predicate on the "user_id" field.
 func UserIDIn(vs ...int64) predicate.Member {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUserID), v...))
-	})
+	return predicate.Member(sql.FieldIn(FieldUserID, vs...))
 }
 
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
 func UserIDNotIn(vs ...int64) predicate.Member {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUserID), v...))
-	})
+	return predicate.Member(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // UserIDGT applies the GT predicate on the "user_id" field.
 func UserIDGT(v int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUserID), v))
-	})
+	return predicate.Member(sql.FieldGT(FieldUserID, v))
 }
 
 // UserIDGTE applies the GTE predicate on the "user_id" field.
 func UserIDGTE(v int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUserID), v))
-	})
+	return predicate.Member(sql.FieldGTE(FieldUserID, v))
 }
 
 // UserIDLT applies the LT predicate on the "user_id" field.
 func UserIDLT(v int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUserID), v))
-	})
+	return predicate.Member(sql.FieldLT(FieldUserID, v))
 }
 
 // UserIDLTE applies the LTE predicate on the "user_id" field.
 func UserIDLTE(v int64) predicate.Member {
-	return predicate.Member(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUserID), v))
-	})
+	return predicate.Member(sql.FieldLTE(FieldUserID, v))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v uint32) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v uint32) predicate.Member {
+	return predicate.Member(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...uint32) predicate.Member {
+	return predicate.Member(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...uint32) predicate.Member {
+	return predicate.Member(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v uint32) predicate.Member {
+	return predicate.Member(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v uint32) predicate.Member {
+	return predicate.Member(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v uint32) predicate.Member {
+	return predicate.Member(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v uint32) predicate.Member {
+	return predicate.Member(sql.FieldLTE(FieldStatus, v))
+}
+
+// JoiningAtEQ applies the EQ predicate on the "joining_at" field.
+func JoiningAtEQ(v time.Time) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldJoiningAt, v))
+}
+
+// JoiningAtNEQ applies the NEQ predicate on the "joining_at" field.
+func JoiningAtNEQ(v time.Time) predicate.Member {
+	return predicate.Member(sql.FieldNEQ(FieldJoiningAt, v))
+}
+
+// JoiningAtIn applies the In predicate on the "joining_at" field.
+func JoiningAtIn(vs ...time.Time) predicate.Member {
+	return predicate.Member(sql.FieldIn(FieldJoiningAt, vs...))
+}
+
+// JoiningAtNotIn applies the NotIn predicate on the "joining_at" field.
+func JoiningAtNotIn(vs ...time.Time) predicate.Member {
+	return predicate.Member(sql.FieldNotIn(FieldJoiningAt, vs...))
+}
+
+// JoiningAtGT applies the GT predicate on the "joining_at" field.
+func JoiningAtGT(v time.Time) predicate.Member {
+	return predicate.Member(sql.FieldGT(FieldJoiningAt, v))
+}
+
+// JoiningAtGTE applies the GTE predicate on the "joining_at" field.
+func JoiningAtGTE(v time.Time) predicate.Member {
+	return predicate.Member(sql.FieldGTE(FieldJoiningAt, v))
+}
+
+// JoiningAtLT applies the LT predicate on the "joining_at" field.
+func JoiningAtLT(v time.Time) predicate.Member {
+	return predicate.Member(sql.FieldLT(FieldJoiningAt, v))
+}
+
+// JoiningAtLTE applies the LTE predicate on the "joining_at" field.
+func JoiningAtLTE(v time.Time) predicate.Member {
+	return predicate.Member(sql.FieldLTE(FieldJoiningAt, v))
+}
+
+// JoiningAtIsNil applies the IsNil predicate on the "joining_at" field.
+func JoiningAtIsNil() predicate.Member {
+	return predicate.Member(sql.FieldIsNull(FieldJoiningAt))
+}
+
+// JoiningAtNotNil applies the NotNil predicate on the "joining_at" field.
+func JoiningAtNotNil() predicate.Member {
+	return predicate.Member(sql.FieldNotNull(FieldJoiningAt))
 }
 
 // HasGroupz applies the HasEdge predicate on the "groupz" edge.
@@ -228,7 +250,6 @@ func HasGroupz() predicate.Member {
 	return predicate.Member(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(GroupzTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

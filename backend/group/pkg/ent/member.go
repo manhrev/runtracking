@@ -21,6 +21,10 @@ type Member struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int64 `json:"user_id,omitempty"`
+	// Status holds the value of the "status" field.
+	Status uint32 `json:"status,omitempty"`
+	// JoiningAt holds the value of the "joining_at" field.
+	JoiningAt time.Time `json:"joining_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MemberQuery when eager-loading is set.
 	Edges          MemberEdges `json:"edges"`
@@ -54,9 +58,9 @@ func (*Member) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case member.FieldID, member.FieldUserID:
+		case member.FieldID, member.FieldUserID, member.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case member.FieldCreatedAt:
+		case member.FieldCreatedAt, member.FieldJoiningAt:
 			values[i] = new(sql.NullTime)
 		case member.ForeignKeys[0]: // groupz_members
 			values[i] = new(sql.NullInt64)
@@ -93,6 +97,18 @@ func (m *Member) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.UserID = value.Int64
 			}
+		case member.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				m.Status = uint32(value.Int64)
+			}
+		case member.FieldJoiningAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field joining_at", values[i])
+			} else if value.Valid {
+				m.JoiningAt = value.Time
+			}
 		case member.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field groupz_members", value)
@@ -107,14 +123,14 @@ func (m *Member) assignValues(columns []string, values []any) error {
 
 // QueryGroupz queries the "groupz" edge of the Member entity.
 func (m *Member) QueryGroupz() *GroupzQuery {
-	return (&MemberClient{config: m.config}).QueryGroupz(m)
+	return NewMemberClient(m.config).QueryGroupz(m)
 }
 
 // Update returns a builder for updating this Member.
 // Note that you need to call Member.Unwrap() before calling this method if this Member
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (m *Member) Update() *MemberUpdateOne {
-	return (&MemberClient{config: m.config}).UpdateOne(m)
+	return NewMemberClient(m.config).UpdateOne(m)
 }
 
 // Unwrap unwraps the Member entity that was returned from a transaction after it was closed,
@@ -138,6 +154,12 @@ func (m *Member) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", m.UserID))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", m.Status))
+	builder.WriteString(", ")
+	builder.WriteString("joining_at=")
+	builder.WriteString(m.JoiningAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

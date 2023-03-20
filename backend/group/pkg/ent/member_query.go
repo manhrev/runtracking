@@ -18,11 +18,9 @@ import (
 // MemberQuery is the builder for querying Member entities.
 type MemberQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
+	ctx        *QueryContext
 	order      []OrderFunc
-	fields     []string
+	inters     []Interceptor
 	predicates []predicate.Member
 	withGroupz *GroupzQuery
 	withFKs    bool
@@ -38,26 +36,26 @@ func (mq *MemberQuery) Where(ps ...predicate.Member) *MemberQuery {
 	return mq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (mq *MemberQuery) Limit(limit int) *MemberQuery {
-	mq.limit = &limit
+	mq.ctx.Limit = &limit
 	return mq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (mq *MemberQuery) Offset(offset int) *MemberQuery {
-	mq.offset = &offset
+	mq.ctx.Offset = &offset
 	return mq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (mq *MemberQuery) Unique(unique bool) *MemberQuery {
-	mq.unique = &unique
+	mq.ctx.Unique = &unique
 	return mq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (mq *MemberQuery) Order(o ...OrderFunc) *MemberQuery {
 	mq.order = append(mq.order, o...)
 	return mq
@@ -65,7 +63,7 @@ func (mq *MemberQuery) Order(o ...OrderFunc) *MemberQuery {
 
 // QueryGroupz chains the current query on the "groupz" edge.
 func (mq *MemberQuery) QueryGroupz() *GroupzQuery {
-	query := &GroupzQuery{config: mq.config}
+	query := (&GroupzClient{config: mq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -88,7 +86,7 @@ func (mq *MemberQuery) QueryGroupz() *GroupzQuery {
 // First returns the first Member entity from the query.
 // Returns a *NotFoundError when no Member was found.
 func (mq *MemberQuery) First(ctx context.Context) (*Member, error) {
-	nodes, err := mq.Limit(1).All(ctx)
+	nodes, err := mq.Limit(1).All(setContextOp(ctx, mq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +109,7 @@ func (mq *MemberQuery) FirstX(ctx context.Context) *Member {
 // Returns a *NotFoundError when no Member ID was found.
 func (mq *MemberQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = mq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = mq.Limit(1).IDs(setContextOp(ctx, mq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +132,7 @@ func (mq *MemberQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one Member entity is found.
 // Returns a *NotFoundError when no Member entities are found.
 func (mq *MemberQuery) Only(ctx context.Context) (*Member, error) {
-	nodes, err := mq.Limit(2).All(ctx)
+	nodes, err := mq.Limit(2).All(setContextOp(ctx, mq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +160,7 @@ func (mq *MemberQuery) OnlyX(ctx context.Context) *Member {
 // Returns a *NotFoundError when no entities are found.
 func (mq *MemberQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = mq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = mq.Limit(2).IDs(setContextOp(ctx, mq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,10 +185,12 @@ func (mq *MemberQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of Members.
 func (mq *MemberQuery) All(ctx context.Context) ([]*Member, error) {
+	ctx = setContextOp(ctx, mq.ctx, "All")
 	if err := mq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return mq.sqlAll(ctx)
+	qr := querierAll[[]*Member, *MemberQuery]()
+	return withInterceptors[[]*Member](ctx, mq, qr, mq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -205,6 +205,7 @@ func (mq *MemberQuery) AllX(ctx context.Context) []*Member {
 // IDs executes the query and returns a list of Member IDs.
 func (mq *MemberQuery) IDs(ctx context.Context) ([]int64, error) {
 	var ids []int64
+	ctx = setContextOp(ctx, mq.ctx, "IDs")
 	if err := mq.Select(member.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -222,10 +223,11 @@ func (mq *MemberQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (mq *MemberQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, mq.ctx, "Count")
 	if err := mq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return mq.sqlCount(ctx)
+	return withInterceptors[int](ctx, mq, querierCount[*MemberQuery](), mq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -239,10 +241,15 @@ func (mq *MemberQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (mq *MemberQuery) Exist(ctx context.Context) (bool, error) {
-	if err := mq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, mq.ctx, "Exist")
+	switch _, err := mq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return mq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -262,22 +269,21 @@ func (mq *MemberQuery) Clone() *MemberQuery {
 	}
 	return &MemberQuery{
 		config:     mq.config,
-		limit:      mq.limit,
-		offset:     mq.offset,
+		ctx:        mq.ctx.Clone(),
 		order:      append([]OrderFunc{}, mq.order...),
+		inters:     append([]Interceptor{}, mq.inters...),
 		predicates: append([]predicate.Member{}, mq.predicates...),
 		withGroupz: mq.withGroupz.Clone(),
 		// clone intermediate query.
-		sql:    mq.sql.Clone(),
-		path:   mq.path,
-		unique: mq.unique,
+		sql:  mq.sql.Clone(),
+		path: mq.path,
 	}
 }
 
 // WithGroupz tells the query-builder to eager-load the nodes that are connected to
 // the "groupz" edge. The optional arguments are used to configure the query builder of the edge.
 func (mq *MemberQuery) WithGroupz(opts ...func(*GroupzQuery)) *MemberQuery {
-	query := &GroupzQuery{config: mq.config}
+	query := (&GroupzClient{config: mq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -301,16 +307,11 @@ func (mq *MemberQuery) WithGroupz(opts ...func(*GroupzQuery)) *MemberQuery {
 //		Scan(ctx, &v)
 //
 func (mq *MemberQuery) GroupBy(field string, fields ...string) *MemberGroupBy {
-	grbuild := &MemberGroupBy{config: mq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := mq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return mq.sqlQuery(ctx), nil
-	}
+	mq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MemberGroupBy{build: mq}
+	grbuild.flds = &mq.ctx.Fields
 	grbuild.label = member.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -328,11 +329,11 @@ func (mq *MemberQuery) GroupBy(field string, fields ...string) *MemberGroupBy {
 //		Scan(ctx, &v)
 //
 func (mq *MemberQuery) Select(fields ...string) *MemberSelect {
-	mq.fields = append(mq.fields, fields...)
-	selbuild := &MemberSelect{MemberQuery: mq}
-	selbuild.label = member.Label
-	selbuild.flds, selbuild.scan = &mq.fields, selbuild.Scan
-	return selbuild
+	mq.ctx.Fields = append(mq.ctx.Fields, fields...)
+	sbuild := &MemberSelect{MemberQuery: mq}
+	sbuild.label = member.Label
+	sbuild.flds, sbuild.scan = &mq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a MemberSelect configured with the given aggregations.
@@ -341,7 +342,17 @@ func (mq *MemberQuery) Aggregate(fns ...AggregateFunc) *MemberSelect {
 }
 
 func (mq *MemberQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range mq.fields {
+	for _, inter := range mq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, mq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range mq.ctx.Fields {
 		if !member.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -414,6 +425,9 @@ func (mq *MemberQuery) loadGroupz(ctx context.Context, query *GroupzQuery, nodes
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(groupz.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -436,22 +450,11 @@ func (mq *MemberQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(mq.modifiers) > 0 {
 		_spec.Modifiers = mq.modifiers
 	}
-	_spec.Node.Columns = mq.fields
-	if len(mq.fields) > 0 {
-		_spec.Unique = mq.unique != nil && *mq.unique
+	_spec.Node.Columns = mq.ctx.Fields
+	if len(mq.ctx.Fields) > 0 {
+		_spec.Unique = mq.ctx.Unique != nil && *mq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, mq.driver, _spec)
-}
-
-func (mq *MemberQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := mq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (mq *MemberQuery) querySpec() *sqlgraph.QuerySpec {
@@ -467,10 +470,10 @@ func (mq *MemberQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   mq.sql,
 		Unique: true,
 	}
-	if unique := mq.unique; unique != nil {
+	if unique := mq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := mq.fields; len(fields) > 0 {
+	if fields := mq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, member.FieldID)
 		for i := range fields {
@@ -486,10 +489,10 @@ func (mq *MemberQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := mq.limit; limit != nil {
+	if limit := mq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := mq.offset; offset != nil {
+	if offset := mq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := mq.order; len(ps) > 0 {
@@ -505,7 +508,7 @@ func (mq *MemberQuery) querySpec() *sqlgraph.QuerySpec {
 func (mq *MemberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(mq.driver.Dialect())
 	t1 := builder.Table(member.Table)
-	columns := mq.fields
+	columns := mq.ctx.Fields
 	if len(columns) == 0 {
 		columns = member.Columns
 	}
@@ -514,7 +517,7 @@ func (mq *MemberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = mq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if mq.unique != nil && *mq.unique {
+	if mq.ctx.Unique != nil && *mq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range mq.modifiers {
@@ -526,12 +529,12 @@ func (mq *MemberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range mq.order {
 		p(selector)
 	}
-	if offset := mq.offset; offset != nil {
+	if offset := mq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := mq.limit; limit != nil {
+	if limit := mq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -545,13 +548,8 @@ func (mq *MemberQuery) Modify(modifiers ...func(s *sql.Selector)) *MemberSelect 
 
 // MemberGroupBy is the group-by builder for Member entities.
 type MemberGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *MemberQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -560,58 +558,46 @@ func (mgb *MemberGroupBy) Aggregate(fns ...AggregateFunc) *MemberGroupBy {
 	return mgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (mgb *MemberGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := mgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, mgb.build.ctx, "GroupBy")
+	if err := mgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	mgb.sql = query
-	return mgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*MemberQuery, *MemberGroupBy](ctx, mgb.build, mgb, mgb.build.inters, v)
 }
 
-func (mgb *MemberGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range mgb.fields {
-		if !member.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (mgb *MemberGroupBy) sqlScan(ctx context.Context, root *MemberQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(mgb.fns))
+	for _, fn := range mgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := mgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*mgb.flds)+len(mgb.fns))
+		for _, f := range *mgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*mgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := mgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (mgb *MemberGroupBy) sqlQuery() *sql.Selector {
-	selector := mgb.sql.Select()
-	aggregation := make([]string, 0, len(mgb.fns))
-	for _, fn := range mgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(mgb.fields)+len(mgb.fns))
-		for _, f := range mgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(mgb.fields...)...)
-}
-
 // MemberSelect is the builder for selecting fields of Member entities.
 type MemberSelect struct {
 	*MemberQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -622,26 +608,27 @@ func (ms *MemberSelect) Aggregate(fns ...AggregateFunc) *MemberSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ms *MemberSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, ms.ctx, "Select")
 	if err := ms.prepareQuery(ctx); err != nil {
 		return err
 	}
-	ms.sql = ms.MemberQuery.sqlQuery(ctx)
-	return ms.sqlScan(ctx, v)
+	return scanWithInterceptors[*MemberQuery, *MemberSelect](ctx, ms.MemberQuery, ms, ms.inters, v)
 }
 
-func (ms *MemberSelect) sqlScan(ctx context.Context, v any) error {
+func (ms *MemberSelect) sqlScan(ctx context.Context, root *MemberQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(ms.fns))
 	for _, fn := range ms.fns {
-		aggregation = append(aggregation, fn(ms.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*ms.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		ms.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		ms.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := ms.sql.Query()
+	query, args := selector.Query()
 	if err := ms.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

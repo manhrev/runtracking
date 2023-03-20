@@ -107,19 +107,19 @@ func (cm *ChallengeMember) assignValues(columns []string, values []any) error {
 
 // QueryChallengeMemberRules queries the "challenge_member_rules" edge of the ChallengeMember entity.
 func (cm *ChallengeMember) QueryChallengeMemberRules() *ChallengeMemberRuleQuery {
-	return (&ChallengeMemberClient{config: cm.config}).QueryChallengeMemberRules(cm)
+	return NewChallengeMemberClient(cm.config).QueryChallengeMemberRules(cm)
 }
 
 // QueryChallenge queries the "challenge" edge of the ChallengeMember entity.
 func (cm *ChallengeMember) QueryChallenge() *ChallengeQuery {
-	return (&ChallengeMemberClient{config: cm.config}).QueryChallenge(cm)
+	return NewChallengeMemberClient(cm.config).QueryChallenge(cm)
 }
 
 // Update returns a builder for updating this ChallengeMember.
 // Note that you need to call ChallengeMember.Unwrap() before calling this method if this ChallengeMember
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (cm *ChallengeMember) Update() *ChallengeMemberUpdateOne {
-	return (&ChallengeMemberClient{config: cm.config}).UpdateOne(cm)
+	return NewChallengeMemberClient(cm.config).UpdateOne(cm)
 }
 
 // Unwrap unwraps the ChallengeMember entity that was returned from a transaction after it was closed,

@@ -107,6 +107,8 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "user_id", Type: field.TypeInt64},
+		{Name: "status", Type: field.TypeUint32, Default: 0},
+		{Name: "joining_at", Type: field.TypeTime, Nullable: true},
 		{Name: "groupz_members", Type: field.TypeInt64, Nullable: true},
 	}
 	// MembersTable holds the schema information for the "members" table.
@@ -117,7 +119,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "members_groupzs_members",
-				Columns:    []*schema.Column{MembersColumns[3]},
+				Columns:    []*schema.Column{MembersColumns[5]},
 				RefColumns: []*schema.Column{GroupzsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -126,7 +128,7 @@ var (
 			{
 				Name:    "member_user_id_groupz_members",
 				Unique:  true,
-				Columns: []*schema.Column{MembersColumns[2], MembersColumns[3]},
+				Columns: []*schema.Column{MembersColumns[2], MembersColumns[5]},
 			},
 		},
 	}
