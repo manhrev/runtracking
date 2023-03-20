@@ -76,7 +76,7 @@ export default function Run({
     totalTime,
     weight
   )
-  console.log(kcalBurned)
+  // console.log(kcalBurned)
   // dialog
   const [visible, setVisible] = useState(false)
 
