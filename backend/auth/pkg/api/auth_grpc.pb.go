@@ -104,6 +104,15 @@ func (c *authClient) GetUserById(ctx context.Context, in *GetByIdRequest, opts .
 	return out, nil
 }
 
+func (c *authClient) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...grpc.CallOption) (*UpdateUserInfoReply, error) {
+	out := new(UpdateUserInfoReply)
+	err := c.cc.Invoke(ctx, "/auth.Auth/UpdateUserInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -115,6 +124,7 @@ type AuthServer interface {
 	SetHealthRecord(context.Context, *HealthRecordRequest) (*emptypb.Empty, error)
 	GetAllUsers(context.Context, *emptypb.Empty) (*GetAllUsersReply, error)
 	GetUserById(context.Context, *GetByIdRequest) (*UserInfo, error)
+	UpdateUserInfo(context.Context, *UpdateUserInfoRequest) (*UpdateUserInfoReply, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -142,6 +152,9 @@ func (UnimplementedAuthServer) GetAllUsers(context.Context, *emptypb.Empty) (*Ge
 }
 func (UnimplementedAuthServer) GetUserById(context.Context, *GetByIdRequest) (*UserInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
+}
+func (UnimplementedAuthServer) UpdateUserInfo(context.Context, *UpdateUserInfoRequest) (*UpdateUserInfoReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserInfo not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -282,6 +295,24 @@ func _Auth_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_UpdateUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).UpdateUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/UpdateUserInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).UpdateUserInfo(ctx, req.(*UpdateUserInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -316,6 +347,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserById",
 			Handler:    _Auth_GetUserById_Handler,
+		},
+		{
+			MethodName: "UpdateUserInfo",
+			Handler:    _Auth_UpdateUserInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

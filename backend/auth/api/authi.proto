@@ -31,10 +31,6 @@ message ListUserReply{
     int64 total = 2;
 }
 
-message GetAllUsersReply{
-    repeated UserInfo users = 1;
-}
-
 message GetByIdsRequest{
     repeated int64 ids = 1;
 }
