@@ -15,9 +15,9 @@ generate-code:
 		./api/notification_code.proto
 
 generate-ts:
-	mkdir -p ./npm/code
-	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/notification.proto
-	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/notification_code.proto
+	mkdir -p ./pkg/ts
+	protoc -I=./api --js_out=import_style=commonjs:./pkg/ts --grpc-web_out=import_style=typescript,mode=grpcwebtext:./pkg/ts ./api/notification.proto
+	protoc -I=./api --js_out=import_style=commonjs:./pkg/ts --grpc-web_out=import_style=typescript,mode=grpcwebtext:./pkg/ts ./api/notification_code.proto
 
 generate-ent:
 	mkdir -p ./pkg/ent
