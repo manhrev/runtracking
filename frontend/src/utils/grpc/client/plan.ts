@@ -84,6 +84,8 @@ class rpcPlanClient extends gRPCClientAbstract {
         from ? new Timestamp().setSeconds(from?.seconds || 0) : undefined
       )
       .setTo(to ? new Timestamp().setSeconds(to?.seconds || 0) : undefined)
+      .setIdsList(params.idsList)
+
     return await this.gRPCClientRequest<ListPlanReply.AsObject>('listPlan', req)
   }
 }

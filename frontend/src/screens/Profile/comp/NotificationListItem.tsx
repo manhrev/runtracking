@@ -3,36 +3,75 @@ import { Divider, Text, TouchableRipple, Avatar } from 'react-native-paper'
 import { useAppTheme, AppTheme } from '../../../theme'
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler'
 import RightSwipe from './RightSwipe'
-import { NotificationInfo } from '../../../lib/notification/notification_pb'
 import {
-  formatDate,
-  formatDateNotification,
-  getIconWithActivityType,
-  getNameWithActivityType,
-  minutesPerKilometer,
-  secondsToMinutes,
-} from '../../../utils/helpers'
+  NotificationInfo,
+  SOURCE_TYPE,
+} from '../../../lib/notification/notification_pb'
+import { formatDateNotification } from '../../../utils/helpers'
 import {
   deleteNotificationInfoThunk,
   updateNotificationInfoThunk,
 } from '../../../redux/features/notification/thunk'
 import { useAppDispatch } from '../../../redux/store'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { RootBaseStackParamList } from '../../../navigators/BaseStack'
+import { toast } from '../../../utils/toast/toast'
+import { listPlanThunk } from '../../../redux/features/planList/thunk'
+import { ActivityType, PlanSortBy } from '../../../lib/plan/plan_pb'
 
 interface NotificationListItemProps {
   notificationInfo: NotificationInfo.AsObject
+  navigation: NativeStackNavigationProp<
+    RootBaseStackParamList,
+    'NotificationList',
+    undefined
+  >
 }
 
-export default function NotificationListItem(props: NotificationListItemProps) {
+export default function NotificationListItem({
+  navigation,
+  notificationInfo,
+}: NotificationListItemProps) {
   const theme = useAppTheme()
-  //   const { left, right, topDivider, color, onPress } = props;
 
-  const { notificationInfo } = props
-  const { id, image, isSeen, message, referenceId, type, time } =
+  const { id, image, isSeen, message, sourceId, sourceType, time } =
     notificationInfo
   const dispatch = useAppDispatch()
 
   const onPressDelete = async (id: number) => {
     await dispatch(deleteNotificationInfoThunk({ id: id }))
+  }
+
+  const viewNoti = async () => {
+    const { error } = await dispatch(
+      updateNotificationInfoThunk({ id: id, isSeen: true })
+    ).unwrap()
+    if (error) toast.error({ message: 'An error occurred, please try again' })
+    else {
+      switch (sourceType) {
+        case SOURCE_TYPE.PLAN:
+          const { error } = await dispatch(
+            listPlanThunk({
+              activityType: ActivityType.ACTIVITY_TYPE_UNSPECIFIED,
+              ascending: true,
+              idsList: [sourceId],
+              limit: 1,
+              offset: 0,
+              sortBy: PlanSortBy.PLAN_SORT_BY_CREATED_TIME,
+              from: undefined,
+              to: undefined,
+            })
+          ).unwrap()
+
+          if (error)
+            toast.error({ message: 'An error occurred, please try again' })
+          else
+            navigation.navigate('PlanDetail', {
+              planId: sourceId,
+              canEdit: false,
+            })
+      }
+    }
   }
 
   const rightSwipeActions = () =>
@@ -48,7 +87,7 @@ export default function NotificationListItem(props: NotificationListItemProps) {
         <Swipeable renderRightActions={rightSwipeActions}>
           <TouchableRipple
             onPress={() => {
-              dispatch(updateNotificationInfoThunk({ id: id, isSeen: true }))
+              viewNoti()
             }}
           >
             <View style={styles(theme).listItemContainer}>

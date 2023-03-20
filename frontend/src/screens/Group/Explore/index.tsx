@@ -91,7 +91,7 @@ export default function Explore({
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
         <Searchbar
-          style={{ marginTop: 20 }}
+          style={{ marginTop: 20, height: 45 }}
           placeholder="Search group name"
           onChangeText={onChangeSearch}
           value={searchQuery}
