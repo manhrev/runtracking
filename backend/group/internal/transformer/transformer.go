@@ -15,6 +15,11 @@ func TransformGroupListEntToGroupList(groupList []*ent.Groupz) []*group.GroupInf
 			Name:              groupEnt.Name,
 			Description:       groupEnt.Description,
 			BackgroundPicture: groupEnt.BackgroundPicture,
+			LeaderId:          groupEnt.LeaderID,
+			CreatedAt:         timestamppb.New(groupEnt.CreatedAt),
+			UpdatedAt:         timestamppb.New(groupEnt.UpdatedAt),
+			NumOfChallenge:    int64(len(groupEnt.Edges.Challenges)),
+			NumOfMembers:      int64(len(groupEnt.Edges.Members)),
 		}
 		groupInfoList = append(groupInfoList, groupInfo)
 	}

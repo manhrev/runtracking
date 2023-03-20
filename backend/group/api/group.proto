@@ -88,6 +88,7 @@ message ListGroupRequest{
         FILTER_BY_UNSPECIFIED = 0;
         FILTER_BY_IS_MEMBER = 1;
         FILTER_BY_IS_NOT_MEMBER = 2;
+        FILTER_BY_IS_ADMIN = 3;
     }
     GroupSortBy sort_by = 4;
 }
@@ -102,14 +103,20 @@ message GroupInfo{
     string name = 2;
     string description = 3;
     string background_picture = 4;
+    int64 leader_id = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
 
-    // current number of active challenges in group
-    // paticipate in event?
-    // number of member
-    // date created
-    // last updated
-    // leader id?
-    // join status of user request: pending, rejected, ...
+    //Member status of current user with this group
+    Member.Status member_status = 8;
+
+    //number active
+    int64 num_of_members = 9;
+    int64 num_of_challenge = 10;
+
+
+    //waiting until event service implemented
+    int64 num_of_event_participated = 11;
 }
 
 message GetGroupRequest{
@@ -173,11 +180,10 @@ message Member{
         MEMBER_STATUS_BANNED = 2;
         MEMBER_STATUS_ACTIVE = 3;
         MEMBER_STATUS_REJECTED = 4;
-
-
-    }
-
 }
+}
+
+
 
 message ChallengeInfo{
     int64 id = 1;

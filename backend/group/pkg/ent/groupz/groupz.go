@@ -19,6 +19,8 @@ const (
 	FieldBackgroundPicture = "background_picture"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// FieldLeaderID holds the string denoting the leader_id field in the database.
 	FieldLeaderID = "leader_id"
 	// EdgeMembers holds the string denoting the members edge name in mutations.
@@ -50,6 +52,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldBackgroundPicture,
 	FieldCreatedAt,
+	FieldUpdatedAt,
 	FieldLeaderID,
 }
 
@@ -68,4 +71,8 @@ var (
 	DefaultBackgroundPicture string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 )

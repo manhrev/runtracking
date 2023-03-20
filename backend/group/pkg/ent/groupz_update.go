@@ -99,6 +99,12 @@ func (gu *GroupzUpdate) SetNillableCreatedAt(t *time.Time) *GroupzUpdate {
 	return gu
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (gu *GroupzUpdate) SetUpdatedAt(t time.Time) *GroupzUpdate {
+	gu.mutation.SetUpdatedAt(t)
+	return gu
+}
+
 // SetLeaderID sets the "leader_id" field.
 func (gu *GroupzUpdate) SetLeaderID(i int64) *GroupzUpdate {
 	gu.mutation.ResetLeaderID()
@@ -191,6 +197,7 @@ func (gu *GroupzUpdate) RemoveChallenges(c ...*Challenge) *GroupzUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (gu *GroupzUpdate) Save(ctx context.Context) (int, error) {
+	gu.defaults()
 	return withHooks[int, GroupzMutation](ctx, gu.sqlSave, gu.mutation, gu.hooks)
 }
 
@@ -213,6 +220,14 @@ func (gu *GroupzUpdate) Exec(ctx context.Context) error {
 func (gu *GroupzUpdate) ExecX(ctx context.Context) {
 	if err := gu.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (gu *GroupzUpdate) defaults() {
+	if _, ok := gu.mutation.UpdatedAt(); !ok {
+		v := groupz.UpdateDefaultUpdatedAt()
+		gu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -257,6 +272,9 @@ func (gu *GroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := gu.mutation.CreatedAt(); ok {
 		_spec.SetField(groupz.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := gu.mutation.UpdatedAt(); ok {
+		_spec.SetField(groupz.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := gu.mutation.LeaderID(); ok {
 		_spec.SetField(groupz.FieldLeaderID, field.TypeInt64, value)
@@ -462,6 +480,12 @@ func (guo *GroupzUpdateOne) SetNillableCreatedAt(t *time.Time) *GroupzUpdateOne 
 	return guo
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (guo *GroupzUpdateOne) SetUpdatedAt(t time.Time) *GroupzUpdateOne {
+	guo.mutation.SetUpdatedAt(t)
+	return guo
+}
+
 // SetLeaderID sets the "leader_id" field.
 func (guo *GroupzUpdateOne) SetLeaderID(i int64) *GroupzUpdateOne {
 	guo.mutation.ResetLeaderID()
@@ -561,6 +585,7 @@ func (guo *GroupzUpdateOne) Select(field string, fields ...string) *GroupzUpdate
 
 // Save executes the query and returns the updated Groupz entity.
 func (guo *GroupzUpdateOne) Save(ctx context.Context) (*Groupz, error) {
+	guo.defaults()
 	return withHooks[*Groupz, GroupzMutation](ctx, guo.sqlSave, guo.mutation, guo.hooks)
 }
 
@@ -583,6 +608,14 @@ func (guo *GroupzUpdateOne) Exec(ctx context.Context) error {
 func (guo *GroupzUpdateOne) ExecX(ctx context.Context) {
 	if err := guo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (guo *GroupzUpdateOne) defaults() {
+	if _, ok := guo.mutation.UpdatedAt(); !ok {
+		v := groupz.UpdateDefaultUpdatedAt()
+		guo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -644,6 +677,9 @@ func (guo *GroupzUpdateOne) sqlSave(ctx context.Context) (_node *Groupz, err err
 	}
 	if value, ok := guo.mutation.CreatedAt(); ok {
 		_spec.SetField(groupz.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := guo.mutation.UpdatedAt(); ok {
+		_spec.SetField(groupz.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := guo.mutation.LeaderID(); ok {
 		_spec.SetField(groupz.FieldLeaderID, field.TypeInt64, value)

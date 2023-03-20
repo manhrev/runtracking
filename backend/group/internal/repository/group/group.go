@@ -89,9 +89,13 @@ func (m *groupImpl) List(ctx context.Context,
 
 	switch filterBy {
 	case api.ListGroupRequest_FILTER_BY_IS_MEMBER:
-		query.Where(group.HasMembersWith(member.UserIDEQ(userId), member.StatusEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE))))
+		query.Where(group.Or(
+			group.HasMembersWith(member.UserIDEQ(userId), member.StatusEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE))),
+			group.LeaderIDEQ(userId)))
 	case api.ListGroupRequest_FILTER_BY_IS_NOT_MEMBER:
-		query.Where(group.HasMembersWith(member.UserIDNEQ(userId), member.StatusNEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE))))
+		query.Where(group.Not(group.Or(group.HasMembersWith(member.UserIDEQ(userId), member.StatusEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE))), group.LeaderIDEQ(userId))))
+	case api.ListGroupRequest_FILTER_BY_IS_ADMIN:
+		query.Where(group.LeaderIDEQ(userId))
 	}
 
 	// sort by type
@@ -128,6 +132,14 @@ func (m *groupImpl) List(ctx context.Context,
 		query.Offset(0)
 	}
 
+	// count member active of group
+	query.WithMembers(func(mq *ent.MemberQuery) {
+		mq.Where(member.StatusEQ(uint32(api.Member_MEMBER_STATUS_ACTIVE)))
+	})
+
+	// count challenge of group
+	query.WithChallenges()
+
 	groups, err := query.All(ctx)
 	if err != nil {
 		return nil, 0, status.Internal(err.Error())
@@ -159,8 +171,11 @@ func (m *groupImpl) ListMember(ctx context.Context,
 		return nil, status.Internal(err.Error())
 	}
 
-	query := group.QueryMembers().
-		Where(member.StatusEQ(uint32(statusMember)))
+	query := group.QueryMembers()
+
+	if statusMember != api.Member_MEMBER_STATUS_UNSPECIFIED {
+		query.Where(member.StatusEQ(uint32(statusMember)))
+	}
 
 	members, err := query.All(ctx)
 	if err != nil {

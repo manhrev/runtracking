@@ -78,6 +78,20 @@ func (gc *GroupzCreate) SetNillableCreatedAt(t *time.Time) *GroupzCreate {
 	return gc
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (gc *GroupzCreate) SetUpdatedAt(t time.Time) *GroupzCreate {
+	gc.mutation.SetUpdatedAt(t)
+	return gc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (gc *GroupzCreate) SetNillableUpdatedAt(t *time.Time) *GroupzCreate {
+	if t != nil {
+		gc.SetUpdatedAt(*t)
+	}
+	return gc
+}
+
 // SetLeaderID sets the "leader_id" field.
 func (gc *GroupzCreate) SetLeaderID(i int64) *GroupzCreate {
 	gc.mutation.SetLeaderID(i)
@@ -163,6 +177,10 @@ func (gc *GroupzCreate) defaults() {
 		v := groupz.DefaultCreatedAt()
 		gc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		v := groupz.DefaultUpdatedAt()
+		gc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -172,6 +190,9 @@ func (gc *GroupzCreate) check() error {
 	}
 	if _, ok := gc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Groupz.created_at"`)}
+	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Groupz.updated_at"`)}
 	}
 	if _, ok := gc.mutation.LeaderID(); !ok {
 		return &ValidationError{Name: "leader_id", err: errors.New(`ent: missing required field "Groupz.leader_id"`)}
@@ -229,6 +250,10 @@ func (gc *GroupzCreate) createSpec() (*Groupz, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.CreatedAt(); ok {
 		_spec.SetField(groupz.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := gc.mutation.UpdatedAt(); ok {
+		_spec.SetField(groupz.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if value, ok := gc.mutation.LeaderID(); ok {
 		_spec.SetField(groupz.FieldLeaderID, field.TypeInt64, value)

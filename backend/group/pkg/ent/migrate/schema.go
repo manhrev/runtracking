@@ -94,6 +94,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "background_picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "leader_id", Type: field.TypeInt64},
 	}
 	// GroupzsTable holds the schema information for the "groupzs" table.
