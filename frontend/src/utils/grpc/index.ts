@@ -5,6 +5,7 @@ import Constants from 'expo-constants'
 import rpcActivityClient from './client/activity'
 import rpcNotificationClient from './client/notification'
 import rpcPlanClient from './client/plan'
+import rpcGroupClient from './client/group'
 
 export * from './abstract/gRPCClient'
 export * from './abstract/types'
@@ -30,8 +31,6 @@ const HOST = `http://${manifest?.debuggerHost
   .shift()
   ?.concat(':8080')}`
 
-console.log(HOST)
-
 const authConfig = {
   hostname: HOST,
   onError: onAuthError,
@@ -51,3 +50,4 @@ export const activityClient = new rpcActivityClient(activityConfig)
 export const authClient = new rpcAuthClient(authConfig)
 export const notificationClient = new rpcNotificationClient(notificationConfig)
 export const planClient = new rpcPlanClient(notificationConfig)
+export const groupClient = new rpcGroupClient(notificationConfig)

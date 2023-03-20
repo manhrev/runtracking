@@ -37,7 +37,8 @@ const slice = createSlice({
     builder.addCase(
       listMoreActivityInfoThunk.fulfilled,
       (state, { payload }) => {
-        const { response } = payload
+        const { error, response } = payload
+        if (error) return
         state.status = StatusEnum.SUCCEEDED
         state.activityList = state.activityList.concat(
           response?.activityListList || []

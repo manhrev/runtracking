@@ -11,11 +11,13 @@ import { AppTheme, useAppTheme } from '../../../../theme'
 interface GroupItemProps {
   hideTopDivider?: boolean
   showBottomDivider?: boolean
+  name: string
 }
 
 export default function GroupItem({
   hideTopDivider,
   showBottomDivider,
+  name,
 }: GroupItemProps) {
   const theme = useAppTheme()
 
@@ -27,7 +29,11 @@ export default function GroupItem({
         )}
         <View style={styles(theme).listItemContainer}>
           <View style={styles(theme).listItemTilte}>
-            <Avatar.Icon size={55} icon="camera" style={{ borderRadius: 10 }} />
+            <Avatar.Icon
+              size={55}
+              icon="account-group-outline"
+              style={{ borderRadius: 10 }}
+            />
             <View
               style={{
                 display: 'flex',
@@ -40,7 +46,7 @@ export default function GroupItem({
                   variant="titleMedium"
                   style={{ fontWeight: '700', marginBottom: 5 }}
                 >
-                  Group 1
+                  {name}
                 </Text>
                 <Text variant="bodyMedium">100 members</Text>
               </View>
@@ -51,7 +57,9 @@ export default function GroupItem({
                   flex: 1,
                 }}
               >
-                <Button mode="contained-tonal">Join</Button>
+                <Button mode="contained-tonal" onPress={() => {}}>
+                  Join
+                </Button>
               </View>
             </View>
           </View>

@@ -47,12 +47,13 @@ export default function ActivityList({
       })
     ).unwrap()
     if (response) {
-      if (response.activityListList.length >= 10) setCanLoadmore(true)
+      setCurrentOffset(0)
+      if (response.total > 10) setCanLoadmore(true)
       else setCanLoadmore(false)
     } else setCanLoadmore(false)
   }
   const fetchMore = async () => {
-    const res: any = await dispatch(
+    const { error, response } = await dispatch(
       listMoreActivityInfoThunk({
         activityType: activityType,
         ascending: false,
@@ -60,10 +61,10 @@ export default function ActivityList({
         offset: currentOffset + 10,
         sortBy: ActivitySortBy.ACTIVITY_SORT_BY_END_TIME,
       })
-    )
+    ).unwrap()
 
-    if (!res.payload.error) {
-      if (currentOffset + 20 > activityList.length) {
+    if (response) {
+      if (currentOffset + 20 > response.total) {
         setCanLoadmore(false)
       }
       setCurrentOffset(currentOffset + 10)
