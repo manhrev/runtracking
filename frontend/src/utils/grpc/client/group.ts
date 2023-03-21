@@ -6,6 +6,8 @@ import {
   GroupInfo,
   UpdateGroupRequest,
   UpdateGroupReply,
+  JoinGroupReply,
+  JoinGroupRequest,
 } from '../../../lib/group/group_pb'
 import { GRPCClientConfig } from '../abstract/types'
 import gRPCClientAbstract from '../abstract/gRPCClient'
@@ -59,6 +61,15 @@ class rpcGroupClient extends gRPCClientAbstract {
     req.setGroupinfo(newInfo)
     return await this.gRPCClientRequest<UpdateGroupReply.AsObject>(
       'updateGroup',
+      req
+    )
+  }
+  async joinGroup(param: JoinGroupRequest.AsObject) {
+    const req = new JoinGroupRequest()
+    req.setGroupId(param.groupId)
+
+    return await this.gRPCClientRequest<JoinGroupReply.AsObject>(
+      'joinGroup',
       req
     )
   }

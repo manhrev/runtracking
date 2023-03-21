@@ -2480,7 +2480,8 @@ proto.group.ListGroupRequest.serializeBinaryToWriter = function(message, writer)
 proto.group.ListGroupRequest.FilterBy = {
   FILTER_BY_UNSPECIFIED: 0,
   FILTER_BY_IS_MEMBER: 1,
-  FILTER_BY_IS_NOT_MEMBER: 2
+  FILTER_BY_IS_NOT_MEMBER: 2,
+  FILTER_BY_IS_ADMIN: 3
 };
 
 /**
@@ -2816,7 +2817,14 @@ proto.group.GroupInfo.toObject = function(includeInstance, msg) {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
     name: jspb.Message.getFieldWithDefault(msg, 2, ""),
     description: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    backgroundPicture: jspb.Message.getFieldWithDefault(msg, 4, "")
+    backgroundPicture: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    leaderId: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    memberStatus: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    numOfMembers: jspb.Message.getFieldWithDefault(msg, 9, 0),
+    numOfChallenge: jspb.Message.getFieldWithDefault(msg, 10, 0),
+    numOfEventParticipated: jspb.Message.getFieldWithDefault(msg, 11, 0)
   };
 
   if (includeInstance) {
@@ -2868,6 +2876,36 @@ proto.group.GroupInfo.deserializeBinaryFromReader = function(msg, reader) {
     case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setBackgroundPicture(value);
+      break;
+    case 5:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setLeaderId(value);
+      break;
+    case 6:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreatedAt(value);
+      break;
+    case 7:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setUpdatedAt(value);
+      break;
+    case 8:
+      var value = /** @type {!proto.group.Member.Status} */ (reader.readEnum());
+      msg.setMemberStatus(value);
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setNumOfMembers(value);
+      break;
+    case 10:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setNumOfChallenge(value);
+      break;
+    case 11:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setNumOfEventParticipated(value);
       break;
     default:
       reader.skipField();
@@ -2923,6 +2961,57 @@ proto.group.GroupInfo.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getLeaderId();
+  if (f !== 0) {
+    writer.writeInt64(
+      5,
+      f
+    );
+  }
+  f = message.getCreatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getUpdatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getMemberStatus();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      8,
+      f
+    );
+  }
+  f = message.getNumOfMembers();
+  if (f !== 0) {
+    writer.writeInt64(
+      9,
+      f
+    );
+  }
+  f = message.getNumOfChallenge();
+  if (f !== 0) {
+    writer.writeInt64(
+      10,
+      f
+    );
+  }
+  f = message.getNumOfEventParticipated();
+  if (f !== 0) {
+    writer.writeInt64(
+      11,
       f
     );
   }
@@ -2998,6 +3087,170 @@ proto.group.GroupInfo.prototype.getBackgroundPicture = function() {
  */
 proto.group.GroupInfo.prototype.setBackgroundPicture = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional int64 leader_id = 5;
+ * @return {number}
+ */
+proto.group.GroupInfo.prototype.getLeaderId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.group.GroupInfo} returns this
+ */
+proto.group.GroupInfo.prototype.setLeaderId = function(value) {
+  return jspb.Message.setProto3IntField(this, 5, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp created_at = 6;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.group.GroupInfo.prototype.getCreatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Timestamp|undefined} value
+ * @return {!proto.group.GroupInfo} returns this
+*/
+proto.group.GroupInfo.prototype.setCreatedAt = function(value) {
+  return jspb.Message.setWrapperField(this, 6, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.group.GroupInfo} returns this
+ */
+proto.group.GroupInfo.prototype.clearCreatedAt = function() {
+  return this.setCreatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.group.GroupInfo.prototype.hasCreatedAt = function() {
+  return jspb.Message.getField(this, 6) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp updated_at = 7;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.group.GroupInfo.prototype.getUpdatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Timestamp|undefined} value
+ * @return {!proto.group.GroupInfo} returns this
+*/
+proto.group.GroupInfo.prototype.setUpdatedAt = function(value) {
+  return jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.group.GroupInfo} returns this
+ */
+proto.group.GroupInfo.prototype.clearUpdatedAt = function() {
+  return this.setUpdatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.group.GroupInfo.prototype.hasUpdatedAt = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional Member.Status member_status = 8;
+ * @return {!proto.group.Member.Status}
+ */
+proto.group.GroupInfo.prototype.getMemberStatus = function() {
+  return /** @type {!proto.group.Member.Status} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/**
+ * @param {!proto.group.Member.Status} value
+ * @return {!proto.group.GroupInfo} returns this
+ */
+proto.group.GroupInfo.prototype.setMemberStatus = function(value) {
+  return jspb.Message.setProto3EnumField(this, 8, value);
+};
+
+
+/**
+ * optional int64 num_of_members = 9;
+ * @return {number}
+ */
+proto.group.GroupInfo.prototype.getNumOfMembers = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.group.GroupInfo} returns this
+ */
+proto.group.GroupInfo.prototype.setNumOfMembers = function(value) {
+  return jspb.Message.setProto3IntField(this, 9, value);
+};
+
+
+/**
+ * optional int64 num_of_challenge = 10;
+ * @return {number}
+ */
+proto.group.GroupInfo.prototype.getNumOfChallenge = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 10, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.group.GroupInfo} returns this
+ */
+proto.group.GroupInfo.prototype.setNumOfChallenge = function(value) {
+  return jspb.Message.setProto3IntField(this, 10, value);
+};
+
+
+/**
+ * optional int64 num_of_event_participated = 11;
+ * @return {number}
+ */
+proto.group.GroupInfo.prototype.getNumOfEventParticipated = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.group.GroupInfo} returns this
+ */
+proto.group.GroupInfo.prototype.setNumOfEventParticipated = function(value) {
+  return jspb.Message.setProto3IntField(this, 11, value);
 };
 
 

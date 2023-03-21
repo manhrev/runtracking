@@ -286,6 +286,7 @@ export namespace ListGroupRequest {
     FILTER_BY_UNSPECIFIED = 0,
     FILTER_BY_IS_MEMBER = 1,
     FILTER_BY_IS_NOT_MEMBER = 2,
+    FILTER_BY_IS_ADMIN = 3,
   }
 }
 
@@ -326,6 +327,31 @@ export class GroupInfo extends jspb.Message {
   getBackgroundPicture(): string;
   setBackgroundPicture(value: string): GroupInfo;
 
+  getLeaderId(): number;
+  setLeaderId(value: number): GroupInfo;
+
+  getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): GroupInfo;
+  hasCreatedAt(): boolean;
+  clearCreatedAt(): GroupInfo;
+
+  getUpdatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setUpdatedAt(value?: google_protobuf_timestamp_pb.Timestamp): GroupInfo;
+  hasUpdatedAt(): boolean;
+  clearUpdatedAt(): GroupInfo;
+
+  getMemberStatus(): Member.Status;
+  setMemberStatus(value: Member.Status): GroupInfo;
+
+  getNumOfMembers(): number;
+  setNumOfMembers(value: number): GroupInfo;
+
+  getNumOfChallenge(): number;
+  setNumOfChallenge(value: number): GroupInfo;
+
+  getNumOfEventParticipated(): number;
+  setNumOfEventParticipated(value: number): GroupInfo;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GroupInfo.AsObject;
   static toObject(includeInstance: boolean, msg: GroupInfo): GroupInfo.AsObject;
@@ -340,6 +366,13 @@ export namespace GroupInfo {
     name: string,
     description: string,
     backgroundPicture: string,
+    leaderId: number,
+    createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    memberStatus: Member.Status,
+    numOfMembers: number,
+    numOfChallenge: number,
+    numOfEventParticipated: number,
   }
 }
 
