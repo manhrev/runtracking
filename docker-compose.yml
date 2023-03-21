@@ -4,210 +4,209 @@ services:
   gateway:
     build:
       context: backend/gateway
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dep
     container_name: gateway
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 8080:8080
+  # auth:
+  #   build:
+  #     context: backend/auth
+  #     dockerfile: Dockerfile
+  #   container_name: auth
+  #   volumes:
+  #     - ./backend/auth:/app
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   depends_on:
+  #     - auth_db
+  #     - redis
+  #   environment:
+  #     LISTEN_PORT: 8080
+  #     DB_USERNAME: root
+  #     DB_PASSWORD: password@1
+  #     DB_HOST: auth_db
+  #     DB_PORT: 3306
+  #     DB_NAME: auth
+  #     NOTIFICATION_SERVICE: notification
+  #     NOTIFICATION_PORT: 8080
+  #     CACHE_HOST: redis
+  #     CACHE_PORT: 6379
+  #     CACHE_PASSWORD: ""
+  #     CACHE_DB: 0
 
-  auth:
-    build:
-      context: backend/auth
-      dockerfile: Dockerfile
-    container_name: auth
-    volumes:
-      - ./backend/auth:/app
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    depends_on:
-      - auth_db
-      - redis
-    environment:
-      LISTEN_PORT: 8080
-      DB_USERNAME: root
-      DB_PASSWORD: password@1
-      DB_HOST: auth_db
-      DB_PORT: 3306
-      DB_NAME: auth
-      NOTIFICATION_SERVICE: notification
-      NOTIFICATION_PORT: 8080
-      CACHE_HOST: redis
-      CACHE_PORT: 6379
-      CACHE_PASSWORD: ""
-      CACHE_DB: 0
+  # group:
+  #   build:
+  #     context: backend/group
+  #     dockerfile: Dockerfile
+  #   container_name: group
+  #   volumes:
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   depends_on:
+  #     - group_db
+  #   environment:
+  #     LISTEN_PORT: 8080
+  #     DB_USERNAME: root
+  #     DB_PASSWORD: password@1
+  #     DB_HOST: group_db
+  #     DB_PORT: 3306
+  #     DB_NAME: group
 
-  group:
-    build:
-      context: backend/group
-      dockerfile: Dockerfile
-    container_name: group
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    depends_on:
-      - group_db
-    environment:
-      LISTEN_PORT: 8080
-      DB_USERNAME: root
-      DB_PASSWORD: password@1
-      DB_HOST: group_db
-      DB_PORT: 3306
-      DB_NAME: group
+  # activity:
+  #   build:
+  #     context: backend/activity
+  #     dockerfile: Dockerfile
+  #   container_name: activity
+  #   volumes:
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   depends_on:
+  #     - activity_db
+  #   environment:
+  #     LISTEN_PORT: 8080
+  #     DB_USERNAME: root
+  #     DB_PASSWORD: password@1
+  #     DB_HOST: activity_db
+  #     DB_PORT: 3306
+  #     DB_NAME: activity
+  #     PLANI_DOMAIN: plan
+  #     PLANI_PORT: 8080
 
-  activity:
-    build:
-      context: backend/activity
-      dockerfile: Dockerfile
-    container_name: activity
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    depends_on:
-      - activity_db
-    environment:
-      LISTEN_PORT: 8080
-      DB_USERNAME: root
-      DB_PASSWORD: password@1
-      DB_HOST: activity_db
-      DB_PORT: 3306
-      DB_NAME: activity
-      PLANI_DOMAIN: plan
-      PLANI_PORT: 8080
+  # notification:
+  #   build:
+  #     context: backend/notification
+  #     dockerfile: Dockerfile
+  #   container_name: notification
+  #   volumes:
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   depends_on:
+  #     - notification_db
+  #   ports:
+  #     - 8000:8000
+  #   environment:
+  #     LISTEN_PORT: 8080
+  #     LISTEN_HTTP_PORT: 8000
+  #     DB_USERNAME: root
+  #     DB_PASSWORD: password@1
+  #     DB_HOST: notification_db
+  #     DB_PORT: 3306
+  #     DB_NAME: notification
+  #     AUTH_SERVICE: auth
+  #     AUTH_PORT: 8080
+  #     GCP_CLOUD_TASK_HOST: gcloud-tasks-emulator
+  #     GCP_CLOUD_TASK_PORT: 8123
+  #     GCP_CLOUD_TASK_PROJECT_ID: daring-acumen-370401
+  #     GCP_CLOUD_TASK_LOCATION_ID: asia-southeast2
+  #     GCP_CLOUD_TASK_QUEUE_ID: test-queue1
 
-  notification:
-    build:
-      context: backend/notification
-      dockerfile: Dockerfile
-    container_name: notification
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    depends_on:
-      - notification_db
-    ports:
-      - 8000:8000
-    environment:
-      LISTEN_PORT: 8080
-      LISTEN_HTTP_PORT: 8000
-      DB_USERNAME: root
-      DB_PASSWORD: password@1
-      DB_HOST: notification_db
-      DB_PORT: 3306
-      DB_NAME: notification
-      AUTH_SERVICE: auth
-      AUTH_PORT: 8080
-      GCP_CLOUD_TASK_HOST: gcloud-tasks-emulator
-      GCP_CLOUD_TASK_PORT: 8123
-      GCP_CLOUD_TASK_PROJECT_ID: daring-acumen-370401
-      GCP_CLOUD_TASK_LOCATION_ID: asia-southeast2
-      GCP_CLOUD_TASK_QUEUE_ID: test-queue1
+  # plan:
+  #   build:
+  #     context: backend/plan
+  #     dockerfile: Dockerfile
+  #   container_name: plan
+  #   volumes:
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   depends_on:
+  #     - plan_db
+  #   ports:
+  #     - 8081:8080
+  #   environment:
+  #     LISTEN_PORT: 8080
+  #     DB_USERNAME: root
+  #     DB_PASSWORD: password@1
+  #     DB_HOST: plan_db
+  #     DB_PORT: 3306
+  #     DB_NAME: plan
+  #     NOTIFICATIONI_DOMAIN: notification
+  #     NOTIFICATIONI_PORT: 8080
 
-  plan:
-    build:
-      context: backend/plan
-      dockerfile: Dockerfile
-    container_name: plan
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    depends_on:
-      - plan_db
-    ports:
-      - 8081:8080
-    environment:
-      LISTEN_PORT: 8080
-      DB_USERNAME: root
-      DB_PASSWORD: password@1
-      DB_HOST: plan_db
-      DB_PORT: 3306
-      DB_NAME: plan
-      NOTIFICATIONI_DOMAIN: notification
-      NOTIFICATIONI_PORT: 8080
+  # gcloud-tasks-emulator:
+  #   image: ghcr.io/aertje/cloud-tasks-emulator:latest
+  #   command: -host 0.0.0.0 -port 8123 -queue "projects/daring-acumen-370401/locations/asia-southeast2/queues/test-queue1"
+  #   ports:
+  #     - "${TASKS_PORT:-8123}:8123"
+  #   environment:
+  #     APP_ENGINE_EMULATOR_HOST: http://localhost:8080
+  #   volumes:
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
 
-  gcloud-tasks-emulator:
-    image: ghcr.io/aertje/cloud-tasks-emulator:latest
-    command: -host 0.0.0.0 -port 8123 -queue "projects/daring-acumen-370401/locations/asia-southeast2/queues/test-queue1"
-    ports:
-      - "${TASKS_PORT:-8123}:8123"
-    environment:
-      APP_ENGINE_EMULATOR_HOST: http://localhost:8080
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   volumes:
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   ports:
+  #     - "6379:6379"
+  #   # restart: always
 
-  redis:
-    image: redis:latest
-    container_name: redis
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    ports:
-      - "6379:6379"
-    # restart: always
+  # auth_db:
+  #   image: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password@1
+  #     MYSQL_DATABASE: auth
+  #   container_name: 'db-auth'
+  #   volumes:
+  #     - "./tmp/db/auth:/var/lib/mysql"
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   ports:
+  #     - 33306:3306
 
-  auth_db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password@1
-      MYSQL_DATABASE: auth
-    container_name: 'db-auth'
-    volumes:
-      - "./tmp/db/auth:/var/lib/mysql"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    ports:
-      - 33306:3306
+  # group_db:
+  #   image: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password@1
+  #     MYSQL_DATABASE: group
+  #   container_name: 'db-group'
+  #   volumes:
+  #     - "./tmp/db/group:/var/lib/mysql"
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   ports:
+  #     - 33307:3306
 
-  group_db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password@1
-      MYSQL_DATABASE: group
-    container_name: 'db-group'
-    volumes:
-      - "./tmp/db/group:/var/lib/mysql"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    ports:
-      - 33307:3306
+  # activity_db:
+  #   image: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password@1
+  #     MYSQL_DATABASE: activity
+  #   container_name: 'db-activity'
+  #   volumes:
+  #     - "./tmp/db/activity:/var/lib/mysql"
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   ports:
+  #     - 33308:3306
 
-  activity_db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password@1
-      MYSQL_DATABASE: activity
-    container_name: 'db-activity'
-    volumes:
-      - "./tmp/db/activity:/var/lib/mysql"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    ports:
-      - 33308:3306
+  # notification_db:
+  #   image: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password@1
+  #     MYSQL_DATABASE: notification
+  #   container_name: 'db-notification'
+  #   volumes:
+  #     - "./tmp/db/notification:/var/lib/mysql"
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   ports:
+  #     - 33309:3306
 
-  notification_db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password@1
-      MYSQL_DATABASE: notification
-    container_name: 'db-notification'
-    volumes:
-      - "./tmp/db/notification:/var/lib/mysql"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    ports:
-      - 33309:3306
-
-  plan_db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password@1
-      MYSQL_DATABASE: plan
-    container_name: 'db-plan'
-    volumes:
-      - "./tmp/db/plan:/var/lib/mysql"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-    ports:
-      - 33310:3306
+  # plan_db:
+  #   image: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password@1
+  #     MYSQL_DATABASE: plan
+  #   container_name: 'db-plan'
+  #   volumes:
+  #     - "./tmp/db/plan:/var/lib/mysql"
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #     - "/etc/timezone:/etc/timezone:ro"
+  #   ports:
+  #     - 33310:3306
