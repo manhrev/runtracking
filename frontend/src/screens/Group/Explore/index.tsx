@@ -132,6 +132,11 @@ export default function Explore({
                 name={group.name}
                 hideTopDivider={idx === 0}
                 showBottomDivider={idx === groupList.length - 1}
+                navigateFunc={() => {
+                  navigation.navigate('GroupDetail', {
+                    groupInfo: group,
+                  })
+                }}
               />
             )
           })}
