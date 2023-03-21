@@ -15,11 +15,15 @@ import PlanAdd from '../screens/Plan/PlanAdd'
 import RunCommit from '../screens/Run/RunCommit'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
 import { TrackPoint, ActivityType } from '../lib/activity/activity_pb'
+import { GroupInfo } from '../lib/group/group_pb'
 import { useAppDispatch, useAppSelector } from '../redux/store'
 import { selectUserSlice } from '../redux/features/user/slice'
 import { useEffect } from 'react'
 import { getMeThunk } from '../redux/features/user/thunk'
 import NotificationList from '../screens/Profile/NotificationList'
+import GroupAdd from '../screens/Group/YourGroups/GroupAdd'
+import GroupDetail from '../screens/Group/YourGroups/GroupDetail'
+import GroupEdit from '../screens/Group/YourGroups/GroupEdit'
 import { toast } from '../utils/toast/toast'
 
 export type RootBaseStackParamList = {
@@ -77,6 +81,15 @@ export type RootBaseStackParamList = {
   Signup: undefined
   Intro: undefined
   GetInfo: undefined
+
+  // Group
+  GroupAdd: undefined
+  GroupDetail: {
+    groupInfo: GroupInfo.AsObject
+  }
+  GroupEdit: {
+    groupInfo: GroupInfo.AsObject
+  }
 }
 
 const Stack = createNativeStackNavigator<RootBaseStackParamList>()
@@ -177,6 +190,30 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={NotificationList}
+          />
+          <Stack.Screen
+            name="GroupAdd"
+            options={{
+              title: 'Add New Group',
+              headerBackVisible: true,
+            }}
+            component={GroupAdd}
+          />
+          <Stack.Screen
+            name="GroupDetail"
+            options={{
+              title: 'Group Detail',
+              headerBackVisible: true,
+            }}
+            component={GroupDetail}
+          />
+          <Stack.Screen
+            name="GroupEdit"
+            options={{
+              title: 'Group Edit',
+              headerBackVisible: true,
+            }}
+            component={GroupEdit}
           />
         </>
       ) : (
