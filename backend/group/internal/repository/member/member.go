@@ -43,7 +43,6 @@ type Member interface {
 	ListMemberByUserId(
 		ctx context.Context,
 		userId int64,
-		memberStatus group.Member_Status,
 	) ([]*ent.Member, error)
 }
 type memberImpl struct {
@@ -148,10 +147,9 @@ func (m *memberImpl) Delete(
 func (m *memberImpl) ListMemberByUserId(
 	ctx context.Context,
 	userId int64,
-	memberStatus group.Member_Status,
 ) ([]*ent.Member, error) {
 	members, err := m.entClient.Member.Query().
-		Where(member.UserIDEQ(userId), member.StatusEQ(uint32(memberStatus))).
+		Where(member.UserIDEQ(userId)).
 		WithGroupz().
 		All(ctx)
 
