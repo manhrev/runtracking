@@ -192,7 +192,7 @@ func (m *groupImpl) Update(ctx context.Context, userId int64, groupInfo *grouppb
 		return status.Internal("User is not an admin of group")
 	}
 
-	return m.repository.Group.Update(ctx, groupInfo)
+	return m.repository.Group.Update(ctx, userId, groupInfo)
 }
 
 func (m *groupImpl) Delete(ctx context.Context, userId int64, groupId int64) error {
