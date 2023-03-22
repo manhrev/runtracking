@@ -30,7 +30,7 @@ type Group interface {
 	) ([]*ent.Groupz, int64, error)
 	Get(ctx context.Context, groupId int64) (*ent.Groupz, error)
 	Delete(ctx context.Context, userId int64, groupId int64) error
-	Update(ctx context.Context, groupInfo *grouppb.GroupInfo) error
+	Update(ctx context.Context, userId int64, groupInfo *grouppb.GroupInfo) error
 	ListMember(ctx context.Context,
 		groupId int64,
 		status api.Member_Status) ([]*ent.Member, error)
@@ -148,12 +148,12 @@ func (m *groupImpl) List(ctx context.Context,
 	return groups, int64(total), nil
 }
 
-func (m *groupImpl) Update(ctx context.Context, groupInfo *grouppb.GroupInfo) error {
+func (m *groupImpl) Update(ctx context.Context, userId int64, groupInfo *grouppb.GroupInfo) error {
 	err := m.entClient.Groupz.UpdateOneID(groupInfo.GetId()).
 		SetBackgroundPicture(groupInfo.GetBackgroundPicture()).
 		SetDescription(groupInfo.GetDescription()).
 		SetName(groupInfo.GetName()).
-		SetLeaderID(groupInfo.GetId()).
+		SetLeaderID(userId).
 		Exec(ctx)
 
 	if err != nil {
