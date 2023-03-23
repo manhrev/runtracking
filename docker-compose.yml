@@ -4,7 +4,7 @@ services:
   gateway:
     build:
       context: backend/gateway
-      dockerfile: Dockerfile.dep
+      dockerfile: Dockerfile
     container_name: gateway
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
@@ -56,8 +56,7 @@ services:
       DB_NAME: group
       AUTH_SERVICE: auth
       AUTH_PORT: 8080
-    
-  
+
   activity:
     build:
       context: backend/activity
