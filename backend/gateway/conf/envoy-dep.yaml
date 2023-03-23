@@ -25,16 +25,20 @@ static_resources:
                         allow_origin_string_match:
                           - prefix: "*"
                         allow_methods: GET, PUT, DELETE, POST, OPTIONS
-                        allow_headers: authorization,keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
+                        allow_headers: authorization,oauth,keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout,cookie
                         max_age: "1728000"
                         expose_headers: grpc-status,grpc-message
+                      response_headers_to_add:
+                        - append: false
+                          header:
+                            key: x-request-id
+                            value: "%REQ(X-REQUEST-ID)%"
                       routes:
                         - match:
                             prefix: /auth.Auth/Login
                           route:
                             cluster: auth_cluster
                             timeout: 0s
-                            auto_host_rewrite: true
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
 
@@ -47,7 +51,6 @@ static_resources:
                           route:
                             cluster: auth_cluster
                             timeout: 0s
-                            auto_host_rewrite: true
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
                           typed_per_filter_config:
@@ -56,11 +59,10 @@ static_resources:
                               disabled: true
 
                         - match:
-                            prefix: /auth.
+                            prefix: /auth
                           route:
                             cluster: auth_cluster
                             timeout: 0s
-                            auto_host_rewrite: true
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
 
@@ -103,19 +105,23 @@ static_resources:
                       grpc_service:
                         envoy_grpc:
                           cluster_name: auth_cluster
-
-                        timeout: 0.250s
-                      include_peer_certificate: true
-                      failure_mode_allow: false
+                        timeout: 5s
                       transport_api_version: V3
+                      failure_mode_allow: false
                   - name: envoy.filters.http.router
 
   clusters:
     - name: auth_cluster
       connect_timeout: 1s
-      type: logical_dns
+      type: STRICT_DNS
       http2_protocol_options: {}
       lb_policy: round_robin
+      dns_lookup_family: V4_ONLY
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+
       load_assignment:
         cluster_name: auth_cluster
         endpoints:
@@ -123,19 +129,11 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: auth-jzg35jprna-as.a.run.app
+                      address: 35.213.159.197
                       port_value: 443
-      dns_lookup_family: V4_ONLY
-      transport_socket:
-        name: envoy.transport_sockets.tls
-        typed_config:
-          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
-          common_tls_context:
-            alpn_protocols: h2
-          sni: auth-jzg35jprna-as.a.run.app
 
-    # - name: group_cluster
-    #   connect_timeout: 1s
+      # - name: group_cluster
+      #   connect_timeout: 1s
     #   type: logical_dns
     #   http2_protocol_options: {}
     #   lb_policy: round_robin
