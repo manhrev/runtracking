@@ -132,7 +132,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.plan.ListPlanRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.plan.ListPlanRequest.repeatedFields_, null);
 };
 goog.inherits(proto.plan.ListPlanRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -1465,6 +1465,13 @@ proto.plan.PlanInfo.prototype.setStatus = function(value) {
 
 
 
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.plan.ListPlanRequest.repeatedFields_ = [8];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -1502,7 +1509,8 @@ proto.plan.ListPlanRequest.toObject = function(includeInstance, msg) {
     sortBy: jspb.Message.getFieldWithDefault(msg, 4, 0),
     activityType: jspb.Message.getFieldWithDefault(msg, 5, 0),
     from: (f = msg.getFrom()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    to: (f = msg.getTo()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
+    to: (f = msg.getTo()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    idsList: (f = jspb.Message.getRepeatedField(msg, 8)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -1568,6 +1576,12 @@ proto.plan.ListPlanRequest.deserializeBinaryFromReader = function(msg, reader) {
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setTo(value);
+      break;
+    case 8:
+      var values = /** @type {!Array<number>} */ (reader.isDelimited() ? reader.readPackedInt64() : [reader.readInt64()]);
+      for (var i = 0; i < values.length; i++) {
+        msg.addIds(values[i]);
+      }
       break;
     default:
       reader.skipField();
@@ -1647,6 +1661,13 @@ proto.plan.ListPlanRequest.serializeBinaryToWriter = function(message, writer) {
       7,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getIdsList();
+  if (f.length > 0) {
+    writer.writePackedInt64(
+      8,
+      f
     );
   }
 };
@@ -1813,6 +1834,43 @@ proto.plan.ListPlanRequest.prototype.clearTo = function() {
  */
 proto.plan.ListPlanRequest.prototype.hasTo = function() {
   return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * repeated int64 ids = 8;
+ * @return {!Array<number>}
+ */
+proto.plan.ListPlanRequest.prototype.getIdsList = function() {
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 8));
+};
+
+
+/**
+ * @param {!Array<number>} value
+ * @return {!proto.plan.ListPlanRequest} returns this
+ */
+proto.plan.ListPlanRequest.prototype.setIdsList = function(value) {
+  return jspb.Message.setField(this, 8, value || []);
+};
+
+
+/**
+ * @param {number} value
+ * @param {number=} opt_index
+ * @return {!proto.plan.ListPlanRequest} returns this
+ */
+proto.plan.ListPlanRequest.prototype.addIds = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 8, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.plan.ListPlanRequest} returns this
+ */
+proto.plan.ListPlanRequest.prototype.clearIdsList = function() {
+  return this.setIdsList([]);
 };
 
 

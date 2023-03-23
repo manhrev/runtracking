@@ -6,25 +6,27 @@ import {
   Text,
   TouchableRipple,
 } from 'react-native-paper'
+import { GroupInfo } from '../../../../lib/group/group_pb'
 import { AppTheme, useAppTheme } from '../../../../theme'
 
 interface GroupItemProps {
   hideTopDivider?: boolean
   showBottomDivider?: boolean
+  group: GroupInfo.AsObject
 }
 
 export default function GroupItem({
   hideTopDivider,
   showBottomDivider,
+  group,
 }: GroupItemProps) {
   const theme = useAppTheme()
+  const { name, numOfMembers } = group
 
   return (
     <TouchableRipple style={{ borderRadius: 10 }} onPress={() => {}} borderless>
       <View>
-        {!hideTopDivider && (
-          <Divider bold style={{ width: '80%', alignSelf: 'flex-end' }} />
-        )}
+        {!hideTopDivider && <Divider />}
         <View style={styles(theme).listItemContainer}>
           <View style={styles(theme).listItemTilte}>
             <Avatar.Icon size={55} icon="camera" style={{ borderRadius: 10 }} />
@@ -40,11 +42,11 @@ export default function GroupItem({
                   variant="titleMedium"
                   style={{ fontWeight: '700', marginBottom: 5 }}
                 >
-                  Group 1
+                  {name}
                 </Text>
-                <Text variant="bodyMedium">100 members</Text>
+                <Text variant="bodyMedium">{numOfMembers} members</Text>
               </View>
-              <View
+              {/* <View
                 style={{
                   justifyContent: 'center',
                   alignItems: 'flex-end',
@@ -52,13 +54,11 @@ export default function GroupItem({
                 }}
               >
                 <Button mode="contained-tonal">Join</Button>
-              </View>
+              </View> */}
             </View>
           </View>
         </View>
-        {showBottomDivider && (
-          <Divider bold style={{ width: '80%', alignSelf: 'flex-end' }} />
-        )}
+        {showBottomDivider && <Divider />}
       </View>
     </TouchableRipple>
   )

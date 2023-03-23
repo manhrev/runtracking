@@ -1,4 +1,4 @@
-import { Dimensions, ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 import { useState } from 'react'
 import { Button, Text, TextInput, RadioButton } from 'react-native-paper'
 import { Dropdown } from 'react-native-element-dropdown'
@@ -175,6 +175,7 @@ export default function PlanAdd({
         limit: 100,
         offset: 0,
         sortBy: 1,
+        idsList: [],
       })
     ).unwrap()
     if (!error) {

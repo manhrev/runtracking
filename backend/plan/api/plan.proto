@@ -90,6 +90,7 @@ message ListPlanRequest {
     ActivityType activity_type = 5; // only get activity with this type, to get all, pass ACTIVITY_TYPE_UNSPECIFIED
     google.protobuf.Timestamp from = 6;
     google.protobuf.Timestamp to = 7;
+    repeated int64 ids = 8;
 }
 
 message ListPlanReply {

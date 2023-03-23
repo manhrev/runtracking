@@ -3,7 +3,13 @@ import { GroupInfo } from '../../../lib/group/group_pb'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
-import { createGroupThunk, updateGroupThunk, deleteGroupThunk, listGroupExploreThunk, listMoreGroupExploreThunk } from './thunk'
+import {
+  createGroupThunk,
+  updateGroupThunk,
+  deleteGroupThunk,
+  listGroupExploreThunk,
+  listMoreGroupExploreThunk,
+} from './thunk'
 
 type GroupListState = {
   groupList: Array<GroupInfo.AsObject>

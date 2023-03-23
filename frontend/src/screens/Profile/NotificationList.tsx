@@ -1,24 +1,22 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
-import { Card, List, TouchableRipple, Text, Button } from 'react-native-paper'
+import { Button } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
 import {
   isNotificationListLoading,
   selectNotificationList,
 } from '../../redux/features/notification/slice'
 import {
-  listLastNotificationInfoThunk,
   listMoreNotificationInfoThunk,
   listNotificationInfoThunk,
 } from '../../redux/features/notification/thunk'
-import { selectUserSlice } from '../../redux/features/user/slice'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
 import NotificationListItem from './comp/NotificationListItem'
-import * as Notifications from 'expo-notifications'
-import { Subscription } from 'expo-modules-core'
 import { useFocusEffect } from '@react-navigation/native'
+import { baseStyles } from '../baseStyle'
+import { RefreshControl } from 'react-native-gesture-handler'
 
 export default function NotificationList({
   navigation,
@@ -46,47 +44,58 @@ export default function NotificationList({
   }
 
   const fetchMore = async () => {
-    const res: any = await dispatch(
+    const { response } = await dispatch(
       listMoreNotificationInfoThunk({
         limit: 10,
         offset: offset + 10,
       })
-    )
+    ).unwrap()
 
-    if (!res.payload.error) {
+    if (response) {
       if (offset + 10 > notificationList.length) {
         setCanLoadmore(false)
       }
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchNotificationList()
-    }, [])
-  )
+  useEffect(() => {
+    fetchNotificationList()
+  }, [])
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      {notificationList.map((notification) => {
-        return (
-          <NotificationListItem
-            key={notification.id}
-            notificationInfo={notification}
-          />
-        )
-      })}
+    <View style={baseStyles(theme).container}>
+      <View style={baseStyles(theme).innerWrapper}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={fetchNotificationList}
+            />
+          }
+        >
+          {notificationList.map((notification) => {
+            return (
+              <NotificationListItem
+                key={notification.id}
+                notificationInfo={notification}
+                navigation={navigation}
+              />
+            )
+          })}
 
-      <Button
-        style={{ marginTop: 10, marginBottom: 60 }}
-        mode="elevated"
-        onPress={fetchMore}
-        loading={isLoading}
-        disabled={!canLoadmore}
-      >
-        Load more
-      </Button>
-    </ScrollView>
+          <Button
+            style={{ marginTop: 10, marginBottom: 20 }}
+            mode="elevated"
+            onPress={fetchMore}
+            loading={isLoading}
+            disabled={!canLoadmore}
+          >
+            Load more
+          </Button>
+        </ScrollView>
+      </View>
+    </View>
   )
 }
 

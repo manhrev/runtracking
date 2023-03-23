@@ -1,13 +1,12 @@
-import { Dimensions, ScrollView, StyleSheet, View } from 'react-native'
-import { Button, IconButton, SegmentedButtons, Text } from 'react-native-paper'
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
+import { Button, Text } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import UpperRightMenu from '../../comp/UpperRightMenu'
 import { useFocusEffect, useIsFocused } from '@react-navigation/native'
 
 import { baseStyles } from '../baseStyle'
-import { BarChart } from 'react-native-chart-kit'
 import ActivityListItem from './comp/ActivityListItem'
 import { RootHomeTabsParamList } from '../../navigators/HomeTab'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
@@ -19,9 +18,6 @@ import {
 } from '../../redux/features/activityList/slice'
 import { useSelector } from 'react-redux'
 import StatisticSection from './comp/StatisticSection'
-import { getMeThunk } from '../../redux/features/user/thunk'
-
-const windowWidth = Dimensions.get('window').width
 
 export default function Activity({
   navigation,
@@ -30,7 +26,7 @@ export default function Activity({
   const dispatch = useAppDispatch()
   const theme = useAppTheme()
   const isFocused = useIsFocused()
-  const [filterByValue, setFilterByValue] = useState('week')
+  const [activityStatSwitch, setActivityStatSwitch] = useState(false)
   const { activityList } = useAppSelector(selectActivityList)
   const isLoading = useSelector(isActivityListLoading)
   const fetchListActivity = async () => {
@@ -54,8 +50,19 @@ export default function Activity({
     <>
       <View style={baseStyles(theme).homeContainer}>
         <View style={baseStyles(theme).innerWrapper}>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <StatisticSection />
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={() => {
+                  fetchListActivity()
+                  setActivityStatSwitch(!activityStatSwitch)
+                }}
+              />
+            }
+          >
+            <StatisticSection reload={activityStatSwitch} />
             <View style={styles(theme).recentActivityContainer}>
               <Text variant="headlineSmall" style={{ fontWeight: 'bold' }}>
                 Recent activities
@@ -85,27 +92,6 @@ export default function Activity({
           </ScrollView>
         </View>
       </View>
-      {isFocused && (
-        <UpperRightMenu
-          menuList={[
-            {
-              menuItem: 'act 1',
-              callback: () => {
-                console.log('menu 1 clicked')
-              },
-              icon: 'egg',
-            },
-            {
-              menuItem: 'act 2',
-              callback: () => {},
-            },
-            {
-              menuItem: 'act 3',
-              callback: () => {},
-            },
-          ]}
-        />
-      )}
     </>
   )
 }

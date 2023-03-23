@@ -1,4 +1,4 @@
-import { Button, Divider, IconButton, Menu, Text } from 'react-native-paper'
+import { Button, IconButton, Menu, Text } from 'react-native-paper'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
@@ -15,8 +15,9 @@ import {
   listMoreActivityInfoThunk,
 } from '../../redux/features/activityList/thunk'
 import { ActivitySortBy, ActivityType } from '../../lib/activity/activity_pb'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getNameWithActivityType } from '../../utils/helpers'
+import { RefreshControl } from 'react-native-gesture-handler'
 
 export default function ActivityList({
   navigation,
@@ -36,7 +37,7 @@ export default function ActivityList({
   const openActivityTypeMenu = () => setVisible(true)
   const closeActivityTypeMenu = () => setVisible(false)
 
-  const fetchListActivity = async (activityType: ActivityType) => {
+  const fetchListActivity = async () => {
     const { response } = await dispatch(
       listActivityInfoThunk({
         activityType: activityType,
@@ -52,6 +53,7 @@ export default function ActivityList({
       else setCanLoadmore(false)
     } else setCanLoadmore(false)
   }
+
   const fetchMore = async () => {
     const { error, response } = await dispatch(
       listMoreActivityInfoThunk({
@@ -64,12 +66,16 @@ export default function ActivityList({
     ).unwrap()
 
     if (response) {
-      if (currentOffset + 20 > response.total) {
+      if (currentOffset + 20 >= response.total) {
         setCanLoadmore(false)
       }
       setCurrentOffset(currentOffset + 10)
     }
   }
+
+  useEffect(() => {
+    fetchListActivity()
+  }, [activityType])
   return (
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
@@ -108,7 +114,6 @@ export default function ActivityList({
             <Menu.Item
               onPress={() => {
                 setActivityType(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
                 closeActivityTypeMenu()
               }}
               title={'All'}
@@ -116,7 +121,6 @@ export default function ActivityList({
             <Menu.Item
               onPress={() => {
                 setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_RUNNING)
                 closeActivityTypeMenu()
               }}
               title={getNameWithActivityType(
@@ -126,7 +130,6 @@ export default function ActivityList({
             <Menu.Item
               onPress={() => {
                 setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_CYCLING)
                 closeActivityTypeMenu()
               }}
               title={getNameWithActivityType(
@@ -136,7 +139,6 @@ export default function ActivityList({
             <Menu.Item
               onPress={() => {
                 setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)
-                fetchListActivity(ActivityType.ACTIVITY_TYPE_WALKING)
                 closeActivityTypeMenu()
               }}
               title={getNameWithActivityType(
@@ -145,7 +147,17 @@ export default function ActivityList({
             />
           </Menu>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={() => {
+                fetchListActivity()
+              }}
+            />
+          }
+        >
           {activityList.map((activity) => {
             return (
               <ActivityListItem

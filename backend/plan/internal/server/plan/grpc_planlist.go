@@ -25,6 +25,7 @@ func (s *planServer) ListPlan(ctx context.Context, request *plan.ListPlanRequest
 		request.GetActivityType(),
 		request.GetFrom(),
 		request.GetTo(),
+		request.GetIds(),
 	)
 
 	return &plan.ListPlanReply{

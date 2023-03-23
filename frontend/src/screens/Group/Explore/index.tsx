@@ -1,8 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState } from 'react'
 import { ScrollView, View } from 'react-native'
+import { RefreshControl } from 'react-native-gesture-handler'
 import { Button, Divider, Searchbar, Text } from 'react-native-paper'
-import { GroupSortBy, ListGroupRequest } from '../../../lib/group/group_pb'
+import { useDialog } from '../../../hooks/useDialog'
+import {
+  GroupInfo,
+  GroupSortBy,
+  ListGroupRequest,
+} from '../../../lib/group/group_pb'
 import { RootGroupTopTabsParamList } from '../../../navigators/GroupTopTab'
 import {
   isGroupListLoading,
@@ -15,8 +21,11 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../redux/store'
 import { useAppTheme } from '../../../theme'
 import { baseStyles } from '../../baseStyle'
+import { ConfirmDialog } from '../../../comp/ConfirmDialog'
 import Filter from './comp/Filter'
 import GroupItem from './comp/GroupItem'
+import { groupClient } from '../../../utils/grpc'
+import { toast } from '../../../utils/toast/toast'
 
 const LIMIT = 10
 
@@ -26,6 +35,12 @@ export default function Explore({
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'Explore'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
+  const {
+    handleToggleDialog,
+    dataSelected: groupId,
+    open,
+    toggleDialog,
+  } = useDialog<number>()
 
   const { groupList } = useAppSelector(selectGroupList)
   const groupListLoading = useAppSelector(isGroupListLoading)
@@ -38,7 +53,7 @@ export default function Explore({
   const [currentOffset, setCurrentOffset] = useState(0)
   const [searchByName, setSearchByName] = useState('')
   const [sortBy, setSortBy] = useState(GroupSortBy.GROUP_SORT_BY_CREATED_TIME)
-  const filterBy = ListGroupRequest.FilterBy.FILTER_BY_UNSPECIFIED
+  const filterBy = ListGroupRequest.FilterBy.FILTER_BY_IS_NOT_MEMBER
 
   useEffect(() => {
     fetchListGroup()
@@ -76,11 +91,28 @@ export default function Explore({
     ).unwrap()
 
     if (response) {
-      if (currentOffset + 20 > response.total) {
+      if (currentOffset + 20 >= response.total) {
         setCanLoadmore(false)
       }
       setCurrentOffset(currentOffset + 10)
     }
+  }
+
+  const joinGroup = async () => {
+    if (groupId !== undefined) {
+      const { error } = await groupClient.joinGroup({ groupId: groupId })
+      if (error) {
+        toast.error({ message: 'Something went wrong, please try again later' })
+      } else {
+        toast.success({
+          message: 'Join group request sent, waiting for accept',
+        })
+      }
+    } else {
+      toast.error({ message: 'Something went wrong, please try again later' })
+    }
+
+    toggleDialog()
   }
 
   const onChangeSearch = (query: string) => {
@@ -90,23 +122,38 @@ export default function Explore({
   return (
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
-        <Searchbar
-          style={{ marginTop: 20 }}
-          placeholder="Search group name"
-          onChangeText={onChangeSearch}
-          value={searchQuery}
-          onSubmitEditing={() => {
-            setSearchByName(searchQuery)
-          }}
+        <ConfirmDialog
+          toogleDialog={toggleDialog}
+          visible={open}
+          onSubmit={joinGroup}
+          message="Are you sure you want to join this group?"
         />
-        <Filter
-          asc={asc}
-          switchAsc={setAsc}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-        />
-        <Divider />
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={groupListLoading}
+              onRefresh={fetchListGroup}
+            />
+          }
+        >
+          <Searchbar
+            style={{ marginTop: 20, height: 45 }}
+            placeholder="Search group name"
+            onChangeText={onChangeSearch}
+            value={searchQuery}
+            onSubmitEditing={() => {
+              setSearchByName(searchQuery)
+            }}
+          />
+          <Filter
+            asc={asc}
+            switchAsc={setAsc}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+          />
+          <Divider />
+
           {noData && (
             <Text
               variant="bodyLarge"
@@ -115,11 +162,11 @@ export default function Explore({
               No data
             </Text>
           )}
-          {groupList.map((group, idx) => {
+          {groupList.map((group: GroupInfo.AsObject, idx) => {
             return (
               <GroupItem
                 key={idx}
-                name={group.name}
+                group={group}
                 hideTopDivider={idx === 0}
                 showBottomDivider={idx === groupList.length - 1}
                 navigateFunc={() => {
@@ -127,12 +174,15 @@ export default function Explore({
                     groupInfo: group,
                   })
                 }}
+                onSubmit={() => {
+                  handleToggleDialog(group.id)
+                }}
               />
             )
           })}
           {!noData && (
             <Button
-              style={{ marginTop: 10, marginBottom: 140 }}
+              style={{ marginTop: 10, marginBottom: 20 }}
               mode="elevated"
               onPress={fetchMore}
               loading={groupListLoading}
