@@ -31,7 +31,7 @@ func (s *activityServer) CommitActivity(
 	switch request.CommitType {
 	case activity.CommitType_COMMIT_TYPE_PLAN:
 		// check if activity commited
-		if activityInfo.PlanID != 0 {
+		if activityInfo.CommitType != uint32(activity.CommitType_COMMIT_TYPE_UNSPECIFIED) {
 			return nil, status.Internal("Activity already committed to a plan")
 		}
 

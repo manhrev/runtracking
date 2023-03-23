@@ -10,13 +10,14 @@ func TransformActivityListEntToActivityList(notificationList []*ent.Notification
 	notificationInfoList := []*notification.NotificationInfo{}
 	for _, notificationEnt := range notificationList {
 		notificationInfo := &notification.NotificationInfo{
-			Id:          notificationEnt.ID,
-			Message:     notificationEnt.Edges.Notification.Message,
-			Type:        notification.NOTIFICATION_TYPE(notificationEnt.Edges.Notification.Type),
-			ReferenceId: notificationEnt.Edges.Notification.ReceivedID,
-			Image:       "",
-			IsSeen:      notificationEnt.IsSeen,
-			Time:        timestamppb.New(notificationEnt.CreatedAt),
+			Id:         notificationEnt.ID,
+			Message:    notificationEnt.Edges.Notification.Message,
+			SourceType: notification.SOURCE_TYPE(notificationEnt.Edges.Notification.SourceType),
+			ReceiveIds: notificationEnt.Edges.Notification.ReceiveIds,
+			SourceId:   notificationEnt.Edges.Notification.SourceID,
+			Image:      "",
+			IsSeen:     notificationEnt.IsSeen,
+			Time:       timestamppb.New(notificationEnt.CreatedAt),
 		}
 		notificationInfoList = append(notificationInfoList, notificationInfo)
 	}

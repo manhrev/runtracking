@@ -90,44 +90,30 @@ func (ac *ActivityCreate) SetRoute(ap []*activity.TrackPoint) *ActivityCreate {
 	return ac
 }
 
-// SetPlanID sets the "plan_id" field.
-func (ac *ActivityCreate) SetPlanID(i int64) *ActivityCreate {
-	ac.mutation.SetPlanID(i)
+// SetCommitID sets the "commit_id" field.
+func (ac *ActivityCreate) SetCommitID(i int64) *ActivityCreate {
+	ac.mutation.SetCommitID(i)
 	return ac
 }
 
-// SetNillablePlanID sets the "plan_id" field if the given value is not nil.
-func (ac *ActivityCreate) SetNillablePlanID(i *int64) *ActivityCreate {
+// SetNillableCommitID sets the "commit_id" field if the given value is not nil.
+func (ac *ActivityCreate) SetNillableCommitID(i *int64) *ActivityCreate {
 	if i != nil {
-		ac.SetPlanID(*i)
+		ac.SetCommitID(*i)
 	}
 	return ac
 }
 
-// SetChallengeID sets the "challenge_id" field.
-func (ac *ActivityCreate) SetChallengeID(i int64) *ActivityCreate {
-	ac.mutation.SetChallengeID(i)
+// SetCommitType sets the "commit_type" field.
+func (ac *ActivityCreate) SetCommitType(u uint32) *ActivityCreate {
+	ac.mutation.SetCommitType(u)
 	return ac
 }
 
-// SetNillableChallengeID sets the "challenge_id" field if the given value is not nil.
-func (ac *ActivityCreate) SetNillableChallengeID(i *int64) *ActivityCreate {
-	if i != nil {
-		ac.SetChallengeID(*i)
-	}
-	return ac
-}
-
-// SetEventID sets the "event_id" field.
-func (ac *ActivityCreate) SetEventID(i int64) *ActivityCreate {
-	ac.mutation.SetEventID(i)
-	return ac
-}
-
-// SetNillableEventID sets the "event_id" field if the given value is not nil.
-func (ac *ActivityCreate) SetNillableEventID(i *int64) *ActivityCreate {
-	if i != nil {
-		ac.SetEventID(*i)
+// SetNillableCommitType sets the "commit_type" field if the given value is not nil.
+func (ac *ActivityCreate) SetNillableCommitType(u *uint32) *ActivityCreate {
+	if u != nil {
+		ac.SetCommitType(*u)
 	}
 	return ac
 }
@@ -159,50 +145,8 @@ func (ac *ActivityCreate) Mutation() *ActivityMutation {
 
 // Save creates the Activity in the database.
 func (ac *ActivityCreate) Save(ctx context.Context) (*Activity, error) {
-	var (
-		err  error
-		node *Activity
-	)
 	ac.defaults()
-	if len(ac.hooks) == 0 {
-		if err = ac.check(); err != nil {
-			return nil, err
-		}
-		node, err = ac.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ActivityMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = ac.check(); err != nil {
-				return nil, err
-			}
-			ac.mutation = mutation
-			if node, err = ac.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(ac.hooks) - 1; i >= 0; i-- {
-			if ac.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = ac.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, ac.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Activity)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ActivityMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Activity, ActivityMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -232,6 +176,10 @@ func (ac *ActivityCreate) defaults() {
 	if _, ok := ac.mutation.GetType(); !ok {
 		v := entactivity.DefaultType
 		ac.mutation.SetType(v)
+	}
+	if _, ok := ac.mutation.CommitType(); !ok {
+		v := entactivity.DefaultCommitType
+		ac.mutation.SetCommitType(v)
 	}
 	if _, ok := ac.mutation.CreatedAt(); !ok {
 		v := entactivity.DefaultCreatedAt
@@ -271,6 +219,9 @@ func (ac *ActivityCreate) check() error {
 	if _, ok := ac.mutation.Route(); !ok {
 		return &ValidationError{Name: "route", err: errors.New(`ent: missing required field "Activity.route"`)}
 	}
+	if _, ok := ac.mutation.CommitType(); !ok {
+		return &ValidationError{Name: "commit_type", err: errors.New(`ent: missing required field "Activity.commit_type"`)}
+	}
 	if _, ok := ac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Activity.created_at"`)}
 	}
@@ -278,6 +229,9 @@ func (ac *ActivityCreate) check() error {
 }
 
 func (ac *ActivityCreate) sqlSave(ctx context.Context) (*Activity, error) {
+	if err := ac.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := ac.createSpec()
 	if err := sqlgraph.CreateNode(ctx, ac.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -289,19 +243,15 @@ func (ac *ActivityCreate) sqlSave(ctx context.Context) (*Activity, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int64(id)
 	}
+	ac.mutation.id = &_node.ID
+	ac.mutation.done = true
 	return _node, nil
 }
 
 func (ac *ActivityCreate) createSpec() (*Activity, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Activity{config: ac.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: entactivity.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: entactivity.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(entactivity.Table, sqlgraph.NewFieldSpec(entactivity.FieldID, field.TypeInt64))
 	)
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
@@ -347,17 +297,13 @@ func (ac *ActivityCreate) createSpec() (*Activity, *sqlgraph.CreateSpec) {
 		_spec.SetField(entactivity.FieldRoute, field.TypeJSON, value)
 		_node.Route = value
 	}
-	if value, ok := ac.mutation.PlanID(); ok {
-		_spec.SetField(entactivity.FieldPlanID, field.TypeInt64, value)
-		_node.PlanID = value
+	if value, ok := ac.mutation.CommitID(); ok {
+		_spec.SetField(entactivity.FieldCommitID, field.TypeInt64, value)
+		_node.CommitID = value
 	}
-	if value, ok := ac.mutation.ChallengeID(); ok {
-		_spec.SetField(entactivity.FieldChallengeID, field.TypeInt64, value)
-		_node.ChallengeID = value
-	}
-	if value, ok := ac.mutation.EventID(); ok {
-		_spec.SetField(entactivity.FieldEventID, field.TypeInt64, value)
-		_node.EventID = value
+	if value, ok := ac.mutation.CommitType(); ok {
+		_spec.SetField(entactivity.FieldCommitType, field.TypeUint32, value)
+		_node.CommitType = value
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(entactivity.FieldCreatedAt, field.TypeTime, value)

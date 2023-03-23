@@ -74,49 +74,7 @@ func (cmc *ChallengeMemberCreate) Mutation() *ChallengeMemberMutation {
 
 // Save creates the ChallengeMember in the database.
 func (cmc *ChallengeMemberCreate) Save(ctx context.Context) (*ChallengeMember, error) {
-	var (
-		err  error
-		node *ChallengeMember
-	)
-	if len(cmc.hooks) == 0 {
-		if err = cmc.check(); err != nil {
-			return nil, err
-		}
-		node, err = cmc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = cmc.check(); err != nil {
-				return nil, err
-			}
-			cmc.mutation = mutation
-			if node, err = cmc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(cmc.hooks) - 1; i >= 0; i-- {
-			if cmc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, cmc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*ChallengeMember)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ChallengeMemberMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*ChallengeMember, ChallengeMemberMutation](ctx, cmc.sqlSave, cmc.mutation, cmc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -150,6 +108,9 @@ func (cmc *ChallengeMemberCreate) check() error {
 }
 
 func (cmc *ChallengeMemberCreate) sqlSave(ctx context.Context) (*ChallengeMember, error) {
+	if err := cmc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := cmc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, cmc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -161,6 +122,8 @@ func (cmc *ChallengeMemberCreate) sqlSave(ctx context.Context) (*ChallengeMember
 		id := _spec.ID.Value.(int64)
 		_node.ID = int64(id)
 	}
+	cmc.mutation.id = &_node.ID
+	cmc.mutation.done = true
 	return _node, nil
 }
 

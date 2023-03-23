@@ -11,1108 +11,647 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Activity(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Activity(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldID, id))
 }
 
 // ActivityName applies equality check predicate on the "activity_name" field. It's identical to ActivityNameEQ.
 func ActivityName(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldActivityName, v))
 }
 
 // ActivityNote applies equality check predicate on the "activity_note" field. It's identical to ActivityNoteEQ.
 func ActivityNote(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldActivityNote, v))
 }
 
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserID), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldUserID, v))
 }
 
 // Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
 func Type(v uint32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldType, v))
 }
 
 // TotalDistance applies equality check predicate on the "total_distance" field. It's identical to TotalDistanceEQ.
 func TotalDistance(v float64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTotalDistance), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldTotalDistance, v))
 }
 
 // Kcal applies equality check predicate on the "kcal" field. It's identical to KcalEQ.
 func Kcal(v float32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKcal), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldKcal, v))
 }
 
 // StartTime applies equality check predicate on the "start_time" field. It's identical to StartTimeEQ.
 func StartTime(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStartTime), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldStartTime, v))
 }
 
 // Duration applies equality check predicate on the "duration" field. It's identical to DurationEQ.
 func Duration(v uint64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldDuration, v))
 }
 
 // EndTime applies equality check predicate on the "end_time" field. It's identical to EndTimeEQ.
 func EndTime(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEndTime), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldEndTime, v))
 }
 
-// PlanID applies equality check predicate on the "plan_id" field. It's identical to PlanIDEQ.
-func PlanID(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPlanID), v))
-	})
+// CommitID applies equality check predicate on the "commit_id" field. It's identical to CommitIDEQ.
+func CommitID(v int64) predicate.Activity {
+	return predicate.Activity(sql.FieldEQ(FieldCommitID, v))
 }
 
-// ChallengeID applies equality check predicate on the "challenge_id" field. It's identical to ChallengeIDEQ.
-func ChallengeID(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldChallengeID), v))
-	})
-}
-
-// EventID applies equality check predicate on the "event_id" field. It's identical to EventIDEQ.
-func EventID(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEventID), v))
-	})
+// CommitType applies equality check predicate on the "commit_type" field. It's identical to CommitTypeEQ.
+func CommitType(v uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldEQ(FieldCommitType, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // ActivityNameEQ applies the EQ predicate on the "activity_name" field.
 func ActivityNameEQ(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldActivityName, v))
 }
 
 // ActivityNameNEQ applies the NEQ predicate on the "activity_name" field.
 func ActivityNameNEQ(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldActivityName, v))
 }
 
 // ActivityNameIn applies the In predicate on the "activity_name" field.
 func ActivityNameIn(vs ...string) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldActivityName), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldActivityName, vs...))
 }
 
 // ActivityNameNotIn applies the NotIn predicate on the "activity_name" field.
 func ActivityNameNotIn(vs ...string) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldActivityName), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldActivityName, vs...))
 }
 
 // ActivityNameGT applies the GT predicate on the "activity_name" field.
 func ActivityNameGT(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldActivityName, v))
 }
 
 // ActivityNameGTE applies the GTE predicate on the "activity_name" field.
 func ActivityNameGTE(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldActivityName, v))
 }
 
 // ActivityNameLT applies the LT predicate on the "activity_name" field.
 func ActivityNameLT(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldActivityName, v))
 }
 
 // ActivityNameLTE applies the LTE predicate on the "activity_name" field.
 func ActivityNameLTE(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldActivityName, v))
 }
 
 // ActivityNameContains applies the Contains predicate on the "activity_name" field.
 func ActivityNameContains(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldContains(FieldActivityName, v))
 }
 
 // ActivityNameHasPrefix applies the HasPrefix predicate on the "activity_name" field.
 func ActivityNameHasPrefix(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldHasPrefix(FieldActivityName, v))
 }
 
 // ActivityNameHasSuffix applies the HasSuffix predicate on the "activity_name" field.
 func ActivityNameHasSuffix(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldHasSuffix(FieldActivityName, v))
 }
 
 // ActivityNameEqualFold applies the EqualFold predicate on the "activity_name" field.
 func ActivityNameEqualFold(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldEqualFold(FieldActivityName, v))
 }
 
 // ActivityNameContainsFold applies the ContainsFold predicate on the "activity_name" field.
 func ActivityNameContainsFold(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldActivityName), v))
-	})
+	return predicate.Activity(sql.FieldContainsFold(FieldActivityName, v))
 }
 
 // ActivityNoteEQ applies the EQ predicate on the "activity_note" field.
 func ActivityNoteEQ(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldActivityNote, v))
 }
 
 // ActivityNoteNEQ applies the NEQ predicate on the "activity_note" field.
 func ActivityNoteNEQ(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldActivityNote, v))
 }
 
 // ActivityNoteIn applies the In predicate on the "activity_note" field.
 func ActivityNoteIn(vs ...string) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldActivityNote), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldActivityNote, vs...))
 }
 
 // ActivityNoteNotIn applies the NotIn predicate on the "activity_note" field.
 func ActivityNoteNotIn(vs ...string) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldActivityNote), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldActivityNote, vs...))
 }
 
 // ActivityNoteGT applies the GT predicate on the "activity_note" field.
 func ActivityNoteGT(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldActivityNote, v))
 }
 
 // ActivityNoteGTE applies the GTE predicate on the "activity_note" field.
 func ActivityNoteGTE(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldActivityNote, v))
 }
 
 // ActivityNoteLT applies the LT predicate on the "activity_note" field.
 func ActivityNoteLT(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldActivityNote, v))
 }
 
 // ActivityNoteLTE applies the LTE predicate on the "activity_note" field.
 func ActivityNoteLTE(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldActivityNote, v))
 }
 
 // ActivityNoteContains applies the Contains predicate on the "activity_note" field.
 func ActivityNoteContains(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldContains(FieldActivityNote, v))
 }
 
 // ActivityNoteHasPrefix applies the HasPrefix predicate on the "activity_note" field.
 func ActivityNoteHasPrefix(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldHasPrefix(FieldActivityNote, v))
 }
 
 // ActivityNoteHasSuffix applies the HasSuffix predicate on the "activity_note" field.
 func ActivityNoteHasSuffix(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldHasSuffix(FieldActivityNote, v))
 }
 
 // ActivityNoteEqualFold applies the EqualFold predicate on the "activity_note" field.
 func ActivityNoteEqualFold(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldEqualFold(FieldActivityNote, v))
 }
 
 // ActivityNoteContainsFold applies the ContainsFold predicate on the "activity_note" field.
 func ActivityNoteContainsFold(v string) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldActivityNote), v))
-	})
+	return predicate.Activity(sql.FieldContainsFold(FieldActivityNote, v))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
 func UserIDEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserID), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldUserID, v))
 }
 
 // UserIDNEQ applies the NEQ predicate on the "user_id" field.
 func UserIDNEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUserID), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldUserID, v))
 }
 
 // UserIDIn applies the In predicate on the "user_id" field.
 func UserIDIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUserID), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldUserID, vs...))
 }
 
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
 func UserIDNotIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUserID), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // UserIDGT applies the GT predicate on the "user_id" field.
 func UserIDGT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUserID), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldUserID, v))
 }
 
 // UserIDGTE applies the GTE predicate on the "user_id" field.
 func UserIDGTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUserID), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldUserID, v))
 }
 
 // UserIDLT applies the LT predicate on the "user_id" field.
 func UserIDLT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUserID), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldUserID, v))
 }
 
 // UserIDLTE applies the LTE predicate on the "user_id" field.
 func UserIDLTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUserID), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldUserID, v))
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v uint32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldType, v))
 }
 
 // TypeNEQ applies the NEQ predicate on the "type" field.
 func TypeNEQ(v uint32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldType), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldType, v))
 }
 
 // TypeIn applies the In predicate on the "type" field.
 func TypeIn(vs ...uint32) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldType), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldType, vs...))
 }
 
 // TypeNotIn applies the NotIn predicate on the "type" field.
 func TypeNotIn(vs ...uint32) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldType), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldType, vs...))
 }
 
 // TypeGT applies the GT predicate on the "type" field.
 func TypeGT(v uint32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldType), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldType, v))
 }
 
 // TypeGTE applies the GTE predicate on the "type" field.
 func TypeGTE(v uint32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldType), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldType, v))
 }
 
 // TypeLT applies the LT predicate on the "type" field.
 func TypeLT(v uint32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldType), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldType, v))
 }
 
 // TypeLTE applies the LTE predicate on the "type" field.
 func TypeLTE(v uint32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldType), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldType, v))
 }
 
 // TotalDistanceEQ applies the EQ predicate on the "total_distance" field.
 func TotalDistanceEQ(v float64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTotalDistance), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldTotalDistance, v))
 }
 
 // TotalDistanceNEQ applies the NEQ predicate on the "total_distance" field.
 func TotalDistanceNEQ(v float64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldTotalDistance), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldTotalDistance, v))
 }
 
 // TotalDistanceIn applies the In predicate on the "total_distance" field.
 func TotalDistanceIn(vs ...float64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldTotalDistance), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldTotalDistance, vs...))
 }
 
 // TotalDistanceNotIn applies the NotIn predicate on the "total_distance" field.
 func TotalDistanceNotIn(vs ...float64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldTotalDistance), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldTotalDistance, vs...))
 }
 
 // TotalDistanceGT applies the GT predicate on the "total_distance" field.
 func TotalDistanceGT(v float64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldTotalDistance), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldTotalDistance, v))
 }
 
 // TotalDistanceGTE applies the GTE predicate on the "total_distance" field.
 func TotalDistanceGTE(v float64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldTotalDistance), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldTotalDistance, v))
 }
 
 // TotalDistanceLT applies the LT predicate on the "total_distance" field.
 func TotalDistanceLT(v float64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldTotalDistance), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldTotalDistance, v))
 }
 
 // TotalDistanceLTE applies the LTE predicate on the "total_distance" field.
 func TotalDistanceLTE(v float64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldTotalDistance), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldTotalDistance, v))
 }
 
 // KcalEQ applies the EQ predicate on the "kcal" field.
 func KcalEQ(v float32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKcal), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldKcal, v))
 }
 
 // KcalNEQ applies the NEQ predicate on the "kcal" field.
 func KcalNEQ(v float32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldKcal), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldKcal, v))
 }
 
 // KcalIn applies the In predicate on the "kcal" field.
 func KcalIn(vs ...float32) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldKcal), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldKcal, vs...))
 }
 
 // KcalNotIn applies the NotIn predicate on the "kcal" field.
 func KcalNotIn(vs ...float32) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldKcal), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldKcal, vs...))
 }
 
 // KcalGT applies the GT predicate on the "kcal" field.
 func KcalGT(v float32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldKcal), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldKcal, v))
 }
 
 // KcalGTE applies the GTE predicate on the "kcal" field.
 func KcalGTE(v float32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldKcal), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldKcal, v))
 }
 
 // KcalLT applies the LT predicate on the "kcal" field.
 func KcalLT(v float32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldKcal), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldKcal, v))
 }
 
 // KcalLTE applies the LTE predicate on the "kcal" field.
 func KcalLTE(v float32) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldKcal), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldKcal, v))
 }
 
 // StartTimeEQ applies the EQ predicate on the "start_time" field.
 func StartTimeEQ(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStartTime), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldStartTime, v))
 }
 
 // StartTimeNEQ applies the NEQ predicate on the "start_time" field.
 func StartTimeNEQ(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStartTime), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldStartTime, v))
 }
 
 // StartTimeIn applies the In predicate on the "start_time" field.
 func StartTimeIn(vs ...time.Time) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldStartTime), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldStartTime, vs...))
 }
 
 // StartTimeNotIn applies the NotIn predicate on the "start_time" field.
 func StartTimeNotIn(vs ...time.Time) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldStartTime), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldStartTime, vs...))
 }
 
 // StartTimeGT applies the GT predicate on the "start_time" field.
 func StartTimeGT(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldStartTime), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldStartTime, v))
 }
 
 // StartTimeGTE applies the GTE predicate on the "start_time" field.
 func StartTimeGTE(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldStartTime), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldStartTime, v))
 }
 
 // StartTimeLT applies the LT predicate on the "start_time" field.
 func StartTimeLT(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldStartTime), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldStartTime, v))
 }
 
 // StartTimeLTE applies the LTE predicate on the "start_time" field.
 func StartTimeLTE(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldStartTime), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldStartTime, v))
 }
 
 // DurationEQ applies the EQ predicate on the "duration" field.
 func DurationEQ(v uint64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldDuration, v))
 }
 
 // DurationNEQ applies the NEQ predicate on the "duration" field.
 func DurationNEQ(v uint64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDuration), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldDuration, v))
 }
 
 // DurationIn applies the In predicate on the "duration" field.
 func DurationIn(vs ...uint64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldDuration), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldDuration, vs...))
 }
 
 // DurationNotIn applies the NotIn predicate on the "duration" field.
 func DurationNotIn(vs ...uint64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldDuration), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldDuration, vs...))
 }
 
 // DurationGT applies the GT predicate on the "duration" field.
 func DurationGT(v uint64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDuration), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldDuration, v))
 }
 
 // DurationGTE applies the GTE predicate on the "duration" field.
 func DurationGTE(v uint64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDuration), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldDuration, v))
 }
 
 // DurationLT applies the LT predicate on the "duration" field.
 func DurationLT(v uint64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDuration), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldDuration, v))
 }
 
 // DurationLTE applies the LTE predicate on the "duration" field.
 func DurationLTE(v uint64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDuration), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldDuration, v))
 }
 
 // EndTimeEQ applies the EQ predicate on the "end_time" field.
 func EndTimeEQ(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEndTime), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldEndTime, v))
 }
 
 // EndTimeNEQ applies the NEQ predicate on the "end_time" field.
 func EndTimeNEQ(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldEndTime), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldEndTime, v))
 }
 
 // EndTimeIn applies the In predicate on the "end_time" field.
 func EndTimeIn(vs ...time.Time) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldEndTime), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldEndTime, vs...))
 }
 
 // EndTimeNotIn applies the NotIn predicate on the "end_time" field.
 func EndTimeNotIn(vs ...time.Time) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldEndTime), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldEndTime, vs...))
 }
 
 // EndTimeGT applies the GT predicate on the "end_time" field.
 func EndTimeGT(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldEndTime), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldEndTime, v))
 }
 
 // EndTimeGTE applies the GTE predicate on the "end_time" field.
 func EndTimeGTE(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldEndTime), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldEndTime, v))
 }
 
 // EndTimeLT applies the LT predicate on the "end_time" field.
 func EndTimeLT(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldEndTime), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldEndTime, v))
 }
 
 // EndTimeLTE applies the LTE predicate on the "end_time" field.
 func EndTimeLTE(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldEndTime), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldEndTime, v))
 }
 
-// PlanIDEQ applies the EQ predicate on the "plan_id" field.
-func PlanIDEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPlanID), v))
-	})
+// CommitIDEQ applies the EQ predicate on the "commit_id" field.
+func CommitIDEQ(v int64) predicate.Activity {
+	return predicate.Activity(sql.FieldEQ(FieldCommitID, v))
 }
 
-// PlanIDNEQ applies the NEQ predicate on the "plan_id" field.
-func PlanIDNEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPlanID), v))
-	})
+// CommitIDNEQ applies the NEQ predicate on the "commit_id" field.
+func CommitIDNEQ(v int64) predicate.Activity {
+	return predicate.Activity(sql.FieldNEQ(FieldCommitID, v))
 }
 
-// PlanIDIn applies the In predicate on the "plan_id" field.
-func PlanIDIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldPlanID), v...))
-	})
+// CommitIDIn applies the In predicate on the "commit_id" field.
+func CommitIDIn(vs ...int64) predicate.Activity {
+	return predicate.Activity(sql.FieldIn(FieldCommitID, vs...))
 }
 
-// PlanIDNotIn applies the NotIn predicate on the "plan_id" field.
-func PlanIDNotIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldPlanID), v...))
-	})
+// CommitIDNotIn applies the NotIn predicate on the "commit_id" field.
+func CommitIDNotIn(vs ...int64) predicate.Activity {
+	return predicate.Activity(sql.FieldNotIn(FieldCommitID, vs...))
 }
 
-// PlanIDGT applies the GT predicate on the "plan_id" field.
-func PlanIDGT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldPlanID), v))
-	})
+// CommitIDGT applies the GT predicate on the "commit_id" field.
+func CommitIDGT(v int64) predicate.Activity {
+	return predicate.Activity(sql.FieldGT(FieldCommitID, v))
 }
 
-// PlanIDGTE applies the GTE predicate on the "plan_id" field.
-func PlanIDGTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldPlanID), v))
-	})
+// CommitIDGTE applies the GTE predicate on the "commit_id" field.
+func CommitIDGTE(v int64) predicate.Activity {
+	return predicate.Activity(sql.FieldGTE(FieldCommitID, v))
 }
 
-// PlanIDLT applies the LT predicate on the "plan_id" field.
-func PlanIDLT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldPlanID), v))
-	})
+// CommitIDLT applies the LT predicate on the "commit_id" field.
+func CommitIDLT(v int64) predicate.Activity {
+	return predicate.Activity(sql.FieldLT(FieldCommitID, v))
 }
 
-// PlanIDLTE applies the LTE predicate on the "plan_id" field.
-func PlanIDLTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldPlanID), v))
-	})
+// CommitIDLTE applies the LTE predicate on the "commit_id" field.
+func CommitIDLTE(v int64) predicate.Activity {
+	return predicate.Activity(sql.FieldLTE(FieldCommitID, v))
 }
 
-// PlanIDIsNil applies the IsNil predicate on the "plan_id" field.
-func PlanIDIsNil() predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldPlanID)))
-	})
+// CommitIDIsNil applies the IsNil predicate on the "commit_id" field.
+func CommitIDIsNil() predicate.Activity {
+	return predicate.Activity(sql.FieldIsNull(FieldCommitID))
 }
 
-// PlanIDNotNil applies the NotNil predicate on the "plan_id" field.
-func PlanIDNotNil() predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldPlanID)))
-	})
+// CommitIDNotNil applies the NotNil predicate on the "commit_id" field.
+func CommitIDNotNil() predicate.Activity {
+	return predicate.Activity(sql.FieldNotNull(FieldCommitID))
 }
 
-// ChallengeIDEQ applies the EQ predicate on the "challenge_id" field.
-func ChallengeIDEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldChallengeID), v))
-	})
+// CommitTypeEQ applies the EQ predicate on the "commit_type" field.
+func CommitTypeEQ(v uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldEQ(FieldCommitType, v))
 }
 
-// ChallengeIDNEQ applies the NEQ predicate on the "challenge_id" field.
-func ChallengeIDNEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldChallengeID), v))
-	})
+// CommitTypeNEQ applies the NEQ predicate on the "commit_type" field.
+func CommitTypeNEQ(v uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldNEQ(FieldCommitType, v))
 }
 
-// ChallengeIDIn applies the In predicate on the "challenge_id" field.
-func ChallengeIDIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldChallengeID), v...))
-	})
+// CommitTypeIn applies the In predicate on the "commit_type" field.
+func CommitTypeIn(vs ...uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldIn(FieldCommitType, vs...))
 }
 
-// ChallengeIDNotIn applies the NotIn predicate on the "challenge_id" field.
-func ChallengeIDNotIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldChallengeID), v...))
-	})
+// CommitTypeNotIn applies the NotIn predicate on the "commit_type" field.
+func CommitTypeNotIn(vs ...uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldNotIn(FieldCommitType, vs...))
 }
 
-// ChallengeIDGT applies the GT predicate on the "challenge_id" field.
-func ChallengeIDGT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldChallengeID), v))
-	})
+// CommitTypeGT applies the GT predicate on the "commit_type" field.
+func CommitTypeGT(v uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldGT(FieldCommitType, v))
 }
 
-// ChallengeIDGTE applies the GTE predicate on the "challenge_id" field.
-func ChallengeIDGTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldChallengeID), v))
-	})
+// CommitTypeGTE applies the GTE predicate on the "commit_type" field.
+func CommitTypeGTE(v uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldGTE(FieldCommitType, v))
 }
 
-// ChallengeIDLT applies the LT predicate on the "challenge_id" field.
-func ChallengeIDLT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldChallengeID), v))
-	})
+// CommitTypeLT applies the LT predicate on the "commit_type" field.
+func CommitTypeLT(v uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldLT(FieldCommitType, v))
 }
 
-// ChallengeIDLTE applies the LTE predicate on the "challenge_id" field.
-func ChallengeIDLTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldChallengeID), v))
-	})
-}
-
-// ChallengeIDIsNil applies the IsNil predicate on the "challenge_id" field.
-func ChallengeIDIsNil() predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldChallengeID)))
-	})
-}
-
-// ChallengeIDNotNil applies the NotNil predicate on the "challenge_id" field.
-func ChallengeIDNotNil() predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldChallengeID)))
-	})
-}
-
-// EventIDEQ applies the EQ predicate on the "event_id" field.
-func EventIDEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEventID), v))
-	})
-}
-
-// EventIDNEQ applies the NEQ predicate on the "event_id" field.
-func EventIDNEQ(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldEventID), v))
-	})
-}
-
-// EventIDIn applies the In predicate on the "event_id" field.
-func EventIDIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldEventID), v...))
-	})
-}
-
-// EventIDNotIn applies the NotIn predicate on the "event_id" field.
-func EventIDNotIn(vs ...int64) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldEventID), v...))
-	})
-}
-
-// EventIDGT applies the GT predicate on the "event_id" field.
-func EventIDGT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldEventID), v))
-	})
-}
-
-// EventIDGTE applies the GTE predicate on the "event_id" field.
-func EventIDGTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldEventID), v))
-	})
-}
-
-// EventIDLT applies the LT predicate on the "event_id" field.
-func EventIDLT(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldEventID), v))
-	})
-}
-
-// EventIDLTE applies the LTE predicate on the "event_id" field.
-func EventIDLTE(v int64) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldEventID), v))
-	})
-}
-
-// EventIDIsNil applies the IsNil predicate on the "event_id" field.
-func EventIDIsNil() predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldEventID)))
-	})
-}
-
-// EventIDNotNil applies the NotNil predicate on the "event_id" field.
-func EventIDNotNil() predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldEventID)))
-	})
+// CommitTypeLTE applies the LTE predicate on the "commit_type" field.
+func CommitTypeLTE(v uint32) predicate.Activity {
+	return predicate.Activity(sql.FieldLTE(FieldCommitType, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Activity(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Activity(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Activity(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Activity {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Activity(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Activity(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Activity(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Activity(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Activity {
-	return predicate.Activity(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Activity(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // And groups predicates with the AND operator between them.

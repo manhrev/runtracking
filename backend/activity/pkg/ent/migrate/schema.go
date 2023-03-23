@@ -21,9 +21,8 @@ var (
 		{Name: "duration", Type: field.TypeUint64},
 		{Name: "end_time", Type: field.TypeTime},
 		{Name: "route", Type: field.TypeJSON},
-		{Name: "plan_id", Type: field.TypeInt64, Nullable: true},
-		{Name: "challenge_id", Type: field.TypeInt64, Nullable: true},
-		{Name: "event_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "commit_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "commit_type", Type: field.TypeUint32, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// ActivitiesTable holds the schema information for the "activities" table.

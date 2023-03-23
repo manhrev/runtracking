@@ -192,7 +192,6 @@ func (m *activityImpl) Delete(ctx context.Context, userId int64, activityIdList 
 			activity.IDIn(activityIdList...),
 		).
 		Exec(ctx)
-	log.Println(deletedCount)
 	if err != nil {
 		return status.Internal(err.Error())
 	}
@@ -211,17 +210,16 @@ func (m *activityImpl) SetCommit(
 	targetId int64,
 ) error {
 	query := m.entClient.Activity.UpdateOneID(activityId)
-	switch commitType {
-	case activitypb.CommitType_COMMIT_TYPE_CHALLENGE:
-		query.SetChallengeID(targetId)
-	case activitypb.CommitType_COMMIT_TYPE_PLAN:
-		query.SetPlanID(targetId)
-	case activitypb.CommitType_COMMIT_TYPE_EVENT:
-		query.SetEventID(targetId)
+	if commitType == activitypb.CommitType_COMMIT_TYPE_UNSPECIFIED {
+		log.Printf("Error while SetCommit: Commit type not satisfied")
+		return status.Internal("Commit type not satisfied")
 	}
+	query.SetCommitType(uint32(commitType)).SetCommitID(targetId)
+
 	_, err := query.Save(ctx)
 	if err != nil {
 		log.Printf("Error while SetCommit: %v", err)
+		return status.Internal(fmt.Sprintf("Error while SetCommit: %v", err))
 	}
 
 	return nil
@@ -250,6 +248,17 @@ func (m *activityImpl) GetStatistic(
 		groupByStr := fmt.Sprintf(`
 			CAST(CAST(CONVERT_TZ(%s, "+00:00", "%s") as DATE) as DATETIME)
 		`, "end_time", GetTimeZoneStr(int32(tz)))
+
+		switch groupBy {
+		case activitypb.GetActivityStatisticRequest_GORUP_BY_MONTH:
+			groupByStr = fmt.Sprintf(`
+				CAST(STR_TO_DATE(DATE_FORMAT(CONVERT_TZ(%s, "+00:00", "%s"),'01/%%m/%%Y'),'%%d/%%m/%%Y') as DATETIME)
+			`, "end_time", GetTimeZoneStr(int32(tz)))
+		case activitypb.GetActivityStatisticRequest_GORUP_BY_YEAR:
+			groupByStr = fmt.Sprintf(`
+				CAST(STR_TO_DATE(DATE_FORMAT(CONVERT_TZ(%s, "+00:00", "%s"),'01/01/%%Y'),'%%d/%%m/%%Y') as DATETIME)
+			`, "end_time", GetTimeZoneStr(int32(tz)))
+		}
 
 		s.Select(
 			sql.As(groupByStr, "date_time"),
@@ -298,7 +307,6 @@ func (m *activityImpl) GetStatistic(
 		log.Printf("error while listactivity statistic %v", err.Error())
 		return nil, status.Internal(err.Error())
 	}
-	log.Println(sliceOfPointers)
 
 	return sliceOfPointers, nil
 }

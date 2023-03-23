@@ -1,54 +1,56 @@
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import React from "react";
-import ExampleScreen from "../screens/ExampleScreen";
-import Activity from "../screens/Activity/ActivityHome";
-import ProfileHome from "../screens/Profile/ProfileHome";
-import RunHome from "../screens/Run/RunHome";
-import { RootBaseStackParamList } from "./BaseStack";
-import ComingSoon from "../screens/ComingSoon";
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import React from 'react'
+import ExampleScreen from '../screens/ExampleScreen'
+import Activity from '../screens/Activity/ActivityHome'
+import ProfileHome from '../screens/Profile/ProfileHome'
+import RunHome from '../screens/Run/RunHome'
+import { RootBaseStackParamList } from './BaseStack'
+import ComingSoon from '../screens/ComingSoon'
+import PlanHome from '../screens/Plan/PlanHome'
+import GroupTopTabs from './GroupTopTab'
 
 export type RootHomeTabsParamList = {
-  ActivityHome: undefined;
-  GroupHome: undefined;
-  ProfileHome: undefined;
-  RunHome: undefined;
-  PlanHome: undefined;
-} & RootBaseStackParamList;
+  ActivityHome: undefined
+  GroupHome: undefined
+  ProfileHome: undefined
+  RunHome: undefined
+  PlanHome: undefined
+} & RootBaseStackParamList
 
-const Tab = createMaterialBottomTabNavigator<RootHomeTabsParamList>();
+const Tab = createMaterialBottomTabNavigator<RootHomeTabsParamList>()
 
 export default function HomeTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="ProfileHome"
+      initialRouteName="RunHome"
       backBehavior="initialRoute"
       shifting
     >
       <Tab.Screen
         name="GroupHome"
-        component={ComingSoon}
-        options={{ tabBarIcon: "account-group" }}
+        component={GroupTopTabs}
+        options={{ tabBarIcon: 'account-group' }}
       />
       <Tab.Screen
         name="ActivityHome"
         component={Activity}
-        options={{ tabBarIcon: "text-box-check" }}
+        options={{ tabBarIcon: 'text-box-check' }}
       />
       <Tab.Screen
         name="RunHome"
         component={RunHome}
-        options={{ tabBarIcon: "run" }}
+        options={{ tabBarIcon: 'run' }}
       />
       <Tab.Screen
         name="PlanHome"
-        component={ComingSoon}
-        options={{ tabBarIcon: "file-document-edit" }}
+        component={PlanHome}
+        options={{ tabBarIcon: 'file-document-edit' }}
       />
       <Tab.Screen
         name="ProfileHome"
         component={ProfileHome}
-        options={{ tabBarIcon: "account" }}
+        options={{ tabBarIcon: 'account' }}
       />
     </Tab.Navigator>
-  );
+  )
 }

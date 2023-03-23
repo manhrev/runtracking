@@ -15,11 +15,10 @@ type ChallengeFunc func(context.Context, *ent.ChallengeMutation) (ent.Value, err
 
 // Mutate calls f(ctx, m).
 func (f ChallengeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ChallengeMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMutation", m)
+	if mv, ok := m.(*ent.ChallengeMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMutation", m)
 }
 
 // The ChallengeMemberFunc type is an adapter to allow the use of ordinary
@@ -28,11 +27,10 @@ type ChallengeMemberFunc func(context.Context, *ent.ChallengeMemberMutation) (en
 
 // Mutate calls f(ctx, m).
 func (f ChallengeMemberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ChallengeMemberMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMemberMutation", m)
+	if mv, ok := m.(*ent.ChallengeMemberMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMemberMutation", m)
 }
 
 // The ChallengeMemberRuleFunc type is an adapter to allow the use of ordinary
@@ -41,11 +39,10 @@ type ChallengeMemberRuleFunc func(context.Context, *ent.ChallengeMemberRuleMutat
 
 // Mutate calls f(ctx, m).
 func (f ChallengeMemberRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ChallengeMemberRuleMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMemberRuleMutation", m)
+	if mv, ok := m.(*ent.ChallengeMemberRuleMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMemberRuleMutation", m)
 }
 
 // The GroupzFunc type is an adapter to allow the use of ordinary
@@ -54,11 +51,10 @@ type GroupzFunc func(context.Context, *ent.GroupzMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f GroupzFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.GroupzMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupzMutation", m)
+	if mv, ok := m.(*ent.GroupzMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupzMutation", m)
 }
 
 // The MemberFunc type is an adapter to allow the use of ordinary
@@ -67,11 +63,10 @@ type MemberFunc func(context.Context, *ent.MemberMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f MemberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.MemberMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MemberMutation", m)
+	if mv, ok := m.(*ent.MemberMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MemberMutation", m)
 }
 
 // Condition is a hook condition function.

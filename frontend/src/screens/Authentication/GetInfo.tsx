@@ -1,46 +1,40 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
-import {
-  Button,
-  Checkbox,
-  IconButton,
-  Text,
-  TextInput,
-} from "react-native-paper";
-import { RootBaseStackParamList } from "../../navigators/BaseStack";
-import { AppTheme, useAppTheme } from "../../theme";
-import { authClient } from "../../utils/grpc";
-import { baseStyles } from "../baseStyle";
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useState } from 'react'
+import { Image, StyleSheet, View } from 'react-native'
+import { Button, IconButton, Text, TextInput } from 'react-native-paper'
+import { RootBaseStackParamList } from '../../navigators/BaseStack'
+import { AppTheme, useAppTheme } from '../../theme'
+import { authClient } from '../../utils/grpc'
+import { toast } from '../../utils/toast/toast'
+import { baseStyles } from '../baseStyle'
 
 export default function GetInfo({
   navigation,
-  route,
-}: NativeStackScreenProps<RootBaseStackParamList, "GetInfo">) {
-  const theme = useAppTheme();
-  const [age, setAge] = useState("");
-  const [height, setHeight] = useState("");
-  const [weight, setWeight] = useState("");
+}: NativeStackScreenProps<RootBaseStackParamList, 'GetInfo'>) {
+  const theme = useAppTheme()
+  const [age, setAge] = useState('')
+  const [height, setHeight] = useState('')
+  const [weight, setWeight] = useState('')
 
   const handleContinue = async () => {
-    if (age == "" || height == "" || weight == "") {
-      alert("Please input");
-      return;
+    if (age == '' || height == '' || weight == '') {
+      toast.error({ message: 'Please fill all fields' })
+      return
     }
 
     const { error } = await authClient.updateHealthInfo({
       age: parseInt(age),
       height: parseInt(height),
       weight: parseInt(weight),
-    });
+    })
 
     if (error) {
-      alert("An error occurred, please try again");
+      toast.error({ message: 'An error occurred, please try again' })
     } else {
-      alert("Create account successfully, please login");
-      navigation.navigate("Login");
+      toast.success({ message: 'Create account successfully, please login' })
+      navigation.navigate('Login')
     }
-  };
+  }
 
   return (
     <>
@@ -49,8 +43,8 @@ export default function GetInfo({
           <View
             style={{
               paddingVertical: 20,
-              display: "flex",
-              flexDirection: "row",
+              display: 'flex',
+              flexDirection: 'row',
             }}
           >
             <View style={{ flex: 1 }}>
@@ -58,26 +52,26 @@ export default function GetInfo({
                 icon="arrow-left"
                 size={24}
                 onPress={() => navigation.goBack()}
-                style={{ position: "relative" }}
+                style={{ position: 'relative' }}
               />
             </View>
-            <View style={{ flex: 1, alignItems: "center" }}></View>
+            <View style={{ flex: 1, alignItems: 'center' }}></View>
             <View style={{ flex: 1 }}></View>
           </View>
           <View>
             <Image
               style={{
-                width: "80%",
+                width: '80%',
                 height: 170,
                 borderRadius: 50,
-                alignSelf: "center",
+                alignSelf: 'center',
               }}
-              source={require("./../../../assets/Banners/getinf.jpg")}
+              source={require('./../../../assets/Banners/getinf.jpg')}
             />
           </View>
           <Text
             variant="bodyLarge"
-            style={{ fontWeight: "bold", lineHeight: 18, paddingTop: 20 }}
+            style={{ fontWeight: 'bold', lineHeight: 18, paddingTop: 20 }}
           >
             We need these information to calculate your activity, you can use
             default values here
@@ -116,7 +110,7 @@ export default function GetInfo({
           >
             <Text
               variant="titleMedium"
-              style={{ color: theme.colors.onPrimary, fontWeight: "bold" }}
+              style={{ color: theme.colors.onPrimary, fontWeight: 'bold' }}
             >
               Finish
             </Text>
@@ -124,7 +118,7 @@ export default function GetInfo({
         </View>
       </View>
     </>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -132,4 +126,4 @@ const styles = (theme: AppTheme) =>
     inputStyle: {
       marginBottom: 10,
     },
-  });
+  })

@@ -144,19 +144,19 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 
 // QueryChallengeMembers queries the "challenge_members" edge of the Challenge entity.
 func (c *Challenge) QueryChallengeMembers() *ChallengeMemberQuery {
-	return (&ChallengeClient{config: c.config}).QueryChallengeMembers(c)
+	return NewChallengeClient(c.config).QueryChallengeMembers(c)
 }
 
 // QueryGroupz queries the "groupz" edge of the Challenge entity.
 func (c *Challenge) QueryGroupz() *GroupzQuery {
-	return (&ChallengeClient{config: c.config}).QueryGroupz(c)
+	return NewChallengeClient(c.config).QueryGroupz(c)
 }
 
 // Update returns a builder for updating this Challenge.
 // Note that you need to call Challenge.Unwrap() before calling this method if this Challenge
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (c *Challenge) Update() *ChallengeUpdateOne {
-	return (&ChallengeClient{config: c.config}).UpdateOne(c)
+	return NewChallengeClient(c.config).UpdateOne(c)
 }
 
 // Unwrap unwraps the Challenge entity that was returned from a transaction after it was closed,

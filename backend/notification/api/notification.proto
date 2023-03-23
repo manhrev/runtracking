@@ -44,8 +44,9 @@ message ListNotificationInfoReply{
 message PushNotiRequest{
     string messeage = 1;
     google.protobuf.Timestamp scheduled_time = 2;
-    NOTIFICATION_TYPE type = 3;
-    int64 received_id = 4;
+    SOURCE_TYPE source_type = 3;
+    int64 source_id = 4;
+    repeated int64 receive_ids = 5;
 }
 
 message ListNotificationInfoRequest{
@@ -56,18 +57,22 @@ message ListNotificationInfoRequest{
 message NotificationInfo{
     int64 id = 1;
     string message = 2;
-    NOTIFICATION_TYPE type = 3;
-    int64 reference_id = 6;
+    SOURCE_TYPE source_type = 3;
+    int64 source_id = 6;
+
+    // size of receive_ids > 0 => notify to list of users with ids given
+    repeated int64 receive_ids = 8;
     string image = 7;
     bool is_seen = 4;
     google.protobuf.Timestamp time = 5;
 }
 
-enum NOTIFICATION_TYPE{
-        ALLUSERS = 0;
-        MEMBERS_OF_GROUP = 1;
-        GROUPS_OF_EVENT = 2;
-        ONLYUSER = 3;
+enum SOURCE_TYPE{
+        ADMIN = 0;
+        GROUP = 1;
+        EVENT = 2;
+        PERSONAL = 3;
+        PLAN = 4;
     }
 
 

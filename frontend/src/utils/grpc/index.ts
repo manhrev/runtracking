@@ -1,14 +1,16 @@
-import { StatusCode as grpcStatusCode } from "grpc-web";
-import rpcAuthClient from "./client/auth";
-import { Code as AuthCode } from "../../lib/auth/auth_code_pb";
-import Constants from "expo-constants";
-import rpcActivityClient from "./client/activity";
-import rpcNotificationClient from "./client/notification";
+import { StatusCode as grpcStatusCode } from 'grpc-web'
+import rpcAuthClient from './client/auth'
+import { Code as AuthCode } from '../../lib/auth/auth_code_pb'
+import Constants from 'expo-constants'
+import rpcActivityClient from './client/activity'
+import rpcNotificationClient from './client/notification'
+import rpcPlanClient from './client/plan'
+import rpcGroupClient from './client/group'
 
-export * from "./abstract/gRPCClient";
-export * from "./abstract/types";
+export * from './abstract/gRPCClient'
+export * from './abstract/types'
 
-const { manifest } = Constants;
+const { manifest } = Constants
 
 const onAuthError = (error: any, serviceName: any) => {
   // switch (error?.code) {
@@ -22,30 +24,30 @@ const onAuthError = (error: any, serviceName: any) => {
   //   msg: i18n.t(`Error::${serviceName}.${error?.code}`),
   // });
   // error?.code && alert(error.code);
-};
+}
 
 const HOST = `http://${manifest?.debuggerHost
-  ?.split(":")
+  ?.split(':')
   .shift()
-  ?.concat(":8080")}`;
-
-console.log(HOST);
+  ?.concat(':8080')}`
 
 const authConfig = {
   hostname: HOST,
   onError: onAuthError,
-};
+}
 
 const activityConfig = {
   hostname: HOST,
   onError: onAuthError,
-};
+}
 
 const notificationConfig = {
   hostname: HOST,
   onError: onAuthError,
-};
-export const activityClient = new rpcActivityClient(activityConfig);
+}
+export const activityClient = new rpcActivityClient(activityConfig)
 
-export const authClient = new rpcAuthClient(authConfig);
-export const notificationClient = new rpcNotificationClient(notificationConfig);
+export const authClient = new rpcAuthClient(authConfig)
+export const notificationClient = new rpcNotificationClient(notificationConfig)
+export const planClient = new rpcPlanClient(notificationConfig)
+export const groupClient = new rpcGroupClient(notificationConfig)

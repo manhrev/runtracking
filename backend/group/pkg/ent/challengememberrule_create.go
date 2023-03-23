@@ -72,49 +72,7 @@ func (cmrc *ChallengeMemberRuleCreate) Mutation() *ChallengeMemberRuleMutation {
 
 // Save creates the ChallengeMemberRule in the database.
 func (cmrc *ChallengeMemberRuleCreate) Save(ctx context.Context) (*ChallengeMemberRule, error) {
-	var (
-		err  error
-		node *ChallengeMemberRule
-	)
-	if len(cmrc.hooks) == 0 {
-		if err = cmrc.check(); err != nil {
-			return nil, err
-		}
-		node, err = cmrc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ChallengeMemberRuleMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = cmrc.check(); err != nil {
-				return nil, err
-			}
-			cmrc.mutation = mutation
-			if node, err = cmrc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(cmrc.hooks) - 1; i >= 0; i-- {
-			if cmrc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cmrc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, cmrc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*ChallengeMemberRule)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ChallengeMemberRuleMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*ChallengeMemberRule, ChallengeMemberRuleMutation](ctx, cmrc.sqlSave, cmrc.mutation, cmrc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -148,6 +106,9 @@ func (cmrc *ChallengeMemberRuleCreate) check() error {
 }
 
 func (cmrc *ChallengeMemberRuleCreate) sqlSave(ctx context.Context) (*ChallengeMemberRule, error) {
+	if err := cmrc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := cmrc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, cmrc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -159,6 +120,8 @@ func (cmrc *ChallengeMemberRuleCreate) sqlSave(ctx context.Context) (*ChallengeM
 		id := _spec.ID.Value.(int64)
 		_node.ID = int64(id)
 	}
+	cmrc.mutation.id = &_node.ID
+	cmrc.mutation.done = true
 	return _node, nil
 }
 

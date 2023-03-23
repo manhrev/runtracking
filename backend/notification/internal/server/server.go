@@ -66,7 +66,7 @@ func Serve(server *grpc.Server) {
 	if err != nil {
 		log.Fatalf("error while create connect to sample service: %v", err)
 	}
-	authClient := auth.NewAuthClient(conn)
+	authClient := auth.NewAuthIClient(conn)
 
 	// http.HandleFunc("/notification/pushnoti2allusers", notification.PushNoti2AllUsers)
 	r := mux.NewRouter()

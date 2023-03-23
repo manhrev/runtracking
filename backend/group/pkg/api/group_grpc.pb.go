@@ -22,8 +22,16 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GroupClient interface {
+	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*CreateGroupReply, error)
+	ListGroup(ctx context.Context, in *ListGroupRequest, opts ...grpc.CallOption) (*ListGroupReply, error)
 	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GetGroupReply, error)
-	SetGroup(ctx context.Context, in *SetGroupRequest, opts ...grpc.CallOption) (*SetGroupReply, error)
+	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...grpc.CallOption) (*UpdateGroupReply, error)
+	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...grpc.CallOption) (*DeleteGroupReply, error)
+	ListMembersOfGroup(ctx context.Context, in *ListMembersOfGroupRequest, opts ...grpc.CallOption) (*ListMembersOfGroupReply, error)
+	JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...grpc.CallOption) (*JoinGroupReply, error)
+	AcceptMember(ctx context.Context, in *AcceptMemberRequest, opts ...grpc.CallOption) (*AcceptMemberReply, error)
+	BanMember(ctx context.Context, in *BanMemberRequest, opts ...grpc.CallOption) (*BanMemberReply, error)
+	LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opts ...grpc.CallOption) (*LeaveGroupReply, error)
 }
 
 type groupClient struct {
@@ -32,6 +40,24 @@ type groupClient struct {
 
 func NewGroupClient(cc grpc.ClientConnInterface) GroupClient {
 	return &groupClient{cc}
+}
+
+func (c *groupClient) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*CreateGroupReply, error) {
+	out := new(CreateGroupReply)
+	err := c.cc.Invoke(ctx, "/group.Group/CreateGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) ListGroup(ctx context.Context, in *ListGroupRequest, opts ...grpc.CallOption) (*ListGroupReply, error) {
+	out := new(ListGroupReply)
+	err := c.cc.Invoke(ctx, "/group.Group/ListGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *groupClient) GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GetGroupReply, error) {
@@ -43,9 +69,63 @@ func (c *groupClient) GetGroup(ctx context.Context, in *GetGroupRequest, opts ..
 	return out, nil
 }
 
-func (c *groupClient) SetGroup(ctx context.Context, in *SetGroupRequest, opts ...grpc.CallOption) (*SetGroupReply, error) {
-	out := new(SetGroupReply)
-	err := c.cc.Invoke(ctx, "/group.Group/SetGroup", in, out, opts...)
+func (c *groupClient) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...grpc.CallOption) (*UpdateGroupReply, error) {
+	out := new(UpdateGroupReply)
+	err := c.cc.Invoke(ctx, "/group.Group/UpdateGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...grpc.CallOption) (*DeleteGroupReply, error) {
+	out := new(DeleteGroupReply)
+	err := c.cc.Invoke(ctx, "/group.Group/DeleteGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) ListMembersOfGroup(ctx context.Context, in *ListMembersOfGroupRequest, opts ...grpc.CallOption) (*ListMembersOfGroupReply, error) {
+	out := new(ListMembersOfGroupReply)
+	err := c.cc.Invoke(ctx, "/group.Group/ListMembersOfGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...grpc.CallOption) (*JoinGroupReply, error) {
+	out := new(JoinGroupReply)
+	err := c.cc.Invoke(ctx, "/group.Group/JoinGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) AcceptMember(ctx context.Context, in *AcceptMemberRequest, opts ...grpc.CallOption) (*AcceptMemberReply, error) {
+	out := new(AcceptMemberReply)
+	err := c.cc.Invoke(ctx, "/group.Group/AcceptMember", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) BanMember(ctx context.Context, in *BanMemberRequest, opts ...grpc.CallOption) (*BanMemberReply, error) {
+	out := new(BanMemberReply)
+	err := c.cc.Invoke(ctx, "/group.Group/BanMember", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opts ...grpc.CallOption) (*LeaveGroupReply, error) {
+	out := new(LeaveGroupReply)
+	err := c.cc.Invoke(ctx, "/group.Group/LeaveGroup", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +136,16 @@ func (c *groupClient) SetGroup(ctx context.Context, in *SetGroupRequest, opts ..
 // All implementations must embed UnimplementedGroupServer
 // for forward compatibility
 type GroupServer interface {
+	CreateGroup(context.Context, *CreateGroupRequest) (*CreateGroupReply, error)
+	ListGroup(context.Context, *ListGroupRequest) (*ListGroupReply, error)
 	GetGroup(context.Context, *GetGroupRequest) (*GetGroupReply, error)
-	SetGroup(context.Context, *SetGroupRequest) (*SetGroupReply, error)
+	UpdateGroup(context.Context, *UpdateGroupRequest) (*UpdateGroupReply, error)
+	DeleteGroup(context.Context, *DeleteGroupRequest) (*DeleteGroupReply, error)
+	ListMembersOfGroup(context.Context, *ListMembersOfGroupRequest) (*ListMembersOfGroupReply, error)
+	JoinGroup(context.Context, *JoinGroupRequest) (*JoinGroupReply, error)
+	AcceptMember(context.Context, *AcceptMemberRequest) (*AcceptMemberReply, error)
+	BanMember(context.Context, *BanMemberRequest) (*BanMemberReply, error)
+	LeaveGroup(context.Context, *LeaveGroupRequest) (*LeaveGroupReply, error)
 	mustEmbedUnimplementedGroupServer()
 }
 
@@ -65,11 +153,35 @@ type GroupServer interface {
 type UnimplementedGroupServer struct {
 }
 
+func (UnimplementedGroupServer) CreateGroup(context.Context, *CreateGroupRequest) (*CreateGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGroup not implemented")
+}
+func (UnimplementedGroupServer) ListGroup(context.Context, *ListGroupRequest) (*ListGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListGroup not implemented")
+}
 func (UnimplementedGroupServer) GetGroup(context.Context, *GetGroupRequest) (*GetGroupReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGroup not implemented")
 }
-func (UnimplementedGroupServer) SetGroup(context.Context, *SetGroupRequest) (*SetGroupReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetGroup not implemented")
+func (UnimplementedGroupServer) UpdateGroup(context.Context, *UpdateGroupRequest) (*UpdateGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateGroup not implemented")
+}
+func (UnimplementedGroupServer) DeleteGroup(context.Context, *DeleteGroupRequest) (*DeleteGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteGroup not implemented")
+}
+func (UnimplementedGroupServer) ListMembersOfGroup(context.Context, *ListMembersOfGroupRequest) (*ListMembersOfGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListMembersOfGroup not implemented")
+}
+func (UnimplementedGroupServer) JoinGroup(context.Context, *JoinGroupRequest) (*JoinGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method JoinGroup not implemented")
+}
+func (UnimplementedGroupServer) AcceptMember(context.Context, *AcceptMemberRequest) (*AcceptMemberReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptMember not implemented")
+}
+func (UnimplementedGroupServer) BanMember(context.Context, *BanMemberRequest) (*BanMemberReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BanMember not implemented")
+}
+func (UnimplementedGroupServer) LeaveGroup(context.Context, *LeaveGroupRequest) (*LeaveGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LeaveGroup not implemented")
 }
 func (UnimplementedGroupServer) mustEmbedUnimplementedGroupServer() {}
 
@@ -82,6 +194,42 @@ type UnsafeGroupServer interface {
 
 func RegisterGroupServer(s grpc.ServiceRegistrar, srv GroupServer) {
 	s.RegisterService(&Group_ServiceDesc, srv)
+}
+
+func _Group_CreateGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).CreateGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/CreateGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).CreateGroup(ctx, req.(*CreateGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_ListGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).ListGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/ListGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).ListGroup(ctx, req.(*ListGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Group_GetGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -102,20 +250,128 @@ func _Group_GetGroup_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Group_SetGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetGroupRequest)
+func _Group_UpdateGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateGroupRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GroupServer).SetGroup(ctx, in)
+		return srv.(GroupServer).UpdateGroup(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/group.Group/SetGroup",
+		FullMethod: "/group.Group/UpdateGroup",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GroupServer).SetGroup(ctx, req.(*SetGroupRequest))
+		return srv.(GroupServer).UpdateGroup(ctx, req.(*UpdateGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_DeleteGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).DeleteGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/DeleteGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).DeleteGroup(ctx, req.(*DeleteGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_ListMembersOfGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMembersOfGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).ListMembersOfGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/ListMembersOfGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).ListMembersOfGroup(ctx, req.(*ListMembersOfGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_JoinGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).JoinGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/JoinGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).JoinGroup(ctx, req.(*JoinGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_AcceptMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).AcceptMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/AcceptMember",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).AcceptMember(ctx, req.(*AcceptMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_BanMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BanMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).BanMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/BanMember",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).BanMember(ctx, req.(*BanMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_LeaveGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).LeaveGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/LeaveGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).LeaveGroup(ctx, req.(*LeaveGroupRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,12 +384,44 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GroupServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "CreateGroup",
+			Handler:    _Group_CreateGroup_Handler,
+		},
+		{
+			MethodName: "ListGroup",
+			Handler:    _Group_ListGroup_Handler,
+		},
+		{
 			MethodName: "GetGroup",
 			Handler:    _Group_GetGroup_Handler,
 		},
 		{
-			MethodName: "SetGroup",
-			Handler:    _Group_SetGroup_Handler,
+			MethodName: "UpdateGroup",
+			Handler:    _Group_UpdateGroup_Handler,
+		},
+		{
+			MethodName: "DeleteGroup",
+			Handler:    _Group_DeleteGroup_Handler,
+		},
+		{
+			MethodName: "ListMembersOfGroup",
+			Handler:    _Group_ListMembersOfGroup_Handler,
+		},
+		{
+			MethodName: "JoinGroup",
+			Handler:    _Group_JoinGroup_Handler,
+		},
+		{
+			MethodName: "AcceptMember",
+			Handler:    _Group_AcceptMember_Handler,
+		},
+		{
+			MethodName: "BanMember",
+			Handler:    _Group_BanMember_Handler,
+		},
+		{
+			MethodName: "LeaveGroup",
+			Handler:    _Group_LeaveGroup_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

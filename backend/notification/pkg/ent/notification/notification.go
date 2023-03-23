@@ -9,10 +9,12 @@ const (
 	FieldID = "id"
 	// FieldMessage holds the string denoting the message field in the database.
 	FieldMessage = "message"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
-	// FieldReceivedID holds the string denoting the received_id field in the database.
-	FieldReceivedID = "received_id"
+	// FieldSourceType holds the string denoting the source_type field in the database.
+	FieldSourceType = "source_type"
+	// FieldSourceID holds the string denoting the source_id field in the database.
+	FieldSourceID = "source_id"
+	// FieldReceiveIds holds the string denoting the receive_ids field in the database.
+	FieldReceiveIds = "receive_ids"
 	// FieldScheduledTime holds the string denoting the scheduled_time field in the database.
 	FieldScheduledTime = "scheduled_time"
 	// EdgeNotificationUsers holds the string denoting the notification_users edge name in mutations.
@@ -32,8 +34,9 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldMessage,
-	FieldType,
-	FieldReceivedID,
+	FieldSourceType,
+	FieldSourceID,
+	FieldReceiveIds,
 	FieldScheduledTime,
 }
 

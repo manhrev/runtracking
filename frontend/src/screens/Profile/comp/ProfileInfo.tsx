@@ -1,55 +1,55 @@
-import { StyleSheet, View } from "react-native";
-import { Divider, Text } from "react-native-paper";
-import { selectUserSlice } from "../../../redux/features/user/slice";
-import { useAppSelector } from "../../../redux/store";
-import { AppTheme, useAppTheme } from "../../../theme";
-import { baseStyles } from "../../baseStyle";
+import { StyleSheet, View } from 'react-native'
+import { Divider, Text } from 'react-native-paper'
+import { selectUserSlice } from '../../../redux/features/user/slice'
+import { useAppSelector } from '../../../redux/store'
+import { AppTheme, useAppTheme } from '../../../theme'
+import { baseStyles } from '../../baseStyle'
 
 export default function ProfileInfo() {
-  const theme = useAppTheme();
+  const theme = useAppTheme()
   const { email, height, phoneNumber, username, weight } =
-    useAppSelector(selectUserSlice);
+    useAppSelector(selectUserSlice)
   return (
     <View style={styles(theme).extendedBaseContainer}>
       <View style={baseStyles(theme).innerWrapper}>
         <View style={styles(theme).infoValue}>
           <View style={styles(theme).infoValueListItem}>
             <View>
-              <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
+              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
                 Username
               </Text>
             </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
               <Text variant="titleMedium">{username}</Text>
             </View>
           </View>
           <View style={styles(theme).infoValueListItem}>
             <View>
-              <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
+              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
                 Email
               </Text>
             </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
               <Text variant="titleMedium">{email}</Text>
             </View>
           </View>
           <View style={styles(theme).infoValueListItem}>
             <View>
-              <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
+              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
                 Phone number
               </Text>
             </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
               <Text variant="titleMedium">{phoneNumber}</Text>
             </View>
           </View>
           <View style={styles(theme).infoValueListItem}>
             <View>
-              <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
+              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
                 Groups joined
               </Text>
             </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
               <Text variant="titleMedium">0 groups</Text>
             </View>
           </View>
@@ -77,7 +77,7 @@ export default function ProfileInfo() {
         </View>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = (theme: AppTheme) =>
@@ -90,8 +90,8 @@ const styles = (theme: AppTheme) =>
       paddingHorizontal: 20,
     },
     infoValueListItem: {
-      display: "flex",
-      flexDirection: "row",
+      display: 'flex',
+      flexDirection: 'row',
       paddingVertical: 8,
     },
-  });
+  })

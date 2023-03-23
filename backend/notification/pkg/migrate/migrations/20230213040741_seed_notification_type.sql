@@ -1,1 +1,0 @@
-INSERT INTO `notification_types`(type_name) VALUES ('ALLUSERS'), ('MEMBERS_OF_GROUP'), ('GROUPS_OF_EVENT'), ('ONLYUSER');

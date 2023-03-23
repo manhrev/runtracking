@@ -3,6 +3,26 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 
 
+export class GetAllUsersReply extends jspb.Message {
+  getUsersList(): Array<UserInfo>;
+  setUsersList(value: Array<UserInfo>): GetAllUsersReply;
+  clearUsersList(): GetAllUsersReply;
+  addUsers(value?: UserInfo, index?: number): UserInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetAllUsersReply.AsObject;
+  static toObject(includeInstance: boolean, msg: GetAllUsersReply): GetAllUsersReply.AsObject;
+  static serializeBinaryToWriter(message: GetAllUsersReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetAllUsersReply;
+  static deserializeBinaryFromReader(message: GetAllUsersReply, reader: jspb.BinaryReader): GetAllUsersReply;
+}
+
+export namespace GetAllUsersReply {
+  export type AsObject = {
+    usersList: Array<UserInfo.AsObject>,
+  }
+}
+
 export class HealthRecordRequest extends jspb.Message {
   getAge(): number;
   setAge(value: number): HealthRecordRequest;
@@ -26,6 +46,24 @@ export namespace HealthRecordRequest {
     age: number,
     height: number,
     weight: number,
+  }
+}
+
+export class GetByIdRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): GetByIdRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetByIdRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetByIdRequest): GetByIdRequest.AsObject;
+  static serializeBinaryToWriter(message: GetByIdRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetByIdRequest;
+  static deserializeBinaryFromReader(message: GetByIdRequest, reader: jspb.BinaryReader): GetByIdRequest;
+}
+
+export namespace GetByIdRequest {
+  export type AsObject = {
+    id: number,
   }
 }
 
@@ -216,6 +254,40 @@ export namespace UserInfo {
     height: number,
     weight: number,
     age: number,
+  }
+}
+
+export class UpdateUserInfoRequest extends jspb.Message {
+  getUserInfo(): UserInfo | undefined;
+  setUserInfo(value?: UserInfo): UpdateUserInfoRequest;
+  hasUserInfo(): boolean;
+  clearUserInfo(): UpdateUserInfoRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateUserInfoRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateUserInfoRequest): UpdateUserInfoRequest.AsObject;
+  static serializeBinaryToWriter(message: UpdateUserInfoRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateUserInfoRequest;
+  static deserializeBinaryFromReader(message: UpdateUserInfoRequest, reader: jspb.BinaryReader): UpdateUserInfoRequest;
+}
+
+export namespace UpdateUserInfoRequest {
+  export type AsObject = {
+    userInfo?: UserInfo.AsObject,
+  }
+}
+
+export class UpdateUserInfoReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateUserInfoReply.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateUserInfoReply): UpdateUserInfoReply.AsObject;
+  static serializeBinaryToWriter(message: UpdateUserInfoReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateUserInfoReply;
+  static deserializeBinaryFromReader(message: UpdateUserInfoReply, reader: jspb.BinaryReader): UpdateUserInfoReply;
+}
+
+export namespace UpdateUserInfoReply {
+  export type AsObject = {
   }
 }
 

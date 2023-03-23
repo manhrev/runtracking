@@ -20,9 +20,9 @@ func (s *authServer) Login(ctx context.Context, request *auth.LoginRequest) (*au
 	//Push notification to user
 	_, err = s.notificationClient.PushNotification(ctx, &notification.PushNotiRequest{
 		Messeage:      "You have been logged in to Go Tracker ...",
-		Type:          notification.NOTIFICATION_TYPE_ONLYUSER,
+		SourceType:    notification.SOURCE_TYPE_PERSONAL,
 		ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 10)),
-		ReceivedId:    reply.GetUserId(),
+		ReceiveIds:    []int64{reply.GetUserId()},
 	})
 
 	if err != nil {

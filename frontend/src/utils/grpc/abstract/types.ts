@@ -1,17 +1,17 @@
-import * as grpcWeb from "grpc-web";
+import * as grpcWeb from 'grpc-web'
 
 export interface GRPCClientResponse<T> {
-  error: grpcWeb.RpcError | null;
-  response: T | null;
+  error: grpcWeb.RpcError | null
+  response: T | null
 }
 
 export type ErrorHandler = (
   error: grpcWeb.RpcError,
   serviceName?: string
-) => void;
+) => void
 
 export interface GRPCClientConfig {
-  hostname: string;
-  serviceName?: string;
-  onError?: ErrorHandler;
+  hostname: string
+  serviceName?: string
+  onError?: ErrorHandler
 }

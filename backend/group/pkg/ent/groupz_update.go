@@ -99,6 +99,12 @@ func (gu *GroupzUpdate) SetNillableCreatedAt(t *time.Time) *GroupzUpdate {
 	return gu
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (gu *GroupzUpdate) SetUpdatedAt(t time.Time) *GroupzUpdate {
+	gu.mutation.SetUpdatedAt(t)
+	return gu
+}
+
 // SetLeaderID sets the "leader_id" field.
 func (gu *GroupzUpdate) SetLeaderID(i int64) *GroupzUpdate {
 	gu.mutation.ResetLeaderID()
@@ -191,34 +197,8 @@ func (gu *GroupzUpdate) RemoveChallenges(c ...*Challenge) *GroupzUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (gu *GroupzUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(gu.hooks) == 0 {
-		affected, err = gu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*GroupzMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			gu.mutation = mutation
-			affected, err = gu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(gu.hooks) - 1; i >= 0; i-- {
-			if gu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = gu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, gu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	gu.defaults()
+	return withHooks[int, GroupzMutation](ctx, gu.sqlSave, gu.mutation, gu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -240,6 +220,14 @@ func (gu *GroupzUpdate) Exec(ctx context.Context) error {
 func (gu *GroupzUpdate) ExecX(ctx context.Context) {
 	if err := gu.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (gu *GroupzUpdate) defaults() {
+	if _, ok := gu.mutation.UpdatedAt(); !ok {
+		v := groupz.UpdateDefaultUpdatedAt()
+		gu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -284,6 +272,9 @@ func (gu *GroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := gu.mutation.CreatedAt(); ok {
 		_spec.SetField(groupz.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := gu.mutation.UpdatedAt(); ok {
+		_spec.SetField(groupz.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := gu.mutation.LeaderID(); ok {
 		_spec.SetField(groupz.FieldLeaderID, field.TypeInt64, value)
@@ -408,6 +399,7 @@ func (gu *GroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	gu.mutation.done = true
 	return n, nil
 }
 
@@ -485,6 +477,12 @@ func (guo *GroupzUpdateOne) SetNillableCreatedAt(t *time.Time) *GroupzUpdateOne 
 	if t != nil {
 		guo.SetCreatedAt(*t)
 	}
+	return guo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (guo *GroupzUpdateOne) SetUpdatedAt(t time.Time) *GroupzUpdateOne {
+	guo.mutation.SetUpdatedAt(t)
 	return guo
 }
 
@@ -587,40 +585,8 @@ func (guo *GroupzUpdateOne) Select(field string, fields ...string) *GroupzUpdate
 
 // Save executes the query and returns the updated Groupz entity.
 func (guo *GroupzUpdateOne) Save(ctx context.Context) (*Groupz, error) {
-	var (
-		err  error
-		node *Groupz
-	)
-	if len(guo.hooks) == 0 {
-		node, err = guo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*GroupzMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			guo.mutation = mutation
-			node, err = guo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(guo.hooks) - 1; i >= 0; i-- {
-			if guo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = guo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, guo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Groupz)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from GroupzMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	guo.defaults()
+	return withHooks[*Groupz, GroupzMutation](ctx, guo.sqlSave, guo.mutation, guo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -642,6 +608,14 @@ func (guo *GroupzUpdateOne) Exec(ctx context.Context) error {
 func (guo *GroupzUpdateOne) ExecX(ctx context.Context) {
 	if err := guo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (guo *GroupzUpdateOne) defaults() {
+	if _, ok := guo.mutation.UpdatedAt(); !ok {
+		v := groupz.UpdateDefaultUpdatedAt()
+		guo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -703,6 +677,9 @@ func (guo *GroupzUpdateOne) sqlSave(ctx context.Context) (_node *Groupz, err err
 	}
 	if value, ok := guo.mutation.CreatedAt(); ok {
 		_spec.SetField(groupz.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := guo.mutation.UpdatedAt(); ok {
+		_spec.SetField(groupz.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := guo.mutation.LeaderID(); ok {
 		_spec.SetField(groupz.FieldLeaderID, field.TypeInt64, value)
@@ -830,5 +807,6 @@ func (guo *GroupzUpdateOne) sqlSave(ctx context.Context) (_node *Groupz, err err
 		}
 		return nil, err
 	}
+	guo.mutation.done = true
 	return _node, nil
 }

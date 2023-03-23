@@ -78,6 +78,20 @@ func (gc *GroupzCreate) SetNillableCreatedAt(t *time.Time) *GroupzCreate {
 	return gc
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (gc *GroupzCreate) SetUpdatedAt(t time.Time) *GroupzCreate {
+	gc.mutation.SetUpdatedAt(t)
+	return gc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (gc *GroupzCreate) SetNillableUpdatedAt(t *time.Time) *GroupzCreate {
+	if t != nil {
+		gc.SetUpdatedAt(*t)
+	}
+	return gc
+}
+
 // SetLeaderID sets the "leader_id" field.
 func (gc *GroupzCreate) SetLeaderID(i int64) *GroupzCreate {
 	gc.mutation.SetLeaderID(i)
@@ -127,50 +141,8 @@ func (gc *GroupzCreate) Mutation() *GroupzMutation {
 
 // Save creates the Groupz in the database.
 func (gc *GroupzCreate) Save(ctx context.Context) (*Groupz, error) {
-	var (
-		err  error
-		node *Groupz
-	)
 	gc.defaults()
-	if len(gc.hooks) == 0 {
-		if err = gc.check(); err != nil {
-			return nil, err
-		}
-		node, err = gc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*GroupzMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = gc.check(); err != nil {
-				return nil, err
-			}
-			gc.mutation = mutation
-			if node, err = gc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(gc.hooks) - 1; i >= 0; i-- {
-			if gc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = gc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, gc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Groupz)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from GroupzMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Groupz, GroupzMutation](ctx, gc.sqlSave, gc.mutation, gc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -205,6 +177,10 @@ func (gc *GroupzCreate) defaults() {
 		v := groupz.DefaultCreatedAt()
 		gc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		v := groupz.DefaultUpdatedAt()
+		gc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -215,6 +191,9 @@ func (gc *GroupzCreate) check() error {
 	if _, ok := gc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Groupz.created_at"`)}
 	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Groupz.updated_at"`)}
+	}
 	if _, ok := gc.mutation.LeaderID(); !ok {
 		return &ValidationError{Name: "leader_id", err: errors.New(`ent: missing required field "Groupz.leader_id"`)}
 	}
@@ -222,6 +201,9 @@ func (gc *GroupzCreate) check() error {
 }
 
 func (gc *GroupzCreate) sqlSave(ctx context.Context) (*Groupz, error) {
+	if err := gc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := gc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, gc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -233,6 +215,8 @@ func (gc *GroupzCreate) sqlSave(ctx context.Context) (*Groupz, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int64(id)
 	}
+	gc.mutation.id = &_node.ID
+	gc.mutation.done = true
 	return _node, nil
 }
 
@@ -266,6 +250,10 @@ func (gc *GroupzCreate) createSpec() (*Groupz, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.CreatedAt(); ok {
 		_spec.SetField(groupz.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := gc.mutation.UpdatedAt(); ok {
+		_spec.SetField(groupz.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if value, ok := gc.mutation.LeaderID(); ok {
 		_spec.SetField(groupz.FieldLeaderID, field.TypeInt64, value)

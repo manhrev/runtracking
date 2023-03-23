@@ -40,7 +40,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -152,6 +152,34 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Member.Use(hooks...)
 }
 
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Challenge.Intercept(interceptors...)
+	c.ChallengeMember.Intercept(interceptors...)
+	c.ChallengeMemberRule.Intercept(interceptors...)
+	c.Groupz.Intercept(interceptors...)
+	c.Member.Intercept(interceptors...)
+}
+
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *ChallengeMutation:
+		return c.Challenge.mutate(ctx, m)
+	case *ChallengeMemberMutation:
+		return c.ChallengeMember.mutate(ctx, m)
+	case *ChallengeMemberRuleMutation:
+		return c.ChallengeMemberRule.mutate(ctx, m)
+	case *GroupzMutation:
+		return c.Groupz.mutate(ctx, m)
+	case *MemberMutation:
+		return c.Member.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
 // ChallengeClient is a client for the Challenge schema.
 type ChallengeClient struct {
 	config
@@ -166,6 +194,12 @@ func NewChallengeClient(c config) *ChallengeClient {
 // A call to `Use(f, g, h)` equals to `challenge.Hooks(f(g(h())))`.
 func (c *ChallengeClient) Use(hooks ...Hook) {
 	c.hooks.Challenge = append(c.hooks.Challenge, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `challenge.Intercept(f(g(h())))`.
+func (c *ChallengeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Challenge = append(c.inters.Challenge, interceptors...)
 }
 
 // Create returns a builder for creating a Challenge entity.
@@ -220,6 +254,8 @@ func (c *ChallengeClient) DeleteOneID(id int64) *ChallengeDeleteOne {
 func (c *ChallengeClient) Query() *ChallengeQuery {
 	return &ChallengeQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeChallenge},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -239,7 +275,7 @@ func (c *ChallengeClient) GetX(ctx context.Context, id int64) *Challenge {
 
 // QueryChallengeMembers queries the challenge_members edge of a Challenge.
 func (c *ChallengeClient) QueryChallengeMembers(ch *Challenge) *ChallengeMemberQuery {
-	query := &ChallengeMemberQuery{config: c.config}
+	query := (&ChallengeMemberClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ch.ID
 		step := sqlgraph.NewStep(
@@ -255,7 +291,7 @@ func (c *ChallengeClient) QueryChallengeMembers(ch *Challenge) *ChallengeMemberQ
 
 // QueryGroupz queries the groupz edge of a Challenge.
 func (c *ChallengeClient) QueryGroupz(ch *Challenge) *GroupzQuery {
-	query := &GroupzQuery{config: c.config}
+	query := (&GroupzClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ch.ID
 		step := sqlgraph.NewStep(
@@ -274,6 +310,26 @@ func (c *ChallengeClient) Hooks() []Hook {
 	return c.hooks.Challenge
 }
 
+// Interceptors returns the client interceptors.
+func (c *ChallengeClient) Interceptors() []Interceptor {
+	return c.inters.Challenge
+}
+
+func (c *ChallengeClient) mutate(ctx context.Context, m *ChallengeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ChallengeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ChallengeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ChallengeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ChallengeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Challenge mutation op: %q", m.Op())
+	}
+}
+
 // ChallengeMemberClient is a client for the ChallengeMember schema.
 type ChallengeMemberClient struct {
 	config
@@ -288,6 +344,12 @@ func NewChallengeMemberClient(c config) *ChallengeMemberClient {
 // A call to `Use(f, g, h)` equals to `challengemember.Hooks(f(g(h())))`.
 func (c *ChallengeMemberClient) Use(hooks ...Hook) {
 	c.hooks.ChallengeMember = append(c.hooks.ChallengeMember, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `challengemember.Intercept(f(g(h())))`.
+func (c *ChallengeMemberClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ChallengeMember = append(c.inters.ChallengeMember, interceptors...)
 }
 
 // Create returns a builder for creating a ChallengeMember entity.
@@ -342,6 +404,8 @@ func (c *ChallengeMemberClient) DeleteOneID(id int64) *ChallengeMemberDeleteOne 
 func (c *ChallengeMemberClient) Query() *ChallengeMemberQuery {
 	return &ChallengeMemberQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeChallengeMember},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -361,7 +425,7 @@ func (c *ChallengeMemberClient) GetX(ctx context.Context, id int64) *ChallengeMe
 
 // QueryChallengeMemberRules queries the challenge_member_rules edge of a ChallengeMember.
 func (c *ChallengeMemberClient) QueryChallengeMemberRules(cm *ChallengeMember) *ChallengeMemberRuleQuery {
-	query := &ChallengeMemberRuleQuery{config: c.config}
+	query := (&ChallengeMemberRuleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cm.ID
 		step := sqlgraph.NewStep(
@@ -377,7 +441,7 @@ func (c *ChallengeMemberClient) QueryChallengeMemberRules(cm *ChallengeMember) *
 
 // QueryChallenge queries the challenge edge of a ChallengeMember.
 func (c *ChallengeMemberClient) QueryChallenge(cm *ChallengeMember) *ChallengeQuery {
-	query := &ChallengeQuery{config: c.config}
+	query := (&ChallengeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cm.ID
 		step := sqlgraph.NewStep(
@@ -396,6 +460,26 @@ func (c *ChallengeMemberClient) Hooks() []Hook {
 	return c.hooks.ChallengeMember
 }
 
+// Interceptors returns the client interceptors.
+func (c *ChallengeMemberClient) Interceptors() []Interceptor {
+	return c.inters.ChallengeMember
+}
+
+func (c *ChallengeMemberClient) mutate(ctx context.Context, m *ChallengeMemberMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ChallengeMemberCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ChallengeMemberUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ChallengeMemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ChallengeMemberDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ChallengeMember mutation op: %q", m.Op())
+	}
+}
+
 // ChallengeMemberRuleClient is a client for the ChallengeMemberRule schema.
 type ChallengeMemberRuleClient struct {
 	config
@@ -410,6 +494,12 @@ func NewChallengeMemberRuleClient(c config) *ChallengeMemberRuleClient {
 // A call to `Use(f, g, h)` equals to `challengememberrule.Hooks(f(g(h())))`.
 func (c *ChallengeMemberRuleClient) Use(hooks ...Hook) {
 	c.hooks.ChallengeMemberRule = append(c.hooks.ChallengeMemberRule, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `challengememberrule.Intercept(f(g(h())))`.
+func (c *ChallengeMemberRuleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ChallengeMemberRule = append(c.inters.ChallengeMemberRule, interceptors...)
 }
 
 // Create returns a builder for creating a ChallengeMemberRule entity.
@@ -464,6 +554,8 @@ func (c *ChallengeMemberRuleClient) DeleteOneID(id int64) *ChallengeMemberRuleDe
 func (c *ChallengeMemberRuleClient) Query() *ChallengeMemberRuleQuery {
 	return &ChallengeMemberRuleQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeChallengeMemberRule},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -483,7 +575,7 @@ func (c *ChallengeMemberRuleClient) GetX(ctx context.Context, id int64) *Challen
 
 // QueryChallengeMember queries the challenge_member edge of a ChallengeMemberRule.
 func (c *ChallengeMemberRuleClient) QueryChallengeMember(cmr *ChallengeMemberRule) *ChallengeMemberQuery {
-	query := &ChallengeMemberQuery{config: c.config}
+	query := (&ChallengeMemberClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cmr.ID
 		step := sqlgraph.NewStep(
@@ -502,6 +594,26 @@ func (c *ChallengeMemberRuleClient) Hooks() []Hook {
 	return c.hooks.ChallengeMemberRule
 }
 
+// Interceptors returns the client interceptors.
+func (c *ChallengeMemberRuleClient) Interceptors() []Interceptor {
+	return c.inters.ChallengeMemberRule
+}
+
+func (c *ChallengeMemberRuleClient) mutate(ctx context.Context, m *ChallengeMemberRuleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ChallengeMemberRuleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ChallengeMemberRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ChallengeMemberRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ChallengeMemberRuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ChallengeMemberRule mutation op: %q", m.Op())
+	}
+}
+
 // GroupzClient is a client for the Groupz schema.
 type GroupzClient struct {
 	config
@@ -516,6 +628,12 @@ func NewGroupzClient(c config) *GroupzClient {
 // A call to `Use(f, g, h)` equals to `groupz.Hooks(f(g(h())))`.
 func (c *GroupzClient) Use(hooks ...Hook) {
 	c.hooks.Groupz = append(c.hooks.Groupz, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `groupz.Intercept(f(g(h())))`.
+func (c *GroupzClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Groupz = append(c.inters.Groupz, interceptors...)
 }
 
 // Create returns a builder for creating a Groupz entity.
@@ -570,6 +688,8 @@ func (c *GroupzClient) DeleteOneID(id int64) *GroupzDeleteOne {
 func (c *GroupzClient) Query() *GroupzQuery {
 	return &GroupzQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeGroupz},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -589,7 +709,7 @@ func (c *GroupzClient) GetX(ctx context.Context, id int64) *Groupz {
 
 // QueryMembers queries the members edge of a Groupz.
 func (c *GroupzClient) QueryMembers(gr *Groupz) *MemberQuery {
-	query := &MemberQuery{config: c.config}
+	query := (&MemberClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := gr.ID
 		step := sqlgraph.NewStep(
@@ -605,7 +725,7 @@ func (c *GroupzClient) QueryMembers(gr *Groupz) *MemberQuery {
 
 // QueryChallenges queries the challenges edge of a Groupz.
 func (c *GroupzClient) QueryChallenges(gr *Groupz) *ChallengeQuery {
-	query := &ChallengeQuery{config: c.config}
+	query := (&ChallengeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := gr.ID
 		step := sqlgraph.NewStep(
@@ -624,6 +744,26 @@ func (c *GroupzClient) Hooks() []Hook {
 	return c.hooks.Groupz
 }
 
+// Interceptors returns the client interceptors.
+func (c *GroupzClient) Interceptors() []Interceptor {
+	return c.inters.Groupz
+}
+
+func (c *GroupzClient) mutate(ctx context.Context, m *GroupzMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&GroupzCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&GroupzUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&GroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&GroupzDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Groupz mutation op: %q", m.Op())
+	}
+}
+
 // MemberClient is a client for the Member schema.
 type MemberClient struct {
 	config
@@ -638,6 +778,12 @@ func NewMemberClient(c config) *MemberClient {
 // A call to `Use(f, g, h)` equals to `member.Hooks(f(g(h())))`.
 func (c *MemberClient) Use(hooks ...Hook) {
 	c.hooks.Member = append(c.hooks.Member, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `member.Intercept(f(g(h())))`.
+func (c *MemberClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Member = append(c.inters.Member, interceptors...)
 }
 
 // Create returns a builder for creating a Member entity.
@@ -692,6 +838,8 @@ func (c *MemberClient) DeleteOneID(id int64) *MemberDeleteOne {
 func (c *MemberClient) Query() *MemberQuery {
 	return &MemberQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeMember},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -711,7 +859,7 @@ func (c *MemberClient) GetX(ctx context.Context, id int64) *Member {
 
 // QueryGroupz queries the groupz edge of a Member.
 func (c *MemberClient) QueryGroupz(m *Member) *GroupzQuery {
-	query := &GroupzQuery{config: c.config}
+	query := (&GroupzClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := m.ID
 		step := sqlgraph.NewStep(
@@ -728,4 +876,24 @@ func (c *MemberClient) QueryGroupz(m *Member) *GroupzQuery {
 // Hooks returns the client hooks.
 func (c *MemberClient) Hooks() []Hook {
 	return c.hooks.Member
+}
+
+// Interceptors returns the client interceptors.
+func (c *MemberClient) Interceptors() []Interceptor {
+	return c.inters.Member
+}
+
+func (c *MemberClient) mutate(ctx context.Context, m *MemberMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MemberCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MemberUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MemberDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Member mutation op: %q", m.Op())
+	}
 }
