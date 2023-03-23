@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { View, Image, StyleSheet } from 'react-native'
+import { View, Image, StyleSheet, ScrollView } from 'react-native'
 import { Text, IconButton, Button, TextInput } from 'react-native-paper'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
@@ -14,7 +14,6 @@ import { CreateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
 import {
   createGroupThunk
 } from '../../../../redux/features/groupList/thunk'
-import { ScrollView } from 'react-native-gesture-handler'
 
 export default function GroupAdd({
   navigation,
@@ -40,6 +39,12 @@ export default function GroupAdd({
   }
 
   const createNewGroup = async () => {
+    if(groupInfo.name == "" || groupInfo.backgroundPicture == "")
+    {
+      toast.error({ message: 'Group name or image link cannot be empty!' })
+      return
+    }
+
     const req: CreateGroupRequest.AsObject = {
       groupInfo: {
         id: groupInfo.id,
@@ -73,6 +78,8 @@ export default function GroupAdd({
             }
           />
         </View>
+
+        {groupInfo.name && <Text style={styles(theme).groupTitle}>{groupInfo.name}</Text>}
 
         <Text style={styles(theme).title}>Group name </Text>
         <TextInput
@@ -172,6 +179,11 @@ const styles = (theme: AppTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 20,
+    },
+    groupTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      alignSelf: 'center',
     },
 })
 

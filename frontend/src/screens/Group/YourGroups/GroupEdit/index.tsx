@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { View, Image, StyleSheet } from 'react-native'
+import { View, Image, StyleSheet, Alert, ScrollView } from 'react-native'
 import { Text, IconButton, Button, TextInput } from 'react-native-paper'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
@@ -9,12 +9,12 @@ import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
 import * as Clipboard from 'expo-clipboard';
 
-import { UpdateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
+import { UpdateGroupRequest, GroupInfo, DeleteGroupRequest } from '../../../../lib/group/group_pb'
 
 import {
-  createGroupThunk, updateGroupThunk
+  updateGroupThunk,
+  deleteGroupThunk
 } from '../../../../redux/features/groupList/thunk'
-import { ScrollView } from 'react-native-gesture-handler'
 
 export default function GroupEdit({
   navigation,
@@ -40,7 +40,44 @@ export default function GroupEdit({
     setGroupInfo({...groupInfo, backgroundPicture: text})
   }
 
+  const deleteGroupOrNot = () => {
+    Alert.alert(
+      'Delete Group',
+      'Are you sure you want to delete this group?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        { text: 'Yes', onPress: () => deleteGroupConfirmed() },
+      ],
+      { cancelable: false }
+    )
+  }
+
+  const deleteGroupConfirmed = async () => {
+    const req: DeleteGroupRequest.AsObject = {
+      idToDelete: groupInfo.id
+    }
+
+    const { error } = await dispatch(deleteGroupThunk(req)).unwrap()
+    if (error) {
+      toast.error({ message: 'An error occured, please try again!' })
+      return
+    }
+    else {
+      toast.success({ message: 'Group deleted!' })
+      navigation.popToTop()
+    }
+  }
+
   const updateInfoGroup = async () => {
+    if(groupInfo.name == "" || groupInfo.backgroundPicture == "")
+    {
+      toast.error({ message: 'Group name or image link cannot be empty!' })
+      return
+    }
+
     const req: UpdateGroupRequest.AsObject = {
       groupinfo: {
         id: groupInfo.id,
@@ -65,6 +102,16 @@ export default function GroupEdit({
     <View style={baseStyles(theme).container}>
       <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
         <View style={styles(theme).imgContainer}>
+          <IconButton
+              style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+              }}
+              icon="trash-can"
+              size={30}
+              onPress={() => deleteGroupOrNot()}
+          />
           <Image
             style={styles(theme).profilePicture}
             source={
@@ -74,6 +121,8 @@ export default function GroupEdit({
             }
           />
         </View>
+
+        {groupInfo.name && <Text style={styles(theme).groupTitle}>{groupInfo.name}</Text>}
 
         <Text style={styles(theme).title}>Group name </Text>
         <TextInput
@@ -171,6 +220,11 @@ const styles = (theme: AppTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 20,
+    },
+    groupTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      alignSelf: 'center',
     },
 })
 

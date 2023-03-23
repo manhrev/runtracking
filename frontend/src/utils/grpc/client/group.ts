@@ -6,6 +6,8 @@ import {
   GroupInfo,
   UpdateGroupRequest,
   UpdateGroupReply,
+  DeleteGroupRequest,
+  DeleteGroupReply,
 } from '../../../lib/group/group_pb'
 import { GRPCClientConfig } from '../abstract/types'
 import gRPCClientAbstract from '../abstract/gRPCClient'
@@ -59,6 +61,15 @@ class rpcGroupClient extends gRPCClientAbstract {
     req.setGroupinfo(newInfo)
     return await this.gRPCClientRequest<UpdateGroupReply.AsObject>(
       'updateGroup',
+      req
+    )
+  }
+
+  async deleteGroup(param: DeleteGroupRequest.AsObject) {
+    const req = new DeleteGroupRequest()
+    req.setIdToDelete(param.idToDelete)
+    return await this.gRPCClientRequest<DeleteGroupReply.AsObject>(
+      'deleteGroup',
       req
     )
   }
