@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { View, Image, StyleSheet } from 'react-native'
+import { View, Image, StyleSheet, ScrollView } from 'react-native'
 import { Text, IconButton, Button, TextInput } from 'react-native-paper'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
@@ -7,6 +7,7 @@ import { baseStyles } from '../../../baseStyle'
 import { useState } from 'react'
 import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
+import * as Clipboard from 'expo-clipboard';
 
 import { CreateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
 
@@ -20,15 +21,30 @@ export default function GroupAdd({
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'GroupAdd'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-
   const [groupInfo, setGroupInfo] = useState<GroupInfo.AsObject>({
     id: 0,
     name: 'Example Group',
     description: 'Example Description',
-    backgroundPicture: '',
+    backgroundPicture: 'https://cdn.dribbble.com/users/2984251/screenshots/15487625/media/1501cb8cd7dbdb88127b7402c2692acd.png?compress=1&resize=1000x750&vertical=top',
   })
 
+  const copiedTextToImageLink = async () => {
+    const text: any = await Clipboard.getStringAsync();
+    if(text == null || text == "")
+    {
+      toast.error({ message: 'Clipboard is empty!' })
+      return
+    }
+    setGroupInfo({...groupInfo, backgroundPicture: text})
+  }
+
   const createNewGroup = async () => {
+    if(groupInfo.name == "" || groupInfo.backgroundPicture == "")
+    {
+      toast.error({ message: 'Group name or image link cannot be empty!' })
+      return
+    }
+
     const req: CreateGroupRequest.AsObject = {
       groupInfo: {
         id: groupInfo.id,
@@ -51,13 +67,19 @@ export default function GroupAdd({
 
   return (
     <View style={baseStyles(theme).container}>
-      <View style={baseStyles(theme).innerWrapper}>
+      <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
         <View style={styles(theme).imgContainer}>
           <Image
             style={styles(theme).profilePicture}
-            source={require('../../../../../assets/group-img.png')}
+            source={
+              groupInfo.backgroundPicture == "" ?
+              require('../../../../../assets/group-img.png') :
+              { uri: groupInfo.backgroundPicture }
+            }
           />
         </View>
+
+        {groupInfo.name && <Text style={styles(theme).groupTitle}>{groupInfo.name}</Text>}
 
         <Text style={styles(theme).title}>Group name </Text>
         <TextInput
@@ -66,6 +88,22 @@ export default function GroupAdd({
             onChangeText={text => setGroupInfo({...groupInfo, name: text})}
         />
 
+        <Text style={styles(theme).title}>Image link </Text>
+        <TextInput
+            mode="outlined"
+            value={groupInfo.backgroundPicture}
+            onChangeText={text => setGroupInfo({...groupInfo, backgroundPicture: text})}
+            right={groupInfo.backgroundPicture == "" ?
+                <TextInput.Icon
+                  icon="clipboard-arrow-down-outline"
+                  onPress={() => copiedTextToImageLink()}
+                /> :
+                <TextInput.Icon
+                  icon="window-close"
+                  onPress={() => setGroupInfo({...groupInfo, backgroundPicture: ""})}
+                />
+            }
+        />
 
         <Text style={styles(theme).title}>Group description </Text>
         <TextInput
@@ -76,6 +114,8 @@ export default function GroupAdd({
           value={groupInfo.description}
           onChangeText={(text) => setGroupInfo({...groupInfo, description: text})}
         />
+
+        
         
         <View style={styles(theme).btnContainer}>
           <Button
@@ -95,7 +135,7 @@ export default function GroupAdd({
             Create
           </Button>
         </View>
-      </View>
+      </ScrollView>
     </View>
   )
 }
@@ -138,6 +178,12 @@ const styles = (theme: AppTheme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      marginBottom: 20,
+    },
+    groupTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      alignSelf: 'center',
     },
 })
 
