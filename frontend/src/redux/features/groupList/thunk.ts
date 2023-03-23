@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { CreateGroupRequest, UpdateGroupRequest, ListGroupRequest } from '../../../lib/group/group_pb'
+import { CreateGroupRequest, UpdateGroupRequest, DeleteGroupRequest, ListGroupRequest } from '../../../lib/group/group_pb'
 import { groupClient } from '../../../utils/grpc'
 
 export const listGroupExploreThunk = createAsyncThunk(
@@ -27,5 +27,12 @@ export const updateGroupThunk = createAsyncThunk(
   'group/updateGroup',
   async (payload: UpdateGroupRequest.AsObject) => {
     return await groupClient.updateGroup(payload)
+  }
+)
+
+export const deleteGroupThunk = createAsyncThunk(
+  'group/deleteGroup',
+  async (payload: DeleteGroupRequest.AsObject) => {
+    return await groupClient.deleteGroup(payload)
   }
 )

@@ -3,7 +3,7 @@ import { GroupInfo } from '../../../lib/group/group_pb'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
-import { createGroupThunk, updateGroupThunk, listGroupExploreThunk, listMoreGroupExploreThunk } from './thunk'
+import { createGroupThunk, updateGroupThunk, deleteGroupThunk, listGroupExploreThunk, listMoreGroupExploreThunk } from './thunk'
 
 type GroupListState = {
   groupList: Array<GroupInfo.AsObject>
@@ -48,6 +48,12 @@ const slice = createSlice({
         state.status = StatusEnum.SUCCEEDED
       })
       .addCase(updateGroupThunk.fulfilled, (state, { payload }) => {
+        const { response, error } = payload
+        if (error) return
+        // state.groupList = [response?.groupInfo || {}].concat(state.groupList)
+        state.status = StatusEnum.SUCCEEDED
+      })
+      .addCase(deleteGroupThunk.fulfilled, (state, { payload }) => {
         const { response, error } = payload
         if (error) return
         // state.groupList = [response?.groupInfo || {}].concat(state.groupList)

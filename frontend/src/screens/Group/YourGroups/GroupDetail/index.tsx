@@ -56,7 +56,11 @@ export default function GroupDetail({
             />
             <Image
                 style={styles(theme).profilePicture}
-                source={require('../../../../../assets/group-img.png')}
+                source={
+                    route.params.groupInfo.backgroundPicture == "" ?
+                    require('../../../../../assets/group-img.png') :
+                    { uri: route.params.groupInfo.backgroundPicture }
+                  }
             />
         </View>
 
