@@ -7,6 +7,7 @@ import user from './features/user/slice'
 import planList from './features/planList/slice'
 import notificationList from './features/notification/slice'
 import groupList from './features/groupList/slice'
+import yourGroupList from './features/yourGroupList/slice'
 
 const rootReducer = combineReducers({
   common,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   planList,
   notificationList,
   groupList,
+  yourGroupList,
 })
 
 export type RootState = ReturnType<typeof rootReducer>

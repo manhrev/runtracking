@@ -6,7 +6,7 @@ import {
   Text,
   TouchableRipple,
 } from 'react-native-paper'
-import { GroupInfo } from '../../../../lib/group/group_pb'
+import { GroupInfo, Member } from '../../../../lib/group/group_pb'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { formatDateWithoutTime } from '../../../../utils/helpers'
 
@@ -26,7 +26,7 @@ export default function GroupItem({
   onSubmit,
 }: GroupItemProps) {
   const theme = useAppTheme()
-  const { name, numOfMembers, createdAt } = group
+  const { numOfMembers, createdAt, memberStatus } = group
   return (
     <TouchableRipple onPress={() => navigateFunc()}>
       <>
@@ -49,7 +49,7 @@ export default function GroupItem({
             >
               <View style={{ marginLeft: 12 }}>
                 <Text variant="titleMedium" style={{ fontWeight: '700' }}>
-                  {name}
+                  {group.name}
                 </Text>
                 <Text variant="bodyMedium">{numOfMembers} members</Text>
                 <Text variant="bodyMedium">
@@ -63,14 +63,21 @@ export default function GroupItem({
                   flex: 1,
                 }}
               >
-                <Button
-                  mode="contained-tonal"
-                  onPress={() => {
-                    onSubmit()
-                  }}
-                >
-                  Join
-                </Button>
+                {memberStatus === Member.Status.MEMBER_STATUS_UNSPECIFIED && (
+                  <Button
+                    mode="contained-tonal"
+                    onPress={() => {
+                      onSubmit()
+                    }}
+                  >
+                    Join
+                  </Button>
+                )}
+                {memberStatus === Member.Status.MEMBER_STATUS_WAITING && (
+                  <Button mode="contained-tonal" disabled>
+                    Requested
+                  </Button>
+                )}
               </View>
             </View>
           </View>

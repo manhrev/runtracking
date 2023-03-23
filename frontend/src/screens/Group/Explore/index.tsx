@@ -4,7 +4,11 @@ import { ScrollView, View } from 'react-native'
 import { RefreshControl } from 'react-native-gesture-handler'
 import { Button, Divider, Searchbar, Text } from 'react-native-paper'
 import { useDialog } from '../../../hooks/useDialog'
-import { GroupSortBy, ListGroupRequest } from '../../../lib/group/group_pb'
+import {
+  GroupInfo,
+  GroupSortBy,
+  ListGroupRequest,
+} from '../../../lib/group/group_pb'
 import { RootGroupTopTabsParamList } from '../../../navigators/GroupTopTab'
 import {
   isGroupListLoading,
@@ -158,7 +162,7 @@ export default function Explore({
               No data
             </Text>
           )}
-          {groupList.map((group, idx) => {
+          {groupList.map((group: GroupInfo.AsObject, idx) => {
             return (
               <GroupItem
                 key={idx}
