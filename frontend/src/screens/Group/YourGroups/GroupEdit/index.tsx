@@ -7,12 +7,14 @@ import { baseStyles } from '../../../baseStyle'
 import { useState } from 'react'
 import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
+import * as Clipboard from 'expo-clipboard';
 
 import { UpdateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
 
 import {
   createGroupThunk, updateGroupThunk
 } from '../../../../redux/features/groupList/thunk'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export default function GroupEdit({
   navigation,
@@ -27,6 +29,16 @@ export default function GroupEdit({
     description: route.params.groupInfo.description,
     backgroundPicture: route.params.groupInfo.backgroundPicture,
   })
+
+  const copiedTextToImageLink = async () => {
+    const text: any = await Clipboard.getStringAsync();
+    if(text == null || text == "")
+    {
+      toast.error({ message: 'Clipboard is empty!' })
+      return
+    }
+    setGroupInfo({...groupInfo, backgroundPicture: text})
+  }
 
   const updateInfoGroup = async () => {
     const req: UpdateGroupRequest.AsObject = {
@@ -51,11 +63,15 @@ export default function GroupEdit({
 
   return (
     <View style={baseStyles(theme).container}>
-      <View style={baseStyles(theme).innerWrapper}>
+      <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
         <View style={styles(theme).imgContainer}>
           <Image
             style={styles(theme).profilePicture}
-            source={require('../../../../../assets/group-img.png')}
+            source={
+              groupInfo.backgroundPicture == "" ?
+              require('../../../../../assets/group-img.png') :
+              { uri: groupInfo.backgroundPicture }
+            }
           />
         </View>
 
@@ -66,6 +82,22 @@ export default function GroupEdit({
             onChangeText={text => setGroupInfo({...groupInfo, name: text})}
         />
 
+        <Text style={styles(theme).title}>Image link </Text>
+        <TextInput
+            mode="outlined"
+            value={groupInfo.backgroundPicture}
+            onChangeText={text => setGroupInfo({...groupInfo, backgroundPicture: text})}
+            right={groupInfo.backgroundPicture == "" ?
+                <TextInput.Icon
+                  icon="clipboard-arrow-down-outline"
+                  onPress={() => copiedTextToImageLink()}
+                /> :
+                <TextInput.Icon
+                  icon="window-close"
+                  onPress={() => setGroupInfo({...groupInfo, backgroundPicture: ""})}
+                />
+            }
+        />
 
         <Text style={styles(theme).title}>Group description </Text>
         <TextInput
@@ -95,7 +127,7 @@ export default function GroupEdit({
             Save
           </Button>
         </View>
-      </View>
+      </ScrollView>
     </View>
   )
 }
@@ -138,6 +170,7 @@ const styles = (theme: AppTheme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      marginBottom: 20,
     },
 })
 
