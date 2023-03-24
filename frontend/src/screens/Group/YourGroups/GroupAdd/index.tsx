@@ -26,6 +26,11 @@ export default function GroupAdd({
     name: 'Example Group',
     description: 'Example Description',
     backgroundPicture: 'https://cdn.dribbble.com/users/2984251/screenshots/15487625/media/1501cb8cd7dbdb88127b7402c2692acd.png?compress=1&resize=1000x750&vertical=top',
+    leaderId: 0,
+    memberStatus: 0,
+    numOfMembers: 0,
+    numOfChallenge: 0,
+    numOfEventParticipated: 0,
   })
 
   const copiedTextToImageLink = async () => {
@@ -51,6 +56,11 @@ export default function GroupAdd({
         name: groupInfo.name,
         description: groupInfo.description,
         backgroundPicture: groupInfo.backgroundPicture,
+        leaderId: groupInfo.leaderId,
+        memberStatus: groupInfo.memberStatus,
+        numOfMembers: groupInfo.numOfMembers,
+        numOfChallenge: groupInfo.numOfChallenge,
+        numOfEventParticipated: groupInfo.numOfEventParticipated,
       }
     }
 

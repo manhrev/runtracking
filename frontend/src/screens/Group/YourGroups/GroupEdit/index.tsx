@@ -28,6 +28,11 @@ export default function GroupEdit({
     name: route.params.groupInfo.name,
     description: route.params.groupInfo.description,
     backgroundPicture: route.params.groupInfo.backgroundPicture,
+    leaderId: 0,
+    memberStatus: 0,
+    numOfMembers: 0,
+    numOfChallenge: 0,
+    numOfEventParticipated: 0,
   })
 
   const copiedTextToImageLink = async () => {
@@ -84,6 +89,11 @@ export default function GroupEdit({
         name: groupInfo.name,
         description: groupInfo.description,
         backgroundPicture: groupInfo.backgroundPicture,
+        leaderId: groupInfo.leaderId,
+        memberStatus: groupInfo.memberStatus,
+        numOfMembers: groupInfo.numOfMembers,
+        numOfChallenge: groupInfo.numOfChallenge,
+        numOfEventParticipated: groupInfo.numOfEventParticipated,
       }
     }
 

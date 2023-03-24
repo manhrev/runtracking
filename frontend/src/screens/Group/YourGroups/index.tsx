@@ -140,6 +140,11 @@ export default function YourGroups({
                 key={idx}
                 group={group}
                 showBottomDivider={idx === yourGroupList.length - 1}
+                navigateFunc={() => {
+                  navigation.navigate('GroupDetail', {
+                    groupInfo: group,
+                  })
+                }}
               />
             )
           })}
