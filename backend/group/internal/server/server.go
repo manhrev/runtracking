@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -13,6 +14,7 @@ import (
 	pb "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -26,7 +28,8 @@ var (
 	auth_service string = os.Getenv("AUTH_SERVICE")
 	auth_port    string = os.Getenv("AUTH_PORT")
 
-	listen_port string = os.Getenv("LISTEN_PORT")
+	listen_port          string = os.Getenv("LISTEN_PORT")
+	is_secure_connection        = os.Getenv("IS_SECURE_CONNECTION")
 )
 
 func Run() {
@@ -54,9 +57,15 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", auth_service, auth_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// connection credentials
+	creds := insecure.NewCredentials()
+	if is_secure_connection == "true" {
+		creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})
+	}
+
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", auth_service, auth_port), grpc.WithTransportCredentials(creds))
 	if err != nil {
-		log.Fatalf("error while create connect to sample service: %v", err)
+		log.Fatalf("error while create connect to auth service: %v", err)
 	}
 	authClient := auth.NewAuthIClient(conn)
 
