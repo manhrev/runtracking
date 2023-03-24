@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -22,6 +23,7 @@ import (
 	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -35,7 +37,8 @@ var (
 	notification_service string = os.Getenv("NOTIFICATION_SERVICE")
 	notification_port    string = os.Getenv("NOTIFICATION_PORT")
 
-	listen_port string = os.Getenv("LISTEN_PORT")
+	listen_port          string = os.Getenv("LISTEN_PORT")
+	is_secure_connection        = os.Getenv("IS_SECURE_CONNECTION")
 )
 
 func Run() {
@@ -63,9 +66,15 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", notification_service, notification_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// connection credentials
+	creds := insecure.NewCredentials()
+	if is_secure_connection == "true" {
+		creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})
+	}
+
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", notification_service, notification_port), grpc.WithTransportCredentials(creds))
 	if err != nil {
-		log.Fatalf("error while create connect to sample service: %v", err)
+		log.Fatalf("error while create connect to notification service: %v", err)
 	}
 	notificationClient := notification.NewNotificationIClient(conn)
 
