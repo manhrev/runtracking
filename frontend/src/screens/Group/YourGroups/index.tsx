@@ -1,12 +1,14 @@
+import { useFocusEffect } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   View,
   TouchableOpacity,
   ScrollView,
   RefreshControl,
 } from 'react-native'
-import { Text, IconButton, Button } from 'react-native-paper'
+import { Text, IconButton, Button, Portal, FAB } from 'react-native-paper'
+import { FabGroup } from '../../../comp/FabGroup'
 import {
   GroupInfo,
   GroupSortBy,
@@ -44,7 +46,6 @@ export default function YourGroups({
   const [currentOffset, setCurrentOffset] = useState(0)
   const [sortBy, setSortBy] = useState(GroupSortBy.GROUP_SORT_BY_CREATED_TIME)
   const filterBy = ListGroupRequest.FilterBy.FILTER_BY_IS_MEMBER
-
   useEffect(() => {
     fetchListYourGroups()
   }, [dispatch, sortBy, asc])
@@ -100,32 +101,16 @@ export default function YourGroups({
             />
           }
         >
-          <TouchableOpacity
-            onPress={() => navigation.navigate('GroupAdd')}
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              alignSelf: 'flex-end',
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                color: theme.colors.primary,
-              }}
-            >
-              NEW GROUP
-            </Text>
-
-            <IconButton
-              icon="plus-circle"
-              style={{ alignSelf: 'flex-end', marginRight: 10 }}
-              iconColor={theme.colors.primary}
-              size={30}
-            />
-          </TouchableOpacity>
+          <FabGroup
+            actions={[
+              {
+                icon: 'plus',
+                label: 'Create a group',
+                onPress: () => navigation.navigate('GroupAdd'),
+              },
+            ]}
+            type="tertiary"
+          />
           {noData && (
             <Text
               variant="bodyLarge"
