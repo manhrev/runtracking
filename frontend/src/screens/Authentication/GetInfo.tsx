@@ -15,18 +15,20 @@ export default function GetInfo({
   const [age, setAge] = useState('')
   const [height, setHeight] = useState('')
   const [weight, setWeight] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleContinue = async () => {
     if (age == '' || height == '' || weight == '') {
       toast.error({ message: 'Please fill all fields' })
       return
     }
-
+    setLoading(true)
     const { error } = await authClient.updateHealthInfo({
       age: parseInt(age),
       height: parseInt(height),
       weight: parseInt(weight),
     })
+    setLoading(false)
 
     if (error) {
       toast.error({ message: 'An error occurred, please try again' })
@@ -107,6 +109,7 @@ export default function GetInfo({
             onPress={handleContinue}
             style={{ marginTop: 30, borderRadius: 50 }}
             contentStyle={{ paddingVertical: 5, borderRadius: 100 }}
+            loading={loading}
           >
             <Text
               variant="titleMedium"
