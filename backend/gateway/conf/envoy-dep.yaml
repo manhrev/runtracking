@@ -165,7 +165,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: notification-jzg35jprna-uc.a.run.app
+                      address: notification-jzg35jprna-as.a.run.app
                       port_value: 443
       transport_socket:
         name: envoy.transport_sockets.tls
