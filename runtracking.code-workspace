@@ -10,10 +10,7 @@
 			"path": "backend/notification"
 		},
 		{
-			"path": "backend/activity"
-		},
-		{
-			"path": "backend/group"
+			"path": "backend/intermediary"
 		}
 	],
 	"settings": {}

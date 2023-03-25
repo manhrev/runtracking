@@ -4,8 +4,7 @@ import (
 	"context"
 
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
-	"github.com/manhrev/runtracking/backend/notification/helper"
-	"github.com/manhrev/runtracking/backend/notification/internal/service/cloudtask"
+	"github.com/manhrev/runtracking/backend/intermediary/helper"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -13,7 +12,7 @@ type receiverAdmin struct {
 	authClient auth.AuthIClient
 }
 
-func (r *receiverAdmin) GetAllUsers(ctx context.Context, message cloudtask.NotificationTransfer) ([]*auth.UserInfo, error) {
+func (r *receiverAdmin) GetAllUsers(ctx context.Context, message NotificationTransfer) ([]*auth.UserInfo, error) {
 	var users *auth.GetAllUsersReply
 	var err error
 	if len(message.ReceivedIds) > 0 {

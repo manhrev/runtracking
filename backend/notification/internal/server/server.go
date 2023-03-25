@@ -2,25 +2,17 @@ package server
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
-
 	_ "github.com/go-sql-driver/mysql"
-	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/internal/server/notification"
 	"github.com/manhrev/runtracking/backend/notification/internal/server/notificationi"
-	"github.com/manhrev/runtracking/backend/notification/internal/service/expopush"
 	pb "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -34,7 +26,6 @@ var (
 	auth_port    string = os.Getenv("AUTH_PORT")
 
 	listen_port          string = os.Getenv("LISTEN_PORT")
-	listen_http_port     string = os.Getenv("LISTEN_HTTP_PORT")
 	is_secure_connection        = os.Getenv("IS_SECURE_CONNECTION")
 )
 
@@ -63,30 +54,9 @@ func Serve(server *grpc.Server) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	expoPushService := expopush.NewExpoPushService(entClient)
-
-	// connection credentials
-	creds := insecure.NewCredentials()
-	if is_secure_connection == "true" {
-		creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})
-	}
-
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", auth_service, auth_port), grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("error while create connect to auth service: %v", err)
 	}
-	authClient := auth.NewAuthIClient(conn)
-
-	// http.HandleFunc("/notification/pushnoti2allusers", notification.PushNoti2AllUsers)
-	r := mux.NewRouter()
-	notificationi.RegisterRouteHttpServer(entClient, r, authClient, expoPushService)
-
-	go func() {
-		err = http.ListenAndServe(fmt.Sprintf(":%s", listen_http_port), r)
-		if err != nil {
-			log.Fatalf("Failed to serve http server: %v", err)
-		}
-	}()
 
 	// register main and other server servers
 	pb.RegisterNotificationServer(server, notification.NewServer(entClient))
