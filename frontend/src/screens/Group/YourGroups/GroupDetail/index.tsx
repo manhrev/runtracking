@@ -67,18 +67,6 @@ export default function GroupDetail({
         </View>
 
         <Text style={styles(theme).groupTitle}>{route.params.groupInfo.name}</Text>
-        
-        
-        {/* {route.params.groupInfo.memberStatus == Member.Status.MEMBER_STATUS_ACTIVE && <Button
-            style={styles(theme).joinButton}
-            mode="contained"
-            onPress={() => {}}
-            labelStyle={{
-                fontSize: 15
-            }}
-        >
-            Joined &#10003;
-        </Button>} */}
 
         {route.params.groupInfo.memberStatus === Member.Status.MEMBER_STATUS_ACTIVE && (
             <Button
@@ -119,7 +107,7 @@ export default function GroupDetail({
             </Button>
         )}
 
-        <Text style={styles(theme).athTitle}>3,000 ATH</Text>
+        <Text style={styles(theme).athTitle}>{route.params.groupInfo.numOfMembers} ATH(s)</Text>
 
         <Divider bold style={{ width: '100%', marginTop: 20 }} />
         <Button
@@ -128,7 +116,10 @@ export default function GroupDetail({
                 alignSelf: 'center',
             }}
             mode="text"
-            onPress={() => {}}
+            onPress={() => navigation.navigate('GroupMembers', { 
+                groupId: route.params.groupInfo.id,
+                isLeader: userState.userId == route.params.groupInfo.leaderId,
+            })}
             labelStyle={{
                 fontSize: 15
             }}

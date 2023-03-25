@@ -24,6 +24,7 @@ import NotificationList from '../screens/Profile/NotificationList'
 import GroupAdd from '../screens/Group/YourGroups/GroupAdd'
 import GroupDetail from '../screens/Group/YourGroups/GroupDetail'
 import GroupEdit from '../screens/Group/YourGroups/GroupEdit'
+import GroupMembers from '../screens/Group/YourGroups/GroupMembers'
 import { toast } from '../utils/toast/toast'
 
 export type RootBaseStackParamList = {
@@ -89,6 +90,10 @@ export type RootBaseStackParamList = {
   }
   GroupEdit: {
     groupInfo: GroupInfo.AsObject
+  }
+  GroupMembers: {
+    groupId: number,
+    isLeader: boolean
   }
 }
 
@@ -214,6 +219,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={GroupEdit}
+          />
+          <Stack.Screen
+            name="GroupMembers"
+            options={{
+              title: 'Members of Group',
+              headerBackVisible: true,
+            }}
+            component={GroupMembers}
           />
         </>
       ) : (

@@ -107,6 +107,7 @@ export default function Explore({
         toast.success({
           message: 'Join group request sent, waiting for accept',
         })
+        fetchListGroup()
       }
     } else {
       toast.error({ message: 'Something went wrong, please try again later' })

@@ -10,6 +10,10 @@ import {
   JoinGroupRequest,
   DeleteGroupRequest,
   DeleteGroupReply,
+  ListMembersOfGroupRequest,
+  ListMembersOfGroupReply,
+  AcceptMemberRequest,
+  AcceptMemberReply,
 } from '../../../lib/group/group_pb'
 import { GRPCClientConfig } from '../abstract/types'
 import gRPCClientAbstract from '../abstract/gRPCClient'
@@ -81,6 +85,34 @@ class rpcGroupClient extends gRPCClientAbstract {
     req.setIdToDelete(param.idToDelete)
     return await this.gRPCClientRequest<DeleteGroupReply.AsObject>(
       'deleteGroup',
+      req
+    )
+  }
+
+  // member
+  async listMembersOfGroup(param: ListMembersOfGroupRequest.AsObject) {
+    const req = new ListMembersOfGroupRequest()
+    req.setGroupId(param.groupId)
+    req.setAscending(param.ascending)
+    req.setLimit(param.limit)
+    req.setOffset(param.offset)
+    req.setSortBy(param.sortBy)
+    req.setSearchByName(param.searchByName)
+    req.setStatus(param.status)
+
+    return await this.gRPCClientRequest<ListMembersOfGroupReply.AsObject>(
+      'listMembersOfGroup',
+      req
+    )
+  }
+
+  async acceptMember(param: AcceptMemberRequest.AsObject) {
+    const req = new AcceptMemberRequest()
+    req.setGroupId(param.groupId)
+    req.setMemberId(param.memberId)
+
+    return await this.gRPCClientRequest<AcceptMemberReply.AsObject>(
+      'acceptMember',
       req
     )
   }
