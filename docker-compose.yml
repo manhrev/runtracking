@@ -36,6 +36,7 @@ services:
       CACHE_PORT: 6379
       CACHE_PASSWORD: ""
       CACHE_DB: 0
+      IS_SECURE_CONNECTION: "false"
 
   group:
     build:
@@ -56,6 +57,7 @@ services:
       DB_NAME: group
       AUTH_SERVICE: auth
       AUTH_PORT: 8080
+      IS_SECURE_CONNECTION: "false"
 
   activity:
     build:
@@ -76,6 +78,7 @@ services:
       DB_NAME: activity
       PLANI_DOMAIN: plan
       PLANI_PORT: 8080
+      IS_SECURE_CONNECTION: "false"
 
   notification:
     build:
@@ -104,6 +107,7 @@ services:
       GCP_CLOUD_TASK_PROJECT_ID: daring-acumen-370401
       GCP_CLOUD_TASK_LOCATION_ID: asia-southeast2
       GCP_CLOUD_TASK_QUEUE_ID: test-queue1
+      IS_SECURE_CONNECTION: "false"
 
   plan:
     build:
@@ -126,6 +130,7 @@ services:
       DB_NAME: plan
       NOTIFICATIONI_DOMAIN: notification
       NOTIFICATIONI_PORT: 8080
+      IS_SECURE_CONNECTION: "false"
 
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest

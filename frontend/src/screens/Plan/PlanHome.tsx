@@ -31,6 +31,7 @@ import {
   toDate,
 } from '../../utils/helpers'
 import { toast } from '../../utils/toast/toast'
+import { FabGroup } from '../../comp/FabGroup'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -63,6 +64,7 @@ export default function Plan({
           limit: 100,
           offset: 0,
           sortBy: 1,
+          idsList: [],
         })
       ).unwrap()
     }, [])
@@ -145,29 +147,30 @@ export default function Plan({
     <>
       <View style={styles(theme).container}>
         <View style={styles(theme).btnContainer}>
-          <Button
-            mode="text"
-            onPress={() => {
-              navigation.navigate('PlanAdd')
-            }}
-            style={styles(theme).addPlanBtn}
-            labelStyle={{ fontSize: 16 }}
-          >
-            ADD NEW PLAN
-          </Button>
-
-          {deleteListId.length > 0 && (
-            <Button
-              mode="text"
-              onPress={() => deletePlanOrNot()}
-              style={styles(theme).selectPlanBtn}
-              labelStyle={{
-                fontSize: 16,
-                color: '#e82525',
-              }}
-            >
-              DELETE({deleteListId.length})
-            </Button>
+          {deleteListId.length > 0 ? (
+            <FabGroup
+              // icon="delete"
+              actions={[
+                {
+                  icon: 'delete',
+                  label: 'Remove selected plans',
+                  onPress: () => deletePlanOrNot(),
+                  color: theme.colors.onError,
+                  style: { backgroundColor: theme.colors.error },
+                },
+              ]}
+              type="error"
+            />
+          ) : (
+            <FabGroup
+              actions={[
+                {
+                  icon: 'plus',
+                  label: 'Create new plan',
+                  onPress: () => navigation.navigate('PlanAdd'),
+                },
+              ]}
+            />
           )}
         </View>
 
@@ -390,6 +393,7 @@ const styles = (theme: AppTheme) =>
       marginRight: 10,
     },
     btnContainer: {
+      marginTop: 40,
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
