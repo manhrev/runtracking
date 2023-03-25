@@ -13,18 +13,20 @@ interface GroupItemProps {
   hideTopDivider?: boolean
   showBottomDivider?: boolean
   group: GroupInfo.AsObject
+  navigateFunc: () => void
 }
 
 export default function GroupItem({
   hideTopDivider,
   showBottomDivider,
   group,
+  navigateFunc,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const { name, numOfMembers } = group
 
   return (
-    <TouchableRipple style={{ borderRadius: 10 }} onPress={() => {}} borderless>
+    <TouchableRipple style={{ borderRadius: 10 }} onPress={() => navigateFunc()} borderless>
       <View>
         {!hideTopDivider && <Divider />}
         <View style={styles(theme).listItemContainer}>

@@ -5,10 +5,10 @@ import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
 import { useState } from 'react'
-import { useAppDispatch } from '../../../../redux/store'
+import { useAppDispatch, useAppSelector } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
 
-import { CreateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
+import { Member } from '../../../../lib/group/group_pb'
 
 import {
   createGroupThunk
@@ -20,6 +20,8 @@ export default function GroupDetail({
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'GroupDetail'>) {
     const theme = useAppTheme()
     const dispatch = useAppDispatch()
+
+    const userState  = useAppSelector((state) => state.user);
 
     const testData = [
         {
@@ -44,7 +46,7 @@ export default function GroupDetail({
     <View style={baseStyles(theme).container}>
       <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
         <View style={styles(theme).imgContainer}>
-            <IconButton
+            {userState.userId == route.params.groupInfo.leaderId && <IconButton
                 style={{
                     position: 'absolute',
                     top: 0,
@@ -53,30 +55,59 @@ export default function GroupDetail({
                 icon="pencil"
                 size={30}
                 onPress={() => navigation.navigate('GroupEdit', { groupInfo: route.params.groupInfo })}
-            />
+            />}
             <Image
                 style={styles(theme).profilePicture}
                 source={
                     route.params.groupInfo.backgroundPicture == "" ?
                     require('../../../../../assets/group-img.png') :
                     { uri: route.params.groupInfo.backgroundPicture }
-                  }
+                }
             />
         </View>
 
         <Text style={styles(theme).groupTitle}>{route.params.groupInfo.name}</Text>
-        
-        <Button
-            style={styles(theme).joinButton}
-            mode="contained"
-            onPress={() => {}}
-            labelStyle={{
-                fontSize: 15
-            }}
-        >
-            Joined &#10003;
-        </Button>
-        <Text style={styles(theme).athTitle}>3,000 ATH</Text>
+
+        {route.params.groupInfo.memberStatus === Member.Status.MEMBER_STATUS_ACTIVE && (
+            <Button
+                style={styles(theme).joinButton}
+                mode="contained"
+                onPress={() => {}}
+                labelStyle={{
+                    fontSize: 15
+                }}
+            >
+                Joined &#10003;
+            </Button>
+        )}
+        {route.params.groupInfo.memberStatus === Member.Status.MEMBER_STATUS_WAITING && (
+            <Button
+                style={styles(theme).joinButton}
+                buttonColor="#e68a00"
+                mode="contained"
+                onPress={() => {}}
+                labelStyle={{
+                    fontSize: 15
+                }}
+            >
+                Requested
+            </Button>
+        )}
+        {route.params.groupInfo.memberStatus === (Member.Status.MEMBER_STATUS_BANNED || Member.Status.MEMBER_STATUS_REJECTED) && (
+            <Button
+                style={styles(theme).joinButton}
+                buttonColor="#e82525"
+                mode="contained"
+                onPress={() => {}}
+                labelStyle={{
+                    fontSize: 15
+                }}
+            >
+                {route.params.groupInfo.memberStatus === Member.Status.MEMBER_STATUS_BANNED ? 'Banned' : 'Rejected'}
+            </Button>
+        )}
+
+        <Text style={styles(theme).athTitle}>{route.params.groupInfo.numOfMembers} ATH(s)</Text>
 
         <Divider bold style={{ width: '100%', marginTop: 20 }} />
         <Button
@@ -85,7 +116,10 @@ export default function GroupDetail({
                 alignSelf: 'center',
             }}
             mode="text"
-            onPress={() => {}}
+            onPress={() => navigation.navigate('GroupMembers', { 
+                groupId: route.params.groupInfo.id,
+                isLeader: userState.userId == route.params.groupInfo.leaderId,
+            })}
             labelStyle={{
                 fontSize: 15
             }}

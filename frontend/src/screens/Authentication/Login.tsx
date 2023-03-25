@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import { Button, IconButton, Text, TextInput } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
-import { loginThunk } from '../../redux/features/user/thunk'
+import { loginThunk, getMeThunk } from '../../redux/features/user/thunk'
 import { checkIfExistOrSaveExpoPushTokenThunk } from '../../redux/features/notification/thunk'
 import { useAppDispatch } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
@@ -48,6 +48,9 @@ export default function Login({
       if (error) {
         toast.error({ message: 'An error occured!' })
       }
+
+      // get me
+      dispatch(getMeThunk())
     }
   }
   return (
