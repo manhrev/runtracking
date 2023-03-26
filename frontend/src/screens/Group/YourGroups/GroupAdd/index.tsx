@@ -13,7 +13,7 @@ import { CreateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
 
 import {
   createGroupThunk
-} from '../../../../redux/features/groupList/thunk'
+} from '../../../../redux/features/yourGroupList/thunk'
 
 export default function GroupAdd({
   navigation,

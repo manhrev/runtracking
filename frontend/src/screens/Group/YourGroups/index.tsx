@@ -36,6 +36,7 @@ export default function YourGroups({
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'YourGroups'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
+  const userState = useAppSelector((state) => state.user)
 
   const { yourGroupList } = useAppSelector(selectYourGroupList)
   const yourGroupsLoading = useAppSelector(isYourGroupListLoading)
@@ -127,9 +128,11 @@ export default function YourGroups({
                 showBottomDivider={idx === yourGroupList.length - 1}
                 navigateFunc={() => {
                   navigation.navigate('GroupDetail', {
-                    groupInfo: group,
+                    groupId: group.id,
+                    detailFrom: 'YourGroups',
                   })
                 }}
+                isLeader={group.leaderId === userState.userId}
               />
             )
           })}

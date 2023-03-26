@@ -172,7 +172,8 @@ export default function Explore({
                 showBottomDivider={idx === groupList.length - 1}
                 navigateFunc={() => {
                   navigation.navigate('GroupDetail', {
-                    groupInfo: group,
+                    groupId: group.id,
+                    detailFrom: 'Explore',
                   })
                 }}
                 onSubmit={() => {

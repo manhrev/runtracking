@@ -47,24 +47,6 @@ const slice = createSlice({
         state.groupList = state.groupList.concat(response?.groupListList || [])
         state.status = StatusEnum.SUCCEEDED
       })
-      .addCase(createGroupThunk.fulfilled, (state, { payload }) => {
-        const { response, error } = payload
-        if (error) return
-        // state.groupList = [response?.groupInfo || {}].concat(state.groupList)
-        state.status = StatusEnum.SUCCEEDED
-      })
-      .addCase(updateGroupThunk.fulfilled, (state, { payload }) => {
-        const { response, error } = payload
-        if (error) return
-        // state.groupList = [response?.groupInfo || {}].concat(state.groupList)
-        state.status = StatusEnum.SUCCEEDED
-      })
-      .addCase(deleteGroupThunk.fulfilled, (state, { payload }) => {
-        const { response, error } = payload
-        if (error) return
-        // state.groupList = [response?.groupInfo || {}].concat(state.groupList)
-        state.status = StatusEnum.SUCCEEDED
-      })
   },
 })
 
