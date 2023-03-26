@@ -47,10 +47,11 @@ export default function GroupMembers({
     const [searchByName, setSearchByName] = useState('')
     const [sortBy, setSortBy] = useState(ListMembersOfGroupRequest.MOGSortBy.MOG_SORT_BY_CREATED_TIME)
     //   const filterBy = ListGroupRequest.FilterBy.FILTER_BY_IS_NOT_MEMBER
+    const [status, setStatus] = useState(Member.Status.MEMBER_STATUS_UNSPECIFIED)
 
     useEffect(() => {
         fetchMemberList()
-    }, [dispatch, searchByName, sortBy, asc])
+    }, [dispatch, searchByName, sortBy, asc, status])
 
     const fetchMemberList = async () => {
         const { response } = await dispatch(
@@ -61,7 +62,7 @@ export default function GroupMembers({
             groupId: route.params.groupId,
             sortBy: sortBy,
             searchByName: searchByName,
-            status: 0, // need to fix
+            status: status,
         })
         ).unwrap()
     }
@@ -112,6 +113,8 @@ export default function GroupMembers({
             switchAsc={setAsc}
             sortBy={sortBy}
             setSortBy={setSortBy}
+            status={status}
+            setStatus={setStatus}
           />
           <Divider />
 
