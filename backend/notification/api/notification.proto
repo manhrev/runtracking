@@ -32,7 +32,6 @@ message IdReply{
 }
 
 message ExpoPushTokenRequest{
-    int64 user_id = 1;
     string expo_push_token = 2;
 }
 

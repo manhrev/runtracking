@@ -3,6 +3,7 @@ package expopush
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/manhrev/runtracking/backend/intermediary/internal/service/receiver"
@@ -57,7 +58,7 @@ func (e *expoPush) PushBulkNotification(ctx context.Context, userIds []int64, me
 
 	response, err := e.expoPushClient.PublishMultiple(messages)
 	if err != nil {
-		return nil, errors.New("Fail when push tokens")
+		return nil, errors.New(fmt.Sprintf("Fail when push token: %s", err.Error()))
 	}
 	return response, nil
 

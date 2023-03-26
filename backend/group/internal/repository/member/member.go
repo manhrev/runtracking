@@ -18,6 +18,7 @@ type Member interface {
 		ctx context.Context,
 		userId int64,
 		groupId int64,
+		statusMember group.Member_Status,
 	) (*ent.Member, error)
 	Update(
 		ctx context.Context,
@@ -59,11 +60,12 @@ func (m *memberImpl) Create(
 	ctx context.Context,
 	userId int64,
 	groupId int64,
+	statusMember group.Member_Status,
 ) (*ent.Member, error) {
 	newMember, err := m.entClient.Member.Create().
 		SetUserID(userId).
 		SetGroupzID(groupId).
-		SetStatus(uint32(group.Member_MEMBER_STATUS_WAITING)).
+		SetStatus(uint32(statusMember)).
 		Save(ctx)
 
 	if err != nil {

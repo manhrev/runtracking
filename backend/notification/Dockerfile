@@ -6,6 +6,7 @@ RUN go build -o /server
 COPY wait-for-it.sh /wait-for-it.sh
 COPY /docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /wait-for-it.sh /docker-entrypoint.sh
+COPY new-runtracking-credential-file.json new-runtracking-credential-file.json
 RUN apk add --no-cache bash
 EXPOSE ${LISTEN_PORT}
 ENTRYPOINT ["/docker-entrypoint.sh"]

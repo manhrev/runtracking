@@ -24,7 +24,6 @@ class rpcNotificationClient extends gRPCClientAbstract {
   async checkIfExistOrSaveExpoPushToken(param: ExpoPushTokenRequest.AsObject) {
     const req = new ExpoPushTokenRequest()
     req.setExpoPushToken(param.expoPushToken)
-    req.setUserId(param.userId)
     return await this.gRPCClientRequest<Empty.AsObject>(
       'checkIfExistOrSaveExpoPushToken',
       req
@@ -34,7 +33,6 @@ class rpcNotificationClient extends gRPCClientAbstract {
   async removeExpoPushToken(param: ExpoPushTokenRequest.AsObject) {
     const req = new ExpoPushTokenRequest()
     req.setExpoPushToken(param.expoPushToken)
-    req.setUserId(param.userId)
     return await this.gRPCClientRequest<Empty.AsObject>(
       'removeExpoPushToken',
       req

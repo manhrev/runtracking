@@ -19,7 +19,7 @@ type Group interface {
 		ctx context.Context,
 		userId int64,
 		groupInfo *grouppb.GroupInfo,
-	) (*ent.Groupz, error)
+	) error
 	Delete(ctx context.Context, userId int64, groupId int64) error
 	List(ctx context.Context,
 		userId int64,
@@ -69,8 +69,19 @@ func New(entClient *ent.Client,
 	}
 }
 
-func (m *groupImpl) Create(ctx context.Context, userId int64, groupInfo *grouppb.GroupInfo) (*ent.Groupz, error) {
-	return m.repository.Group.Create(ctx, userId, groupInfo)
+func (m *groupImpl) Create(ctx context.Context, userId int64, groupInfo *grouppb.GroupInfo) error {
+	groupz, err := m.repository.Group.Create(ctx, userId, groupInfo)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = m.repository.Member.Create(ctx, userId, groupz.ID, group.Member_MEMBER_STATUS_ACTIVE)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *groupImpl) List(ctx context.Context,
@@ -131,6 +142,11 @@ func (m *groupImpl) ListMember(ctx context.Context,
 		authSortBy = auth.ListUserRequest_USER_SORT_BY_NAME
 	}
 
+	groupz, err := m.repository.Group.Get(ctx, groupId)
+	if err != nil {
+		return nil, err
+	}
+
 	members, err := m.repository.Group.ListMember(ctx, groupId, statusMember)
 
 	if err != nil {
@@ -158,7 +174,7 @@ func (m *groupImpl) ListMember(ctx context.Context,
 			return nil, err
 		}
 		userInfoList, total := reply.Users, reply.Total
-		memberList := transformer.TransformUserInfoListToMemberList(userInfoList, memberMap)
+		memberList := transformer.TransformUserInfoListToMemberList(userInfoList, memberMap, groupz)
 
 		var memberSlice MemberSlice = memberList
 

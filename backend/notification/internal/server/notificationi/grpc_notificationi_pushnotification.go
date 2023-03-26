@@ -47,7 +47,7 @@ func (s *notificationIServer) PushNotification(ctx context.Context, request *not
 		message, request.ScheduledTime)
 
 	if err != nil {
-		return nil, errors.New("error when use cloud task")
+		return nil, errors.New(err.Error())
 	}
 
 	return &emptypb.Empty{}, nil

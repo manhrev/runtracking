@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "backend/intermediary"
+		},
+		{
+			"path": "backend/group"
 		}
 	],
 	"settings": {}

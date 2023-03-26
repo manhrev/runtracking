@@ -6,10 +6,15 @@ import {
   switchNightMode,
 } from '../../redux/features/toggle/slice'
 import { logoutThunk } from '../../redux/features/user/thunk'
+import { removeExpoPushTokenThunk} from '../../redux/features/notification/thunk'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
 import SettingItem from './comp/SettingItem'
 import { toast } from '../../utils/toast/toast'
+import { EXPO_PUSH_TOKEN, notificationClient } from '../../utils/grpc'
+import { selectUserSlice } from '../../redux/features/user/slice'
+import { selectNotificationList } from '../../redux/features/notification/slice'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function AppSetting({
   navigation,
@@ -17,8 +22,18 @@ export default function AppSetting({
 }: NativeStackScreenProps<RootBaseStackParamList, 'AppSetting'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
+
   const handleLogout = async () => {
+    const expoToken = await AsyncStorage.getItem(EXPO_PUSH_TOKEN)
+    
+    // remove token when logging out
+    if(expoToken != null){
+    console.log(expoToken)
+    dispatch(removeExpoPushTokenThunk({
+      expoPushToken: expoToken,
+    }))
     dispatch(logoutThunk())
+  }
     toast.success({ message: 'Logged out!' })
   }
   const { isNightMode } = useAppSelector(selectToggleSlice)

@@ -40,8 +40,6 @@ export default function Login({
         req.setExpoPushToken(expoPushToken)
         await AsyncStorage.setItem(EXPO_PUSH_TOKEN, expoPushToken)
       }
-      if (response != null && response.userId != undefined)
-        req.setUserId(response.userId)
       const { error } = await dispatch(
         checkIfExistOrSaveExpoPushTokenThunk(req.toObject())
       ).unwrap()
