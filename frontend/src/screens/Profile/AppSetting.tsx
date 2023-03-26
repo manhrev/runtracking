@@ -28,12 +28,12 @@ export default function AppSetting({
     
     // remove token when logging out
     if(expoToken != null){
-    console.log(expoToken)
-    dispatch(removeExpoPushTokenThunk({
-      expoPushToken: expoToken,
-    }))
+      console.log(expoToken)
+      dispatch(removeExpoPushTokenThunk({
+        expoPushToken: expoToken,
+      }))
+    }
     dispatch(logoutThunk())
-  }
     toast.success({ message: 'Logged out!' })
   }
   const { isNightMode } = useAppSelector(selectToggleSlice)
