@@ -69,6 +69,7 @@ func Serve(server *grpc.Server) {
 	if err != nil {
 		log.Fatalf("error while create connect to notification service: %v", err)
 	}
+
 	notificationiClient := notification.NewNotificationIClient(notificationIConn)
 
 	// register main and other server servers

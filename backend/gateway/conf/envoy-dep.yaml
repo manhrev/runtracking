@@ -66,28 +66,41 @@ static_resources:
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
 
-                        # - match:
-                        #     prefix: /group.Group
-                        #   route:
-                        #     cluster: group_cluster
-                        # - match:
-                        #     prefix: /notification.Notification
-                        #   route:
-                        #     cluster: notification_cluster
-                        # - match:
-                        #     prefix: /notification
-                        #   route:
-                        #     cluster: notification_http_cluster
+                        - match:
+                            prefix: /group.Group
+                          route:
+                            cluster: group_cluster
+                            timeout: 0s
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
+                            auto_host_rewrite: true
 
-                        # - match:
-                        #     prefix: /activity.Activity/
-                        #   route:
-                        #     cluster: activity_cluster
+                        - match:
+                            prefix: /notification.Notification
+                          route:
+                            cluster: notification_cluster
+                            timeout: 0s
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
+                            auto_host_rewrite: true
 
-                        # - match:
-                        #     prefix: /plan.Plan/
-                        #   route:
-                        #     cluster: plan_cluster
+                        - match:
+                            prefix: /activity.Activity/
+                          route:
+                            cluster: activity_cluster
+                            timeout: 0s
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
+                            auto_host_rewrite: true
+
+                        - match:
+                            prefix: /plan.Plan/
+                          route:
+                            cluster: plan_cluster
+                            timeout: 0s
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
+                            auto_host_rewrite: true
 
                 http_filters:
                   - name: envoy.filters.http.grpc_web
@@ -112,7 +125,7 @@ static_resources:
 
   clusters:
     - name: auth_cluster
-      connect_timeout: 1s
+      connect_timeout: 30s
       type: STRICT_DNS
       http2_protocol_options: {}
       lb_policy: round_robin
@@ -121,7 +134,6 @@ static_resources:
         name: envoy.transport_sockets.tls
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
-
       load_assignment:
         cluster_name: auth_cluster
         endpoints:
@@ -132,34 +144,47 @@ static_resources:
                       address: 35.213.159.197
                       port_value: 443
 
-      # - name: group_cluster
-      #   connect_timeout: 1s
-    #   type: logical_dns
-    #   http2_protocol_options: {}
-    #   lb_policy: round_robin
-    #   load_assignment:
-    #     cluster_name: group_cluster
-    #     endpoints:
-    #       - lb_endpoints:
-    #           - endpoint:
-    #               address:
-    #                 socket_address:
-    #                   address: group
-    #                   port_value: 8080
-    # - name: notification_cluster
-    #   connect_timeout: 1s
-    #   type: logical_dns
-    #   http2_protocol_options: {}
-    #   lb_policy: round_robin
-    #   load_assignment:
-    #     cluster_name: notification_cluster
-    #     endpoints:
-    #       - lb_endpoints:
-    #           - endpoint:
-    #               address:
-    #                 socket_address:
-    #                   address: notification
-    #                   port_value: 8080
+    - name: group_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      dns_lookup_family: V4_ONLY
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+      load_assignment:
+        cluster_name: group_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: group-jzg35jprna-as.a.run.app
+                      port_value: 443
+
+    - name: notification_cluster
+      connect_timeout: 30s
+      dns_lookup_family: V4_ONLY
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: notification_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: notification-jzg35jprna-as.a.run.app
+                      port_value: 443
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+          common_tls_context:
+            alpn_protocols: h2
 
     # - name: notification_http_cluster
     #   connect_timeout: 1s
@@ -184,32 +209,42 @@ static_resources:
     #                   address: notification
     #                   port_value: 8000
 
-    # - name: activity_cluster
-    #   connect_timeout: 1s
-    #   type: logical_dns
-    #   http2_protocol_options: {}
-    #   lb_policy: round_robin
-    #   load_assignment:
-    #     cluster_name: activity_cluster
-    #     endpoints:
-    #       - lb_endpoints:
-    #           - endpoint:
-    #               address:
-    #                 socket_address:
-    #                   address: activity
-    #                   port_value: 8080
+    - name: activity_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      dns_lookup_family: V4_ONLY
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+      load_assignment:
+        cluster_name: activity_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: activity-jzg35jprna-as.a.run.app
+                      port_value: 443
 
-    # - name: plan_cluster
-    #   connect_timeout: 1s
-    #   type: logical_dns
-    #   http2_protocol_options: {}
-    #   lb_policy: round_robin
-    #   load_assignment:
-    #     cluster_name: plan_cluster
-    #     endpoints:
-    #       - lb_endpoints:
-    #           - endpoint:
-    #               address:
-    #                 socket_address:
-    #                   address: plan
-    #                   port_value: 8080
+    - name: plan_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      dns_lookup_family: V4_ONLY
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+      load_assignment:
+        cluster_name: plan_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: plan-jzg35jprna-as.a.run.app
+                      port_value: 443

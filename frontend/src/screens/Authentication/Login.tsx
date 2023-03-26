@@ -22,14 +22,16 @@ export default function Login({
   const dispatch = useAppDispatch()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const handleLogin = async () => {
+    setLoading(true)
     const { response, error } = await dispatch(
       loginThunk({
         password,
         userName: username,
       })
     ).unwrap()
-
+    setLoading(false)
     if (error) {
       toast.error({ message: 'Cannot login, please try again' })
     } else {
@@ -121,6 +123,7 @@ export default function Login({
             borderRadius: 50,
           }}
           contentStyle={{ paddingVertical: 5, borderRadius: 100 }}
+          loading={loading}
         >
           <Text
             variant="titleMedium"

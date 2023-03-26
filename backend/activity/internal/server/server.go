@@ -67,6 +67,7 @@ func Serve(server *grpc.Server) {
 	if err != nil {
 		log.Fatalf("error while create connect to plani service: %v", err)
 	}
+
 	planiClient := plan.NewPlanIClient(planIConn)
 
 	// register main and other server servers
