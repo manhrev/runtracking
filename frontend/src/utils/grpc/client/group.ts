@@ -14,6 +14,8 @@ import {
   ListMembersOfGroupReply,
   AcceptMemberRequest,
   AcceptMemberReply,
+  LeaveGroupRequest,
+  LeaveGroupReply,
 } from '../../../lib/group/group_pb'
 import { GRPCClientConfig } from '../abstract/types'
 import gRPCClientAbstract from '../abstract/gRPCClient'
@@ -113,6 +115,16 @@ class rpcGroupClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<AcceptMemberReply.AsObject>(
       'acceptMember',
+      req
+    )
+  }
+
+  async leaveGroup(param: LeaveGroupRequest.AsObject) {
+    const req = new LeaveGroupRequest()
+    req.setGroupId(param.groupId)
+
+    return await this.gRPCClientRequest<LeaveGroupReply.AsObject>(
+      'leaveGroup',
       req
     )
   }

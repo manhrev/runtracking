@@ -15,6 +15,12 @@ import {
 
 import { Member, GroupInfo } from '../../../../lib/group/group_pb'
 import { useEffect, useState } from 'react'
+import { FabGroup } from '../../../../comp/FabGroup'
+import { groupClient } from '../../../../utils/grpc'
+import { toast } from '../../../../utils/toast/toast'
+
+import { useDialog } from '../../../../hooks/useDialog'
+import { ConfirmDialog } from '../../../../comp/ConfirmDialog'
 
 export default function GroupDetail({
   navigation,
@@ -24,6 +30,14 @@ export default function GroupDetail({
     const dispatch = useAppDispatch()
 
     const userState  = useAppSelector((state) => state.user);
+
+    const [currentAction, setCurrentAction] = useState("")
+    const {
+        handleToggleDialog,
+        dataSelected: groupId,
+        open,
+        toggleDialog,
+    } = useDialog<number>()
 
     const testData = [
         {
@@ -57,10 +71,77 @@ export default function GroupDetail({
         }
     }, [yourGroups, exploreGroups])
 
+    const handleAction = (action: string) => {
+        setCurrentAction(action)
+        handleToggleDialog()
+    }
+
+    const leaveGroup = async () => {
+        const { error } = await groupClient.leaveGroup({
+            groupId: route.params.groupId,
+        })
+        if (error) {
+            toast.error({ message: 'Something went wrong, please try again later!' })
+        }
+        else toast.success({ message: 'You have left the group!' })
+
+        toggleDialog()
+    }
+
+    const joinGroup = async () => {
+        const { error } = await groupClient.joinGroup({
+            groupId: route.params.groupId,
+        })
+        if (error) {
+            toast.error({ message: 'Something went wrong, please try again later!' })
+        }
+        else toast.success({ message: 'Join group request sent, waiting for accept!' })
+
+        toggleDialog()
+    }
+
 
   return (
     <View style={baseStyles(theme).container}>
       {selectedGroup != undefined && <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
+        <ConfirmDialog
+          toogleDialog={toggleDialog}
+          visible={open}
+          onSubmit={currentAction == "leave" ? leaveGroup : joinGroup}
+          message={currentAction == "leave" ? "Are you sure you want to leave this group?" : "Are you sure you want to join this group?"}
+        />
+        {selectedGroup.memberStatus == Member.Status.MEMBER_STATUS_ACTIVE && <FabGroup
+            actions={
+                [{
+                    icon: 'exit-to-app',
+                    label: 'Leave group',
+                    onPress: () => handleAction('leave'),
+                    labelTextColor: theme.colors.onError,
+                    color: theme.colors.onError,
+                    style: { backgroundColor: theme.colors.error },
+                }]
+            }
+            type="primary"
+            bottom={1}
+            icon="cog"
+        />}
+
+        {selectedGroup.memberStatus == Member.Status.MEMBER_STATUS_UNSPECIFIED && <FabGroup
+            actions={
+                [{
+                    icon: 'plus',
+                    label: 'Join group',
+                    onPress: () => handleAction("join"),
+                    labelTextColor: theme.colors.onPrimary,
+                    color: theme.colors.onPrimary,
+                    style: { backgroundColor: theme.colors.primary },
+                }]
+            }
+            type="primary"
+            bottom={1}
+            icon="cog"
+        />}
+
         <View style={styles(theme).imgContainer}>
             {userState.userId == selectedGroup.leaderId && <IconButton
                 style={{
@@ -232,7 +313,7 @@ export default function GroupDetail({
                     <View style={{
                         width: 150,
                         height: 130,
-                        backgroundColor: theme.colors.primary,
+                        backgroundColor: theme.colors.tertiary,
                         borderRadius: 5,
                         margin: 10,
                         justifyContent: 'center',
@@ -284,7 +365,7 @@ export default function GroupDetail({
                     <View style={{
                         width: 150,
                         height: 130,
-                        backgroundColor: theme.colors.primary,
+                        backgroundColor: theme.colors.tertiary,
                         borderRadius: 5,
                         margin: 10,
                         justifyContent: 'center',
