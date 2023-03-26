@@ -18,7 +18,7 @@ func (s *groupServer) CreateGroup(
 		return nil, status.Internal(err.Error())
 	}
 
-	_, err = s.service.Group.Create(ctx, userId, request.GetGroupInfo())
+	err = s.service.Group.Create(ctx, userId, request.GetGroupInfo())
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-package notificationi
+package intermediaryi
 
 import (
 	"encoding/json"
@@ -6,21 +6,19 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/manhrev/runtracking/backend/notification/internal/service/cloudtask"
-	receiver "github.com/manhrev/runtracking/backend/notification/internal/service/receiver"
-	"github.com/manhrev/runtracking/backend/notification/internal/status"
+	receiver "github.com/manhrev/runtracking/backend/intermediary/internal/service/receiver"
+	"github.com/manhrev/runtracking/backend/intermediary/internal/status"
 	noti "github.com/manhrev/runtracking/backend/notification/pkg/api"
 )
 
-func (s *notificationIHttpServer) PushNotification(w http.ResponseWriter, r *http.Request) {
+func (s *intermediaryIHttpServer) PushNotification(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	var message cloudtask.NotificationTransfer
+	var message receiver.NotificationTransfer
 	err := json.Unmarshal(reqBody, &message)
 
 	receiverService := receiver.GetReceiver(noti.SOURCE_TYPE(message.SourceType), s.authClient)
 
 	userInfos, err := receiverService.GetAllUsers(r.Context(), message)
-	log.Println(userInfos)
 	if err != nil {
 		panic(err)
 	}

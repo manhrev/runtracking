@@ -806,7 +806,6 @@ proto.notification.ExpoPushTokenRequest.prototype.toObject = function(opt_includ
  */
 proto.notification.ExpoPushTokenRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    userId: jspb.Message.getFieldWithDefault(msg, 1, 0),
     expoPushToken: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
@@ -844,10 +843,6 @@ proto.notification.ExpoPushTokenRequest.deserializeBinaryFromReader = function(m
     }
     var field = reader.getFieldNumber();
     switch (field) {
-    case 1:
-      var value = /** @type {number} */ (reader.readInt64());
-      msg.setUserId(value);
-      break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setExpoPushToken(value);
@@ -881,13 +876,6 @@ proto.notification.ExpoPushTokenRequest.prototype.serializeBinary = function() {
  */
 proto.notification.ExpoPushTokenRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getUserId();
-  if (f !== 0) {
-    writer.writeInt64(
-      1,
-      f
-    );
-  }
   f = message.getExpoPushToken();
   if (f.length > 0) {
     writer.writeString(
@@ -895,24 +883,6 @@ proto.notification.ExpoPushTokenRequest.serializeBinaryToWriter = function(messa
       f
     );
   }
-};
-
-
-/**
- * optional int64 user_id = 1;
- * @return {number}
- */
-proto.notification.ExpoPushTokenRequest.prototype.getUserId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.notification.ExpoPushTokenRequest} returns this
- */
-proto.notification.ExpoPushTokenRequest.prototype.setUserId = function(value) {
-  return jspb.Message.setProto3IntField(this, 1, value);
 };
 
 

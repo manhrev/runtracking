@@ -81,9 +81,6 @@ export namespace IdReply {
 }
 
 export class ExpoPushTokenRequest extends jspb.Message {
-  getUserId(): number;
-  setUserId(value: number): ExpoPushTokenRequest;
-
   getExpoPushToken(): string;
   setExpoPushToken(value: string): ExpoPushTokenRequest;
 
@@ -97,7 +94,6 @@ export class ExpoPushTokenRequest extends jspb.Message {
 
 export namespace ExpoPushTokenRequest {
   export type AsObject = {
-    userId: number,
     expoPushToken: string,
   }
 }

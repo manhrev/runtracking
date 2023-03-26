@@ -3,12 +3,18 @@ package notificationi
 import (
 	"context"
 	"errors"
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/manhrev/runtracking/backend/notification/helper"
 	"github.com/manhrev/runtracking/backend/notification/internal/service/cloudtask"
 	noti "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"google.golang.org/protobuf/types/known/emptypb"
+)
+
+var (
+	intermediary_url    string = os.Getenv("INTERMEDIARY_URL")
+	intermediary_scheme string = os.Getenv("INTERMEDIARY_SCHEME")
 )
 
 func (s *notificationIServer) PushNotification(ctx context.Context, request *noti.PushNotiRequest) (*emptypb.Empty, error) {
@@ -24,8 +30,6 @@ func (s *notificationIServer) PushNotification(ctx context.Context, request *not
 	if err != nil {
 		return nil, errors.New("fail when save data to notification database " + err.Error())
 	}
-	log.Printf("IDS: %v \n: ", request.GetReceiveIds())
-	log.Printf("IDS INT: %v \n: ", helper.ConvertInt64sToInts(request.GetReceiveIds()))
 
 	message := cloudtask.NotificationTransfer{
 		Id:          int(notification.ID),
@@ -36,10 +40,14 @@ func (s *notificationIServer) PushNotification(ctx context.Context, request *not
 	}
 
 	cloudTask := cloudtask.NewCloudTask()
-	_, err = cloudTask.CreateHTTPTask("http://notification:8000/notification/pushnotification", message, request.ScheduledTime)
+	_, err = cloudTask.CreateHTTPTask(
+		fmt.Sprintf("%s://%s/notification/pushnotification",
+			intermediary_scheme,
+			intermediary_url),
+		message, request.ScheduledTime)
 
 	if err != nil {
-		return nil, errors.New("error when use cloud task")
+		return nil, errors.New(err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
