@@ -4,15 +4,17 @@ import { Text, IconButton, Button, TextInput, Divider, List } from 'react-native
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
-import { useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../../redux/store'
-import { toast } from '../../../../utils/toast/toast'
-
-import { Member } from '../../../../lib/group/group_pb'
+import {
+    selectYourGroupList,
+} from '../../../../redux/features/yourGroupList/slice'
 
 import {
-  createGroupThunk
-} from '../../../../redux/features/groupList/thunk'
+    selectGroupList,
+} from '../../../../redux/features/groupList/slice'
+
+import { Member, GroupInfo } from '../../../../lib/group/group_pb'
+import { useEffect, useState } from 'react'
 
 export default function GroupDetail({
   navigation,
@@ -42,11 +44,25 @@ export default function GroupDetail({
         },
     ]
 
+    const [selectedGroup, setSelectedGroup] = useState(({} as GroupInfo.AsObject))
+    const yourGroups = useAppSelector(selectYourGroupList).yourGroupList.find(group => group.id === route.params.groupId)
+    const exploreGroups = useAppSelector(selectGroupList).groupList.find(group => group.id === route.params.groupId)
+
+    useEffect(() => {
+        if(route.params.detailFrom == "YourGroups") {
+            setSelectedGroup(yourGroups as GroupInfo.AsObject)
+        }
+        else if(route.params.detailFrom == "Explore") {
+            setSelectedGroup(exploreGroups as GroupInfo.AsObject)
+        }
+    }, [yourGroups, exploreGroups])
+
+
   return (
     <View style={baseStyles(theme).container}>
-      <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
+      {selectedGroup != undefined && <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
         <View style={styles(theme).imgContainer}>
-            {userState.userId == route.params.groupInfo.leaderId && <IconButton
+            {userState.userId == selectedGroup.leaderId && <IconButton
                 style={{
                     position: 'absolute',
                     top: 0,
@@ -54,21 +70,21 @@ export default function GroupDetail({
                 }}
                 icon="pencil"
                 size={30}
-                onPress={() => navigation.navigate('GroupEdit', { groupInfo: route.params.groupInfo })}
+                onPress={() => navigation.navigate('GroupEdit', { groupInfo: selectedGroup })}
             />}
             <Image
                 style={styles(theme).profilePicture}
                 source={
-                    route.params.groupInfo.backgroundPicture == "" ?
+                    selectedGroup.backgroundPicture == "" ?
                     require('../../../../../assets/group-img.png') :
-                    { uri: route.params.groupInfo.backgroundPicture }
+                    { uri: selectedGroup.backgroundPicture }
                 }
             />
         </View>
 
-        <Text style={styles(theme).groupTitle}>{route.params.groupInfo.name}</Text>
+        <Text style={styles(theme).groupTitle}>{selectedGroup.name}</Text>
 
-        {route.params.groupInfo.memberStatus === Member.Status.MEMBER_STATUS_ACTIVE && (
+        {selectedGroup.memberStatus === Member.Status.MEMBER_STATUS_ACTIVE && (
             <Button
                 style={styles(theme).joinButton}
                 mode="contained"
@@ -80,7 +96,7 @@ export default function GroupDetail({
                 Joined &#10003;
             </Button>
         )}
-        {route.params.groupInfo.memberStatus === Member.Status.MEMBER_STATUS_WAITING && (
+        {selectedGroup.memberStatus === Member.Status.MEMBER_STATUS_WAITING && (
             <Button
                 style={styles(theme).joinButton}
                 buttonColor="#e68a00"
@@ -93,7 +109,7 @@ export default function GroupDetail({
                 Requested
             </Button>
         )}
-        {route.params.groupInfo.memberStatus === (Member.Status.MEMBER_STATUS_BANNED || Member.Status.MEMBER_STATUS_REJECTED) && (
+        {selectedGroup.memberStatus === (Member.Status.MEMBER_STATUS_BANNED || Member.Status.MEMBER_STATUS_REJECTED) && (
             <Button
                 style={styles(theme).joinButton}
                 buttonColor="#e82525"
@@ -103,28 +119,28 @@ export default function GroupDetail({
                     fontSize: 15
                 }}
             >
-                {route.params.groupInfo.memberStatus === Member.Status.MEMBER_STATUS_BANNED ? 'Banned' : 'Rejected'}
+                {selectedGroup.memberStatus === Member.Status.MEMBER_STATUS_BANNED ? 'Banned' : 'Rejected'}
             </Button>
         )}
 
-        <Text style={styles(theme).athTitle}>{route.params.groupInfo.numOfMembers} ATH(s)</Text>
+        <Text style={styles(theme).desTitle}>{selectedGroup.description}</Text>
 
         <Divider bold style={{ width: '100%', marginTop: 20 }} />
         <Button
             style={{
-                width: '60%',
+                width: '80%',
                 alignSelf: 'center',
             }}
             mode="text"
             onPress={() => navigation.navigate('GroupMembers', { 
-                groupId: route.params.groupInfo.id,
-                isLeader: userState.userId == route.params.groupInfo.leaderId,
+                groupId: selectedGroup.id || 0,
+                isLeader: userState.userId == selectedGroup.leaderId,
             })}
             labelStyle={{
                 fontSize: 15
             }}
         >
-            Members of group
+            Members of group ({selectedGroup.numOfMembers})
         </Button>
         
         <View style={{
@@ -285,10 +301,7 @@ export default function GroupDetail({
             )}
             keyExtractor={item => item.id.toString()}
         />
-    
-
-        {/* <Text>Group ID: {route.params.groupId}</Text> */}
-      </ScrollView>
+      </ScrollView>}
     </View>
   )
 }
@@ -322,7 +335,7 @@ const styles = (theme: AppTheme) =>
         fontWeight: 'bold',
         alignSelf: 'center',
     },
-    athTitle: {
+    desTitle: {
         marginTop: 5,
         alignSelf: 'center',
     },

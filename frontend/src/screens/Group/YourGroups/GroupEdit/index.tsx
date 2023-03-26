@@ -14,7 +14,7 @@ import { UpdateGroupRequest, GroupInfo, DeleteGroupRequest } from '../../../../l
 import {
   updateGroupThunk,
   deleteGroupThunk
-} from '../../../../redux/features/groupList/thunk'
+} from '../../../../redux/features/yourGroupList/thunk'
 
 export default function GroupEdit({
   navigation,

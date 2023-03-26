@@ -1,8 +1,9 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Image } from 'react-native'
 import {
   Avatar,
   Button,
   Divider,
+  IconButton,
   Text,
   TouchableRipple,
 } from 'react-native-paper'
@@ -14,6 +15,7 @@ interface GroupItemProps {
   showBottomDivider?: boolean
   group: GroupInfo.AsObject
   navigateFunc: () => void
+  isLeader: boolean
 }
 
 export default function GroupItem({
@@ -21,6 +23,7 @@ export default function GroupItem({
   showBottomDivider,
   group,
   navigateFunc,
+  isLeader,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const { name, numOfMembers } = group
@@ -31,7 +34,18 @@ export default function GroupItem({
         {!hideTopDivider && <Divider />}
         <View style={styles(theme).listItemContainer}>
           <View style={styles(theme).listItemTilte}>
-            <Avatar.Icon size={55} icon="camera" style={{ borderRadius: 10 }} />
+            <Image
+                style={{
+                    width: 55,
+                    height: 55,
+                    borderRadius: 5,
+                }}
+                source={
+                    group.backgroundPicture == "" ?
+                    require('../../../../../assets/group-img.png') :
+                    { uri: group.backgroundPicture }
+                }
+            />
             <View
               style={{
                 display: 'flex',
@@ -48,15 +62,20 @@ export default function GroupItem({
                 </Text>
                 <Text variant="bodyMedium">{numOfMembers} members</Text>
               </View>
-              {/* <View
+              {isLeader && <View
                 style={{
                   justifyContent: 'center',
                   alignItems: 'flex-end',
                   flex: 1,
                 }}
               >
-                <Button mode="contained-tonal">Join</Button>
-              </View> */}
+                <IconButton
+                  icon="account-star"
+                  iconColor={theme.colors.secondary}
+                  size={35}
+                />
+              </View>}
+              
             </View>
           </View>
         </View>
