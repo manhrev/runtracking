@@ -31,6 +31,8 @@ const HOST = `http://${manifest?.debuggerHost
   .shift()
   ?.concat(':8080')}`
 
+// const HOST = `https://gateway-jzg35jprna-as.a.run.app`
+
 const authConfig = {
   hostname: HOST,
   onError: onAuthError,

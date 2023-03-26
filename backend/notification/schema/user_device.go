@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 type UserDevice struct {
@@ -17,5 +18,11 @@ func (UserDevice) Fields() []ent.Field {
 		field.Int64("user_id"),
 		field.String("expo_push_token").
 			Optional(),
+	}
+}
+
+func (UserDevice) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("user_id", "expo_push_token").Unique(),
 	}
 }

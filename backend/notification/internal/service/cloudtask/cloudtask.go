@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -39,6 +40,9 @@ var (
 	gcp_cloud_task_project_id  string = os.Getenv("GCP_CLOUD_TASK_PROJECT_ID")
 	gcp_cloud_task_location_id string = os.Getenv("GCP_CLOUD_TASK_LOCATION_ID")
 	gcp_cloud_task_queue_id    string = os.Getenv("GCP_CLOUD_TASK_QUEUE_ID")
+
+	enviroment_mode      string = os.Getenv("ENVIROMENT_MODE")
+	credential_file_name string = "new-runtracking-credential-file.json"
 )
 
 func NewCloudTask() CloudTask {
@@ -51,10 +55,26 @@ func NewCloudTask() CloudTask {
 
 func (task *cloudTask) CreateHTTPTask(url string, message NotificationTransfer, scheduledTime *timestamppb.Timestamp) (*taskspb.Task, error) {
 	ctx := context.Background()
-	// client, err := cloudtasks.NewClient(ctx, option.WithCredentialsFile("daring-acumen-370401-ddf8f283029a.json"))
-	conn, _ := grpc.Dial(fmt.Sprintf("%s:%s", gcp_cloud_task_host, gcp_cloud_task_port), grpc.WithInsecure())
-	clientOpt := option.WithGRPCConn(conn)
-	client, err := cloudtasks.NewClient(context.Background(), clientOpt)
+	var client *cloudtasks.Client
+	var err error
+	if enviroment_mode == "deploy" {
+		// abs_name, err := filepath.Abs(credential_file_name)
+		jsonFile, err := os.Open(credential_file_name)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		byteValue, _ := ioutil.ReadAll(jsonFile)
+		fmt.Println(byteValue)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		client, err = cloudtasks.NewClient(ctx, option.WithCredentialsJSON(byteValue))
+	} else {
+		conn, _ := grpc.Dial(fmt.Sprintf("%s:%s", gcp_cloud_task_host, gcp_cloud_task_port), grpc.WithInsecure())
+		clientOpt := option.WithGRPCConn(conn)
+		client, err = cloudtasks.NewClient(context.Background(), clientOpt)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf("NewClient: %v", err)
@@ -79,6 +99,8 @@ func (task *cloudTask) CreateHTTPTask(url string, message NotificationTransfer, 
 			ScheduleTime: scheduledTime,
 		},
 	}
+	log.Printf("Client INFO: %v/n", client)
+	log.Printf("Task Request: %v/n", req)
 
 	// Add a payload message if one is present.
 	req.Task.GetHttpRequest().Body, err = json.Marshal(message)

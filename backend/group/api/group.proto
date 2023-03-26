@@ -173,6 +173,7 @@ message Member{
 
     // Joining group status 
     Status status = 8;
+    bool is_admin = 10;
 
     enum Status{
         MEMBER_STATUS_UNSPECIFIED = 0;

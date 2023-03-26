@@ -90,11 +90,8 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - notification_db
-    ports:
-      - 8000:8000
     environment:
       LISTEN_PORT: 8080
-      LISTEN_HTTP_PORT: 8000
       DB_USERNAME: root
       DB_PASSWORD: password@1
       DB_HOST: notification_db
@@ -107,7 +104,35 @@ services:
       GCP_CLOUD_TASK_PROJECT_ID: daring-acumen-370401
       GCP_CLOUD_TASK_LOCATION_ID: asia-southeast2
       GCP_CLOUD_TASK_QUEUE_ID: test-queue1
+      # GCP_CLOUD_TASK_PROJECT_ID: new-runtracking
+      # GCP_CLOUD_TASK_LOCATION_ID: asia-southeast1
+      # GCP_CLOUD_TASK_QUEUE_ID: notification
       IS_SECURE_CONNECTION: "false"
+      INTERMEDIARY_SCHEME: http
+      INTERMEDIARY_URL: intermediary:8080
+      ENVIROMENT_MODE: local  
+
+  intermediary:
+    build:
+      context: backend/intermediary
+      dockerfile: Dockerfile
+    container_name: intermediary
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - notification_db
+    environment:
+      LISTEN_HTTP_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: notification_db
+      DB_PORT: 3306
+      DB_NAME: notification
+      AUTH_SERVICE: auth
+      AUTH_PORT: 8080
+      IS_SECURE_CONNECTION: "false"
+    
 
   plan:
     build:
@@ -216,3 +241,10 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33310:3306
+
+
+
+
+
+
+

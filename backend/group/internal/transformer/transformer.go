@@ -26,7 +26,7 @@ func TransformGroupListEntToGroupList(groupList []*ent.Groupz) []*group.GroupInf
 	return groupInfoList
 }
 
-func TransformUserInfoListToMemberList(userInfoList []*auth.UserInfo, memberMap map[int64]*ent.Member) []*group.Member {
+func TransformUserInfoListToMemberList(userInfoList []*auth.UserInfo, memberMap map[int64]*ent.Member, groupz *ent.Groupz) []*group.Member {
 	memberList := []*group.Member{}
 	for _, userInfo := range userInfoList {
 		member := &group.Member{
@@ -37,6 +37,7 @@ func TransformUserInfoListToMemberList(userInfoList []*auth.UserInfo, memberMap 
 			Email:       userInfo.GetEmail(),
 			CreatedAt:   timestamppb.New(memberMap[userInfo.GetUserId()].CreatedAt),
 			Status:      group.Member_Status(memberMap[userInfo.GetUserId()].Status),
+			IsAdmin:     (userInfo.GetUserId() == groupz.LeaderID),
 		}
 		memberList = append(memberList, member)
 	}

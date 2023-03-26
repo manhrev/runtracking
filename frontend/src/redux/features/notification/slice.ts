@@ -49,6 +49,10 @@ const slice = createSlice({
         }
       }
     )
+    builder.addCase(removeExpoPushTokenThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING
+    })
+
     builder.addCase(
       removeExpoPushTokenThunk.fulfilled,
       (state, { payload }) => {

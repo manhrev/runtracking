@@ -3,16 +3,17 @@ package expopush
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
-	"github.com/manhrev/runtracking/backend/notification/internal/service/cloudtask"
+	"github.com/manhrev/runtracking/backend/intermediary/internal/service/receiver"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent/userdevice"
 	expo "github.com/oliveroneill/exponent-server-sdk-golang/sdk"
 )
 
 type ExpoPush interface {
-	PushBulkNotification(ctx context.Context, userIDs []int64, message cloudtask.NotificationTransfer) ([]expo.PushResponse, error)
+	PushBulkNotification(ctx context.Context, userIDs []int64, message receiver.NotificationTransfer) ([]expo.PushResponse, error)
 }
 
 type expoPush struct {
@@ -27,7 +28,7 @@ func NewExpoPushService(client *ent.Client) ExpoPush {
 	}
 }
 
-func (e *expoPush) PushBulkNotification(ctx context.Context, userIds []int64, message cloudtask.NotificationTransfer) ([]expo.PushResponse, error) {
+func (e *expoPush) PushBulkNotification(ctx context.Context, userIds []int64, message receiver.NotificationTransfer) ([]expo.PushResponse, error) {
 	userDevices, _ := e.entClient.UserDevice.Query().
 		Where(userdevice.UserIDIn(userIds...)).
 		All(ctx)
@@ -57,7 +58,7 @@ func (e *expoPush) PushBulkNotification(ctx context.Context, userIds []int64, me
 
 	response, err := e.expoPushClient.PublishMultiple(messages)
 	if err != nil {
-		return nil, errors.New("Fail when push tokens")
+		return nil, errors.New(fmt.Sprintf("Fail when push token: %s", err.Error()))
 	}
 	return response, nil
 
