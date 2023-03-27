@@ -9,6 +9,9 @@ import "api/plan.proto";
 
 service PlanI {
     rpc UpdatePlanProgress(UpdatePlanProgressRequest) returns (UpdatePlanProgressReply);
+
+    // for intermediary, cloud schedule check daily progress -> call intermediary -> call plani
+    rpc CheckDaily(CheckDailyRequest) returns (CheckDailyReply);
 }
 
 message UpdatePlanProgressRequest {
@@ -19,4 +22,11 @@ message UpdatePlanProgressRequest {
 }
 
 message UpdatePlanProgressReply {
+}
+
+message CheckDailyRequest {
+    google.protobuf.Timestamp time_check = 3;
+}
+
+message CheckDailyReply {
 }
