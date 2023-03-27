@@ -1,15 +1,10 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import Activity from '../screens/Activity/ActivityHome'
-import ActivityList from '../screens/Activity/ActivityList'
-import { Platform, StatusBar } from 'react-native'
 import { useAppTheme } from '../theme'
 import { RootBaseStackParamList } from './BaseStack'
 import ComingSoon from '../screens/ComingSoon'
-import { Text } from 'react-native-paper'
 import YourGroups from '../screens/Group/YourGroups'
 import Explore from '../screens/Group/Explore'
-
-const heightStatus = Platform.OS === 'android' ? StatusBar.currentHeight : 25
+import Constants from 'expo-constants'
 
 export type RootGroupTopTabsParamList = {
   YourGroups: undefined
@@ -23,7 +18,7 @@ export default function GroupTopTabs() {
   const theme = useAppTheme()
   return (
     <Tab.Navigator
-      style={{ marginTop: heightStatus }}
+      style={{ marginTop: Constants.statusBarHeight }}
       screenOptions={{
         tabBarLabelStyle: { color: theme.colors.primary, fontWeight: 'bold' },
         tabBarStyle: { backgroundColor: theme.colors.onPrimary },

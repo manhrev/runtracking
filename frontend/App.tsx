@@ -12,6 +12,7 @@ import * as Notifications from 'expo-notifications'
 import { listLastNotificationInfoThunk } from './src/redux/features/notification/thunk'
 import Toast from 'react-native-toast-message'
 import toastConfig from './src/constants/toast'
+import { StatusBar } from 'expo-status-bar'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -36,6 +37,7 @@ function AppInsideRedux() {
   const toastConf = toastConfig(isNightMode ? darkTheme : lightTheme)
   return (
     <PaperProvider theme={isNightMode ? darkTheme : lightTheme}>
+      <StatusBar translucent={true} style={isNightMode ? 'light' : 'dark'} />
       <NavigationContainer theme={isNightMode ? darkTheme : lightTheme}>
         <BaseStack />
       </NavigationContainer>

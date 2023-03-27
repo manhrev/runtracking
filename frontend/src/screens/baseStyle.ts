@@ -1,11 +1,12 @@
-import { Dimensions, StatusBar, StyleSheet } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 import { AppTheme } from '../theme'
+import Constants from 'expo-constants'
 
 const windowWidth = Dimensions.get('window').width
 export const baseStyles = (theme: AppTheme) =>
   StyleSheet.create({
     homeContainer: {
-      marginTop: StatusBar.currentHeight,
+      marginTop: Constants.statusBarHeight,
     },
     container: {
       flex: 1,
