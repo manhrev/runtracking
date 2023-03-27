@@ -1,7 +1,7 @@
 ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb h1:mbsFtavDqGdYwdDpP50LGOOZ2hgyGoJcZeOpbgKMyu4=
 ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb/go.mod h1:T230JFcENj4ZZzMkZrXFDSkv+2kXkUgpJ5FQQ5hMcKU=
-entgo.io/ent v0.11.7 h1:V+wKFh0jhAbY/FoU+PPbdMOf2Ma5vh07R/IdF+N/nFg=
-entgo.io/ent v0.11.7/go.mod h1:ericBi6Q8l3wBH1wEIDfKxw7rcQEuRPyBfbIzjtxJ18=
+entgo.io/ent v0.11.8 h1:M/M0QL1CYCUSdqGRXUrXhFYSDRJPsOOrr+RLEej/gyQ=
+entgo.io/ent v0.11.8/go.mod h1:ericBi6Q8l3wBH1wEIDfKxw7rcQEuRPyBfbIzjtxJ18=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/agext/levenshtein v1.2.1 h1:QmvMAjj2aEICytGiWzmxoE0x2KZvE0fvmqMOfy2tjT8=
 github.com/agext/levenshtein v1.2.1/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
@@ -39,6 +39,8 @@ github.com/manhrev/runtracking/backend/auth v0.0.0-20230324100729-2a47f9e9895d h
 github.com/manhrev/runtracking/backend/auth v0.0.0-20230324100729-2a47f9e9895d/go.mod h1:dZpHY2mHlanCn/9lerGtXJjiwZgI5qI7Pxv/uOyn4CE=
 github.com/manhrev/runtracking/backend/notification v0.0.0-20230324100729-2a47f9e9895d h1:nBKqKvhKX/7Q/EQFnS2vOopTau6c/VLev/+kle3vPRs=
 github.com/manhrev/runtracking/backend/notification v0.0.0-20230324100729-2a47f9e9895d/go.mod h1:ghEmKhdRupVqMP3jcr6BySqzQ/VMAa4YZbwXoSAQvhk=
+github.com/manhrev/runtracking/backend/plan v0.0.0-20230327023051-f3941ed82fbf h1:Xs70COF0iBED0b+8UX/Uol+mjuGvAjyOFhPalmHs/nc=
+github.com/manhrev/runtracking/backend/plan v0.0.0-20230327023051-f3941ed82fbf/go.mod h1:xw0K2TSHvmoGZku21tasCEonCUJm20BTcEYtbsqHPZQ=
 github.com/mattn/go-sqlite3 v1.14.16 h1:yOQRA0RpS5PFz/oikGwBEqvAWhWg5ufRz4ETLjwpU1Y=
 github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 h1:DpOJ2HYzCv8LZP15IdmG+YdwD2luVPHITV96TkirNBM=
 github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7/go.mod h1:ZXFpozHsX6DPmq2I0TCekCxypsnAUbP2oI0UX1GXzOo=

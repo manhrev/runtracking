@@ -3,7 +3,6 @@ package plani
 import (
 	"context"
 	"log"
-	"time"
 
 	plan "github.com/manhrev/runtracking/backend/plan/pkg/api"
 )
@@ -12,7 +11,7 @@ func (s *planIServer) CheckDaily(ctx context.Context, request *plan.CheckDailyRe
 
 	go func() {
 		err := s.repository.Plan.CheckProgressDaily(context.Background(), request.GetTimeCheck().AsTime())
-		time.Sleep(10 * time.Second)
+		// time.Sleep(10 * time.Second) testing
 		if err != nil {
 			log.Printf("Error when check daily: %v", err)
 			return

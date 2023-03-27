@@ -131,7 +131,11 @@ services:
       DB_NAME: notification
       AUTH_SERVICE: auth
       AUTH_PORT: 8080
+      PLAN_SERVICE: plan
+      PLAN_PORT: 8080
       IS_SECURE_CONNECTION: "false"
+    ports:
+      - 8082:8080
     
 
   plan:
