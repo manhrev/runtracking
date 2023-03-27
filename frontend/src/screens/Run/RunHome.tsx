@@ -296,14 +296,14 @@ export default function Run({
     } else if (type == 'distance-km') {
       return (value / 1000).toFixed(2)
     } else if (type == 'pace') {
-      if (value == 0) return '00:00'
+      if (value == 0) return "00'00''"
 
       const paceMin =
         Math.floor(value / 60) < 10
           ? '0' + Math.floor(value / 60)
           : Math.floor(value / 60)
       const paceSec = ('0' + (value % 60)).slice(-2)
-      return paceMin + ':' + paceSec
+      return paceMin + "'" + paceSec + "''"
     }
     return 'Wrong type'
   }
