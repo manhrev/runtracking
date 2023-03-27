@@ -73,7 +73,7 @@ func Serve(server *grpc.Server) {
 	}
 
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", notification_service, notification_port), grpc.WithTransportCredentials(creds))
-	log.Println("Conn : %v", conn)
+	// log.Printf("Conn : %v", conn)
 	if err != nil {
 		log.Fatalf("error while create connect to notification service: %v", err)
 	}

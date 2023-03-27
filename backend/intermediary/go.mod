@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/manhrev/runtracking/backend/auth v0.0.0-20230324100729-2a47f9e9895d
 	github.com/manhrev/runtracking/backend/notification v0.0.0-20230324100729-2a47f9e9895d
+	github.com/manhrev/runtracking/backend/plan v0.0.0-20230327023051-f3941ed82fbf
 	github.com/oliveroneill/exponent-server-sdk-golang v0.0.0-20210823140141-d050598be512
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
@@ -14,7 +15,7 @@ require (
 
 require (
 	ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb // indirect
-	entgo.io/ent v0.11.7 // indirect
+	entgo.io/ent v0.11.8 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
