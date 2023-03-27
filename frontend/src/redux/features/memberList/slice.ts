@@ -3,10 +3,7 @@ import { Member } from '../../../lib/group/group_pb'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
-import {
-  listMembersOfGroupThunk,
-  acceptMemberThunk,
-} from './thunk'
+import { listMembersOfGroupThunk, acceptMemberThunk } from './thunk'
 
 type MemberListState = {
   memberList: Array<Member.AsObject>
@@ -30,15 +27,21 @@ const slice = createSlice({
       })
       .addCase(listMembersOfGroupThunk.fulfilled, (state, { payload }) => {
         const { response, error } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.memberList = response?.membersList || []
         state.total = response?.total || 0
         state.status = StatusEnum.SUCCEEDED
       })
       .addCase(acceptMemberThunk.fulfilled, (state, { payload }) => {
         const { response, error } = payload
-        if (error) return
-        
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
+
         state.status = StatusEnum.SUCCEEDED
       })
   },

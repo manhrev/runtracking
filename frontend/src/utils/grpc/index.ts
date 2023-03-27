@@ -26,12 +26,12 @@ const onAuthError = (error: any, serviceName: any) => {
   // error?.code && alert(error.code);
 }
 
-const HOST = `http://${manifest?.debuggerHost
-  ?.split(':')
-  .shift()
-  ?.concat(':8080')}`
+// const HOST = `http://${manifest?.debuggerHost
+//   ?.split(':')
+//   .shift()
+//   ?.concat(':8080')}`
 
-// const HOST = `https://gateway-jzg35jprna-as.a.run.app`
+const HOST = `https://gateway-jzg35jprna-as.a.run.app`
 
 const authConfig = {
   hostname: HOST,

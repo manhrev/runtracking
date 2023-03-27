@@ -73,7 +73,10 @@ const slice = createSlice({
       (state, { payload }) => {
         state.status = StatusEnum.LOADING
         const { response, error } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.status = StatusEnum.SUCCEEDED
         state.notificationList = response?.notificationListList || []
         state.total = response?.total || 0
@@ -86,7 +89,10 @@ const slice = createSlice({
       (state, { payload }) => {
         state.status = StatusEnum.LOADING
         const { response, error } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.status = StatusEnum.SUCCEEDED
         state.notificationList = state.notificationList.concat(
           response?.notificationListList || []
@@ -106,7 +112,10 @@ const slice = createSlice({
         state.status = StatusEnum.LOADING
 
         const { response, error } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.status = StatusEnum.SUCCEEDED
 
         state.notificationList = state.notificationList.filter(
@@ -127,7 +136,10 @@ const slice = createSlice({
         state.status = StatusEnum.LOADING
 
         const { response, error } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.status = StatusEnum.SUCCEEDED
 
         state.notificationList.forEach(
@@ -146,7 +158,10 @@ const slice = createSlice({
       (state, { payload }) => {
         state.status = StatusEnum.LOADING
         const { response, error } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.status = StatusEnum.SUCCEEDED
         if (response && response.notificationListList) {
           state.notificationList.unshift(
