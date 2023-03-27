@@ -23,6 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlanIClient interface {
 	UpdatePlanProgress(ctx context.Context, in *UpdatePlanProgressRequest, opts ...grpc.CallOption) (*UpdatePlanProgressReply, error)
+	// for intermediary, cloud schedule check daily progress -> call intermediary -> call plani
+	CheckDaily(ctx context.Context, in *CheckDailyRequest, opts ...grpc.CallOption) (*CheckDailyReply, error)
 }
 
 type planIClient struct {
@@ -42,11 +44,22 @@ func (c *planIClient) UpdatePlanProgress(ctx context.Context, in *UpdatePlanProg
 	return out, nil
 }
 
+func (c *planIClient) CheckDaily(ctx context.Context, in *CheckDailyRequest, opts ...grpc.CallOption) (*CheckDailyReply, error) {
+	out := new(CheckDailyReply)
+	err := c.cc.Invoke(ctx, "/plan.PlanI/CheckDaily", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlanIServer is the server API for PlanI service.
 // All implementations must embed UnimplementedPlanIServer
 // for forward compatibility
 type PlanIServer interface {
 	UpdatePlanProgress(context.Context, *UpdatePlanProgressRequest) (*UpdatePlanProgressReply, error)
+	// for intermediary, cloud schedule check daily progress -> call intermediary -> call plani
+	CheckDaily(context.Context, *CheckDailyRequest) (*CheckDailyReply, error)
 	mustEmbedUnimplementedPlanIServer()
 }
 
@@ -56,6 +69,9 @@ type UnimplementedPlanIServer struct {
 
 func (UnimplementedPlanIServer) UpdatePlanProgress(context.Context, *UpdatePlanProgressRequest) (*UpdatePlanProgressReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePlanProgress not implemented")
+}
+func (UnimplementedPlanIServer) CheckDaily(context.Context, *CheckDailyRequest) (*CheckDailyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckDaily not implemented")
 }
 func (UnimplementedPlanIServer) mustEmbedUnimplementedPlanIServer() {}
 
@@ -88,6 +104,24 @@ func _PlanI_UpdatePlanProgress_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlanI_CheckDaily_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckDailyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlanIServer).CheckDaily(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/plan.PlanI/CheckDaily",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlanIServer).CheckDaily(ctx, req.(*CheckDailyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlanI_ServiceDesc is the grpc.ServiceDesc for PlanI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +132,10 @@ var PlanI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdatePlanProgress",
 			Handler:    _PlanI_UpdatePlanProgress_Handler,
+		},
+		{
+			MethodName: "CheckDaily",
+			Handler:    _PlanI_CheckDaily_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
