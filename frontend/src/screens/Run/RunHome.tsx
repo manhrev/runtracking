@@ -12,7 +12,7 @@ import { AppTheme, useAppTheme } from '../../theme'
 import { RootHomeTabsParamList } from '../../navigators/HomeTab'
 
 import { useState, useEffect, useRef } from 'react'
-import MapView, { Polyline } from 'react-native-maps'
+import MapView, { Polyline, PROVIDER_GOOGLE } from 'react-native-maps'
 import * as Location from 'expo-location'
 import { getDistance } from 'geolib'
 import Monitor from './comp/Monitor'
@@ -352,6 +352,7 @@ export default function Run({
       />
       <Divider style={{ height: 1 }} />
       <MapView
+        provider={PROVIDER_GOOGLE}
         ref={mapRef}
         style={styles(theme).map}
         initialRegion={{

@@ -13,7 +13,7 @@ import {
   minutesPerKilometer,
   secondsToMinutes,
 } from '../../utils/helpers'
-import MapView, { Marker, Polyline } from 'react-native-maps'
+import MapView, { PROVIDER_GOOGLE, Polyline } from 'react-native-maps'
 import {
   arrayToMultiPolyline,
   calculateCenterAndDelta,
@@ -183,6 +183,7 @@ export default function ActivityDetail({
               <>
                 <Divider style={{ marginVertical: 10 }} />
                 <MapView
+                  provider={PROVIDER_GOOGLE}
                   // ref={mapRef}
                   region={{
                     latitude: center.latitude,
