@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/8763674e-a0ef-4484-9925-3a3dddd79ccc"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -31,12 +32,7 @@
         "ACCESS_BACKGROUND_LOCATION"
       ],
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.manhrev.runtracking",
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyAodBUv7nEDq2B1tJCj5jHltwGLTulJR0U"
-        }
-      }
+      "package": "com.manhrev.runtracking"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -45,6 +41,9 @@
       "eas": {
         "projectId": "8763674e-a0ef-4484-9925-3a3dddd79ccc"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
