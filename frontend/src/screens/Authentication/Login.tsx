@@ -36,6 +36,8 @@ export default function Login({
       toast.error({ message: 'Cannot login, please try again' })
     } else {
       toast.success({ message: 'Logged in' })
+      dispatch(getMeThunk())
+
       let expoPushToken = await registerForPushNotificationsAsync()
       let req = new ExpoPushTokenRequest()
       if (expoPushToken != undefined) {
@@ -48,9 +50,6 @@ export default function Login({
       if (error) {
         toast.error({ message: 'An error occured!' })
       }
-
-      // get me
-      dispatch(getMeThunk())
     }
   }
   return (
