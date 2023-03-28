@@ -185,7 +185,13 @@ export default function PlanDetail({
         seconds: seconds,
       })
     }
+    else if(selectedPlan?.rule === Rule.RULE_TOTAL_DISTANCE ||
+      selectedPlan?.rule === Rule.RULE_TOTAL_DISTANCE_DAILY) {
+        setNewGoalValue(selectedPlan?.goal / 1000)
+      }
+    else setNewGoalValue(selectedPlan?.goal)
   }, [selectedPlan?.goal])
+
 
   return (
     <>

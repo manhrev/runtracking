@@ -7,6 +7,7 @@ import {
   List,
   Menu,
   Avatar,
+  Divider,
 } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
@@ -19,7 +20,7 @@ import { getPlanList, isPlanListLoading } from '../../redux/features/planList/sl
 
 import { listPlanThunk } from '../../redux/features/planList/thunk'
 
-import { RuleStatus, DeletePlansRequest } from '../../lib/plan/plan_pb'
+import { RuleStatus, DeletePlansRequest, PlanSortBy } from '../../lib/plan/plan_pb'
 
 import { deletePlansThunk } from '../../redux/features/planList/thunk'
 
@@ -34,6 +35,9 @@ import {
 import { toast } from '../../utils/toast/toast'
 import { FabGroup } from '../../comp/FabGroup'
 import { RefreshControl } from 'react-native-gesture-handler'
+import Filter from './comp/Filter'
+import PlanItem from './comp/PlanItem'
+import { baseStyles } from '../baseStyle'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -46,25 +50,25 @@ export default function Plan({
   const dispatch = useAppDispatch()
   const { planList } = useAppSelector(getPlanList)
   const isLoading = useAppSelector(isPlanListLoading);
+  const noData = planList.length === 0 && !isLoading
   const [tabState, setTabState] = useState('current')
   const [deleteListId, setDeleteListId] = useState<number[]>([])
   const [selectedAll, setSelectedAll] = useState(false)
 
-  // filter menu
-  const [visible, setVisible] = useState(false)
-  const openMenu = () => setVisible(true)
-  const closeMenu = () => setVisible(false)
-  const [filteredActivityType, setFilteredActivityType] =
-    useState<ActivityType>(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
+  // filter
+  const [asc, setAsc] = useState(false)
+  const [sortBy, setSortBy] = useState(PlanSortBy.PLAN_SORT_BY_CREATED_TIME)
+  const [filteredActivityType, setFilteredActivityType] = useState<ActivityType>(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
+  
 
   const fetchPlanList = async () => {
     const { error } = await dispatch(
       listPlanThunk({
         activityType: filteredActivityType,
-        ascending: false,
+        ascending: asc,
         limit: 100,
         offset: 0,
-        sortBy: 1,
+        sortBy: sortBy,
         idsList: [],
       })
     ).unwrap()
@@ -73,10 +77,11 @@ export default function Plan({
       toast.error({ message: "Something went wrong. Please try again later!" })
     }
   }
+
   useFocusEffect(
     useCallback(() => {
       fetchPlanList()
-    }, [])
+    }, [filteredActivityType, asc, sortBy])
   )
 
 
@@ -84,7 +89,7 @@ export default function Plan({
   useEffect(() => {
     setSelectedAll(false)
     setDeleteListId([])
-  }, [tabState, filteredActivityType])
+  }, [tabState, filteredActivityType, asc, sortBy])
 
   const addOrRemoveFromDeleteList = (id: number) => {
     if (deleteListId.includes(id)) {
@@ -147,231 +152,110 @@ export default function Plan({
       ((item.status === RuleStatus.RULE_STATUS_INPROGRESS &&
         tabState === 'current') ||
         (item.status !== RuleStatus.RULE_STATUS_INPROGRESS &&
-          tabState === 'history')) &&
-      (filteredActivityType === ActivityType.ACTIVITY_TYPE_UNSPECIFIED ||
-        item.activityType === filteredActivityType)
+          tabState === 'history'))
   )
 
   return (
     <>
-      <View style={styles(theme).container}>
-        <View style={styles(theme).btnContainer}>
-          {deleteListId.length > 0 ? (
-            <FabGroup
-              actions={[
-                {
-                  icon: 'delete',
-                  label: 'Remove selected plans',
-                  labelTextColor: theme.colors.onError,
-                  onPress: () => deletePlanOrNot(),
-                  color: theme.colors.onError,
-                  style: { backgroundColor: theme.colors.error },
-                },
-              ]}
-              type="error"
-            />
-          ) : (
-            <FabGroup
-              actions={[
-                {
-                  icon: 'plus',
-                  label: 'Create new plan',
-                  labelTextColor: theme.colors.onPrimary,
-                  color: theme.colors.onPrimary,
-                  style: { backgroundColor: theme.colors.primary },
-                  onPress: () => navigation.navigate('PlanAdd'),
-                },
-              ]}
-            />
-          )}
-        </View>
-
-        <SegmentedButtons
-          style={styles(theme).segmentedBtn}
-          value={tabState}
-          onValueChange={setTabState}
-          density="regular"
-          buttons={[
-            {
-              value: 'current',
-              label: '      Current      ',
-            },
-            {
-              value: 'history',
-              label: '      History      ',
-            },
-          ]}
-        />
-
-        <View style={styles(theme).filterContainer}>
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            anchor={
-              <IconButton
-                icon="filter-menu"
-                style={{ marginLeft: 10 }}
-                iconColor={theme.colors.primary}
-                size={24}
-                onPress={openMenu}
+      <View style={baseStyles(theme).homeContainer}>
+        <View style={baseStyles(theme).innerWrapper}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={fetchPlanList}
               />
             }
           >
-            <Menu.Item
-              onPress={() => {
-                setFilteredActivityType(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
-                closeMenu()
-              }}
-              title="All"
-            />
-            <Menu.Item
-              onPress={() => {
-                setFilteredActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)
-                closeMenu()
-              }}
-              title="Running"
-            />
-            <Menu.Item
-              onPress={() => {
-                setFilteredActivityType(ActivityType.ACTIVITY_TYPE_WALKING)
-                closeMenu()
-              }}
-              title="Walking"
-            />
-            <Menu.Item
-              onPress={() => {
-                setFilteredActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)
-                closeMenu()
-              }}
-              title="Cycling"
-            />
-          </Menu>
+            <View style={styles(theme).btnContainer}>
+              {deleteListId.length > 0 ? (
+                <FabGroup
+                  actions={[
+                    {
+                      icon: 'delete',
+                      label: 'Remove ' + deleteListId.length + ' selected plan(s)',
+                      labelTextColor: theme.colors.onError,
+                      onPress: () => deletePlanOrNot(),
+                      color: theme.colors.onError,
+                      style: { backgroundColor: theme.colors.error },
+                    },
+                  ]}
+                  icon="trash-can"
+                  type="error"
+                />
+              ) : (
+                <FabGroup
+                  actions={[
+                    {
+                      icon: 'plus',
+                      label: 'Create new plan',
+                      labelTextColor: theme.colors.onPrimary,
+                      color: theme.colors.onPrimary,
+                      style: { backgroundColor: theme.colors.primary },
+                      onPress: () => navigation.navigate('PlanAdd'),
+                    },
+                  ]}
+                />
+              )}
+            </View>
 
-          <Text
-            variant="bodyLarge"
-            style={{
-              fontWeight: 'bold',
-              textAlignVertical: 'center',
-              color: theme.colors.secondary,
-            }}
-            onPress={openMenu}
-          >
-            {filteredActivityType === ActivityType.ACTIVITY_TYPE_RUNNING
-              ? 'Running'
-              : filteredActivityType === ActivityType.ACTIVITY_TYPE_WALKING
-              ? 'Walking'
-              : filteredActivityType === ActivityType.ACTIVITY_TYPE_CYCLING
-              ? 'Cycling'
-              : 'All'}
-          </Text>
-
-          <IconButton
-            icon={selectedAll ? 'checkbox-marked' : 'checkbox-blank-outline'}
-            iconColor={selectedAll ? '#e82525' : '#969696'}
-            size={25}
-            onPress={() => selectOrUnselectAll()}
-          />
-        </View>
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isLoading}
-              onRefresh={fetchPlanList}
+            <SegmentedButtons
+              style={styles(theme).segmentedBtn}
+              value={tabState}
+              onValueChange={setTabState}
+              density="regular"
+              buttons={[
+                {
+                  value: 'current',
+                  label: '      Current      ',
+                },
+                {
+                  value: 'history',
+                  label: '      History      ',
+                },
+              ]}
             />
-          }
-        >
-          {filteredPlanList.map((item, index) => (
-            <List.Item
-              style={
-                index == 0
-                  ? styles(theme).curPlanTopDownBordered
-                  : styles(theme).curPlan
-              }
-              key={index}
-              title={item.name}
-              titleStyle={styles(theme).planName}
-              descriptionNumberOfLines={10}
-              description={
-                <View>
-                  <Text>
-                    Start: {toDate(item.startTime.seconds, true)}   --&gt;   End:{' '}
-                    {toDate(item.endTime.seconds, true)}
-                  </Text>
-                  {isDailyActivity(item.rule) ? (
-                    <Text style={{ marginBottom: 3, fontWeight: "bold", color: theme.colors.tertiary }}>
-                      Today:{' '}
-                      {displayValue(
-                        item.rule,
-                        getProgressOfDailyActivity(item.progressList)
-                      )}{' '}
-                      / {displayValue(item.rule, item.goal)}
-                    </Text>
-                  ) : (
-                    <Text style={{ marginBottom: 3, fontWeight: "bold", color: theme.colors.tertiary }}>
-                      Progress: {displayValue(item.rule, item.total)} /{' '}
-                      {displayValue(item.rule, item.goal)}
-                    </Text>
-                  )}
-                  <Progress.Bar
-                    progress={
-                      isDailyActivity(item.rule)
-                        ? getProgressOfDailyActivity(item.progressList) /
-                          item.goal
-                        : item.total / item.goal
-                    }
-                    width={windowWidth * 0.6}
-                    color={theme.colors.primary}
-                    borderColor="#e0e0e0"
-                    unfilledColor="#e0e0e0"
-                    borderRadius={5}
-                    animated={true}
-                  />
-                </View>
-              }
-              left={(props) => (
-                <Avatar.Icon
-                  size={37}
-                  icon={
-                    item.activityType === ActivityType.ACTIVITY_TYPE_RUNNING
-                      ? 'run-fast'
-                      : item.activityType === ActivityType.ACTIVITY_TYPE_WALKING
-                      ? 'walk'
-                      : 'bike'
-                  }
-                  style={{
-                    borderRadius: 5,
-                    alignSelf: 'center',
-                    marginLeft: 20,
+      
+            <Filter
+              asc={asc}
+              setAsc={setAsc}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              filteredActivityType={filteredActivityType}
+              setFilteredActivityType={setFilteredActivityType}
+              selectedAll={selectedAll}
+              selectOrUnselectAll={selectOrUnselectAll}
+            />
+
+            <Divider style={{ height: 1 }}/>
+
+            {filteredPlanList.map((plan, idx) => (
+                <PlanItem
+                  key={idx}
+                  plan={plan}
+                  hideTopDivider={idx === 0}
+                  showBottomDivider={idx === filteredPlanList.length - 1}
+                  navigateFunc={() => {
+                    navigation.navigate('PlanDetail', {
+                      planId: plan.id,
+                      canEdit: plan.status === RuleStatus.RULE_STATUS_INPROGRESS,
+                    })
                   }}
+                  deleteListId={deleteListId}
+                  addOrRemoveFromDeleteList={addOrRemoveFromDeleteList}
                 />
-              )}
-              // checkbox
-              right={(props) => (
-                <IconButton
-                  {...props}
-                  icon={
-                    deleteListId.includes(item.id)
-                      ? 'checkbox-marked'
-                      : 'checkbox-blank-outline'
-                  }
-                  iconColor={
-                    deleteListId.includes(item.id) ? '#e82525' : '#969696'
-                  }
-                  size={27}
-                  onPress={() => addOrRemoveFromDeleteList(item.id)}
-                />
-              )}
-              onPress={() =>
-                navigation.navigate('PlanDetail', {
-                  planId: item.id,
-                  canEdit: item.status === RuleStatus.RULE_STATUS_INPROGRESS,
-                })
-              } // only in progress plan can be edited
-            />
-          ))}
-        </ScrollView>
+            ))}
+            {noData && (
+              <Text
+                variant="bodyLarge"
+                style={{ color: theme.colors.tertiary, textAlign: 'center' }}
+              >
+                No data
+              </Text>
+            )}
+          </ScrollView>
+        </View>
       </View>
     </>
   )
@@ -392,20 +276,6 @@ const styles = (theme: AppTheme) =>
     planName: {
       fontSize: 18,
       fontWeight: 'bold',
-    },
-    curPlan: {
-      // bottom divider
-      width: '100%',
-      borderBottomWidth: 1,
-      borderBottomColor: '#b5b7ba',
-    },
-    curPlanTopDownBordered: {
-      // top and bottom divider
-      width: '100%',
-      borderBottomWidth: 1,
-      borderBottomColor: '#b5b7ba',
-      borderTopWidth: 1,
-      borderTopColor: '#b5b7ba',
     },
     addPlanBtn: {
       marginLeft: 10,
