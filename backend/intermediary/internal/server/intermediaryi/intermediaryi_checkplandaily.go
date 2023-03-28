@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"time"
 
 	plan "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -11,9 +12,18 @@ import (
 
 func (s *intermediaryIHttpServer) CheckDailyPlan(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+
+	// API called at 00:10:00 UTC+7 -> must check at 23:59 the day before
+	currentTimeOfDayBefore := time.Now().In(time.FixedZone("UTC+7", 7*60*60)).AddDate(0, 0, -1)
+	lastMomentOfDayBefore := time.Date(
+		currentTimeOfDayBefore.Year(),
+		currentTimeOfDayBefore.Month(),
+		currentTimeOfDayBefore.Day(), 23, 59, 59, 0,
+		currentTimeOfDayBefore.Location())
+
 	// call plani
 	_, err := s.planIClient.CheckDaily(ctx, &plan.CheckDailyRequest{
-		TimeCheck: timestamppb.Now(),
+		TimeCheck: timestamppb.New(lastMomentOfDayBefore),
 	})
 	if err != nil {
 		log.Printf("Error when calling CheckDaily: %s", err)
