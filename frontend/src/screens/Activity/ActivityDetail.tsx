@@ -196,7 +196,7 @@ export default function ActivityDetail({
                     height: 500,
                   }}
                   customMapStyle={isNightMode ? minimalStyleDark : minimalStyle}
-                  mapType="mutedStandard"
+                  mapType="standard"
                 >
                   {polylineList.map((polyline, index) => (
                     <Polyline
