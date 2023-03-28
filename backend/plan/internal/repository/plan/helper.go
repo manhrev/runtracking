@@ -63,6 +63,10 @@ func checkIfPlanExpired(
 				In(time.FixedZone("UTC+7", 7*60*60)).Day()
 			today := timeCheck.In(time.FixedZone("UTC+7", 7*60*60)).Day()
 
+			log.Printf("Check daily plan %v:%d", planned.Name, planned.ID)
+			log.Printf("Newest progress time: %v - Timecheck: %v", currentProgress[maxIdx].GetTimestamp().AsTime().Unix(), timeCheck.Unix())
+			log.Printf("Newest progress day: %v - Today: %v", newestProgressTime, today)
+
 			if today != newestProgressTime {
 				updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
 				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
