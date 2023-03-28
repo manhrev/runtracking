@@ -29,7 +29,10 @@ const slice = createSlice({
     })
     builder.addCase(listPlanThunk.fulfilled, (state, { payload }) => {
       const { response, error } = payload
-      if (error) return
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
 
       state.status = StatusEnum.SUCCEEDED
       state.planList = response?.plansList || []
@@ -39,7 +42,10 @@ const slice = createSlice({
     })
     builder.addCase(createPlanThunk.fulfilled, (state, { payload }) => {
       const { response, error } = payload
-      if (error) return
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
 
       state.status = StatusEnum.SUCCEEDED
       // state.planList.push(payload);
@@ -49,7 +55,10 @@ const slice = createSlice({
     })
     builder.addCase(updatePlanThunk.fulfilled, (state, { payload }) => {
       const { response, error, updateData } = payload
-      if (error) return
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
 
       state.status = StatusEnum.SUCCEEDED
 
@@ -68,7 +77,10 @@ const slice = createSlice({
     })
     builder.addCase(deletePlansThunk.fulfilled, (state, { payload }) => {
       const { response, error } = payload
-      if (error) return
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
 
       // foreach id
       const ids = payload.deleteData.idsList

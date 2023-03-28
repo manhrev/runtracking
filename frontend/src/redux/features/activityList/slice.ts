@@ -29,7 +29,10 @@ const slice = createSlice({
     })
     builder.addCase(listActivityInfoThunk.fulfilled, (state, { payload }) => {
       const { response, error } = payload
-      if (error) return
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
       state.status = StatusEnum.SUCCEEDED
       state.activityList = response?.activityListList || []
       state.total = response?.total || 0
@@ -38,7 +41,10 @@ const slice = createSlice({
       listMoreActivityInfoThunk.fulfilled,
       (state, { payload }) => {
         const { error, response } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.status = StatusEnum.SUCCEEDED
         state.activityList = state.activityList.concat(
           response?.activityListList || []

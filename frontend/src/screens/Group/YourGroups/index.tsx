@@ -107,7 +107,10 @@ export default function YourGroups({
               {
                 icon: 'plus',
                 label: 'Create a group',
-                onPress: () => navigation.navigate('GroupAdd'),
+                onPress: () =>
+                  navigation.navigate('GroupAdd', {
+                    reloadYourGroupList: () => fetchListYourGroups(),
+                  }),
               },
             ]}
             type="tertiary"
