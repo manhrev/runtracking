@@ -31,6 +31,7 @@ func checkIfPlanExpired(
 			return err
 		}
 		notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
+		log.Printf("Plan %v:%d has failed 0: Status when check if plan expired", planned.Name, planned.ID)
 		return nil
 	}
 
@@ -50,12 +51,12 @@ func checkIfPlanExpired(
 		// check progress
 		if len(currentProgress) == 0 {
 			notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
-			updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
 			err := updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED)).Exec(ctx)
 			if err != nil {
 				log.Printf("Error update plan status when check if plan expired: %v", err)
 				return err
 			}
+			log.Printf("Plan %v:%d has failed 1: No progress", planned.Name, planned.ID)
 			return nil
 		} else {
 			maxIdx := len(currentProgress) - 1
@@ -63,18 +64,24 @@ func checkIfPlanExpired(
 				In(time.FixedZone("UTC+7", 7*60*60)).Day()
 			today := timeCheck.In(time.FixedZone("UTC+7", 7*60*60)).Day()
 
+			log.Printf("Check daily plan %v:%d", planned.Name, planned.ID)
+			log.Printf("Newest progress time: %v - Timecheck: %v", currentProgress[maxIdx].GetTimestamp().AsTime().Unix(), timeCheck.Unix())
+			log.Printf("Newest progress day: %v - Today: %v", newestProgressTime, today)
+
 			if today != newestProgressTime {
 				updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
 				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
-				return nil
+				log.Printf("Plan %v:%d has failed 2: No progress today", planned.Name, planned.ID)
+
 			} else if currentProgress[maxIdx].Value < planned.Goal {
 				updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
 				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
-				return nil
+				log.Printf("Plan %v:%d has failed 3: Progress today not enough", planned.Name, planned.ID)
+
 			}
 			err := updateQuery.Exec(ctx)
 			if err != nil {
-				log.Printf("Error update plan status when check if plan expired: %v", err)
+				log.Printf("Error update plan status for daily plan: %v", err)
 				return err
 			}
 			return nil
