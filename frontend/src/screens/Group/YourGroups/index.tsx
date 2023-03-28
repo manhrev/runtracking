@@ -136,6 +136,7 @@ export default function YourGroups({
                   navigation.navigate('GroupDetail', {
                     groupId: group.id,
                     detailFrom: 'YourGroups',
+                    reloadListFunc: fetchListYourGroups,
                   })
                 }}
                 isLeader={group.leaderId === userState.userId}
