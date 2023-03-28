@@ -5,6 +5,7 @@ tidy:
 	cd ./backend/notification && go mod tidy && go mod vendor
 	cd ./backend/plan && go mod tidy && go mod vendor
 	cd ./backend/group && go mod tidy && go mod vendor
+	cd ./backend/intermediary && go mod tidy && go mod vendor
 
 
 docker-build:

@@ -1,31 +1,30 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { View, Image, StyleSheet, ScrollView } from 'react-native'
-import { Text, IconButton, Button, TextInput } from 'react-native-paper'
-import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
+import { Text, Button, TextInput } from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
 import { useState } from 'react'
 import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
-import * as Clipboard from 'expo-clipboard';
+import * as Clipboard from 'expo-clipboard'
 
 import { CreateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
 
-import {
-  createGroupThunk
-} from '../../../../redux/features/yourGroupList/thunk'
+import { createGroupThunk } from '../../../../redux/features/yourGroupList/thunk'
+import { RootBaseStackParamList } from '../../../../navigators/BaseStack'
 
 export default function GroupAdd({
   navigation,
   route,
-}: NativeStackScreenProps<RootGroupTopTabsParamList, 'GroupAdd'>) {
+}: NativeStackScreenProps<RootBaseStackParamList, 'GroupAdd'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
   const [groupInfo, setGroupInfo] = useState<GroupInfo.AsObject>({
     id: 0,
     name: 'Example Group',
     description: 'Example Description',
-    backgroundPicture: 'https://cdn.dribbble.com/users/2984251/screenshots/15487625/media/1501cb8cd7dbdb88127b7402c2692acd.png?compress=1&resize=1000x750&vertical=top',
+    backgroundPicture:
+      'https://cdn.dribbble.com/users/2984251/screenshots/15487625/media/1501cb8cd7dbdb88127b7402c2692acd.png?compress=1&resize=1000x750&vertical=top',
     leaderId: 0,
     memberStatus: 0,
     numOfMembers: 0,
@@ -34,18 +33,16 @@ export default function GroupAdd({
   })
 
   const copiedTextToImageLink = async () => {
-    const text: any = await Clipboard.getStringAsync();
-    if(text == null || text == "")
-    {
+    const text: any = await Clipboard.getStringAsync()
+    if (text == null || text == '') {
       toast.error({ message: 'Clipboard is empty!' })
       return
     }
-    setGroupInfo({...groupInfo, backgroundPicture: text})
+    setGroupInfo({ ...groupInfo, backgroundPicture: text })
   }
 
   const createNewGroup = async () => {
-    if(groupInfo.name == "" || groupInfo.backgroundPicture == "")
-    {
+    if (groupInfo.name == '' || groupInfo.backgroundPicture == '') {
       toast.error({ message: 'Group name or image link cannot be empty!' })
       return
     }
@@ -61,58 +58,71 @@ export default function GroupAdd({
         numOfMembers: groupInfo.numOfMembers,
         numOfChallenge: groupInfo.numOfChallenge,
         numOfEventParticipated: groupInfo.numOfEventParticipated,
-      }
+      },
     }
 
     const { error } = await dispatch(createGroupThunk(req)).unwrap()
     if (error) {
       toast.error({ message: 'An error occured, please try again!' })
       return
-    }
-    else {
+    } else {
       toast.success({ message: 'Group created!' })
+      const { reloadYourGroupList } = route.params
+      reloadYourGroupList()
       navigation.goBack()
     }
   }
 
   return (
     <View style={baseStyles(theme).container}>
-      <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={baseStyles(theme).innerWrapper}
+      >
         <View style={styles(theme).imgContainer}>
           <Image
             style={styles(theme).profilePicture}
             source={
-              groupInfo.backgroundPicture == "" ?
-              require('../../../../../assets/group-img.png') :
-              { uri: groupInfo.backgroundPicture }
+              groupInfo.backgroundPicture == ''
+                ? require('../../../../../assets/group-img.png')
+                : { uri: groupInfo.backgroundPicture }
             }
           />
         </View>
 
-        {groupInfo.name && <Text style={styles(theme).groupTitle}>{groupInfo.name}</Text>}
+        {groupInfo.name && (
+          <Text style={styles(theme).groupTitle}>{groupInfo.name}</Text>
+        )}
 
         <Text style={styles(theme).title}>Group name </Text>
         <TextInput
-            mode="outlined"
-            value={groupInfo.name}
-            onChangeText={text => setGroupInfo({...groupInfo, name: text})}
+          mode="outlined"
+          value={groupInfo.name}
+          onChangeText={(text) => setGroupInfo({ ...groupInfo, name: text })}
         />
 
         <Text style={styles(theme).title}>Image link </Text>
         <TextInput
-            mode="outlined"
-            value={groupInfo.backgroundPicture}
-            onChangeText={text => setGroupInfo({...groupInfo, backgroundPicture: text})}
-            right={groupInfo.backgroundPicture == "" ?
-                <TextInput.Icon
-                  icon="clipboard-arrow-down-outline"
-                  onPress={() => copiedTextToImageLink()}
-                /> :
-                <TextInput.Icon
-                  icon="window-close"
-                  onPress={() => setGroupInfo({...groupInfo, backgroundPicture: ""})}
-                />
-            }
+          mode="outlined"
+          value={groupInfo.backgroundPicture}
+          onChangeText={(text) =>
+            setGroupInfo({ ...groupInfo, backgroundPicture: text })
+          }
+          right={
+            groupInfo.backgroundPicture == '' ? (
+              <TextInput.Icon
+                icon="clipboard-arrow-down-outline"
+                onPress={() => copiedTextToImageLink()}
+              />
+            ) : (
+              <TextInput.Icon
+                icon="window-close"
+                onPress={() =>
+                  setGroupInfo({ ...groupInfo, backgroundPicture: '' })
+                }
+              />
+            )
+          }
         />
 
         <Text style={styles(theme).title}>Group description </Text>
@@ -122,11 +132,11 @@ export default function GroupAdd({
           numberOfLines={6}
           mode="outlined"
           value={groupInfo.description}
-          onChangeText={(text) => setGroupInfo({...groupInfo, description: text})}
+          onChangeText={(text) =>
+            setGroupInfo({ ...groupInfo, description: text })
+          }
         />
 
-        
-        
         <View style={styles(theme).btnContainer}>
           <Button
             mode="contained"
@@ -149,7 +159,6 @@ export default function GroupAdd({
     </View>
   )
 }
-
 
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
@@ -195,6 +204,4 @@ const styles = (theme: AppTheme) =>
       fontWeight: 'bold',
       alignSelf: 'center',
     },
-})
-
-
+  })

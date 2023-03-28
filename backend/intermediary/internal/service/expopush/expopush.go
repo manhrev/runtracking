@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/manhrev/runtracking/backend/intermediary/internal/service/receiver"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
@@ -53,7 +52,7 @@ func (e *expoPush) PushBulkNotification(ctx context.Context, userIds []int64, me
 			Title:    "Go Tracker Notification",
 			Priority: expo.DefaultPriority,
 		})
-		log.Println(messages)
+		// log.Println(messages)
 	}
 
 	response, err := e.expoPushClient.PublishMultiple(messages)

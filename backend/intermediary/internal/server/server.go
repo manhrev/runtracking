@@ -11,6 +11,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
+	plan "github.com/manhrev/runtracking/backend/plan/pkg/api"
+
 	"github.com/manhrev/runtracking/backend/intermediary/internal/server/intermediaryi"
 	"github.com/manhrev/runtracking/backend/intermediary/internal/service/expopush"
 	"github.com/manhrev/runtracking/backend/notification/pkg/ent"
@@ -28,6 +30,9 @@ var (
 
 	auth_service string = os.Getenv("AUTH_SERVICE")
 	auth_port    string = os.Getenv("AUTH_PORT")
+
+	plan_service string = os.Getenv("PLAN_SERVICE")
+	plan_port    string = os.Getenv("PLAN_PORT")
 
 	listen_http_port     string = os.Getenv("LISTEN_HTTP_PORT")
 	is_secure_connection        = os.Getenv("IS_SECURE_CONNECTION")
@@ -69,9 +74,15 @@ func Serve(server *grpc.Server) {
 	}
 	authClient := auth.NewAuthIClient(conn)
 
+	planconn, err := grpc.Dial(fmt.Sprintf("%s:%s", plan_service, plan_port), grpc.WithTransportCredentials(creds))
+	if err != nil {
+		log.Fatalf("error while create connect to plan service: %v", err)
+	}
+	planIClient := plan.NewPlanIClient(planconn)
+
 	// http.HandleFunc("/notification/pushnoti2allusers", notification.PushNoti2AllUsers)
 	r := mux.NewRouter()
-	intermediaryi.RegisterRouteHttpServer(entNotificationClient, r, authClient, expoPushService)
+	intermediaryi.RegisterRouteHttpServer(entNotificationClient, r, authClient, planIClient, expoPushService)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%s", listen_http_port), r)
 	if err != nil {

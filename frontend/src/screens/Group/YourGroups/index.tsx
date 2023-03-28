@@ -110,7 +110,10 @@ export default function YourGroups({
                 labelTextColor: theme.colors.onTertiary,
                 color: theme.colors.onTertiary,
                 style: { backgroundColor: theme.colors.tertiary },
-                onPress: () => navigation.navigate('GroupAdd'),
+                onPress: () =>
+                  navigation.navigate('GroupAdd', {
+                    reloadYourGroupList: () => fetchListYourGroups(),
+                  }),
               },
             ]}
             type="tertiary"

@@ -26,7 +26,10 @@ const slice = createSlice({
       getActivityStatisticThunk.fulfilled,
       (state, { payload }) => {
         const { response, error } = payload
-        if (error) return
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
         state.status = StatusEnum.SUCCEEDED
         state.activityStatisticList = response?.dataList || []
       }

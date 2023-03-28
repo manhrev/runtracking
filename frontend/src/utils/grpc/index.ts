@@ -6,6 +6,7 @@ import rpcActivityClient from './client/activity'
 import rpcNotificationClient from './client/notification'
 import rpcPlanClient from './client/plan'
 import rpcGroupClient from './client/group'
+import { toast } from '../toast/toast'
 
 export * from './abstract/gRPCClient'
 export * from './abstract/types'
@@ -19,19 +20,16 @@ const onAuthError = (error: any, serviceName: any) => {
   //     break;
   // }
   // if (IGNORE_TOAST_CODES.includes(error?.code)) return;
-  // iToast.error({
-  //   title: i18n.t('Common::ERROR_TITLE'),
-  //   msg: i18n.t(`Error::${serviceName}.${error?.code}`),
-  // });
+  toast.error({ message: 'An error occured!' })
   // error?.code && alert(error.code);
 }
 
-const HOST = `http://${manifest?.debuggerHost
-  ?.split(':')
-  .shift()
-  ?.concat(':8080')}`
+// const HOST = `http://${manifest?.debuggerHost
+//   ?.split(':')
+//   .shift()
+//   ?.concat(':8080')}`
 
-// const HOST = `https://gateway-jzg35jprna-as.a.run.app`
+const HOST = `https://gateway-jzg35jprna-as.a.run.app`
 
 const authConfig = {
   hostname: HOST,

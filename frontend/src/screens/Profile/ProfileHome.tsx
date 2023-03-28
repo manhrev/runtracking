@@ -1,9 +1,18 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState } from 'react'
-import { StyleSheet, View, StatusBar, ScrollView } from 'react-native'
+import {
+  StyleSheet,
+  View,
+  StatusBar,
+  ScrollView,
+  RefreshControl,
+} from 'react-native'
 import { Avatar, Button, Divider, IconButton, Text } from 'react-native-paper'
 import { RootHomeTabsParamList } from '../../navigators/HomeTab'
-import { selectUserSlice } from '../../redux/features/user/slice'
+import {
+  isUserSliceLoading,
+  selectUserSlice,
+} from '../../redux/features/user/slice'
 import { getMeThunk } from '../../redux/features/user/thunk'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
@@ -18,6 +27,7 @@ export default function ProfileHome({
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
   const { displayName } = useAppSelector(selectUserSlice)
+  const loading = useAppSelector(isUserSliceLoading)
   const [isInfoSelected, setIsInfoSelected] = useState(true)
   const handleEditYourProfile = () => {
     navigation.navigate('ProfileSetting')
@@ -28,14 +38,23 @@ export default function ProfileHome({
   const handleViewNofification = () => {
     navigation.navigate('NotificationList', {})
   }
-  useEffect(() => {
+
+  const getMe = () => {
     dispatch(getMeThunk())
+  }
+
+  useEffect(() => {
+    getMe()
   }, [])
+
   return (
     <>
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ marginTop: StatusBar.currentHeight }}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={getMe} />
+        }
       >
         <View style={styles(theme).profileBackgroundContainer}>
           <Avatar.Text

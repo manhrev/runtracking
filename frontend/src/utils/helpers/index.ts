@@ -63,13 +63,14 @@ export function timestampToDate(time: Timestamp.AsObject | undefined): Date {
 export function secondsToMinutes(seconds: number): string {
   var min = Math.floor(seconds / 60)
   var sec = seconds - min * 60
+  if (isNaN(min) || isNaN(sec)) return '--'
   return min + "'" + sec + '"'
 }
 
 export function secondsToHours(seconds: number): string {
   var hours = Math.floor(seconds / (60 * 60))
   var min = Math.floor((seconds - hours * 60 * 60) / 60)
-  return hours + ':' + min
+  return (hours < 10 ? '0' : '') + hours + ':' + (min < 10 ? '0' : '') + min
 }
 
 export function minutesPerKilometer(seconds: number, meters: number): string {

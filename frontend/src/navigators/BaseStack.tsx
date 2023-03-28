@@ -84,16 +84,18 @@ export type RootBaseStackParamList = {
   GetInfo: undefined
 
   // Group
-  GroupAdd: undefined
+  GroupAdd: {
+    reloadYourGroupList: () => void
+  }
   GroupDetail: {
-    groupId: number,
+    groupId: number
     detailFrom: 'YourGroups' | 'Explore'
   }
   GroupEdit: {
     groupInfo: GroupInfo.AsObject
   }
   GroupMembers: {
-    groupId: number,
+    groupId: number
     isLeader: boolean
   }
 }

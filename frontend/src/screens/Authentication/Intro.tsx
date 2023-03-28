@@ -30,7 +30,7 @@ export default function Intro({
             variant="displaySmall"
             style={{ textAlign: 'center', fontWeight: 'bold' }}
           >
-            Welcome to{'\n'}Runtracking
+            Welcome to{'\n'}Go Tracker
           </Text>
           <Text
             variant="titleLarge"

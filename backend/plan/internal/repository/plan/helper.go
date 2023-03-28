@@ -91,10 +91,11 @@ func notifyUserAboutPlan(
 	userId int64,
 	planId int64,
 ) error {
-	if notificationIClient == nil {
-		log.Printf(message)
-		return nil
-	}
+	// uncomment for debug local
+	// if notificationIClient == nil {
+	// 	log.Printf(message)
+	// 	return nil
+	// }
 	_, err := notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
 		Messeage:      message,
 		SourceType:    notification.SOURCE_TYPE_PLAN,
