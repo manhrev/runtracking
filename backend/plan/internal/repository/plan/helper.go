@@ -67,12 +67,12 @@ func checkIfPlanExpired(
 				updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
 				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
 				log.Printf("Plan %v:%d has failed 2: No progress today", planned.Name, planned.ID)
-				return nil
+
 			} else if currentProgress[maxIdx].Value < planned.Goal {
 				updateQuery.SetStatus(int64(plan.RuleStatus_RULE_STATUS_FAILED))
 				notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
 				log.Printf("Plan %v:%d has failed 3: Progress today not enough", planned.Name, planned.ID)
-				return nil
+
 			}
 			err := updateQuery.Exec(ctx)
 			if err != nil {
