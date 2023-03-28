@@ -6,6 +6,7 @@ import {
   Text,
   List,
   Menu,
+  Avatar,
 } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
@@ -114,7 +115,6 @@ export default function Plan({
     }
     dispatch(deletePlansThunk(deleteInfo)).unwrap()
     toast.success({ message: 'Deleted plans successfully' })
-    // alert('Deleted plan with ID(s): ' + deleteListId)
     setDeleteListId([])
     setSelectedAll(false)
   }
@@ -149,11 +149,11 @@ export default function Plan({
         <View style={styles(theme).btnContainer}>
           {deleteListId.length > 0 ? (
             <FabGroup
-              // icon="delete"
               actions={[
                 {
                   icon: 'delete',
                   label: 'Remove selected plans',
+                  labelTextColor: theme.colors.onError,
                   onPress: () => deletePlanOrNot(),
                   color: theme.colors.onError,
                   style: { backgroundColor: theme.colors.error },
@@ -167,6 +167,9 @@ export default function Plan({
                 {
                   icon: 'plus',
                   label: 'Create new plan',
+                  labelTextColor: theme.colors.onPrimary,
+                  color: theme.colors.onPrimary,
+                  style: { backgroundColor: theme.colors.primary },
                   onPress: () => navigation.navigate('PlanAdd'),
                 },
               ]}
@@ -276,8 +279,8 @@ export default function Plan({
               description={
                 <View>
                   <Text>
-                    St: {toDate(item.startTime.seconds)} - End:{' '}
-                    {toDate(item.endTime.seconds)}
+                    Start: {toDate(item.startTime.seconds, true)}   --&gt;   End:{' '}
+                    {toDate(item.endTime.seconds, true)}
                   </Text>
                   {isDailyActivity(item.rule) ? (
                     <Text style={{ marginBottom: 3 }}>
@@ -311,8 +314,8 @@ export default function Plan({
                 </View>
               }
               left={(props) => (
-                <List.Icon
-                  {...props}
+                <Avatar.Icon
+                  size={37}
                   icon={
                     item.activityType === ActivityType.ACTIVITY_TYPE_RUNNING
                       ? 'run-fast'
@@ -321,6 +324,7 @@ export default function Plan({
                       : 'bike'
                   }
                   style={{
+                    borderRadius: 5,
                     alignSelf: 'center',
                     marginLeft: 20,
                   }}
@@ -398,8 +402,6 @@ const styles = (theme: AppTheme) =>
       justifyContent: 'space-between',
     },
     segmentedBtn: {
-      marginTop: 10,
-      // marginBottom: 10,
       alignSelf: 'center',
     },
     filterContainer: {

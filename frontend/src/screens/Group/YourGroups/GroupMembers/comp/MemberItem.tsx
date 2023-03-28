@@ -37,7 +37,7 @@ export default function GroupItem({
           <View style={styles(theme).listItemTilte}>
             <Avatar.Icon
               size={55}
-              icon="account-group-outline"
+              icon="account-outline"
               style={{ borderRadius: 10 }}
             />
             <View
