@@ -31,6 +31,7 @@ func checkIfPlanExpired(
 			return err
 		}
 		notifyUserAboutPlan(ctx, notificationIClient, fmt.Sprintf("Your %v plan has failed!", planned.Name), planned.UserID, planned.ID)
+		log.Printf("Plan %v:%d has failed 0: Status when check if plan expired", planned.Name, planned.ID)
 		return nil
 	}
 
