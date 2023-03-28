@@ -107,6 +107,9 @@ export default function YourGroups({
               {
                 icon: 'plus',
                 label: 'Create a group',
+                labelTextColor: theme.colors.onTertiary,
+                color: theme.colors.onTertiary,
+                style: { backgroundColor: theme.colors.tertiary },
                 onPress: () => navigation.navigate('GroupAdd'),
               },
             ]}

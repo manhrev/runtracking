@@ -6,7 +6,7 @@ import { Rule, PlanProgress } from '../../lib/plan/plan_pb'
 export function getIconWithActivityType(activityType: ActivityType) {
   return {
     [ActivityType.ACTIVITY_TYPE_CYCLING]: 'bike',
-    [ActivityType.ACTIVITY_TYPE_RUNNING]: 'run',
+    [ActivityType.ACTIVITY_TYPE_RUNNING]: 'run-fast',
     [ActivityType.ACTIVITY_TYPE_WALKING]: 'walk',
     [ActivityType.ACTIVITY_TYPE_UNSPECIFIED]: '',
   }[activityType]
@@ -127,13 +127,18 @@ export function isDailyActivity(planRule: Rule) {
   )
 }
 
-export function toDate(seconds: number) {
+export function toDate(seconds: number, withoutYear: boolean = false) {
   // dd/mm/yyyy
   const date = new Date(seconds * 1000)
   const day = date.getDate()
   const month = date.getMonth() + 1
   const year = date.getFullYear()
-  return `${day < 10 ? '0' + day : day}/${
+
+  if (withoutYear) return `${day < 10 ? '0' + day : day}/${ // mm/dd
+    month < 10 ? '0' + month : month
+  }`
+
+  return `${day < 10 ? '0' + day : day}/${ // mm/dd/yyyy
     month < 10 ? '0' + month : month
   }/${year}`
 }
