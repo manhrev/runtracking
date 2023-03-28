@@ -15,7 +15,7 @@ import { RootHomeTabsParamList } from '../../navigators/HomeTab'
 import { useState, useEffect, useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
 import * as Progress from 'react-native-progress'
-import { getPlanList } from '../../redux/features/planList/slice'
+import { getPlanList, isPlanListLoading } from '../../redux/features/planList/slice'
 
 import { listPlanThunk } from '../../redux/features/planList/thunk'
 
@@ -33,6 +33,7 @@ import {
 } from '../../utils/helpers'
 import { toast } from '../../utils/toast/toast'
 import { FabGroup } from '../../comp/FabGroup'
+import { RefreshControl } from 'react-native-gesture-handler'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -44,7 +45,7 @@ export default function Plan({
 
   const dispatch = useAppDispatch()
   const { planList } = useAppSelector(getPlanList)
-  // const isLoading = useAppSelector(isPlanListLoading);
+  const isLoading = useAppSelector(isPlanListLoading);
   const [tabState, setTabState] = useState('current')
   const [deleteListId, setDeleteListId] = useState<number[]>([])
   const [selectedAll, setSelectedAll] = useState(false)
@@ -56,20 +57,28 @@ export default function Plan({
   const [filteredActivityType, setFilteredActivityType] =
     useState<ActivityType>(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
 
+  const fetchPlanList = async () => {
+    const { error } = await dispatch(
+      listPlanThunk({
+        activityType: filteredActivityType,
+        ascending: false,
+        limit: 100,
+        offset: 0,
+        sortBy: 1,
+        idsList: [],
+      })
+    ).unwrap()
+
+    if (error) {
+      toast.error({ message: "Something went wrong. Please try again later!" })
+    }
+  }
   useFocusEffect(
     useCallback(() => {
-      dispatch(
-        listPlanThunk({
-          activityType: 0,
-          ascending: false,
-          limit: 100,
-          offset: 0,
-          sortBy: 1,
-          idsList: [],
-        })
-      ).unwrap()
+      fetchPlanList()
     }, [])
   )
+
 
   // if tab or filter change, reset selected all and delete list
   useEffect(() => {
@@ -264,7 +273,15 @@ export default function Plan({
           />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={fetchPlanList}
+            />
+          }
+        >
           {filteredPlanList.map((item, index) => (
             <List.Item
               style={
@@ -283,7 +300,7 @@ export default function Plan({
                     {toDate(item.endTime.seconds, true)}
                   </Text>
                   {isDailyActivity(item.rule) ? (
-                    <Text style={{ marginBottom: 3 }}>
+                    <Text style={{ marginBottom: 3, fontWeight: "bold", color: theme.colors.tertiary }}>
                       Today:{' '}
                       {displayValue(
                         item.rule,
@@ -292,7 +309,7 @@ export default function Plan({
                       / {displayValue(item.rule, item.goal)}
                     </Text>
                   ) : (
-                    <Text style={{ marginBottom: 3 }}>
+                    <Text style={{ marginBottom: 3, fontWeight: "bold", color: theme.colors.tertiary }}>
                       Progress: {displayValue(item.rule, item.total)} /{' '}
                       {displayValue(item.rule, item.goal)}
                     </Text>

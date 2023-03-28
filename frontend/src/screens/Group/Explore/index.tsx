@@ -174,6 +174,7 @@ export default function Explore({
                   navigation.navigate('GroupDetail', {
                     groupId: group.id,
                     detailFrom: 'Explore',
+                    reloadListFunc: fetchListGroup,
                   })
                 }}
                 onSubmit={() => {

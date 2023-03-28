@@ -83,7 +83,12 @@ export default function GroupDetail({
         if (error) {
             toast.error({ message: 'Something went wrong, please try again later!' })
         }
-        else toast.success({ message: 'You have left the group!' })
+        else
+        {
+            toast.success({ message: 'You have left the group!' })
+            route.params.reloadListFunc()
+            navigation.goBack()
+        }
 
         toggleDialog()
     }
@@ -95,7 +100,11 @@ export default function GroupDetail({
         if (error) {
             toast.error({ message: 'Something went wrong, please try again later!' })
         }
-        else toast.success({ message: 'Join group request sent, waiting for accept!' })
+        else
+        {
+            toast.success({ message: 'Join group request sent, waiting for accept!' })
+            route.params.reloadListFunc()
+        }
 
         toggleDialog()
     }
