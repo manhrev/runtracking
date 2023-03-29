@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer , NavigationContainerRef} from '@react-navigation/native'
 import { Provider as PaperProvider } from 'react-native-paper'
 import { Provider as ReduxProvider } from 'react-redux'
 
@@ -13,6 +13,7 @@ import { listLastNotificationInfoThunk } from './src/redux/features/notification
 import Toast from 'react-native-toast-message'
 import toastConfig from './src/constants/toast'
 import { StatusBar } from 'expo-status-bar'
+import React from 'react';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -33,12 +34,14 @@ export default function App() {
 function AppInsideRedux() {
   const { isNightMode } = useAppSelector(selectToggleSlice)
   const dispatch = useAppDispatch()
-  useExpoPush(dispatch)
+  const navigationRef = React.createRef<NavigationContainerRef<ReactNavigation.RootParamList>>();  
+
+  useExpoPush(dispatch, navigationRef)
   const toastConf = toastConfig(isNightMode ? darkTheme : lightTheme)
   return (
     <PaperProvider theme={isNightMode ? darkTheme : lightTheme}>
-      <StatusBar translucent={true} style={isNightMode ? 'light' : 'dark'} />
-      <NavigationContainer theme={isNightMode ? darkTheme : lightTheme}>
+      <StatusBar translucent={true} style={isNightMode ? 'light' : 'dark'}/>
+      <NavigationContainer theme={isNightMode ? darkTheme : lightTheme} ref={navigationRef}>
         <BaseStack />
       </NavigationContainer>
       <Toast
@@ -55,7 +58,7 @@ function AppInsideRedux() {
   )
 }
 
-const useExpoPush = (dispatch: Dispatch<any>) =>
+const useExpoPush = (dispatch: Dispatch<any>, navigation: React.RefObject<NavigationContainerRef<ReactNavigation.RootParamList>>) =>
   useEffect(() => {
     const fetchLastNotificationInfo = async () => {
       dispatch(
@@ -66,12 +69,17 @@ const useExpoPush = (dispatch: Dispatch<any>) =>
       )
     }
 
-    const notficationSubscription =
+    const notificationSubscription =
       Notifications.addNotificationReceivedListener((notification) => {
         fetchLastNotificationInfo()
       })
 
+      const notificationNavigator = Notifications.addNotificationResponseReceivedListener(response => {
+        navigation.current?.navigate('NotificationList' as never)
+      });
+
     return () => {
-      notficationSubscription.remove()
+      notificationSubscription.remove()
+      notificationNavigator.remove()
     }
   }, [])

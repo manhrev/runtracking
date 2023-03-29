@@ -10,26 +10,28 @@ import { toast } from '../toast/toast'
 
 export * from './abstract/gRPCClient'
 export * from './abstract/types'
+import * as Updates from 'expo-updates';
 
-const { manifest } = Constants
+const inDevelopmentMode = process.env.NODE_ENV === "development";
+const manifest = Updates.manifest?.extra?.expoGo
 
 const onAuthError = (error: any, serviceName: any) => {
-  // switch (error?.code) {
-  //   case grpcStatusCode.UNAUTHENTICATED:
-  //     onLogout(error.code);
-  //     break;
-  // }
-  // if (IGNORE_TOAST_CODES.includes(error?.code)) return;
   toast.error({ message: 'An error occured!' })
-  // error?.code && alert(error.code);
 }
 
-// const HOST = `http://${manifest?.debuggerHost
-//   ?.split(':')
-//   .shift()
-//   ?.concat(':8080')}`
+var HOST: string;
 
-const HOST = `https://gateway-jzg35jprna-as.a.run.app`
+if(inDevelopmentMode){
+  HOST = `http://${manifest?.debuggerHost
+  ?.split(':')
+  .shift()
+  ?.concat(':8080')}`
+}
+else{
+  HOST = `https://gateway-jzg35jprna-as.a.run.app`
+}
+
+console.log("You're running on " + HOST)
 
 const authConfig = {
   hostname: HOST,

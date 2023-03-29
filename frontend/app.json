@@ -32,7 +32,13 @@
         "ACCESS_BACKGROUND_LOCATION"
       ],
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.manhrev.runtracking"
+      "package": "com.manhrev.runtracking",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAodBUv7nEDq2B1tJCj5jHltwGLTulJR0U"
+        }
+      },
+        "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"

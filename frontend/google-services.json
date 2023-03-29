@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1075076155683",
+    "project_id": "go-tracker-ca0dc",
+    "storage_bucket": "go-tracker-ca0dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075076155683:android:3a5f5e304e7f7b4fcce496",
+        "android_client_info": {
+          "package_name": "com.manhrev.runtracking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075076155683-ei2mnvnonesrb1dtnmb2jtb6ifpa80pn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2lgd2z0fh4VBIBT8v3IyQ3VWJ49-8KOQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075076155683-ei2mnvnonesrb1dtnmb2jtb6ifpa80pn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
