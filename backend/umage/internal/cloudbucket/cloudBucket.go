@@ -69,6 +69,8 @@ func HandleFileUploadToBucket(c *gin.Context) {
 		ClientX509CertURL:       client_x509_cert_url,
 	}
 
+	log.Println(keys)
+
 	cred, err := json.Marshal(keys)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
