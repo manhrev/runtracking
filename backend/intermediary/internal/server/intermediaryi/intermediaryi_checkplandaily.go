@@ -18,7 +18,7 @@ func (s *intermediaryIHttpServer) CheckDailyPlan(w http.ResponseWriter, r *http.
 	lastMomentOfDayBefore := time.Date(
 		currentTimeOfDayBefore.Year(),
 		currentTimeOfDayBefore.Month(),
-		currentTimeOfDayBefore.Day(), 23, 59, 59, 0,
+		currentTimeOfDayBefore.Day(), 23, 59, 59, 100,
 		currentTimeOfDayBefore.Location())
 
 	// call plani
