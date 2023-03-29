@@ -21,6 +21,8 @@ func (Challenge) Fields() []ent.Field {
 			Default(time.Now),
 		field.Time("start_time").
 			Optional(),
+		field.String("picture").
+			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
 		field.Time("end_time").
 			Optional(),
 		field.String("description").
