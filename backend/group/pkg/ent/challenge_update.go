@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
@@ -118,6 +119,33 @@ func (cu *ChallengeUpdate) AddTypeID(i int64) *ChallengeUpdate {
 	return cu
 }
 
+// SetCompletedFirstMemberID sets the "completed_first_member_id" field.
+func (cu *ChallengeUpdate) SetCompletedFirstMemberID(i int64) *ChallengeUpdate {
+	cu.mutation.ResetCompletedFirstMemberID()
+	cu.mutation.SetCompletedFirstMemberID(i)
+	return cu
+}
+
+// SetNillableCompletedFirstMemberID sets the "completed_first_member_id" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableCompletedFirstMemberID(i *int64) *ChallengeUpdate {
+	if i != nil {
+		cu.SetCompletedFirstMemberID(*i)
+	}
+	return cu
+}
+
+// AddCompletedFirstMemberID adds i to the "completed_first_member_id" field.
+func (cu *ChallengeUpdate) AddCompletedFirstMemberID(i int64) *ChallengeUpdate {
+	cu.mutation.AddCompletedFirstMemberID(i)
+	return cu
+}
+
+// ClearCompletedFirstMemberID clears the value of the "completed_first_member_id" field.
+func (cu *ChallengeUpdate) ClearCompletedFirstMemberID() *ChallengeUpdate {
+	cu.mutation.ClearCompletedFirstMemberID()
+	return cu
+}
+
 // AddChallengeMemberIDs adds the "challenge_members" edge to the ChallengeMember entity by IDs.
 func (cu *ChallengeUpdate) AddChallengeMemberIDs(ids ...int64) *ChallengeUpdate {
 	cu.mutation.AddChallengeMemberIDs(ids...)
@@ -152,6 +180,21 @@ func (cu *ChallengeUpdate) SetGroupz(g *Groupz) *ChallengeUpdate {
 	return cu.SetGroupzID(g.ID)
 }
 
+// AddChallengeRuleIDs adds the "challenge_rules" edge to the ChallengeRule entity by IDs.
+func (cu *ChallengeUpdate) AddChallengeRuleIDs(ids ...int64) *ChallengeUpdate {
+	cu.mutation.AddChallengeRuleIDs(ids...)
+	return cu
+}
+
+// AddChallengeRules adds the "challenge_rules" edges to the ChallengeRule entity.
+func (cu *ChallengeUpdate) AddChallengeRules(c ...*ChallengeRule) *ChallengeUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddChallengeRuleIDs(ids...)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cu *ChallengeUpdate) Mutation() *ChallengeMutation {
 	return cu.mutation
@@ -182,6 +225,27 @@ func (cu *ChallengeUpdate) RemoveChallengeMembers(c ...*ChallengeMember) *Challe
 func (cu *ChallengeUpdate) ClearGroupz() *ChallengeUpdate {
 	cu.mutation.ClearGroupz()
 	return cu
+}
+
+// ClearChallengeRules clears all "challenge_rules" edges to the ChallengeRule entity.
+func (cu *ChallengeUpdate) ClearChallengeRules() *ChallengeUpdate {
+	cu.mutation.ClearChallengeRules()
+	return cu
+}
+
+// RemoveChallengeRuleIDs removes the "challenge_rules" edge to ChallengeRule entities by IDs.
+func (cu *ChallengeUpdate) RemoveChallengeRuleIDs(ids ...int64) *ChallengeUpdate {
+	cu.mutation.RemoveChallengeRuleIDs(ids...)
+	return cu
+}
+
+// RemoveChallengeRules removes "challenge_rules" edges to ChallengeRule entities.
+func (cu *ChallengeUpdate) RemoveChallengeRules(c ...*ChallengeRule) *ChallengeUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveChallengeRuleIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -261,6 +325,15 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
+	}
+	if value, ok := cu.mutation.CompletedFirstMemberID(); ok {
+		_spec.SetField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
+	}
+	if value, ok := cu.mutation.AddedCompletedFirstMemberID(); ok {
+		_spec.AddField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
+	}
+	if cu.mutation.CompletedFirstMemberIDCleared() {
+		_spec.ClearField(challenge.FieldCompletedFirstMemberID, field.TypeInt64)
 	}
 	if cu.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -343,6 +416,60 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: groupz.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedChallengeRulesIDs(); len(nodes) > 0 && !cu.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ChallengeRulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
 				},
 			},
 		}
@@ -460,6 +587,33 @@ func (cuo *ChallengeUpdateOne) AddTypeID(i int64) *ChallengeUpdateOne {
 	return cuo
 }
 
+// SetCompletedFirstMemberID sets the "completed_first_member_id" field.
+func (cuo *ChallengeUpdateOne) SetCompletedFirstMemberID(i int64) *ChallengeUpdateOne {
+	cuo.mutation.ResetCompletedFirstMemberID()
+	cuo.mutation.SetCompletedFirstMemberID(i)
+	return cuo
+}
+
+// SetNillableCompletedFirstMemberID sets the "completed_first_member_id" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableCompletedFirstMemberID(i *int64) *ChallengeUpdateOne {
+	if i != nil {
+		cuo.SetCompletedFirstMemberID(*i)
+	}
+	return cuo
+}
+
+// AddCompletedFirstMemberID adds i to the "completed_first_member_id" field.
+func (cuo *ChallengeUpdateOne) AddCompletedFirstMemberID(i int64) *ChallengeUpdateOne {
+	cuo.mutation.AddCompletedFirstMemberID(i)
+	return cuo
+}
+
+// ClearCompletedFirstMemberID clears the value of the "completed_first_member_id" field.
+func (cuo *ChallengeUpdateOne) ClearCompletedFirstMemberID() *ChallengeUpdateOne {
+	cuo.mutation.ClearCompletedFirstMemberID()
+	return cuo
+}
+
 // AddChallengeMemberIDs adds the "challenge_members" edge to the ChallengeMember entity by IDs.
 func (cuo *ChallengeUpdateOne) AddChallengeMemberIDs(ids ...int64) *ChallengeUpdateOne {
 	cuo.mutation.AddChallengeMemberIDs(ids...)
@@ -494,6 +648,21 @@ func (cuo *ChallengeUpdateOne) SetGroupz(g *Groupz) *ChallengeUpdateOne {
 	return cuo.SetGroupzID(g.ID)
 }
 
+// AddChallengeRuleIDs adds the "challenge_rules" edge to the ChallengeRule entity by IDs.
+func (cuo *ChallengeUpdateOne) AddChallengeRuleIDs(ids ...int64) *ChallengeUpdateOne {
+	cuo.mutation.AddChallengeRuleIDs(ids...)
+	return cuo
+}
+
+// AddChallengeRules adds the "challenge_rules" edges to the ChallengeRule entity.
+func (cuo *ChallengeUpdateOne) AddChallengeRules(c ...*ChallengeRule) *ChallengeUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddChallengeRuleIDs(ids...)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cuo *ChallengeUpdateOne) Mutation() *ChallengeMutation {
 	return cuo.mutation
@@ -524,6 +693,27 @@ func (cuo *ChallengeUpdateOne) RemoveChallengeMembers(c ...*ChallengeMember) *Ch
 func (cuo *ChallengeUpdateOne) ClearGroupz() *ChallengeUpdateOne {
 	cuo.mutation.ClearGroupz()
 	return cuo
+}
+
+// ClearChallengeRules clears all "challenge_rules" edges to the ChallengeRule entity.
+func (cuo *ChallengeUpdateOne) ClearChallengeRules() *ChallengeUpdateOne {
+	cuo.mutation.ClearChallengeRules()
+	return cuo
+}
+
+// RemoveChallengeRuleIDs removes the "challenge_rules" edge to ChallengeRule entities by IDs.
+func (cuo *ChallengeUpdateOne) RemoveChallengeRuleIDs(ids ...int64) *ChallengeUpdateOne {
+	cuo.mutation.RemoveChallengeRuleIDs(ids...)
+	return cuo
+}
+
+// RemoveChallengeRules removes "challenge_rules" edges to ChallengeRule entities.
+func (cuo *ChallengeUpdateOne) RemoveChallengeRules(c ...*ChallengeRule) *ChallengeUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveChallengeRuleIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -628,6 +818,15 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	if value, ok := cuo.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
 	}
+	if value, ok := cuo.mutation.CompletedFirstMemberID(); ok {
+		_spec.SetField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
+	}
+	if value, ok := cuo.mutation.AddedCompletedFirstMemberID(); ok {
+		_spec.AddField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
+	}
+	if cuo.mutation.CompletedFirstMemberIDCleared() {
+		_spec.ClearField(challenge.FieldCompletedFirstMemberID, field.TypeInt64)
+	}
 	if cuo.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -709,6 +908,60 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: groupz.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedChallengeRulesIDs(); len(nodes) > 0 && !cuo.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ChallengeRulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
 				},
 			},
 		}

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -69,6 +70,46 @@ func (cmru *ChallengeMemberRuleUpdate) AddRuleID(i int64) *ChallengeMemberRuleUp
 	return cmru
 }
 
+// SetIsCompleted sets the "is_completed" field.
+func (cmru *ChallengeMemberRuleUpdate) SetIsCompleted(b bool) *ChallengeMemberRuleUpdate {
+	cmru.mutation.SetIsCompleted(b)
+	return cmru
+}
+
+// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
+func (cmru *ChallengeMemberRuleUpdate) SetNillableIsCompleted(b *bool) *ChallengeMemberRuleUpdate {
+	if b != nil {
+		cmru.SetIsCompleted(*b)
+	}
+	return cmru
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cmru *ChallengeMemberRuleUpdate) SetTimeCompleted(t time.Time) *ChallengeMemberRuleUpdate {
+	cmru.mutation.SetTimeCompleted(t)
+	return cmru
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cmru *ChallengeMemberRuleUpdate) SetNillableTimeCompleted(t *time.Time) *ChallengeMemberRuleUpdate {
+	if t != nil {
+		cmru.SetTimeCompleted(*t)
+	}
+	return cmru
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (cmru *ChallengeMemberRuleUpdate) ClearTimeCompleted() *ChallengeMemberRuleUpdate {
+	cmru.mutation.ClearTimeCompleted()
+	return cmru
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cmru *ChallengeMemberRuleUpdate) SetUpdatedAt(t time.Time) *ChallengeMemberRuleUpdate {
+	cmru.mutation.SetUpdatedAt(t)
+	return cmru
+}
+
 // SetChallengeMemberID sets the "challenge_member" edge to the ChallengeMember entity by ID.
 func (cmru *ChallengeMemberRuleUpdate) SetChallengeMemberID(id int64) *ChallengeMemberRuleUpdate {
 	cmru.mutation.SetChallengeMemberID(id)
@@ -101,6 +142,7 @@ func (cmru *ChallengeMemberRuleUpdate) ClearChallengeMember() *ChallengeMemberRu
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cmru *ChallengeMemberRuleUpdate) Save(ctx context.Context) (int, error) {
+	cmru.defaults()
 	return withHooks[int, ChallengeMemberRuleMutation](ctx, cmru.sqlSave, cmru.mutation, cmru.hooks)
 }
 
@@ -123,6 +165,14 @@ func (cmru *ChallengeMemberRuleUpdate) Exec(ctx context.Context) error {
 func (cmru *ChallengeMemberRuleUpdate) ExecX(ctx context.Context) {
 	if err := cmru.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (cmru *ChallengeMemberRuleUpdate) defaults() {
+	if _, ok := cmru.mutation.UpdatedAt(); !ok {
+		v := challengememberrule.UpdateDefaultUpdatedAt()
+		cmru.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -164,6 +214,18 @@ func (cmru *ChallengeMemberRuleUpdate) sqlSave(ctx context.Context) (n int, err 
 	}
 	if value, ok := cmru.mutation.AddedRuleID(); ok {
 		_spec.AddField(challengememberrule.FieldRuleID, field.TypeInt64, value)
+	}
+	if value, ok := cmru.mutation.IsCompleted(); ok {
+		_spec.SetField(challengememberrule.FieldIsCompleted, field.TypeBool, value)
+	}
+	if value, ok := cmru.mutation.TimeCompleted(); ok {
+		_spec.SetField(challengememberrule.FieldTimeCompleted, field.TypeTime, value)
+	}
+	if cmru.mutation.TimeCompletedCleared() {
+		_spec.ClearField(challengememberrule.FieldTimeCompleted, field.TypeTime)
+	}
+	if value, ok := cmru.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengememberrule.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if cmru.mutation.ChallengeMemberCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -262,6 +324,46 @@ func (cmruo *ChallengeMemberRuleUpdateOne) AddRuleID(i int64) *ChallengeMemberRu
 	return cmruo
 }
 
+// SetIsCompleted sets the "is_completed" field.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetIsCompleted(b bool) *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.SetIsCompleted(b)
+	return cmruo
+}
+
+// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetNillableIsCompleted(b *bool) *ChallengeMemberRuleUpdateOne {
+	if b != nil {
+		cmruo.SetIsCompleted(*b)
+	}
+	return cmruo
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetTimeCompleted(t time.Time) *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.SetTimeCompleted(t)
+	return cmruo
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetNillableTimeCompleted(t *time.Time) *ChallengeMemberRuleUpdateOne {
+	if t != nil {
+		cmruo.SetTimeCompleted(*t)
+	}
+	return cmruo
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (cmruo *ChallengeMemberRuleUpdateOne) ClearTimeCompleted() *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.ClearTimeCompleted()
+	return cmruo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetUpdatedAt(t time.Time) *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.SetUpdatedAt(t)
+	return cmruo
+}
+
 // SetChallengeMemberID sets the "challenge_member" edge to the ChallengeMember entity by ID.
 func (cmruo *ChallengeMemberRuleUpdateOne) SetChallengeMemberID(id int64) *ChallengeMemberRuleUpdateOne {
 	cmruo.mutation.SetChallengeMemberID(id)
@@ -301,6 +403,7 @@ func (cmruo *ChallengeMemberRuleUpdateOne) Select(field string, fields ...string
 
 // Save executes the query and returns the updated ChallengeMemberRule entity.
 func (cmruo *ChallengeMemberRuleUpdateOne) Save(ctx context.Context) (*ChallengeMemberRule, error) {
+	cmruo.defaults()
 	return withHooks[*ChallengeMemberRule, ChallengeMemberRuleMutation](ctx, cmruo.sqlSave, cmruo.mutation, cmruo.hooks)
 }
 
@@ -323,6 +426,14 @@ func (cmruo *ChallengeMemberRuleUpdateOne) Exec(ctx context.Context) error {
 func (cmruo *ChallengeMemberRuleUpdateOne) ExecX(ctx context.Context) {
 	if err := cmruo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (cmruo *ChallengeMemberRuleUpdateOne) defaults() {
+	if _, ok := cmruo.mutation.UpdatedAt(); !ok {
+		v := challengememberrule.UpdateDefaultUpdatedAt()
+		cmruo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -381,6 +492,18 @@ func (cmruo *ChallengeMemberRuleUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	if value, ok := cmruo.mutation.AddedRuleID(); ok {
 		_spec.AddField(challengememberrule.FieldRuleID, field.TypeInt64, value)
+	}
+	if value, ok := cmruo.mutation.IsCompleted(); ok {
+		_spec.SetField(challengememberrule.FieldIsCompleted, field.TypeBool, value)
+	}
+	if value, ok := cmruo.mutation.TimeCompleted(); ok {
+		_spec.SetField(challengememberrule.FieldTimeCompleted, field.TypeTime, value)
+	}
+	if cmruo.mutation.TimeCompletedCleared() {
+		_spec.ClearField(challengememberrule.FieldTimeCompleted, field.TypeTime)
+	}
+	if value, ok := cmruo.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengememberrule.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if cmruo.mutation.ChallengeMemberCleared() {
 		edge := &sqlgraph.EdgeSpec{

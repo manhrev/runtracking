@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -13,6 +14,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -30,16 +32,76 @@ func (cmu *ChallengeMemberUpdate) Where(ps ...predicate.ChallengeMember) *Challe
 	return cmu
 }
 
+// SetPoint sets the "point" field.
+func (cmu *ChallengeMemberUpdate) SetPoint(i int64) *ChallengeMemberUpdate {
+	cmu.mutation.ResetPoint()
+	cmu.mutation.SetPoint(i)
+	return cmu
+}
+
+// SetNillablePoint sets the "point" field if the given value is not nil.
+func (cmu *ChallengeMemberUpdate) SetNillablePoint(i *int64) *ChallengeMemberUpdate {
+	if i != nil {
+		cmu.SetPoint(*i)
+	}
+	return cmu
+}
+
+// AddPoint adds i to the "point" field.
+func (cmu *ChallengeMemberUpdate) AddPoint(i int64) *ChallengeMemberUpdate {
+	cmu.mutation.AddPoint(i)
+	return cmu
+}
+
 // SetMemberID sets the "member_id" field.
 func (cmu *ChallengeMemberUpdate) SetMemberID(i int64) *ChallengeMemberUpdate {
-	cmu.mutation.ResetMemberID()
 	cmu.mutation.SetMemberID(i)
 	return cmu
 }
 
-// AddMemberID adds i to the "member_id" field.
-func (cmu *ChallengeMemberUpdate) AddMemberID(i int64) *ChallengeMemberUpdate {
-	cmu.mutation.AddMemberID(i)
+// SetChallengeID sets the "challenge_id" field.
+func (cmu *ChallengeMemberUpdate) SetChallengeID(i int64) *ChallengeMemberUpdate {
+	cmu.mutation.SetChallengeID(i)
+	return cmu
+}
+
+// SetIsCompleted sets the "is_completed" field.
+func (cmu *ChallengeMemberUpdate) SetIsCompleted(b bool) *ChallengeMemberUpdate {
+	cmu.mutation.SetIsCompleted(b)
+	return cmu
+}
+
+// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
+func (cmu *ChallengeMemberUpdate) SetNillableIsCompleted(b *bool) *ChallengeMemberUpdate {
+	if b != nil {
+		cmu.SetIsCompleted(*b)
+	}
+	return cmu
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cmu *ChallengeMemberUpdate) SetTimeCompleted(t time.Time) *ChallengeMemberUpdate {
+	cmu.mutation.SetTimeCompleted(t)
+	return cmu
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cmu *ChallengeMemberUpdate) SetNillableTimeCompleted(t *time.Time) *ChallengeMemberUpdate {
+	if t != nil {
+		cmu.SetTimeCompleted(*t)
+	}
+	return cmu
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (cmu *ChallengeMemberUpdate) ClearTimeCompleted() *ChallengeMemberUpdate {
+	cmu.mutation.ClearTimeCompleted()
+	return cmu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cmu *ChallengeMemberUpdate) SetUpdatedAt(t time.Time) *ChallengeMemberUpdate {
+	cmu.mutation.SetUpdatedAt(t)
 	return cmu
 }
 
@@ -58,23 +120,14 @@ func (cmu *ChallengeMemberUpdate) AddChallengeMemberRules(c ...*ChallengeMemberR
 	return cmu.AddChallengeMemberRuleIDs(ids...)
 }
 
-// SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
-func (cmu *ChallengeMemberUpdate) SetChallengeID(id int64) *ChallengeMemberUpdate {
-	cmu.mutation.SetChallengeID(id)
-	return cmu
-}
-
-// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
-func (cmu *ChallengeMemberUpdate) SetNillableChallengeID(id *int64) *ChallengeMemberUpdate {
-	if id != nil {
-		cmu = cmu.SetChallengeID(*id)
-	}
-	return cmu
-}
-
 // SetChallenge sets the "challenge" edge to the Challenge entity.
 func (cmu *ChallengeMemberUpdate) SetChallenge(c *Challenge) *ChallengeMemberUpdate {
 	return cmu.SetChallengeID(c.ID)
+}
+
+// SetMember sets the "member" edge to the Member entity.
+func (cmu *ChallengeMemberUpdate) SetMember(m *Member) *ChallengeMemberUpdate {
+	return cmu.SetMemberID(m.ID)
 }
 
 // Mutation returns the ChallengeMemberMutation object of the builder.
@@ -109,8 +162,15 @@ func (cmu *ChallengeMemberUpdate) ClearChallenge() *ChallengeMemberUpdate {
 	return cmu
 }
 
+// ClearMember clears the "member" edge to the Member entity.
+func (cmu *ChallengeMemberUpdate) ClearMember() *ChallengeMemberUpdate {
+	cmu.mutation.ClearMember()
+	return cmu
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cmu *ChallengeMemberUpdate) Save(ctx context.Context) (int, error) {
+	cmu.defaults()
 	return withHooks[int, ChallengeMemberMutation](ctx, cmu.sqlSave, cmu.mutation, cmu.hooks)
 }
 
@@ -136,6 +196,25 @@ func (cmu *ChallengeMemberUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cmu *ChallengeMemberUpdate) defaults() {
+	if _, ok := cmu.mutation.UpdatedAt(); !ok {
+		v := challengemember.UpdateDefaultUpdatedAt()
+		cmu.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (cmu *ChallengeMemberUpdate) check() error {
+	if _, ok := cmu.mutation.ChallengeID(); cmu.mutation.ChallengeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ChallengeMember.challenge"`)
+	}
+	if _, ok := cmu.mutation.MemberID(); cmu.mutation.MemberCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ChallengeMember.member"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cmu *ChallengeMemberUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ChallengeMemberUpdate {
 	cmu.modifiers = append(cmu.modifiers, modifiers...)
@@ -143,6 +222,9 @@ func (cmu *ChallengeMemberUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)
 }
 
 func (cmu *ChallengeMemberUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cmu.check(); err != nil {
+		return n, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   challengemember.Table,
@@ -160,11 +242,23 @@ func (cmu *ChallengeMemberUpdate) sqlSave(ctx context.Context) (n int, err error
 			}
 		}
 	}
-	if value, ok := cmu.mutation.MemberID(); ok {
-		_spec.SetField(challengemember.FieldMemberID, field.TypeInt64, value)
+	if value, ok := cmu.mutation.Point(); ok {
+		_spec.SetField(challengemember.FieldPoint, field.TypeInt64, value)
 	}
-	if value, ok := cmu.mutation.AddedMemberID(); ok {
-		_spec.AddField(challengemember.FieldMemberID, field.TypeInt64, value)
+	if value, ok := cmu.mutation.AddedPoint(); ok {
+		_spec.AddField(challengemember.FieldPoint, field.TypeInt64, value)
+	}
+	if value, ok := cmu.mutation.IsCompleted(); ok {
+		_spec.SetField(challengemember.FieldIsCompleted, field.TypeBool, value)
+	}
+	if value, ok := cmu.mutation.TimeCompleted(); ok {
+		_spec.SetField(challengemember.FieldTimeCompleted, field.TypeTime, value)
+	}
+	if cmu.mutation.TimeCompletedCleared() {
+		_spec.ClearField(challengemember.FieldTimeCompleted, field.TypeTime)
+	}
+	if value, ok := cmu.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengemember.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if cmu.mutation.ChallengeMemberRulesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -255,6 +349,41 @@ func (cmu *ChallengeMemberUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cmu.mutation.MemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengemember.MemberTable,
+			Columns: []string{challengemember.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cmu.mutation.MemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengemember.MemberTable,
+			Columns: []string{challengemember.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(cmu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cmu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -277,16 +406,76 @@ type ChallengeMemberUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
+// SetPoint sets the "point" field.
+func (cmuo *ChallengeMemberUpdateOne) SetPoint(i int64) *ChallengeMemberUpdateOne {
+	cmuo.mutation.ResetPoint()
+	cmuo.mutation.SetPoint(i)
+	return cmuo
+}
+
+// SetNillablePoint sets the "point" field if the given value is not nil.
+func (cmuo *ChallengeMemberUpdateOne) SetNillablePoint(i *int64) *ChallengeMemberUpdateOne {
+	if i != nil {
+		cmuo.SetPoint(*i)
+	}
+	return cmuo
+}
+
+// AddPoint adds i to the "point" field.
+func (cmuo *ChallengeMemberUpdateOne) AddPoint(i int64) *ChallengeMemberUpdateOne {
+	cmuo.mutation.AddPoint(i)
+	return cmuo
+}
+
 // SetMemberID sets the "member_id" field.
 func (cmuo *ChallengeMemberUpdateOne) SetMemberID(i int64) *ChallengeMemberUpdateOne {
-	cmuo.mutation.ResetMemberID()
 	cmuo.mutation.SetMemberID(i)
 	return cmuo
 }
 
-// AddMemberID adds i to the "member_id" field.
-func (cmuo *ChallengeMemberUpdateOne) AddMemberID(i int64) *ChallengeMemberUpdateOne {
-	cmuo.mutation.AddMemberID(i)
+// SetChallengeID sets the "challenge_id" field.
+func (cmuo *ChallengeMemberUpdateOne) SetChallengeID(i int64) *ChallengeMemberUpdateOne {
+	cmuo.mutation.SetChallengeID(i)
+	return cmuo
+}
+
+// SetIsCompleted sets the "is_completed" field.
+func (cmuo *ChallengeMemberUpdateOne) SetIsCompleted(b bool) *ChallengeMemberUpdateOne {
+	cmuo.mutation.SetIsCompleted(b)
+	return cmuo
+}
+
+// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
+func (cmuo *ChallengeMemberUpdateOne) SetNillableIsCompleted(b *bool) *ChallengeMemberUpdateOne {
+	if b != nil {
+		cmuo.SetIsCompleted(*b)
+	}
+	return cmuo
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cmuo *ChallengeMemberUpdateOne) SetTimeCompleted(t time.Time) *ChallengeMemberUpdateOne {
+	cmuo.mutation.SetTimeCompleted(t)
+	return cmuo
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cmuo *ChallengeMemberUpdateOne) SetNillableTimeCompleted(t *time.Time) *ChallengeMemberUpdateOne {
+	if t != nil {
+		cmuo.SetTimeCompleted(*t)
+	}
+	return cmuo
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (cmuo *ChallengeMemberUpdateOne) ClearTimeCompleted() *ChallengeMemberUpdateOne {
+	cmuo.mutation.ClearTimeCompleted()
+	return cmuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cmuo *ChallengeMemberUpdateOne) SetUpdatedAt(t time.Time) *ChallengeMemberUpdateOne {
+	cmuo.mutation.SetUpdatedAt(t)
 	return cmuo
 }
 
@@ -305,23 +494,14 @@ func (cmuo *ChallengeMemberUpdateOne) AddChallengeMemberRules(c ...*ChallengeMem
 	return cmuo.AddChallengeMemberRuleIDs(ids...)
 }
 
-// SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
-func (cmuo *ChallengeMemberUpdateOne) SetChallengeID(id int64) *ChallengeMemberUpdateOne {
-	cmuo.mutation.SetChallengeID(id)
-	return cmuo
-}
-
-// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
-func (cmuo *ChallengeMemberUpdateOne) SetNillableChallengeID(id *int64) *ChallengeMemberUpdateOne {
-	if id != nil {
-		cmuo = cmuo.SetChallengeID(*id)
-	}
-	return cmuo
-}
-
 // SetChallenge sets the "challenge" edge to the Challenge entity.
 func (cmuo *ChallengeMemberUpdateOne) SetChallenge(c *Challenge) *ChallengeMemberUpdateOne {
 	return cmuo.SetChallengeID(c.ID)
+}
+
+// SetMember sets the "member" edge to the Member entity.
+func (cmuo *ChallengeMemberUpdateOne) SetMember(m *Member) *ChallengeMemberUpdateOne {
+	return cmuo.SetMemberID(m.ID)
 }
 
 // Mutation returns the ChallengeMemberMutation object of the builder.
@@ -356,6 +536,12 @@ func (cmuo *ChallengeMemberUpdateOne) ClearChallenge() *ChallengeMemberUpdateOne
 	return cmuo
 }
 
+// ClearMember clears the "member" edge to the Member entity.
+func (cmuo *ChallengeMemberUpdateOne) ClearMember() *ChallengeMemberUpdateOne {
+	cmuo.mutation.ClearMember()
+	return cmuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (cmuo *ChallengeMemberUpdateOne) Select(field string, fields ...string) *ChallengeMemberUpdateOne {
@@ -365,6 +551,7 @@ func (cmuo *ChallengeMemberUpdateOne) Select(field string, fields ...string) *Ch
 
 // Save executes the query and returns the updated ChallengeMember entity.
 func (cmuo *ChallengeMemberUpdateOne) Save(ctx context.Context) (*ChallengeMember, error) {
+	cmuo.defaults()
 	return withHooks[*ChallengeMember, ChallengeMemberMutation](ctx, cmuo.sqlSave, cmuo.mutation, cmuo.hooks)
 }
 
@@ -390,6 +577,25 @@ func (cmuo *ChallengeMemberUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cmuo *ChallengeMemberUpdateOne) defaults() {
+	if _, ok := cmuo.mutation.UpdatedAt(); !ok {
+		v := challengemember.UpdateDefaultUpdatedAt()
+		cmuo.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (cmuo *ChallengeMemberUpdateOne) check() error {
+	if _, ok := cmuo.mutation.ChallengeID(); cmuo.mutation.ChallengeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ChallengeMember.challenge"`)
+	}
+	if _, ok := cmuo.mutation.MemberID(); cmuo.mutation.MemberCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ChallengeMember.member"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cmuo *ChallengeMemberUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ChallengeMemberUpdateOne {
 	cmuo.modifiers = append(cmuo.modifiers, modifiers...)
@@ -397,6 +603,9 @@ func (cmuo *ChallengeMemberUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuil
 }
 
 func (cmuo *ChallengeMemberUpdateOne) sqlSave(ctx context.Context) (_node *ChallengeMember, err error) {
+	if err := cmuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   challengemember.Table,
@@ -431,11 +640,23 @@ func (cmuo *ChallengeMemberUpdateOne) sqlSave(ctx context.Context) (_node *Chall
 			}
 		}
 	}
-	if value, ok := cmuo.mutation.MemberID(); ok {
-		_spec.SetField(challengemember.FieldMemberID, field.TypeInt64, value)
+	if value, ok := cmuo.mutation.Point(); ok {
+		_spec.SetField(challengemember.FieldPoint, field.TypeInt64, value)
 	}
-	if value, ok := cmuo.mutation.AddedMemberID(); ok {
-		_spec.AddField(challengemember.FieldMemberID, field.TypeInt64, value)
+	if value, ok := cmuo.mutation.AddedPoint(); ok {
+		_spec.AddField(challengemember.FieldPoint, field.TypeInt64, value)
+	}
+	if value, ok := cmuo.mutation.IsCompleted(); ok {
+		_spec.SetField(challengemember.FieldIsCompleted, field.TypeBool, value)
+	}
+	if value, ok := cmuo.mutation.TimeCompleted(); ok {
+		_spec.SetField(challengemember.FieldTimeCompleted, field.TypeTime, value)
+	}
+	if cmuo.mutation.TimeCompletedCleared() {
+		_spec.ClearField(challengemember.FieldTimeCompleted, field.TypeTime)
+	}
+	if value, ok := cmuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengemember.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if cmuo.mutation.ChallengeMemberRulesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -518,6 +739,41 @@ func (cmuo *ChallengeMemberUpdateOne) sqlSave(ctx context.Context) (_node *Chall
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: challenge.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cmuo.mutation.MemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengemember.MemberTable,
+			Columns: []string{challengemember.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cmuo.mutation.MemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengemember.MemberTable,
+			Columns: []string{challengemember.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
 				},
 			},
 		}

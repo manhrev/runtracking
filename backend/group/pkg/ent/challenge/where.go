@@ -80,6 +80,11 @@ func TypeID(v int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldTypeID, v))
 }
 
+// CompletedFirstMemberID applies equality check predicate on the "completed_first_member_id" field. It's identical to CompletedFirstMemberIDEQ.
+func CompletedFirstMemberID(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldCompletedFirstMemberID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldCreatedAt, v))
@@ -335,6 +340,56 @@ func TypeIDLTE(v int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldLTE(FieldTypeID, v))
 }
 
+// CompletedFirstMemberIDEQ applies the EQ predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDEQ(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDNEQ applies the NEQ predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDNEQ(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNEQ(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDIn applies the In predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDIn(vs ...int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldIn(FieldCompletedFirstMemberID, vs...))
+}
+
+// CompletedFirstMemberIDNotIn applies the NotIn predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDNotIn(vs ...int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotIn(FieldCompletedFirstMemberID, vs...))
+}
+
+// CompletedFirstMemberIDGT applies the GT predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDGT(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGT(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDGTE applies the GTE predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDGTE(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGTE(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDLT applies the LT predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDLT(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLT(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDLTE applies the LTE predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDLTE(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLTE(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDIsNil applies the IsNil predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDIsNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldIsNull(FieldCompletedFirstMemberID))
+}
+
+// CompletedFirstMemberIDNotNil applies the NotNil predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDNotNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotNull(FieldCompletedFirstMemberID))
+}
+
 // HasChallengeMembers applies the HasEdge predicate on the "challenge_members" edge.
 func HasChallengeMembers() predicate.Challenge {
 	return predicate.Challenge(func(s *sql.Selector) {
@@ -380,6 +435,33 @@ func HasGroupzWith(preds ...predicate.Groupz) predicate.Challenge {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(GroupzInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChallengeRules applies the HasEdge predicate on the "challenge_rules" edge.
+func HasChallengeRules() predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChallengeRulesTable, ChallengeRulesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChallengeRulesWith applies the HasEdge predicate on the "challenge_rules" edge with a given conditions (other predicates).
+func HasChallengeRulesWith(preds ...predicate.ChallengeRule) predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChallengeRulesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChallengeRulesTable, ChallengeRulesColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

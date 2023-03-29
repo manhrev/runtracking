@@ -3,6 +3,8 @@
 package challengemember
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
@@ -53,9 +55,74 @@ func IDLTE(id int64) predicate.ChallengeMember {
 	return predicate.ChallengeMember(sql.FieldLTE(FieldID, id))
 }
 
+// Point applies equality check predicate on the "point" field. It's identical to PointEQ.
+func Point(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldPoint, v))
+}
+
 // MemberID applies equality check predicate on the "member_id" field. It's identical to MemberIDEQ.
 func MemberID(v int64) predicate.ChallengeMember {
 	return predicate.ChallengeMember(sql.FieldEQ(FieldMemberID, v))
+}
+
+// ChallengeID applies equality check predicate on the "challenge_id" field. It's identical to ChallengeIDEQ.
+func ChallengeID(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldChallengeID, v))
+}
+
+// IsCompleted applies equality check predicate on the "is_completed" field. It's identical to IsCompletedEQ.
+func IsCompleted(v bool) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldIsCompleted, v))
+}
+
+// TimeCompleted applies equality check predicate on the "time_completed" field. It's identical to TimeCompletedEQ.
+func TimeCompleted(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldTimeCompleted, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// PointEQ applies the EQ predicate on the "point" field.
+func PointEQ(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldPoint, v))
+}
+
+// PointNEQ applies the NEQ predicate on the "point" field.
+func PointNEQ(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNEQ(FieldPoint, v))
+}
+
+// PointIn applies the In predicate on the "point" field.
+func PointIn(vs ...int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldIn(FieldPoint, vs...))
+}
+
+// PointNotIn applies the NotIn predicate on the "point" field.
+func PointNotIn(vs ...int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNotIn(FieldPoint, vs...))
+}
+
+// PointGT applies the GT predicate on the "point" field.
+func PointGT(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGT(FieldPoint, v))
+}
+
+// PointGTE applies the GTE predicate on the "point" field.
+func PointGTE(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGTE(FieldPoint, v))
+}
+
+// PointLT applies the LT predicate on the "point" field.
+func PointLT(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLT(FieldPoint, v))
+}
+
+// PointLTE applies the LTE predicate on the "point" field.
+func PointLTE(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLTE(FieldPoint, v))
 }
 
 // MemberIDEQ applies the EQ predicate on the "member_id" field.
@@ -78,24 +145,124 @@ func MemberIDNotIn(vs ...int64) predicate.ChallengeMember {
 	return predicate.ChallengeMember(sql.FieldNotIn(FieldMemberID, vs...))
 }
 
-// MemberIDGT applies the GT predicate on the "member_id" field.
-func MemberIDGT(v int64) predicate.ChallengeMember {
-	return predicate.ChallengeMember(sql.FieldGT(FieldMemberID, v))
+// ChallengeIDEQ applies the EQ predicate on the "challenge_id" field.
+func ChallengeIDEQ(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldChallengeID, v))
 }
 
-// MemberIDGTE applies the GTE predicate on the "member_id" field.
-func MemberIDGTE(v int64) predicate.ChallengeMember {
-	return predicate.ChallengeMember(sql.FieldGTE(FieldMemberID, v))
+// ChallengeIDNEQ applies the NEQ predicate on the "challenge_id" field.
+func ChallengeIDNEQ(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNEQ(FieldChallengeID, v))
 }
 
-// MemberIDLT applies the LT predicate on the "member_id" field.
-func MemberIDLT(v int64) predicate.ChallengeMember {
-	return predicate.ChallengeMember(sql.FieldLT(FieldMemberID, v))
+// ChallengeIDIn applies the In predicate on the "challenge_id" field.
+func ChallengeIDIn(vs ...int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldIn(FieldChallengeID, vs...))
 }
 
-// MemberIDLTE applies the LTE predicate on the "member_id" field.
-func MemberIDLTE(v int64) predicate.ChallengeMember {
-	return predicate.ChallengeMember(sql.FieldLTE(FieldMemberID, v))
+// ChallengeIDNotIn applies the NotIn predicate on the "challenge_id" field.
+func ChallengeIDNotIn(vs ...int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNotIn(FieldChallengeID, vs...))
+}
+
+// IsCompletedEQ applies the EQ predicate on the "is_completed" field.
+func IsCompletedEQ(v bool) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldIsCompleted, v))
+}
+
+// IsCompletedNEQ applies the NEQ predicate on the "is_completed" field.
+func IsCompletedNEQ(v bool) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNEQ(FieldIsCompleted, v))
+}
+
+// TimeCompletedEQ applies the EQ predicate on the "time_completed" field.
+func TimeCompletedEQ(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldTimeCompleted, v))
+}
+
+// TimeCompletedNEQ applies the NEQ predicate on the "time_completed" field.
+func TimeCompletedNEQ(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNEQ(FieldTimeCompleted, v))
+}
+
+// TimeCompletedIn applies the In predicate on the "time_completed" field.
+func TimeCompletedIn(vs ...time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldIn(FieldTimeCompleted, vs...))
+}
+
+// TimeCompletedNotIn applies the NotIn predicate on the "time_completed" field.
+func TimeCompletedNotIn(vs ...time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNotIn(FieldTimeCompleted, vs...))
+}
+
+// TimeCompletedGT applies the GT predicate on the "time_completed" field.
+func TimeCompletedGT(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGT(FieldTimeCompleted, v))
+}
+
+// TimeCompletedGTE applies the GTE predicate on the "time_completed" field.
+func TimeCompletedGTE(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGTE(FieldTimeCompleted, v))
+}
+
+// TimeCompletedLT applies the LT predicate on the "time_completed" field.
+func TimeCompletedLT(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLT(FieldTimeCompleted, v))
+}
+
+// TimeCompletedLTE applies the LTE predicate on the "time_completed" field.
+func TimeCompletedLTE(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLTE(FieldTimeCompleted, v))
+}
+
+// TimeCompletedIsNil applies the IsNil predicate on the "time_completed" field.
+func TimeCompletedIsNil() predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldIsNull(FieldTimeCompleted))
+}
+
+// TimeCompletedNotNil applies the NotNil predicate on the "time_completed" field.
+func TimeCompletedNotNil() predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNotNull(FieldTimeCompleted))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // HasChallengeMemberRules applies the HasEdge predicate on the "challenge_member_rules" edge.
@@ -143,6 +310,33 @@ func HasChallengeWith(preds ...predicate.Challenge) predicate.ChallengeMember {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ChallengeInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, ChallengeTable, ChallengeColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasMember applies the HasEdge predicate on the "member" edge.
+func HasMember() predicate.ChallengeMember {
+	return predicate.ChallengeMember(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MemberTable, MemberColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMemberWith applies the HasEdge predicate on the "member" edge with a given conditions (other predicates).
+func HasMemberWith(preds ...predicate.Member) predicate.ChallengeMember {
+	return predicate.ChallengeMember(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MemberInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MemberTable, MemberColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

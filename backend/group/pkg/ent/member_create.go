@@ -10,8 +10,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/seasonmember"
 )
 
 // MemberCreate is the builder for creating a Member entity.
@@ -69,6 +71,34 @@ func (mc *MemberCreate) SetNillableJoiningAt(t *time.Time) *MemberCreate {
 	return mc
 }
 
+// SetPoint sets the "point" field.
+func (mc *MemberCreate) SetPoint(i int64) *MemberCreate {
+	mc.mutation.SetPoint(i)
+	return mc
+}
+
+// SetNillablePoint sets the "point" field if the given value is not nil.
+func (mc *MemberCreate) SetNillablePoint(i *int64) *MemberCreate {
+	if i != nil {
+		mc.SetPoint(*i)
+	}
+	return mc
+}
+
+// SetCompletedChallengeCount sets the "completed_challenge_count" field.
+func (mc *MemberCreate) SetCompletedChallengeCount(i int64) *MemberCreate {
+	mc.mutation.SetCompletedChallengeCount(i)
+	return mc
+}
+
+// SetNillableCompletedChallengeCount sets the "completed_challenge_count" field if the given value is not nil.
+func (mc *MemberCreate) SetNillableCompletedChallengeCount(i *int64) *MemberCreate {
+	if i != nil {
+		mc.SetCompletedChallengeCount(*i)
+	}
+	return mc
+}
+
 // SetID sets the "id" field.
 func (mc *MemberCreate) SetID(i int64) *MemberCreate {
 	mc.mutation.SetID(i)
@@ -92,6 +122,36 @@ func (mc *MemberCreate) SetNillableGroupzID(id *int64) *MemberCreate {
 // SetGroupz sets the "groupz" edge to the Groupz entity.
 func (mc *MemberCreate) SetGroupz(g *Groupz) *MemberCreate {
 	return mc.SetGroupzID(g.ID)
+}
+
+// AddChallengeMemberIDs adds the "challenge_members" edge to the ChallengeMember entity by IDs.
+func (mc *MemberCreate) AddChallengeMemberIDs(ids ...int64) *MemberCreate {
+	mc.mutation.AddChallengeMemberIDs(ids...)
+	return mc
+}
+
+// AddChallengeMembers adds the "challenge_members" edges to the ChallengeMember entity.
+func (mc *MemberCreate) AddChallengeMembers(c ...*ChallengeMember) *MemberCreate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return mc.AddChallengeMemberIDs(ids...)
+}
+
+// AddSeasonMemberIDs adds the "season_members" edge to the SeasonMember entity by IDs.
+func (mc *MemberCreate) AddSeasonMemberIDs(ids ...int64) *MemberCreate {
+	mc.mutation.AddSeasonMemberIDs(ids...)
+	return mc
+}
+
+// AddSeasonMembers adds the "season_members" edges to the SeasonMember entity.
+func (mc *MemberCreate) AddSeasonMembers(s ...*SeasonMember) *MemberCreate {
+	ids := make([]int64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return mc.AddSeasonMemberIDs(ids...)
 }
 
 // Mutation returns the MemberMutation object of the builder.
@@ -137,6 +197,14 @@ func (mc *MemberCreate) defaults() {
 		v := member.DefaultStatus
 		mc.mutation.SetStatus(v)
 	}
+	if _, ok := mc.mutation.Point(); !ok {
+		v := member.DefaultPoint
+		mc.mutation.SetPoint(v)
+	}
+	if _, ok := mc.mutation.CompletedChallengeCount(); !ok {
+		v := member.DefaultCompletedChallengeCount
+		mc.mutation.SetCompletedChallengeCount(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -149,6 +217,12 @@ func (mc *MemberCreate) check() error {
 	}
 	if _, ok := mc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Member.status"`)}
+	}
+	if _, ok := mc.mutation.Point(); !ok {
+		return &ValidationError{Name: "point", err: errors.New(`ent: missing required field "Member.point"`)}
+	}
+	if _, ok := mc.mutation.CompletedChallengeCount(); !ok {
+		return &ValidationError{Name: "completed_challenge_count", err: errors.New(`ent: missing required field "Member.completed_challenge_count"`)}
 	}
 	return nil
 }
@@ -204,6 +278,14 @@ func (mc *MemberCreate) createSpec() (*Member, *sqlgraph.CreateSpec) {
 		_spec.SetField(member.FieldJoiningAt, field.TypeTime, value)
 		_node.JoiningAt = value
 	}
+	if value, ok := mc.mutation.Point(); ok {
+		_spec.SetField(member.FieldPoint, field.TypeInt64, value)
+		_node.Point = value
+	}
+	if value, ok := mc.mutation.CompletedChallengeCount(); ok {
+		_spec.SetField(member.FieldCompletedChallengeCount, field.TypeInt64, value)
+		_node.CompletedChallengeCount = value
+	}
 	if nodes := mc.mutation.GroupzIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -222,6 +304,44 @@ func (mc *MemberCreate) createSpec() (*Member, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.groupz_members = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.ChallengeMembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   member.ChallengeMembersTable,
+			Columns: []string{member.ChallengeMembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengemember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.SeasonMembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   member.SeasonMembersTable,
+			Columns: []string{member.SeasonMembersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: seasonmember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -20,6 +20,8 @@ type Groupz struct {
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// GroupPicture holds the value of the "group_picture" field.
+	GroupPicture string `json:"group_picture,omitempty"`
 	// BackgroundPicture holds the value of the "background_picture" field.
 	BackgroundPicture string `json:"background_picture,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -69,7 +71,7 @@ func (*Groupz) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case groupz.FieldID, groupz.FieldLeaderID:
 			values[i] = new(sql.NullInt64)
-		case groupz.FieldName, groupz.FieldDescription, groupz.FieldBackgroundPicture:
+		case groupz.FieldName, groupz.FieldDescription, groupz.FieldGroupPicture, groupz.FieldBackgroundPicture:
 			values[i] = new(sql.NullString)
 		case groupz.FieldCreatedAt, groupz.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -105,6 +107,12 @@ func (gr *Groupz) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				gr.Description = value.String
+			}
+		case groupz.FieldGroupPicture:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field group_picture", values[i])
+			} else if value.Valid {
+				gr.GroupPicture = value.String
 			}
 		case groupz.FieldBackgroundPicture:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -173,6 +181,9 @@ func (gr *Groupz) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(gr.Description)
+	builder.WriteString(", ")
+	builder.WriteString("group_picture=")
+	builder.WriteString(gr.GroupPicture)
 	builder.WriteString(", ")
 	builder.WriteString("background_picture=")
 	builder.WriteString(gr.BackgroundPicture)

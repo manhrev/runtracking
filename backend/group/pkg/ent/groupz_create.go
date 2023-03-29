@@ -50,6 +50,20 @@ func (gc *GroupzCreate) SetNillableDescription(s *string) *GroupzCreate {
 	return gc
 }
 
+// SetGroupPicture sets the "group_picture" field.
+func (gc *GroupzCreate) SetGroupPicture(s string) *GroupzCreate {
+	gc.mutation.SetGroupPicture(s)
+	return gc
+}
+
+// SetNillableGroupPicture sets the "group_picture" field if the given value is not nil.
+func (gc *GroupzCreate) SetNillableGroupPicture(s *string) *GroupzCreate {
+	if s != nil {
+		gc.SetGroupPicture(*s)
+	}
+	return gc
+}
+
 // SetBackgroundPicture sets the "background_picture" field.
 func (gc *GroupzCreate) SetBackgroundPicture(s string) *GroupzCreate {
 	gc.mutation.SetBackgroundPicture(s)
@@ -169,6 +183,10 @@ func (gc *GroupzCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (gc *GroupzCreate) defaults() {
+	if _, ok := gc.mutation.GroupPicture(); !ok {
+		v := groupz.DefaultGroupPicture
+		gc.mutation.SetGroupPicture(v)
+	}
 	if _, ok := gc.mutation.BackgroundPicture(); !ok {
 		v := groupz.DefaultBackgroundPicture
 		gc.mutation.SetBackgroundPicture(v)
@@ -185,6 +203,9 @@ func (gc *GroupzCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (gc *GroupzCreate) check() error {
+	if _, ok := gc.mutation.GroupPicture(); !ok {
+		return &ValidationError{Name: "group_picture", err: errors.New(`ent: missing required field "Groupz.group_picture"`)}
+	}
 	if _, ok := gc.mutation.BackgroundPicture(); !ok {
 		return &ValidationError{Name: "background_picture", err: errors.New(`ent: missing required field "Groupz.background_picture"`)}
 	}
@@ -242,6 +263,10 @@ func (gc *GroupzCreate) createSpec() (*Groupz, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.Description(); ok {
 		_spec.SetField(groupz.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := gc.mutation.GroupPicture(); ok {
+		_spec.SetField(groupz.FieldGroupPicture, field.TypeString, value)
+		_node.GroupPicture = value
 	}
 	if value, ok := gc.mutation.BackgroundPicture(); ok {
 		_spec.SetField(groupz.FieldBackgroundPicture, field.TypeString, value)

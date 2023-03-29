@@ -19,8 +19,16 @@ const (
 	FieldStatus = "status"
 	// FieldJoiningAt holds the string denoting the joining_at field in the database.
 	FieldJoiningAt = "joining_at"
+	// FieldPoint holds the string denoting the point field in the database.
+	FieldPoint = "point"
+	// FieldCompletedChallengeCount holds the string denoting the completed_challenge_count field in the database.
+	FieldCompletedChallengeCount = "completed_challenge_count"
 	// EdgeGroupz holds the string denoting the groupz edge name in mutations.
 	EdgeGroupz = "groupz"
+	// EdgeChallengeMembers holds the string denoting the challenge_members edge name in mutations.
+	EdgeChallengeMembers = "challenge_members"
+	// EdgeSeasonMembers holds the string denoting the season_members edge name in mutations.
+	EdgeSeasonMembers = "season_members"
 	// Table holds the table name of the member in the database.
 	Table = "members"
 	// GroupzTable is the table that holds the groupz relation/edge.
@@ -30,6 +38,20 @@ const (
 	GroupzInverseTable = "groupzs"
 	// GroupzColumn is the table column denoting the groupz relation/edge.
 	GroupzColumn = "groupz_members"
+	// ChallengeMembersTable is the table that holds the challenge_members relation/edge.
+	ChallengeMembersTable = "challenge_members"
+	// ChallengeMembersInverseTable is the table name for the ChallengeMember entity.
+	// It exists in this package in order to avoid circular dependency with the "challengemember" package.
+	ChallengeMembersInverseTable = "challenge_members"
+	// ChallengeMembersColumn is the table column denoting the challenge_members relation/edge.
+	ChallengeMembersColumn = "member_id"
+	// SeasonMembersTable is the table that holds the season_members relation/edge.
+	SeasonMembersTable = "season_members"
+	// SeasonMembersInverseTable is the table name for the SeasonMember entity.
+	// It exists in this package in order to avoid circular dependency with the "seasonmember" package.
+	SeasonMembersInverseTable = "season_members"
+	// SeasonMembersColumn is the table column denoting the season_members relation/edge.
+	SeasonMembersColumn = "member_id"
 )
 
 // Columns holds all SQL columns for member fields.
@@ -39,6 +61,8 @@ var Columns = []string{
 	FieldUserID,
 	FieldStatus,
 	FieldJoiningAt,
+	FieldPoint,
+	FieldCompletedChallengeCount,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "members"
@@ -67,4 +91,8 @@ var (
 	DefaultCreatedAt func() time.Time
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus uint32
+	// DefaultPoint holds the default value on creation for the "point" field.
+	DefaultPoint int64
+	// DefaultCompletedChallengeCount holds the default value on creation for the "completed_challenge_count" field.
+	DefaultCompletedChallengeCount int64
 )

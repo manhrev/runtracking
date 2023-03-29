@@ -26,6 +26,9 @@ func (Challenge) Fields() []ent.Field {
 		field.String("description").
 			Optional(),
 		field.Int64("type_id"),
+		// id of member who completed with all rules of challenge first
+		field.Int64("completed_first_member_id").
+			Optional(),
 	}
 }
 
@@ -35,5 +38,6 @@ func (Challenge) Edges() []ent.Edge {
 		edge.From("groupz", Groupz.Type).
 			Ref("challenges").
 			Unique(),
+		edge.To("challenge_rules", ChallengeRule.Type),
 	}
 }

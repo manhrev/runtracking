@@ -75,6 +75,16 @@ func JoiningAt(v time.Time) predicate.Member {
 	return predicate.Member(sql.FieldEQ(FieldJoiningAt, v))
 }
 
+// Point applies equality check predicate on the "point" field. It's identical to PointEQ.
+func Point(v int64) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldPoint, v))
+}
+
+// CompletedChallengeCount applies equality check predicate on the "completed_challenge_count" field. It's identical to CompletedChallengeCountEQ.
+func CompletedChallengeCount(v int64) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldCompletedChallengeCount, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Member {
 	return predicate.Member(sql.FieldEQ(FieldCreatedAt, v))
@@ -245,6 +255,86 @@ func JoiningAtNotNil() predicate.Member {
 	return predicate.Member(sql.FieldNotNull(FieldJoiningAt))
 }
 
+// PointEQ applies the EQ predicate on the "point" field.
+func PointEQ(v int64) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldPoint, v))
+}
+
+// PointNEQ applies the NEQ predicate on the "point" field.
+func PointNEQ(v int64) predicate.Member {
+	return predicate.Member(sql.FieldNEQ(FieldPoint, v))
+}
+
+// PointIn applies the In predicate on the "point" field.
+func PointIn(vs ...int64) predicate.Member {
+	return predicate.Member(sql.FieldIn(FieldPoint, vs...))
+}
+
+// PointNotIn applies the NotIn predicate on the "point" field.
+func PointNotIn(vs ...int64) predicate.Member {
+	return predicate.Member(sql.FieldNotIn(FieldPoint, vs...))
+}
+
+// PointGT applies the GT predicate on the "point" field.
+func PointGT(v int64) predicate.Member {
+	return predicate.Member(sql.FieldGT(FieldPoint, v))
+}
+
+// PointGTE applies the GTE predicate on the "point" field.
+func PointGTE(v int64) predicate.Member {
+	return predicate.Member(sql.FieldGTE(FieldPoint, v))
+}
+
+// PointLT applies the LT predicate on the "point" field.
+func PointLT(v int64) predicate.Member {
+	return predicate.Member(sql.FieldLT(FieldPoint, v))
+}
+
+// PointLTE applies the LTE predicate on the "point" field.
+func PointLTE(v int64) predicate.Member {
+	return predicate.Member(sql.FieldLTE(FieldPoint, v))
+}
+
+// CompletedChallengeCountEQ applies the EQ predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountEQ(v int64) predicate.Member {
+	return predicate.Member(sql.FieldEQ(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountNEQ applies the NEQ predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountNEQ(v int64) predicate.Member {
+	return predicate.Member(sql.FieldNEQ(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountIn applies the In predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountIn(vs ...int64) predicate.Member {
+	return predicate.Member(sql.FieldIn(FieldCompletedChallengeCount, vs...))
+}
+
+// CompletedChallengeCountNotIn applies the NotIn predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountNotIn(vs ...int64) predicate.Member {
+	return predicate.Member(sql.FieldNotIn(FieldCompletedChallengeCount, vs...))
+}
+
+// CompletedChallengeCountGT applies the GT predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountGT(v int64) predicate.Member {
+	return predicate.Member(sql.FieldGT(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountGTE applies the GTE predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountGTE(v int64) predicate.Member {
+	return predicate.Member(sql.FieldGTE(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountLT applies the LT predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountLT(v int64) predicate.Member {
+	return predicate.Member(sql.FieldLT(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountLTE applies the LTE predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountLTE(v int64) predicate.Member {
+	return predicate.Member(sql.FieldLTE(FieldCompletedChallengeCount, v))
+}
+
 // HasGroupz applies the HasEdge predicate on the "groupz" edge.
 func HasGroupz() predicate.Member {
 	return predicate.Member(func(s *sql.Selector) {
@@ -263,6 +353,60 @@ func HasGroupzWith(preds ...predicate.Groupz) predicate.Member {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(GroupzInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChallengeMembers applies the HasEdge predicate on the "challenge_members" edge.
+func HasChallengeMembers() predicate.Member {
+	return predicate.Member(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChallengeMembersTable, ChallengeMembersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChallengeMembersWith applies the HasEdge predicate on the "challenge_members" edge with a given conditions (other predicates).
+func HasChallengeMembersWith(preds ...predicate.ChallengeMember) predicate.Member {
+	return predicate.Member(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChallengeMembersInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChallengeMembersTable, ChallengeMembersColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSeasonMembers applies the HasEdge predicate on the "season_members" edge.
+func HasSeasonMembers() predicate.Member {
+	return predicate.Member(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SeasonMembersTable, SeasonMembersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSeasonMembersWith applies the HasEdge predicate on the "season_members" edge with a given conditions (other predicates).
+func HasSeasonMembersWith(preds ...predicate.SeasonMember) predicate.Member {
+	return predicate.Member(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(SeasonMembersInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SeasonMembersTable, SeasonMembersColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

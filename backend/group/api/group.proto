@@ -17,6 +17,13 @@ service Group {
     rpc AcceptMember(AcceptMemberRequest) returns(AcceptMemberReply) {};
     rpc BanMember(BanMemberRequest) returns (BanMemberReply) {};
     rpc LeaveGroup(LeaveGroupRequest) returns(LeaveGroupReply){};
+    
+    // API for challenge
+    rpc CreateChallenge(CreateChallengeRequest) returns(CreateChallengeReply){};
+    rpc ListChallenge(ListChallengeRequest) returns(ListChallengeReply) {};
+    rpc UpdateChallenge(UpdateChallengeRequest) returns(UpdateChallengeReply) {};
+    rpc DeleteChallenge(DeleteChallengeRequest) returns(DeleteChallengeReply) {};
+    rpc ListUserRanking(List)
 }
 
 message LeaveGroupRequest{

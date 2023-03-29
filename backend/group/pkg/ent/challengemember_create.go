@@ -6,12 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 // ChallengeMemberCreate is the builder for creating a ChallengeMember entity.
@@ -21,9 +23,71 @@ type ChallengeMemberCreate struct {
 	hooks    []Hook
 }
 
+// SetPoint sets the "point" field.
+func (cmc *ChallengeMemberCreate) SetPoint(i int64) *ChallengeMemberCreate {
+	cmc.mutation.SetPoint(i)
+	return cmc
+}
+
+// SetNillablePoint sets the "point" field if the given value is not nil.
+func (cmc *ChallengeMemberCreate) SetNillablePoint(i *int64) *ChallengeMemberCreate {
+	if i != nil {
+		cmc.SetPoint(*i)
+	}
+	return cmc
+}
+
 // SetMemberID sets the "member_id" field.
 func (cmc *ChallengeMemberCreate) SetMemberID(i int64) *ChallengeMemberCreate {
 	cmc.mutation.SetMemberID(i)
+	return cmc
+}
+
+// SetChallengeID sets the "challenge_id" field.
+func (cmc *ChallengeMemberCreate) SetChallengeID(i int64) *ChallengeMemberCreate {
+	cmc.mutation.SetChallengeID(i)
+	return cmc
+}
+
+// SetIsCompleted sets the "is_completed" field.
+func (cmc *ChallengeMemberCreate) SetIsCompleted(b bool) *ChallengeMemberCreate {
+	cmc.mutation.SetIsCompleted(b)
+	return cmc
+}
+
+// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
+func (cmc *ChallengeMemberCreate) SetNillableIsCompleted(b *bool) *ChallengeMemberCreate {
+	if b != nil {
+		cmc.SetIsCompleted(*b)
+	}
+	return cmc
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cmc *ChallengeMemberCreate) SetTimeCompleted(t time.Time) *ChallengeMemberCreate {
+	cmc.mutation.SetTimeCompleted(t)
+	return cmc
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cmc *ChallengeMemberCreate) SetNillableTimeCompleted(t *time.Time) *ChallengeMemberCreate {
+	if t != nil {
+		cmc.SetTimeCompleted(*t)
+	}
+	return cmc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cmc *ChallengeMemberCreate) SetUpdatedAt(t time.Time) *ChallengeMemberCreate {
+	cmc.mutation.SetUpdatedAt(t)
+	return cmc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (cmc *ChallengeMemberCreate) SetNillableUpdatedAt(t *time.Time) *ChallengeMemberCreate {
+	if t != nil {
+		cmc.SetUpdatedAt(*t)
+	}
 	return cmc
 }
 
@@ -48,23 +112,14 @@ func (cmc *ChallengeMemberCreate) AddChallengeMemberRules(c ...*ChallengeMemberR
 	return cmc.AddChallengeMemberRuleIDs(ids...)
 }
 
-// SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
-func (cmc *ChallengeMemberCreate) SetChallengeID(id int64) *ChallengeMemberCreate {
-	cmc.mutation.SetChallengeID(id)
-	return cmc
-}
-
-// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
-func (cmc *ChallengeMemberCreate) SetNillableChallengeID(id *int64) *ChallengeMemberCreate {
-	if id != nil {
-		cmc = cmc.SetChallengeID(*id)
-	}
-	return cmc
-}
-
 // SetChallenge sets the "challenge" edge to the Challenge entity.
 func (cmc *ChallengeMemberCreate) SetChallenge(c *Challenge) *ChallengeMemberCreate {
 	return cmc.SetChallengeID(c.ID)
+}
+
+// SetMember sets the "member" edge to the Member entity.
+func (cmc *ChallengeMemberCreate) SetMember(m *Member) *ChallengeMemberCreate {
+	return cmc.SetMemberID(m.ID)
 }
 
 // Mutation returns the ChallengeMemberMutation object of the builder.
@@ -74,6 +129,7 @@ func (cmc *ChallengeMemberCreate) Mutation() *ChallengeMemberMutation {
 
 // Save creates the ChallengeMember in the database.
 func (cmc *ChallengeMemberCreate) Save(ctx context.Context) (*ChallengeMember, error) {
+	cmc.defaults()
 	return withHooks[*ChallengeMember, ChallengeMemberMutation](ctx, cmc.sqlSave, cmc.mutation, cmc.hooks)
 }
 
@@ -99,10 +155,44 @@ func (cmc *ChallengeMemberCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cmc *ChallengeMemberCreate) defaults() {
+	if _, ok := cmc.mutation.Point(); !ok {
+		v := challengemember.DefaultPoint
+		cmc.mutation.SetPoint(v)
+	}
+	if _, ok := cmc.mutation.IsCompleted(); !ok {
+		v := challengemember.DefaultIsCompleted
+		cmc.mutation.SetIsCompleted(v)
+	}
+	if _, ok := cmc.mutation.UpdatedAt(); !ok {
+		v := challengemember.DefaultUpdatedAt()
+		cmc.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cmc *ChallengeMemberCreate) check() error {
+	if _, ok := cmc.mutation.Point(); !ok {
+		return &ValidationError{Name: "point", err: errors.New(`ent: missing required field "ChallengeMember.point"`)}
+	}
 	if _, ok := cmc.mutation.MemberID(); !ok {
 		return &ValidationError{Name: "member_id", err: errors.New(`ent: missing required field "ChallengeMember.member_id"`)}
+	}
+	if _, ok := cmc.mutation.ChallengeID(); !ok {
+		return &ValidationError{Name: "challenge_id", err: errors.New(`ent: missing required field "ChallengeMember.challenge_id"`)}
+	}
+	if _, ok := cmc.mutation.IsCompleted(); !ok {
+		return &ValidationError{Name: "is_completed", err: errors.New(`ent: missing required field "ChallengeMember.is_completed"`)}
+	}
+	if _, ok := cmc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ChallengeMember.updated_at"`)}
+	}
+	if _, ok := cmc.mutation.ChallengeID(); !ok {
+		return &ValidationError{Name: "challenge", err: errors.New(`ent: missing required edge "ChallengeMember.challenge"`)}
+	}
+	if _, ok := cmc.mutation.MemberID(); !ok {
+		return &ValidationError{Name: "member", err: errors.New(`ent: missing required edge "ChallengeMember.member"`)}
 	}
 	return nil
 }
@@ -142,9 +232,21 @@ func (cmc *ChallengeMemberCreate) createSpec() (*ChallengeMember, *sqlgraph.Crea
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := cmc.mutation.MemberID(); ok {
-		_spec.SetField(challengemember.FieldMemberID, field.TypeInt64, value)
-		_node.MemberID = value
+	if value, ok := cmc.mutation.Point(); ok {
+		_spec.SetField(challengemember.FieldPoint, field.TypeInt64, value)
+		_node.Point = value
+	}
+	if value, ok := cmc.mutation.IsCompleted(); ok {
+		_spec.SetField(challengemember.FieldIsCompleted, field.TypeBool, value)
+		_node.IsCompleted = value
+	}
+	if value, ok := cmc.mutation.TimeCompleted(); ok {
+		_spec.SetField(challengemember.FieldTimeCompleted, field.TypeTime, value)
+		_node.TimeCompleted = value
+	}
+	if value, ok := cmc.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengemember.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if nodes := cmc.mutation.ChallengeMemberRulesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -182,7 +284,27 @@ func (cmc *ChallengeMemberCreate) createSpec() (*ChallengeMember, *sqlgraph.Crea
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.challenge_challenge_members = &nodes[0]
+		_node.ChallengeID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cmc.mutation.MemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengemember.MemberTable,
+			Columns: []string{challengemember.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.MemberID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -202,6 +324,7 @@ func (cmcb *ChallengeMemberCreateBulk) Save(ctx context.Context) ([]*ChallengeMe
 	for i := range cmcb.builders {
 		func(i int, root context.Context) {
 			builder := cmcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ChallengeMemberMutation)
 				if !ok {

@@ -21,10 +21,14 @@ const (
 	FieldDescription = "description"
 	// FieldTypeID holds the string denoting the type_id field in the database.
 	FieldTypeID = "type_id"
+	// FieldCompletedFirstMemberID holds the string denoting the completed_first_member_id field in the database.
+	FieldCompletedFirstMemberID = "completed_first_member_id"
 	// EdgeChallengeMembers holds the string denoting the challenge_members edge name in mutations.
 	EdgeChallengeMembers = "challenge_members"
 	// EdgeGroupz holds the string denoting the groupz edge name in mutations.
 	EdgeGroupz = "groupz"
+	// EdgeChallengeRules holds the string denoting the challenge_rules edge name in mutations.
+	EdgeChallengeRules = "challenge_rules"
 	// Table holds the table name of the challenge in the database.
 	Table = "challenges"
 	// ChallengeMembersTable is the table that holds the challenge_members relation/edge.
@@ -33,7 +37,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "challengemember" package.
 	ChallengeMembersInverseTable = "challenge_members"
 	// ChallengeMembersColumn is the table column denoting the challenge_members relation/edge.
-	ChallengeMembersColumn = "challenge_challenge_members"
+	ChallengeMembersColumn = "challenge_id"
 	// GroupzTable is the table that holds the groupz relation/edge.
 	GroupzTable = "challenges"
 	// GroupzInverseTable is the table name for the Groupz entity.
@@ -41,6 +45,13 @@ const (
 	GroupzInverseTable = "groupzs"
 	// GroupzColumn is the table column denoting the groupz relation/edge.
 	GroupzColumn = "groupz_challenges"
+	// ChallengeRulesTable is the table that holds the challenge_rules relation/edge.
+	ChallengeRulesTable = "challenge_rules"
+	// ChallengeRulesInverseTable is the table name for the ChallengeRule entity.
+	// It exists in this package in order to avoid circular dependency with the "challengerule" package.
+	ChallengeRulesInverseTable = "challenge_rules"
+	// ChallengeRulesColumn is the table column denoting the challenge_rules relation/edge.
+	ChallengeRulesColumn = "challenge_challenge_rules"
 )
 
 // Columns holds all SQL columns for challenge fields.
@@ -51,6 +62,7 @@ var Columns = []string{
 	FieldEndTime,
 	FieldDescription,
 	FieldTypeID,
+	FieldCompletedFirstMemberID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "challenges"

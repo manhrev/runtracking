@@ -21,6 +21,8 @@ func (Groupz) Fields() []ent.Field {
 			Optional(),
 		field.String("description").
 			Optional(),
+		field.String("group_picture").
+			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
 		field.String("background_picture").
 			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
 		field.Time("created_at").

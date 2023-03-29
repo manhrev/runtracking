@@ -6,9 +6,14 @@ import (
 	"time"
 
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/schema"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/season"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/seasonmember"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -21,18 +26,56 @@ func init() {
 	challengeDescCreatedAt := challengeFields[1].Descriptor()
 	// challenge.DefaultCreatedAt holds the default value on creation for the created_at field.
 	challenge.DefaultCreatedAt = challengeDescCreatedAt.Default.(func() time.Time)
+	challengememberFields := schema.ChallengeMember{}.Fields()
+	_ = challengememberFields
+	// challengememberDescPoint is the schema descriptor for point field.
+	challengememberDescPoint := challengememberFields[1].Descriptor()
+	// challengemember.DefaultPoint holds the default value on creation for the point field.
+	challengemember.DefaultPoint = challengememberDescPoint.Default.(int64)
+	// challengememberDescIsCompleted is the schema descriptor for is_completed field.
+	challengememberDescIsCompleted := challengememberFields[4].Descriptor()
+	// challengemember.DefaultIsCompleted holds the default value on creation for the is_completed field.
+	challengemember.DefaultIsCompleted = challengememberDescIsCompleted.Default.(bool)
+	// challengememberDescUpdatedAt is the schema descriptor for updated_at field.
+	challengememberDescUpdatedAt := challengememberFields[6].Descriptor()
+	// challengemember.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	challengemember.DefaultUpdatedAt = challengememberDescUpdatedAt.Default.(func() time.Time)
+	// challengemember.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	challengemember.UpdateDefaultUpdatedAt = challengememberDescUpdatedAt.UpdateDefault.(func() time.Time)
+	challengememberruleFields := schema.ChallengeMemberRule{}.Fields()
+	_ = challengememberruleFields
+	// challengememberruleDescIsCompleted is the schema descriptor for is_completed field.
+	challengememberruleDescIsCompleted := challengememberruleFields[3].Descriptor()
+	// challengememberrule.DefaultIsCompleted holds the default value on creation for the is_completed field.
+	challengememberrule.DefaultIsCompleted = challengememberruleDescIsCompleted.Default.(bool)
+	// challengememberruleDescUpdatedAt is the schema descriptor for updated_at field.
+	challengememberruleDescUpdatedAt := challengememberruleFields[5].Descriptor()
+	// challengememberrule.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	challengememberrule.DefaultUpdatedAt = challengememberruleDescUpdatedAt.Default.(func() time.Time)
+	// challengememberrule.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	challengememberrule.UpdateDefaultUpdatedAt = challengememberruleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	challengeruleFields := schema.ChallengeRule{}.Fields()
+	_ = challengeruleFields
+	// challengeruleDescCreatedAt is the schema descriptor for created_at field.
+	challengeruleDescCreatedAt := challengeruleFields[3].Descriptor()
+	// challengerule.DefaultCreatedAt holds the default value on creation for the created_at field.
+	challengerule.DefaultCreatedAt = challengeruleDescCreatedAt.Default.(time.Time)
 	groupzFields := schema.Groupz{}.Fields()
 	_ = groupzFields
+	// groupzDescGroupPicture is the schema descriptor for group_picture field.
+	groupzDescGroupPicture := groupzFields[3].Descriptor()
+	// groupz.DefaultGroupPicture holds the default value on creation for the group_picture field.
+	groupz.DefaultGroupPicture = groupzDescGroupPicture.Default.(string)
 	// groupzDescBackgroundPicture is the schema descriptor for background_picture field.
-	groupzDescBackgroundPicture := groupzFields[3].Descriptor()
+	groupzDescBackgroundPicture := groupzFields[4].Descriptor()
 	// groupz.DefaultBackgroundPicture holds the default value on creation for the background_picture field.
 	groupz.DefaultBackgroundPicture = groupzDescBackgroundPicture.Default.(string)
 	// groupzDescCreatedAt is the schema descriptor for created_at field.
-	groupzDescCreatedAt := groupzFields[4].Descriptor()
+	groupzDescCreatedAt := groupzFields[5].Descriptor()
 	// groupz.DefaultCreatedAt holds the default value on creation for the created_at field.
 	groupz.DefaultCreatedAt = groupzDescCreatedAt.Default.(func() time.Time)
 	// groupzDescUpdatedAt is the schema descriptor for updated_at field.
-	groupzDescUpdatedAt := groupzFields[5].Descriptor()
+	groupzDescUpdatedAt := groupzFields[6].Descriptor()
 	// groupz.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	groupz.DefaultUpdatedAt = groupzDescUpdatedAt.Default.(func() time.Time)
 	// groupz.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -47,4 +90,48 @@ func init() {
 	memberDescStatus := memberFields[3].Descriptor()
 	// member.DefaultStatus holds the default value on creation for the status field.
 	member.DefaultStatus = memberDescStatus.Default.(uint32)
+	// memberDescPoint is the schema descriptor for point field.
+	memberDescPoint := memberFields[5].Descriptor()
+	// member.DefaultPoint holds the default value on creation for the point field.
+	member.DefaultPoint = memberDescPoint.Default.(int64)
+	// memberDescCompletedChallengeCount is the schema descriptor for completed_challenge_count field.
+	memberDescCompletedChallengeCount := memberFields[6].Descriptor()
+	// member.DefaultCompletedChallengeCount holds the default value on creation for the completed_challenge_count field.
+	member.DefaultCompletedChallengeCount = memberDescCompletedChallengeCount.Default.(int64)
+	seasonFields := schema.Season{}.Fields()
+	_ = seasonFields
+	// seasonDescPicture is the schema descriptor for picture field.
+	seasonDescPicture := seasonFields[3].Descriptor()
+	// season.DefaultPicture holds the default value on creation for the picture field.
+	season.DefaultPicture = seasonDescPicture.Default.(string)
+	// seasonDescCreatedAt is the schema descriptor for created_at field.
+	seasonDescCreatedAt := seasonFields[4].Descriptor()
+	// season.DefaultCreatedAt holds the default value on creation for the created_at field.
+	season.DefaultCreatedAt = seasonDescCreatedAt.Default.(func() time.Time)
+	// seasonDescUpdatedAt is the schema descriptor for updated_at field.
+	seasonDescUpdatedAt := seasonFields[5].Descriptor()
+	// season.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	season.DefaultUpdatedAt = seasonDescUpdatedAt.Default.(func() time.Time)
+	// season.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	season.UpdateDefaultUpdatedAt = seasonDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// seasonDescIsCurrent is the schema descriptor for is_current field.
+	seasonDescIsCurrent := seasonFields[8].Descriptor()
+	// season.DefaultIsCurrent holds the default value on creation for the is_current field.
+	season.DefaultIsCurrent = seasonDescIsCurrent.Default.(bool)
+	seasonmemberFields := schema.SeasonMember{}.Fields()
+	_ = seasonmemberFields
+	// seasonmemberDescPoint is the schema descriptor for point field.
+	seasonmemberDescPoint := seasonmemberFields[1].Descriptor()
+	// seasonmember.DefaultPoint holds the default value on creation for the point field.
+	seasonmember.DefaultPoint = seasonmemberDescPoint.Default.(int64)
+	// seasonmemberDescCreatedAt is the schema descriptor for created_at field.
+	seasonmemberDescCreatedAt := seasonmemberFields[4].Descriptor()
+	// seasonmember.DefaultCreatedAt holds the default value on creation for the created_at field.
+	seasonmember.DefaultCreatedAt = seasonmemberDescCreatedAt.Default.(time.Time)
+	// seasonmemberDescUpdatedAt is the schema descriptor for updated_at field.
+	seasonmemberDescUpdatedAt := seasonmemberFields[5].Descriptor()
+	// seasonmember.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	seasonmember.DefaultUpdatedAt = seasonmemberDescUpdatedAt.Default.(func() time.Time)
+	// seasonmember.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	seasonmember.UpdateDefaultUpdatedAt = seasonmemberDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

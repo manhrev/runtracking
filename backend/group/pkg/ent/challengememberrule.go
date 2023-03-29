@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
@@ -20,10 +21,17 @@ type ChallengeMemberRule struct {
 	Total int64 `json:"total,omitempty"`
 	// RuleID holds the value of the "rule_id" field.
 	RuleID int64 `json:"rule_id,omitempty"`
+	// IsCompleted holds the value of the "is_completed" field.
+	IsCompleted bool `json:"is_completed,omitempty"`
+	// TimeCompleted holds the value of the "time_completed" field.
+	TimeCompleted time.Time `json:"time_completed,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChallengeMemberRuleQuery when eager-loading is set.
 	Edges                                   ChallengeMemberRuleEdges `json:"edges"`
 	challenge_member_challenge_member_rules *int64
+	challenge_rule_challenge_member_rules   *int64
 }
 
 // ChallengeMemberRuleEdges holds the relations/edges for other nodes in the graph.
@@ -53,9 +61,15 @@ func (*ChallengeMemberRule) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case challengememberrule.FieldIsCompleted:
+			values[i] = new(sql.NullBool)
 		case challengememberrule.FieldID, challengememberrule.FieldTotal, challengememberrule.FieldRuleID:
 			values[i] = new(sql.NullInt64)
+		case challengememberrule.FieldTimeCompleted, challengememberrule.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case challengememberrule.ForeignKeys[0]: // challenge_member_challenge_member_rules
+			values[i] = new(sql.NullInt64)
+		case challengememberrule.ForeignKeys[1]: // challenge_rule_challenge_member_rules
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ChallengeMemberRule", columns[i])
@@ -90,12 +104,37 @@ func (cmr *ChallengeMemberRule) assignValues(columns []string, values []any) err
 			} else if value.Valid {
 				cmr.RuleID = value.Int64
 			}
+		case challengememberrule.FieldIsCompleted:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_completed", values[i])
+			} else if value.Valid {
+				cmr.IsCompleted = value.Bool
+			}
+		case challengememberrule.FieldTimeCompleted:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field time_completed", values[i])
+			} else if value.Valid {
+				cmr.TimeCompleted = value.Time
+			}
+		case challengememberrule.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				cmr.UpdatedAt = value.Time
+			}
 		case challengememberrule.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field challenge_member_challenge_member_rules", value)
 			} else if value.Valid {
 				cmr.challenge_member_challenge_member_rules = new(int64)
 				*cmr.challenge_member_challenge_member_rules = int64(value.Int64)
+			}
+		case challengememberrule.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field challenge_rule_challenge_member_rules", value)
+			} else if value.Valid {
+				cmr.challenge_rule_challenge_member_rules = new(int64)
+				*cmr.challenge_rule_challenge_member_rules = int64(value.Int64)
 			}
 		}
 	}
@@ -135,6 +174,15 @@ func (cmr *ChallengeMemberRule) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("rule_id=")
 	builder.WriteString(fmt.Sprintf("%v", cmr.RuleID))
+	builder.WriteString(", ")
+	builder.WriteString("is_completed=")
+	builder.WriteString(fmt.Sprintf("%v", cmr.IsCompleted))
+	builder.WriteString(", ")
+	builder.WriteString("time_completed=")
+	builder.WriteString(cmr.TimeCompleted.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(cmr.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

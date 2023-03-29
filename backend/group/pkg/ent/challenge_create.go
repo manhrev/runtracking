@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 )
 
@@ -84,6 +85,20 @@ func (cc *ChallengeCreate) SetTypeID(i int64) *ChallengeCreate {
 	return cc
 }
 
+// SetCompletedFirstMemberID sets the "completed_first_member_id" field.
+func (cc *ChallengeCreate) SetCompletedFirstMemberID(i int64) *ChallengeCreate {
+	cc.mutation.SetCompletedFirstMemberID(i)
+	return cc
+}
+
+// SetNillableCompletedFirstMemberID sets the "completed_first_member_id" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableCompletedFirstMemberID(i *int64) *ChallengeCreate {
+	if i != nil {
+		cc.SetCompletedFirstMemberID(*i)
+	}
+	return cc
+}
+
 // SetID sets the "id" field.
 func (cc *ChallengeCreate) SetID(i int64) *ChallengeCreate {
 	cc.mutation.SetID(i)
@@ -122,6 +137,21 @@ func (cc *ChallengeCreate) SetNillableGroupzID(id *int64) *ChallengeCreate {
 // SetGroupz sets the "groupz" edge to the Groupz entity.
 func (cc *ChallengeCreate) SetGroupz(g *Groupz) *ChallengeCreate {
 	return cc.SetGroupzID(g.ID)
+}
+
+// AddChallengeRuleIDs adds the "challenge_rules" edge to the ChallengeRule entity by IDs.
+func (cc *ChallengeCreate) AddChallengeRuleIDs(ids ...int64) *ChallengeCreate {
+	cc.mutation.AddChallengeRuleIDs(ids...)
+	return cc
+}
+
+// AddChallengeRules adds the "challenge_rules" edges to the ChallengeRule entity.
+func (cc *ChallengeCreate) AddChallengeRules(c ...*ChallengeRule) *ChallengeCreate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddChallengeRuleIDs(ids...)
 }
 
 // Mutation returns the ChallengeMutation object of the builder.
@@ -231,6 +261,10 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 		_spec.SetField(challenge.FieldTypeID, field.TypeInt64, value)
 		_node.TypeID = value
 	}
+	if value, ok := cc.mutation.CompletedFirstMemberID(); ok {
+		_spec.SetField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
+		_node.CompletedFirstMemberID = value
+	}
 	if nodes := cc.mutation.ChallengeMembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -268,6 +302,25 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.groupz_challenges = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ChallengeRulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

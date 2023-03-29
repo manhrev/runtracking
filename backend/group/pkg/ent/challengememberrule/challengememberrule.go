@@ -2,6 +2,10 @@
 
 package challengememberrule
 
+import (
+	"time"
+)
+
 const (
 	// Label holds the string label denoting the challengememberrule type in the database.
 	Label = "challenge_member_rule"
@@ -11,6 +15,12 @@ const (
 	FieldTotal = "total"
 	// FieldRuleID holds the string denoting the rule_id field in the database.
 	FieldRuleID = "rule_id"
+	// FieldIsCompleted holds the string denoting the is_completed field in the database.
+	FieldIsCompleted = "is_completed"
+	// FieldTimeCompleted holds the string denoting the time_completed field in the database.
+	FieldTimeCompleted = "time_completed"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// EdgeChallengeMember holds the string denoting the challenge_member edge name in mutations.
 	EdgeChallengeMember = "challenge_member"
 	// Table holds the table name of the challengememberrule in the database.
@@ -29,12 +39,16 @@ var Columns = []string{
 	FieldID,
 	FieldTotal,
 	FieldRuleID,
+	FieldIsCompleted,
+	FieldTimeCompleted,
+	FieldUpdatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "challenge_member_rules"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"challenge_member_challenge_member_rules",
+	"challenge_rule_challenge_member_rules",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -51,3 +65,12 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultIsCompleted holds the default value on creation for the "is_completed" field.
+	DefaultIsCompleted bool
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
+)
