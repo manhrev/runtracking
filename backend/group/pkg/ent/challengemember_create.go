@@ -77,6 +77,20 @@ func (cmc *ChallengeMemberCreate) SetNillableTimeCompleted(t *time.Time) *Challe
 	return cmc
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (cmc *ChallengeMemberCreate) SetCreatedAt(t time.Time) *ChallengeMemberCreate {
+	cmc.mutation.SetCreatedAt(t)
+	return cmc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cmc *ChallengeMemberCreate) SetNillableCreatedAt(t *time.Time) *ChallengeMemberCreate {
+	if t != nil {
+		cmc.SetCreatedAt(*t)
+	}
+	return cmc
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (cmc *ChallengeMemberCreate) SetUpdatedAt(t time.Time) *ChallengeMemberCreate {
 	cmc.mutation.SetUpdatedAt(t)
@@ -165,6 +179,10 @@ func (cmc *ChallengeMemberCreate) defaults() {
 		v := challengemember.DefaultIsCompleted
 		cmc.mutation.SetIsCompleted(v)
 	}
+	if _, ok := cmc.mutation.CreatedAt(); !ok {
+		v := challengemember.DefaultCreatedAt
+		cmc.mutation.SetCreatedAt(v)
+	}
 	if _, ok := cmc.mutation.UpdatedAt(); !ok {
 		v := challengemember.DefaultUpdatedAt()
 		cmc.mutation.SetUpdatedAt(v)
@@ -184,6 +202,9 @@ func (cmc *ChallengeMemberCreate) check() error {
 	}
 	if _, ok := cmc.mutation.IsCompleted(); !ok {
 		return &ValidationError{Name: "is_completed", err: errors.New(`ent: missing required field "ChallengeMember.is_completed"`)}
+	}
+	if _, ok := cmc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ChallengeMember.created_at"`)}
 	}
 	if _, ok := cmc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ChallengeMember.updated_at"`)}
@@ -243,6 +264,10 @@ func (cmc *ChallengeMemberCreate) createSpec() (*ChallengeMember, *sqlgraph.Crea
 	if value, ok := cmc.mutation.TimeCompleted(); ok {
 		_spec.SetField(challengemember.FieldTimeCompleted, field.TypeTime, value)
 		_node.TimeCompleted = value
+	}
+	if value, ok := cmc.mutation.CreatedAt(); ok {
+		_spec.SetField(challengemember.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
 	}
 	if value, ok := cmc.mutation.UpdatedAt(); ok {
 		_spec.SetField(challengemember.FieldUpdatedAt, field.TypeTime, value)

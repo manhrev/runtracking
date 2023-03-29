@@ -21,6 +21,8 @@ type Challenge struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// StartTime holds the value of the "start_time" field.
 	StartTime time.Time `json:"start_time,omitempty"`
+	// Picture holds the value of the "picture" field.
+	Picture string `json:"picture,omitempty"`
 	// EndTime holds the value of the "end_time" field.
 	EndTime time.Time `json:"end_time,omitempty"`
 	// Description holds the value of the "description" field.
@@ -86,7 +88,7 @@ func (*Challenge) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case challenge.FieldID, challenge.FieldTypeID, challenge.FieldCompletedFirstMemberID:
 			values[i] = new(sql.NullInt64)
-		case challenge.FieldDescription:
+		case challenge.FieldPicture, challenge.FieldDescription:
 			values[i] = new(sql.NullString)
 		case challenge.FieldCreatedAt, challenge.FieldStartTime, challenge.FieldEndTime:
 			values[i] = new(sql.NullTime)
@@ -124,6 +126,12 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field start_time", values[i])
 			} else if value.Valid {
 				c.StartTime = value.Time
+			}
+		case challenge.FieldPicture:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field picture", values[i])
+			} else if value.Valid {
+				c.Picture = value.String
 			}
 		case challenge.FieldEndTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -204,6 +212,9 @@ func (c *Challenge) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("start_time=")
 	builder.WriteString(c.StartTime.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("picture=")
+	builder.WriteString(c.Picture)
 	builder.WriteString(", ")
 	builder.WriteString("end_time=")
 	builder.WriteString(c.EndTime.Format(time.ANSIC))

@@ -65,6 +65,11 @@ func StartTime(v time.Time) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldStartTime, v))
 }
 
+// Picture applies equality check predicate on the "picture" field. It's identical to PictureEQ.
+func Picture(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldPicture, v))
+}
+
 // EndTime applies equality check predicate on the "end_time" field. It's identical to EndTimeEQ.
 func EndTime(v time.Time) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldEndTime, v))
@@ -173,6 +178,71 @@ func StartTimeIsNil() predicate.Challenge {
 // StartTimeNotNil applies the NotNil predicate on the "start_time" field.
 func StartTimeNotNil() predicate.Challenge {
 	return predicate.Challenge(sql.FieldNotNull(FieldStartTime))
+}
+
+// PictureEQ applies the EQ predicate on the "picture" field.
+func PictureEQ(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldPicture, v))
+}
+
+// PictureNEQ applies the NEQ predicate on the "picture" field.
+func PictureNEQ(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNEQ(FieldPicture, v))
+}
+
+// PictureIn applies the In predicate on the "picture" field.
+func PictureIn(vs ...string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldIn(FieldPicture, vs...))
+}
+
+// PictureNotIn applies the NotIn predicate on the "picture" field.
+func PictureNotIn(vs ...string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotIn(FieldPicture, vs...))
+}
+
+// PictureGT applies the GT predicate on the "picture" field.
+func PictureGT(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGT(FieldPicture, v))
+}
+
+// PictureGTE applies the GTE predicate on the "picture" field.
+func PictureGTE(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGTE(FieldPicture, v))
+}
+
+// PictureLT applies the LT predicate on the "picture" field.
+func PictureLT(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLT(FieldPicture, v))
+}
+
+// PictureLTE applies the LTE predicate on the "picture" field.
+func PictureLTE(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLTE(FieldPicture, v))
+}
+
+// PictureContains applies the Contains predicate on the "picture" field.
+func PictureContains(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldContains(FieldPicture, v))
+}
+
+// PictureHasPrefix applies the HasPrefix predicate on the "picture" field.
+func PictureHasPrefix(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldHasPrefix(FieldPicture, v))
+}
+
+// PictureHasSuffix applies the HasSuffix predicate on the "picture" field.
+func PictureHasSuffix(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldHasSuffix(FieldPicture, v))
+}
+
+// PictureEqualFold applies the EqualFold predicate on the "picture" field.
+func PictureEqualFold(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEqualFold(FieldPicture, v))
+}
+
+// PictureContainsFold applies the ContainsFold predicate on the "picture" field.
+func PictureContainsFold(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldContainsFold(FieldPicture, v))
 }
 
 // EndTimeEQ applies the EQ predicate on the "end_time" field.

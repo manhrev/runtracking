@@ -26,6 +26,10 @@ func init() {
 	challengeDescCreatedAt := challengeFields[1].Descriptor()
 	// challenge.DefaultCreatedAt holds the default value on creation for the created_at field.
 	challenge.DefaultCreatedAt = challengeDescCreatedAt.Default.(func() time.Time)
+	// challengeDescPicture is the schema descriptor for picture field.
+	challengeDescPicture := challengeFields[3].Descriptor()
+	// challenge.DefaultPicture holds the default value on creation for the picture field.
+	challenge.DefaultPicture = challengeDescPicture.Default.(string)
 	challengememberFields := schema.ChallengeMember{}.Fields()
 	_ = challengememberFields
 	// challengememberDescPoint is the schema descriptor for point field.
@@ -36,8 +40,12 @@ func init() {
 	challengememberDescIsCompleted := challengememberFields[4].Descriptor()
 	// challengemember.DefaultIsCompleted holds the default value on creation for the is_completed field.
 	challengemember.DefaultIsCompleted = challengememberDescIsCompleted.Default.(bool)
+	// challengememberDescCreatedAt is the schema descriptor for created_at field.
+	challengememberDescCreatedAt := challengememberFields[6].Descriptor()
+	// challengemember.DefaultCreatedAt holds the default value on creation for the created_at field.
+	challengemember.DefaultCreatedAt = challengememberDescCreatedAt.Default.(time.Time)
 	// challengememberDescUpdatedAt is the schema descriptor for updated_at field.
-	challengememberDescUpdatedAt := challengememberFields[6].Descriptor()
+	challengememberDescUpdatedAt := challengememberFields[7].Descriptor()
 	// challengemember.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	challengemember.DefaultUpdatedAt = challengememberDescUpdatedAt.Default.(func() time.Time)
 	// challengemember.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

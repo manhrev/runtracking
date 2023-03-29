@@ -27,6 +27,8 @@ func (ChallengeMember) Fields() []ent.Field {
 			Default(false),
 		field.Time("time_completed").
 			Optional(),
+		field.Time("created_at").
+			Default(time.Now()),
 		field.Time("updated_at").
 			Default(time.Now).
 			UpdateDefault(time.Now),

@@ -15,6 +15,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldStartTime holds the string denoting the start_time field in the database.
 	FieldStartTime = "start_time"
+	// FieldPicture holds the string denoting the picture field in the database.
+	FieldPicture = "picture"
 	// FieldEndTime holds the string denoting the end_time field in the database.
 	FieldEndTime = "end_time"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -59,6 +61,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldStartTime,
+	FieldPicture,
 	FieldEndTime,
 	FieldDescription,
 	FieldTypeID,
@@ -89,4 +92,6 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultPicture holds the default value on creation for the "picture" field.
+	DefaultPicture string
 )

@@ -28,6 +28,8 @@ type ChallengeMember struct {
 	IsCompleted bool `json:"is_completed,omitempty"`
 	// TimeCompleted holds the value of the "time_completed" field.
 	TimeCompleted time.Time `json:"time_completed,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -92,7 +94,7 @@ func (*ChallengeMember) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case challengemember.FieldID, challengemember.FieldPoint, challengemember.FieldMemberID, challengemember.FieldChallengeID:
 			values[i] = new(sql.NullInt64)
-		case challengemember.FieldTimeCompleted, challengemember.FieldUpdatedAt:
+		case challengemember.FieldTimeCompleted, challengemember.FieldCreatedAt, challengemember.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ChallengeMember", columns[i])
@@ -144,6 +146,12 @@ func (cm *ChallengeMember) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field time_completed", values[i])
 			} else if value.Valid {
 				cm.TimeCompleted = value.Time
+			}
+		case challengemember.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				cm.CreatedAt = value.Time
 			}
 		case challengemember.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -208,6 +216,9 @@ func (cm *ChallengeMember) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("time_completed=")
 	builder.WriteString(cm.TimeCompleted.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(cm.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(cm.UpdatedAt.Format(time.ANSIC))

@@ -18,8 +18,9 @@ func (ChallengeRule) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Unique(),
-		// field used to compare with goal placed on challenge member rule table
-		field.Int64("total"),
+		// field used to compare with total placed on challenge member rule table
+		field.Int64("goal").
+			Default(0),
 		field.Int64("rule_id"),
 		field.Time("created_at").
 			Default(time.Now()),

@@ -13,6 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "start_time", Type: field.TypeTime, Nullable: true},
+		{Name: "picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
 		{Name: "end_time", Type: field.TypeTime, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "type_id", Type: field.TypeInt64},
@@ -27,7 +28,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "challenges_groupzs_challenges",
-				Columns:    []*schema.Column{ChallengesColumns[7]},
+				Columns:    []*schema.Column{ChallengesColumns[8]},
 				RefColumns: []*schema.Column{GroupzsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -39,6 +40,7 @@ var (
 		{Name: "point", Type: field.TypeInt64, Default: 0},
 		{Name: "is_completed", Type: field.TypeBool, Default: false},
 		{Name: "time_completed", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "challenge_id", Type: field.TypeInt64},
 		{Name: "member_id", Type: field.TypeInt64},
@@ -51,13 +53,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "challenge_members_challenges_challenge_members",
-				Columns:    []*schema.Column{ChallengeMembersColumns[5]},
+				Columns:    []*schema.Column{ChallengeMembersColumns[6]},
 				RefColumns: []*schema.Column{ChallengesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "challenge_members_members_challenge_members",
-				Columns:    []*schema.Column{ChallengeMembersColumns[6]},
+				Columns:    []*schema.Column{ChallengeMembersColumns[7]},
 				RefColumns: []*schema.Column{MembersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -66,7 +68,7 @@ var (
 			{
 				Name:    "challengemember_member_id_challenge_id",
 				Unique:  true,
-				Columns: []*schema.Column{ChallengeMembersColumns[6], ChallengeMembersColumns[5]},
+				Columns: []*schema.Column{ChallengeMembersColumns[7], ChallengeMembersColumns[6]},
 			},
 		},
 	}

@@ -99,6 +99,20 @@ func (cmu *ChallengeMemberUpdate) ClearTimeCompleted() *ChallengeMemberUpdate {
 	return cmu
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (cmu *ChallengeMemberUpdate) SetCreatedAt(t time.Time) *ChallengeMemberUpdate {
+	cmu.mutation.SetCreatedAt(t)
+	return cmu
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cmu *ChallengeMemberUpdate) SetNillableCreatedAt(t *time.Time) *ChallengeMemberUpdate {
+	if t != nil {
+		cmu.SetCreatedAt(*t)
+	}
+	return cmu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (cmu *ChallengeMemberUpdate) SetUpdatedAt(t time.Time) *ChallengeMemberUpdate {
 	cmu.mutation.SetUpdatedAt(t)
@@ -256,6 +270,9 @@ func (cmu *ChallengeMemberUpdate) sqlSave(ctx context.Context) (n int, err error
 	}
 	if cmu.mutation.TimeCompletedCleared() {
 		_spec.ClearField(challengemember.FieldTimeCompleted, field.TypeTime)
+	}
+	if value, ok := cmu.mutation.CreatedAt(); ok {
+		_spec.SetField(challengemember.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := cmu.mutation.UpdatedAt(); ok {
 		_spec.SetField(challengemember.FieldUpdatedAt, field.TypeTime, value)
@@ -473,6 +490,20 @@ func (cmuo *ChallengeMemberUpdateOne) ClearTimeCompleted() *ChallengeMemberUpdat
 	return cmuo
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (cmuo *ChallengeMemberUpdateOne) SetCreatedAt(t time.Time) *ChallengeMemberUpdateOne {
+	cmuo.mutation.SetCreatedAt(t)
+	return cmuo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cmuo *ChallengeMemberUpdateOne) SetNillableCreatedAt(t *time.Time) *ChallengeMemberUpdateOne {
+	if t != nil {
+		cmuo.SetCreatedAt(*t)
+	}
+	return cmuo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (cmuo *ChallengeMemberUpdateOne) SetUpdatedAt(t time.Time) *ChallengeMemberUpdateOne {
 	cmuo.mutation.SetUpdatedAt(t)
@@ -654,6 +685,9 @@ func (cmuo *ChallengeMemberUpdateOne) sqlSave(ctx context.Context) (_node *Chall
 	}
 	if cmuo.mutation.TimeCompletedCleared() {
 		_spec.ClearField(challengemember.FieldTimeCompleted, field.TypeTime)
+	}
+	if value, ok := cmuo.mutation.CreatedAt(); ok {
+		_spec.SetField(challengemember.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := cmuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(challengemember.FieldUpdatedAt, field.TypeTime, value)

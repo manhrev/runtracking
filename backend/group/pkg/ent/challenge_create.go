@@ -51,6 +51,20 @@ func (cc *ChallengeCreate) SetNillableStartTime(t *time.Time) *ChallengeCreate {
 	return cc
 }
 
+// SetPicture sets the "picture" field.
+func (cc *ChallengeCreate) SetPicture(s string) *ChallengeCreate {
+	cc.mutation.SetPicture(s)
+	return cc
+}
+
+// SetNillablePicture sets the "picture" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillablePicture(s *string) *ChallengeCreate {
+	if s != nil {
+		cc.SetPicture(*s)
+	}
+	return cc
+}
+
 // SetEndTime sets the "end_time" field.
 func (cc *ChallengeCreate) SetEndTime(t time.Time) *ChallengeCreate {
 	cc.mutation.SetEndTime(t)
@@ -193,12 +207,19 @@ func (cc *ChallengeCreate) defaults() {
 		v := challenge.DefaultCreatedAt()
 		cc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := cc.mutation.Picture(); !ok {
+		v := challenge.DefaultPicture
+		cc.mutation.SetPicture(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ChallengeCreate) check() error {
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Challenge.created_at"`)}
+	}
+	if _, ok := cc.mutation.Picture(); !ok {
+		return &ValidationError{Name: "picture", err: errors.New(`ent: missing required field "Challenge.picture"`)}
 	}
 	if _, ok := cc.mutation.TypeID(); !ok {
 		return &ValidationError{Name: "type_id", err: errors.New(`ent: missing required field "Challenge.type_id"`)}
@@ -248,6 +269,10 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.StartTime(); ok {
 		_spec.SetField(challenge.FieldStartTime, field.TypeTime, value)
 		_node.StartTime = value
+	}
+	if value, ok := cc.mutation.Picture(); ok {
+		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
+		_node.Picture = value
 	}
 	if value, ok := cc.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)

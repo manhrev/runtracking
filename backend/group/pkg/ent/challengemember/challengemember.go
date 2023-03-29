@@ -21,6 +21,8 @@ const (
 	FieldIsCompleted = "is_completed"
 	// FieldTimeCompleted holds the string denoting the time_completed field in the database.
 	FieldTimeCompleted = "time_completed"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// EdgeChallengeMemberRules holds the string denoting the challenge_member_rules edge name in mutations.
@@ -62,6 +64,7 @@ var Columns = []string{
 	FieldChallengeID,
 	FieldIsCompleted,
 	FieldTimeCompleted,
+	FieldCreatedAt,
 	FieldUpdatedAt,
 }
 
@@ -80,6 +83,8 @@ var (
 	DefaultPoint int64
 	// DefaultIsCompleted holds the default value on creation for the "is_completed" field.
 	DefaultIsCompleted bool
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.

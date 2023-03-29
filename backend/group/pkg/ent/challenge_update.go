@@ -66,6 +66,20 @@ func (cu *ChallengeUpdate) ClearStartTime() *ChallengeUpdate {
 	return cu
 }
 
+// SetPicture sets the "picture" field.
+func (cu *ChallengeUpdate) SetPicture(s string) *ChallengeUpdate {
+	cu.mutation.SetPicture(s)
+	return cu
+}
+
+// SetNillablePicture sets the "picture" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillablePicture(s *string) *ChallengeUpdate {
+	if s != nil {
+		cu.SetPicture(*s)
+	}
+	return cu
+}
+
 // SetEndTime sets the "end_time" field.
 func (cu *ChallengeUpdate) SetEndTime(t time.Time) *ChallengeUpdate {
 	cu.mutation.SetEndTime(t)
@@ -308,6 +322,9 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.StartTimeCleared() {
 		_spec.ClearField(challenge.FieldStartTime, field.TypeTime)
 	}
+	if value, ok := cu.mutation.Picture(); ok {
+		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)
 	}
@@ -531,6 +548,20 @@ func (cuo *ChallengeUpdateOne) SetNillableStartTime(t *time.Time) *ChallengeUpda
 // ClearStartTime clears the value of the "start_time" field.
 func (cuo *ChallengeUpdateOne) ClearStartTime() *ChallengeUpdateOne {
 	cuo.mutation.ClearStartTime()
+	return cuo
+}
+
+// SetPicture sets the "picture" field.
+func (cuo *ChallengeUpdateOne) SetPicture(s string) *ChallengeUpdateOne {
+	cuo.mutation.SetPicture(s)
+	return cuo
+}
+
+// SetNillablePicture sets the "picture" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillablePicture(s *string) *ChallengeUpdateOne {
+	if s != nil {
+		cuo.SetPicture(*s)
+	}
 	return cuo
 }
 
@@ -799,6 +830,9 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	}
 	if cuo.mutation.StartTimeCleared() {
 		_spec.ClearField(challenge.FieldStartTime, field.TypeTime)
+	}
+	if value, ok := cuo.mutation.Picture(); ok {
+		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)

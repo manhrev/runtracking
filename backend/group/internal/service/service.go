@@ -3,6 +3,7 @@ package service
 import (
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/internal/repository"
+	"github.com/manhrev/runtracking/backend/group/internal/service/challenge"
 	"github.com/manhrev/runtracking/backend/group/internal/service/group"
 	"github.com/manhrev/runtracking/backend/group/internal/service/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
@@ -13,6 +14,7 @@ type Service struct {
 	authClient auth.AuthIClient
 	Group      group.Group
 	Member     member.Member
+	Challenge  challenge.Challenge
 }
 
 func New(entClient *ent.Client, authClient auth.AuthIClient) *Service {
@@ -23,5 +25,6 @@ func New(entClient *ent.Client, authClient auth.AuthIClient) *Service {
 		Group:      group.New(entClient, repo, authClient),
 		authClient: authClient,
 		Member:     member.New(entClient, repo, authClient),
+		Challenge:  challenge.New(entClient, repo, authClient),
 	}
 }

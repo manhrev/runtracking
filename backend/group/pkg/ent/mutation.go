@@ -50,6 +50,7 @@ type ChallengeMutation struct {
 	id                           *int64
 	created_at                   *time.Time
 	start_time                   *time.Time
+	picture                      *string
 	end_time                     *time.Time
 	description                  *string
 	type_id                      *int64
@@ -257,6 +258,42 @@ func (m *ChallengeMutation) StartTimeCleared() bool {
 func (m *ChallengeMutation) ResetStartTime() {
 	m.start_time = nil
 	delete(m.clearedFields, challenge.FieldStartTime)
+}
+
+// SetPicture sets the "picture" field.
+func (m *ChallengeMutation) SetPicture(s string) {
+	m.picture = &s
+}
+
+// Picture returns the value of the "picture" field in the mutation.
+func (m *ChallengeMutation) Picture() (r string, exists bool) {
+	v := m.picture
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPicture returns the old "picture" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldPicture(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPicture is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPicture requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPicture: %w", err)
+	}
+	return oldValue.Picture, nil
+}
+
+// ResetPicture resets all changes to the "picture" field.
+func (m *ChallengeMutation) ResetPicture() {
+	m.picture = nil
 }
 
 // SetEndTime sets the "end_time" field.
@@ -664,12 +701,15 @@ func (m *ChallengeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChallengeMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, challenge.FieldCreatedAt)
 	}
 	if m.start_time != nil {
 		fields = append(fields, challenge.FieldStartTime)
+	}
+	if m.picture != nil {
+		fields = append(fields, challenge.FieldPicture)
 	}
 	if m.end_time != nil {
 		fields = append(fields, challenge.FieldEndTime)
@@ -695,6 +735,8 @@ func (m *ChallengeMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case challenge.FieldStartTime:
 		return m.StartTime()
+	case challenge.FieldPicture:
+		return m.Picture()
 	case challenge.FieldEndTime:
 		return m.EndTime()
 	case challenge.FieldDescription:
@@ -716,6 +758,8 @@ func (m *ChallengeMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldCreatedAt(ctx)
 	case challenge.FieldStartTime:
 		return m.OldStartTime(ctx)
+	case challenge.FieldPicture:
+		return m.OldPicture(ctx)
 	case challenge.FieldEndTime:
 		return m.OldEndTime(ctx)
 	case challenge.FieldDescription:
@@ -746,6 +790,13 @@ func (m *ChallengeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStartTime(v)
+		return nil
+	case challenge.FieldPicture:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPicture(v)
 		return nil
 	case challenge.FieldEndTime:
 		v, ok := value.(time.Time)
@@ -883,6 +934,9 @@ func (m *ChallengeMutation) ResetField(name string) error {
 		return nil
 	case challenge.FieldStartTime:
 		m.ResetStartTime()
+		return nil
+	case challenge.FieldPicture:
+		m.ResetPicture()
 		return nil
 	case challenge.FieldEndTime:
 		m.ResetEndTime()
@@ -1038,6 +1092,7 @@ type ChallengeMemberMutation struct {
 	addpoint                      *int64
 	is_completed                  *bool
 	time_completed                *time.Time
+	created_at                    *time.Time
 	updated_at                    *time.Time
 	clearedFields                 map[string]struct{}
 	challenge_member_rules        map[int64]struct{}
@@ -1369,6 +1424,42 @@ func (m *ChallengeMemberMutation) ResetTimeCompleted() {
 	delete(m.clearedFields, challengemember.FieldTimeCompleted)
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (m *ChallengeMemberMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ChallengeMemberMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ChallengeMember entity.
+// If the ChallengeMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ChallengeMemberMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (m *ChallengeMemberMutation) SetUpdatedAt(t time.Time) {
 	m.updated_at = &t
@@ -1545,7 +1636,7 @@ func (m *ChallengeMemberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChallengeMemberMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.point != nil {
 		fields = append(fields, challengemember.FieldPoint)
 	}
@@ -1560,6 +1651,9 @@ func (m *ChallengeMemberMutation) Fields() []string {
 	}
 	if m.time_completed != nil {
 		fields = append(fields, challengemember.FieldTimeCompleted)
+	}
+	if m.created_at != nil {
+		fields = append(fields, challengemember.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, challengemember.FieldUpdatedAt)
@@ -1582,6 +1676,8 @@ func (m *ChallengeMemberMutation) Field(name string) (ent.Value, bool) {
 		return m.IsCompleted()
 	case challengemember.FieldTimeCompleted:
 		return m.TimeCompleted()
+	case challengemember.FieldCreatedAt:
+		return m.CreatedAt()
 	case challengemember.FieldUpdatedAt:
 		return m.UpdatedAt()
 	}
@@ -1603,6 +1699,8 @@ func (m *ChallengeMemberMutation) OldField(ctx context.Context, name string) (en
 		return m.OldIsCompleted(ctx)
 	case challengemember.FieldTimeCompleted:
 		return m.OldTimeCompleted(ctx)
+	case challengemember.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
 	case challengemember.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
 	}
@@ -1648,6 +1746,13 @@ func (m *ChallengeMemberMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTimeCompleted(v)
+		return nil
+	case challengemember.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
 		return nil
 	case challengemember.FieldUpdatedAt:
 		v, ok := value.(time.Time)
@@ -1743,6 +1848,9 @@ func (m *ChallengeMemberMutation) ResetField(name string) error {
 		return nil
 	case challengemember.FieldTimeCompleted:
 		m.ResetTimeCompleted()
+		return nil
+	case challengemember.FieldCreatedAt:
+		m.ResetCreatedAt()
 		return nil
 	case challengemember.FieldUpdatedAt:
 		m.ResetUpdatedAt()
