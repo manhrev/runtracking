@@ -1,7 +1,8 @@
 package cloudbucket
 
 import (
-	"encoding/json"
+	b64 "encoding/base64"
+
 	"io"
 	"log"
 	"net/http"
@@ -20,30 +21,21 @@ var (
 	storageClient *storage.Client
 
 	//key read
-	key_type                    string = os.Getenv("KEY_TYPE")
-	project_id                  string = os.Getenv("PROJECT_ID")
-	private_key_id              string = os.Getenv("PRIVATE_KEY_ID")
-	private_key                 string = os.Getenv("PRIVATE_KEY")
-	client_email                string = os.Getenv("CLIENT_EMAIL")
-	client_id                   string = os.Getenv("CLIENT_ID")
-	auth_uri                    string = os.Getenv("AUTH_URI")
-	token_uri                   string = os.Getenv("TOKEN_URI")
-	auth_provider_x509_cert_url string = os.Getenv("AUTH_PROVIDER_X509_CERT_URL")
-	client_x509_cert_url        string = os.Getenv("CLIENT_X509_CERT_URL")
+	keysBase64 string = os.Getenv("KEY")
 )
 
-type Keys struct {
-	Type                    string `json:"type"`
-	ProjectID               string `json:"project_id"`
-	PrivateKeyID            string `json:"private_key_id"`
-	PrivateKey              string `json:"private_key"`
-	ClientEmail             string `json:"client_email"`
-	ClientID                string `json:"client_id"`
-	AuthURI                 string `json:"auth_uri"`
-	TokenURI                string `json:"token_uri"`
-	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url"`
-	ClientX509CertURL       string `json:"client_x509_cert_url"`
-}
+// type Keys struct {
+// 	Type                    string `json:"type"`
+// 	ProjectID               string `json:"project_id"`
+// 	PrivateKeyID            string `json:"private_key_id"`
+// 	PrivateKey              string `json:"private_key"`
+// 	ClientEmail             string `json:"client_email"`
+// 	ClientID                string `json:"client_id"`
+// 	AuthURI                 string `json:"auth_uri"`
+// 	TokenURI                string `json:"token_uri"`
+// 	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url"`
+// 	ClientX509CertURL       string `json:"client_x509_cert_url"`
+// }
 
 // HandleFileUploadToBucket uploads file to bucket
 func HandleFileUploadToBucket(c *gin.Context) {
@@ -56,28 +48,22 @@ func HandleFileUploadToBucket(c *gin.Context) {
 
 	ctx := appengine.NewContext(c.Request)
 
-	keys := Keys{
-		Type:                    key_type,
-		ProjectID:               project_id,
-		PrivateKeyID:            private_key_id,
-		PrivateKey:              private_key,
-		ClientEmail:             client_email,
-		ClientID:                client_id,
-		AuthURI:                 auth_uri,
-		TokenURI:                token_uri,
-		AuthProviderX509CertURL: auth_provider_x509_cert_url,
-		ClientX509CertURL:       client_x509_cert_url,
-	}
+	// keys := &Keys{}
 
-	log.Println(keys)
+	// log.Println(keys)
 
-	cred, err := json.Marshal(keys)
+	// cred, err := json.Marshal(keys)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"message": "Internal",
+	// 		"error":   true,
+	// 	})
+	// 	log.Printf("Failed while marshaling keys: %v", err)
+	// }
+	cred, err := b64.StdEncoding.DecodeString(keysBase64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal",
-			"error":   true,
-		})
-		log.Printf("Failed while marshaling keys: %v", err)
+		log.Printf("Error decoding JSON: %v", err)
+		return
 	}
 
 	storageClient, err = storage.NewClient(ctx, option.WithCredentialsJSON(cred))
