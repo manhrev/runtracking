@@ -102,6 +102,12 @@ static_resources:
                               grpc_timeout_header_max: 0s
                             auto_host_rewrite: true
 
+                        - match:
+                            prefix: /umage
+                          route:
+                            cluster: umage_http_cluster
+                            auto_host_rewrite: true
+
                 http_filters:
                   - name: envoy.filters.http.grpc_web
                   - name: envoy.filters.http.cors
@@ -185,6 +191,25 @@ static_resources:
           "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
           common_tls_context:
             alpn_protocols: h2
+
+    - name: umage_http_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      lb_policy: ROUND_ROBIN
+      dns_lookup_family: V4_ONLY
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+      load_assignment:
+        cluster_name: umage_http_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: umage-jzg35jprna-as.a.run.app
+                      port_value: 443
 
     # - name: notification_http_cluster
     #   connect_timeout: 1s
