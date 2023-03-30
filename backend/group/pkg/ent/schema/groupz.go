@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -36,7 +37,13 @@ func (Groupz) Fields() []ent.Field {
 
 func (Groupz) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("members", Member.Type),
-		edge.To("challenges", Challenge.Type),
+		edge.To("members", Member.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
+		edge.To("challenges", Challenge.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
 	}
 }

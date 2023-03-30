@@ -11,8 +11,8 @@ const (
 	Label = "challenge_rule"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTotal holds the string denoting the total field in the database.
-	FieldTotal = "total"
+	// FieldGoal holds the string denoting the goal field in the database.
+	FieldGoal = "goal"
 	// FieldRuleID holds the string denoting the rule_id field in the database.
 	FieldRuleID = "rule_id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -42,7 +42,7 @@ const (
 // Columns holds all SQL columns for challengerule fields.
 var Columns = []string{
 	FieldID,
-	FieldTotal,
+	FieldGoal,
 	FieldRuleID,
 	FieldCreatedAt,
 }
@@ -69,6 +69,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultGoal holds the default value on creation for the "goal" field.
+	DefaultGoal int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt time.Time
 )

@@ -52,6 +52,10 @@ func init() {
 	challengemember.UpdateDefaultUpdatedAt = challengememberDescUpdatedAt.UpdateDefault.(func() time.Time)
 	challengememberruleFields := schema.ChallengeMemberRule{}.Fields()
 	_ = challengememberruleFields
+	// challengememberruleDescTotal is the schema descriptor for total field.
+	challengememberruleDescTotal := challengememberruleFields[1].Descriptor()
+	// challengememberrule.DefaultTotal holds the default value on creation for the total field.
+	challengememberrule.DefaultTotal = challengememberruleDescTotal.Default.(int64)
 	// challengememberruleDescIsCompleted is the schema descriptor for is_completed field.
 	challengememberruleDescIsCompleted := challengememberruleFields[3].Descriptor()
 	// challengememberrule.DefaultIsCompleted holds the default value on creation for the is_completed field.
@@ -64,6 +68,10 @@ func init() {
 	challengememberrule.UpdateDefaultUpdatedAt = challengememberruleDescUpdatedAt.UpdateDefault.(func() time.Time)
 	challengeruleFields := schema.ChallengeRule{}.Fields()
 	_ = challengeruleFields
+	// challengeruleDescGoal is the schema descriptor for goal field.
+	challengeruleDescGoal := challengeruleFields[1].Descriptor()
+	// challengerule.DefaultGoal holds the default value on creation for the goal field.
+	challengerule.DefaultGoal = challengeruleDescGoal.Default.(int64)
 	// challengeruleDescCreatedAt is the schema descriptor for created_at field.
 	challengeruleDescCreatedAt := challengeruleFields[3].Descriptor()
 	// challengerule.DefaultCreatedAt holds the default value on creation for the created_at field.

@@ -67,6 +67,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultTotal holds the default value on creation for the "total" field.
+	DefaultTotal int64
 	// DefaultIsCompleted holds the default value on creation for the "is_completed" field.
 	DefaultIsCompleted bool
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

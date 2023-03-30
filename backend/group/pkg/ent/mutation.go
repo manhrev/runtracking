@@ -2154,24 +2154,10 @@ func (m *ChallengeMemberRuleMutation) AddedTotal() (r int64, exists bool) {
 	return *v, true
 }
 
-// ClearTotal clears the value of the "total" field.
-func (m *ChallengeMemberRuleMutation) ClearTotal() {
-	m.total = nil
-	m.addtotal = nil
-	m.clearedFields[challengememberrule.FieldTotal] = struct{}{}
-}
-
-// TotalCleared returns if the "total" field was cleared in this mutation.
-func (m *ChallengeMemberRuleMutation) TotalCleared() bool {
-	_, ok := m.clearedFields[challengememberrule.FieldTotal]
-	return ok
-}
-
 // ResetTotal resets all changes to the "total" field.
 func (m *ChallengeMemberRuleMutation) ResetTotal() {
 	m.total = nil
 	m.addtotal = nil
-	delete(m.clearedFields, challengememberrule.FieldTotal)
 }
 
 // SetRuleID sets the "rule_id" field.
@@ -2578,9 +2564,6 @@ func (m *ChallengeMemberRuleMutation) AddField(name string, value ent.Value) err
 // mutation.
 func (m *ChallengeMemberRuleMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(challengememberrule.FieldTotal) {
-		fields = append(fields, challengememberrule.FieldTotal)
-	}
 	if m.FieldCleared(challengememberrule.FieldTimeCompleted) {
 		fields = append(fields, challengememberrule.FieldTimeCompleted)
 	}
@@ -2598,9 +2581,6 @@ func (m *ChallengeMemberRuleMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ChallengeMemberRuleMutation) ClearField(name string) error {
 	switch name {
-	case challengememberrule.FieldTotal:
-		m.ClearTotal()
-		return nil
 	case challengememberrule.FieldTimeCompleted:
 		m.ClearTimeCompleted()
 		return nil
@@ -2711,8 +2691,8 @@ type ChallengeRuleMutation struct {
 	op                            Op
 	typ                           string
 	id                            *int64
-	total                         *int64
-	addtotal                      *int64
+	goal                          *int64
+	addgoal                       *int64
 	rule_id                       *int64
 	addrule_id                    *int64
 	created_at                    *time.Time
@@ -2831,60 +2811,60 @@ func (m *ChallengeRuleMutation) IDs(ctx context.Context) ([]int64, error) {
 	}
 }
 
-// SetTotal sets the "total" field.
-func (m *ChallengeRuleMutation) SetTotal(i int64) {
-	m.total = &i
-	m.addtotal = nil
+// SetGoal sets the "goal" field.
+func (m *ChallengeRuleMutation) SetGoal(i int64) {
+	m.goal = &i
+	m.addgoal = nil
 }
 
-// Total returns the value of the "total" field in the mutation.
-func (m *ChallengeRuleMutation) Total() (r int64, exists bool) {
-	v := m.total
+// Goal returns the value of the "goal" field in the mutation.
+func (m *ChallengeRuleMutation) Goal() (r int64, exists bool) {
+	v := m.goal
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTotal returns the old "total" field's value of the ChallengeRule entity.
+// OldGoal returns the old "goal" field's value of the ChallengeRule entity.
 // If the ChallengeRule object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ChallengeRuleMutation) OldTotal(ctx context.Context) (v int64, err error) {
+func (m *ChallengeRuleMutation) OldGoal(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTotal is only allowed on UpdateOne operations")
+		return v, errors.New("OldGoal is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTotal requires an ID field in the mutation")
+		return v, errors.New("OldGoal requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTotal: %w", err)
+		return v, fmt.Errorf("querying old value for OldGoal: %w", err)
 	}
-	return oldValue.Total, nil
+	return oldValue.Goal, nil
 }
 
-// AddTotal adds i to the "total" field.
-func (m *ChallengeRuleMutation) AddTotal(i int64) {
-	if m.addtotal != nil {
-		*m.addtotal += i
+// AddGoal adds i to the "goal" field.
+func (m *ChallengeRuleMutation) AddGoal(i int64) {
+	if m.addgoal != nil {
+		*m.addgoal += i
 	} else {
-		m.addtotal = &i
+		m.addgoal = &i
 	}
 }
 
-// AddedTotal returns the value that was added to the "total" field in this mutation.
-func (m *ChallengeRuleMutation) AddedTotal() (r int64, exists bool) {
-	v := m.addtotal
+// AddedGoal returns the value that was added to the "goal" field in this mutation.
+func (m *ChallengeRuleMutation) AddedGoal() (r int64, exists bool) {
+	v := m.addgoal
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetTotal resets all changes to the "total" field.
-func (m *ChallengeRuleMutation) ResetTotal() {
-	m.total = nil
-	m.addtotal = nil
+// ResetGoal resets all changes to the "goal" field.
+func (m *ChallengeRuleMutation) ResetGoal() {
+	m.goal = nil
+	m.addgoal = nil
 }
 
 // SetRuleID sets the "rule_id" field.
@@ -3107,8 +3087,8 @@ func (m *ChallengeRuleMutation) Type() string {
 // AddedFields().
 func (m *ChallengeRuleMutation) Fields() []string {
 	fields := make([]string, 0, 3)
-	if m.total != nil {
-		fields = append(fields, challengerule.FieldTotal)
+	if m.goal != nil {
+		fields = append(fields, challengerule.FieldGoal)
 	}
 	if m.rule_id != nil {
 		fields = append(fields, challengerule.FieldRuleID)
@@ -3124,8 +3104,8 @@ func (m *ChallengeRuleMutation) Fields() []string {
 // schema.
 func (m *ChallengeRuleMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case challengerule.FieldTotal:
-		return m.Total()
+	case challengerule.FieldGoal:
+		return m.Goal()
 	case challengerule.FieldRuleID:
 		return m.RuleID()
 	case challengerule.FieldCreatedAt:
@@ -3139,8 +3119,8 @@ func (m *ChallengeRuleMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ChallengeRuleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case challengerule.FieldTotal:
-		return m.OldTotal(ctx)
+	case challengerule.FieldGoal:
+		return m.OldGoal(ctx)
 	case challengerule.FieldRuleID:
 		return m.OldRuleID(ctx)
 	case challengerule.FieldCreatedAt:
@@ -3154,12 +3134,12 @@ func (m *ChallengeRuleMutation) OldField(ctx context.Context, name string) (ent.
 // type.
 func (m *ChallengeRuleMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case challengerule.FieldTotal:
+	case challengerule.FieldGoal:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTotal(v)
+		m.SetGoal(v)
 		return nil
 	case challengerule.FieldRuleID:
 		v, ok := value.(int64)
@@ -3183,8 +3163,8 @@ func (m *ChallengeRuleMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ChallengeRuleMutation) AddedFields() []string {
 	var fields []string
-	if m.addtotal != nil {
-		fields = append(fields, challengerule.FieldTotal)
+	if m.addgoal != nil {
+		fields = append(fields, challengerule.FieldGoal)
 	}
 	if m.addrule_id != nil {
 		fields = append(fields, challengerule.FieldRuleID)
@@ -3197,8 +3177,8 @@ func (m *ChallengeRuleMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ChallengeRuleMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case challengerule.FieldTotal:
-		return m.AddedTotal()
+	case challengerule.FieldGoal:
+		return m.AddedGoal()
 	case challengerule.FieldRuleID:
 		return m.AddedRuleID()
 	}
@@ -3210,12 +3190,12 @@ func (m *ChallengeRuleMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ChallengeRuleMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case challengerule.FieldTotal:
+	case challengerule.FieldGoal:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddTotal(v)
+		m.AddGoal(v)
 		return nil
 	case challengerule.FieldRuleID:
 		v, ok := value.(int64)
@@ -3251,8 +3231,8 @@ func (m *ChallengeRuleMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ChallengeRuleMutation) ResetField(name string) error {
 	switch name {
-	case challengerule.FieldTotal:
-		m.ResetTotal()
+	case challengerule.FieldGoal:
+		m.ResetGoal()
 		return nil
 	case challengerule.FieldRuleID:
 		m.ResetRuleID()

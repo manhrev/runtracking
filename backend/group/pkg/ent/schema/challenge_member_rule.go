@@ -19,7 +19,7 @@ func (ChallengeMemberRule) Fields() []ent.Field {
 		field.Int64("id").
 			Unique(),
 		field.Int64("total").
-			Optional(),
+			Default(0),
 		field.Int64("rule_id"),
 		// Field will be set to true if the goal of this rule equals with total of its
 		field.Bool("is_completed").

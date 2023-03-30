@@ -58,6 +58,7 @@ message ListChallengeReply {
 
 message UpdateChallengeRequest{
     ChallengeInfo challengeInfo = 1;
+    int64 group_id = 2;
 }
 message UpdateChallengeReply{}
 
@@ -238,6 +239,7 @@ message Member{
 message ChallengeInfo{
     // just appear when list
     int64 id = 1;
+    int64 group_id = 14;
     Member completed_first_member = 13;
 
     //used both list and CRUD
@@ -252,6 +254,11 @@ message ChallengeInfo{
 }
 
 message ChallengeRuleInfo{
+
+    //use only for listing
+    int64 id = 1;
+
+    //both list and crud
     int64 goal = 2;
     Rule rule = 3;
 }

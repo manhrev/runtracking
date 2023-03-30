@@ -334,12 +334,12 @@ func (crq *ChallengeRuleQuery) WithChallenge(opts ...func(*ChallengeQuery)) *Cha
 // Example:
 //
 //	var v []struct {
-//		Total int64 `json:"total,omitempty"`
+//		Goal int64 `json:"goal,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ChallengeRule.Query().
-//		GroupBy(challengerule.FieldTotal).
+//		GroupBy(challengerule.FieldGoal).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -358,11 +358,11 @@ func (crq *ChallengeRuleQuery) GroupBy(field string, fields ...string) *Challeng
 // Example:
 //
 //	var v []struct {
-//		Total int64 `json:"total,omitempty"`
+//		Goal int64 `json:"goal,omitempty"`
 //	}
 //
 //	client.ChallengeRule.Query().
-//		Select(challengerule.FieldTotal).
+//		Select(challengerule.FieldGoal).
 //		Scan(ctx, &v)
 //
 func (crq *ChallengeRuleQuery) Select(fields ...string) *ChallengeRuleSelect {

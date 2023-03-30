@@ -22,9 +22,17 @@ type ChallengeRuleCreate struct {
 	hooks    []Hook
 }
 
-// SetTotal sets the "total" field.
-func (crc *ChallengeRuleCreate) SetTotal(i int64) *ChallengeRuleCreate {
-	crc.mutation.SetTotal(i)
+// SetGoal sets the "goal" field.
+func (crc *ChallengeRuleCreate) SetGoal(i int64) *ChallengeRuleCreate {
+	crc.mutation.SetGoal(i)
+	return crc
+}
+
+// SetNillableGoal sets the "goal" field if the given value is not nil.
+func (crc *ChallengeRuleCreate) SetNillableGoal(i *int64) *ChallengeRuleCreate {
+	if i != nil {
+		crc.SetGoal(*i)
+	}
 	return crc
 }
 
@@ -123,6 +131,10 @@ func (crc *ChallengeRuleCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (crc *ChallengeRuleCreate) defaults() {
+	if _, ok := crc.mutation.Goal(); !ok {
+		v := challengerule.DefaultGoal
+		crc.mutation.SetGoal(v)
+	}
 	if _, ok := crc.mutation.CreatedAt(); !ok {
 		v := challengerule.DefaultCreatedAt
 		crc.mutation.SetCreatedAt(v)
@@ -131,8 +143,8 @@ func (crc *ChallengeRuleCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (crc *ChallengeRuleCreate) check() error {
-	if _, ok := crc.mutation.Total(); !ok {
-		return &ValidationError{Name: "total", err: errors.New(`ent: missing required field "ChallengeRule.total"`)}
+	if _, ok := crc.mutation.Goal(); !ok {
+		return &ValidationError{Name: "goal", err: errors.New(`ent: missing required field "ChallengeRule.goal"`)}
 	}
 	if _, ok := crc.mutation.RuleID(); !ok {
 		return &ValidationError{Name: "rule_id", err: errors.New(`ent: missing required field "ChallengeRule.rule_id"`)}
@@ -178,9 +190,9 @@ func (crc *ChallengeRuleCreate) createSpec() (*ChallengeRule, *sqlgraph.CreateSp
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := crc.mutation.Total(); ok {
-		_spec.SetField(challengerule.FieldTotal, field.TypeInt64, value)
-		_node.Total = value
+	if value, ok := crc.mutation.Goal(); ok {
+		_spec.SetField(challengerule.FieldGoal, field.TypeInt64, value)
+		_node.Goal = value
 	}
 	if value, ok := crc.mutation.RuleID(); ok {
 		_spec.SetField(challengerule.FieldRuleID, field.TypeInt64, value)

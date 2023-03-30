@@ -12,10 +12,35 @@ import (
 type Challenge interface {
 	Create(
 		ctx context.Context,
-		userId int64,
 		groupId int64,
 		challengeInfo *group.ChallengeInfo,
 	) (*ent.Challenge, error)
+
+	Update(
+		ctx context.Context,
+		groupId int64,
+		challengeInfo *group.ChallengeInfo,
+	) error
+
+	CreateBulkChallengeRules(
+		ctx context.Context,
+		userId int64,
+		groupId int64,
+		challengeId int64,
+		challengeInfo *group.ChallengeInfo,
+	) ([]*ent.ChallengeRule, error)
+
+	CreateBulkChallengeMember(
+		ctx context.Context,
+		memberEnts []*ent.Member,
+		challengeEnt *ent.Challenge,
+	) ([]*ent.ChallengeMember, error)
+
+	CreateBulkChallengeMemberRule(
+		ctx context.Context,
+		challengeMemberEnts []*ent.ChallengeMember,
+		challengeRuleEnts []*ent.ChallengeRule,
+	) ([]*ent.ChallengeMemberRule, error)
 	// Update(
 	// 	ctx context.Context,
 	// 	memberId int64,
@@ -54,7 +79,6 @@ func New(entClient *ent.Client) Challenge {
 
 func (c *challengeImpl) Create(
 	ctx context.Context,
-	userId int64,
 	groupId int64,
 	challengeInfo *group.ChallengeInfo,
 ) (*ent.Challenge, error) {
@@ -64,29 +88,125 @@ func (c *challengeImpl) Create(
 		SetEndTime(challengeInfo.To.AsTime()).
 		SetStartTime(challengeInfo.From.AsTime()).
 		SetPicture(challengeInfo.Picture).
+		SetTypeID(int64(challengeInfo.GetType())).
 		Save(ctx)
 
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}
 
-	// if rule => set rules for challenge
-	if challengeInfo.GetChallengeRules() != nil {
-		bulk := make([]*ent.ChallengeRuleCreate, len(challengeInfo.ChallengeRules))
-		for i, rule := range challengeInfo.ChallengeRules {
-			bulk[i] = c.entClient.ChallengeRule.Create().
-				SetChallenge(newChallenge).
-				SetRuleID(int64(rule.GetRule())).
-				SetTotal(rule.Goal)
-		}
+	return newChallenge, nil
+}
 
-		_, err = c.entClient.ChallengeRule.CreateBulk(bulk...).Save(ctx)
-		if err != nil {
-			status.Internal(fmt.Sprintf("Creating rule for challenge has failed %s\n", err.Error()))
+func (c *challengeImpl) Update(
+	ctx context.Context,
+	groupId int64,
+	challengeInfo *group.ChallengeInfo,
+) error {
+	challengeQuery := c.entClient.Challenge.UpdateOneID(challengeInfo.Id).
+		SetGroupzID(groupId).
+		SetStartTime(challengeInfo.From.AsTime()).
+		SetEndTime(challengeInfo.To.AsTime()).
+		SetPicture(challengeInfo.Picture).
+		SetDescription(challengeInfo.Description).
+		SetTypeID(int64(challengeInfo.Type))
+
+	if challengeInfo.CompletedFirstMember != nil {
+		challengeQuery.SetCompletedFirstMemberID(challengeInfo.CompletedFirstMember.MemberId)
+	}
+
+	err := challengeQuery.Exec(ctx)
+	if err != nil {
+		return status.Internal(err.Error())
+	}
+	return nil
+}
+
+func (c *challengeImpl) CreateBulkChallengeRules(
+	ctx context.Context,
+	userId int64,
+	groupId int64,
+	challengeId int64,
+	challengeInfo *group.ChallengeInfo,
+) ([]*ent.ChallengeRule, error) {
+	bulk := make([]*ent.ChallengeRuleCreate, len(challengeInfo.ChallengeRules))
+	for i, rule := range challengeInfo.ChallengeRules {
+		bulk[i] = c.entClient.ChallengeRule.Create().
+			SetChallengeID(challengeId).
+			SetRuleID(int64(rule.GetRule())).
+			SetGoal(rule.Goal)
+	}
+
+	challengeRules, err := c.entClient.ChallengeRule.CreateBulk(bulk...).Save(ctx)
+	if err != nil {
+		status.Internal(fmt.Sprintf("Creating rule for challenge has failed %s\n", err.Error()))
+	}
+
+	return challengeRules, nil
+}
+
+// func (c *challengeImpl) UpdateChallengeRules(
+// 	ctx context.Context,
+// 	groupId int64,
+// 	challengeId int64,
+// 	challengeInfo *group.ChallengeInfo,
+// ) error {
+
+// 	for _, challengeRule := range challengeInfo.ChallengeRules {
+// 		err := c.entClient.ChallengeRule.UpdateOneID(challengeRule.Id).
+// 			SetChallengeID(challengeId).
+// 			SetRuleID(int64(challengeRule.GetRule())).
+// 			SetTotal(challengeRule.Goal).Exec(ctx)
+
+// 		if err != nil {
+// 			return status.Internal(fmt.Sprintf("Error when update bulk challenge rule: %s", err.Error()))
+// 		}
+// 	}
+// 	return nil
+// }
+
+func (c *challengeImpl) CreateBulkChallengeMember(
+	ctx context.Context,
+	memberEnts []*ent.Member,
+	challengeEnt *ent.Challenge,
+) ([]*ent.ChallengeMember, error) {
+	bulk := make([]*ent.ChallengeMemberCreate, len(memberEnts))
+
+	for i, memberEnt := range memberEnts {
+		bulk[i] = c.entClient.ChallengeMember.Create().
+			SetChallenge(challengeEnt).
+			SetCreatedAt(challengeEnt.StartTime).
+			SetMember(memberEnt)
+	}
+
+	challengeMembers, err := c.entClient.ChallengeMember.CreateBulk(bulk...).Save(ctx)
+	if err != nil {
+		status.Internal(fmt.Sprintf("Creating challenge members for challenge has failed %s\n", err.Error()))
+	}
+
+	return challengeMembers, nil
+}
+
+func (c *challengeImpl) CreateBulkChallengeMemberRule(
+	ctx context.Context,
+	challengeMemberEnts []*ent.ChallengeMember,
+	challengeRuleEnts []*ent.ChallengeRule,
+) ([]*ent.ChallengeMemberRule, error) {
+	bulk := make([]*ent.ChallengeMemberRuleCreate, len(challengeRuleEnts)*len(challengeMemberEnts))
+	for i, challengeRule := range challengeRuleEnts {
+		for j, challengeMemberEnt := range challengeMemberEnts {
+			bulk[i*len(challengeMemberEnts)+j] = c.entClient.ChallengeMemberRule.Create().
+				SetChallengeMember(challengeMemberEnt).
+				SetRuleID(challengeRule.RuleID)
 		}
 	}
 
-	return newChallenge, nil
+	challengeMemberRules, err := c.entClient.ChallengeMemberRule.CreateBulk(bulk...).Save(ctx)
+	if err != nil {
+		status.Internal(fmt.Sprintf("Creating challenge member rules for challenge has failed %s\n", err.Error()))
+	}
+
+	return challengeMemberRules, nil
 }
 
 // func (m *memberImpl) Get(

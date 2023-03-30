@@ -120,16 +120,6 @@ func TotalLTE(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldTotal, v))
 }
 
-// TotalIsNil applies the IsNil predicate on the "total" field.
-func TotalIsNil() predicate.ChallengeMemberRule {
-	return predicate.ChallengeMemberRule(sql.FieldIsNull(FieldTotal))
-}
-
-// TotalNotNil applies the NotNil predicate on the "total" field.
-func TotalNotNil() predicate.ChallengeMemberRule {
-	return predicate.ChallengeMemberRule(sql.FieldNotNull(FieldTotal))
-}
-
 // RuleIDEQ applies the EQ predicate on the "rule_id" field.
 func RuleIDEQ(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldRuleID, v))

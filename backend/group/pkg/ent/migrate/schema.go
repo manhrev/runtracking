@@ -30,7 +30,7 @@ var (
 				Symbol:     "challenges_groupzs_challenges",
 				Columns:    []*schema.Column{ChallengesColumns[8]},
 				RefColumns: []*schema.Column{GroupzsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -55,7 +55,7 @@ var (
 				Symbol:     "challenge_members_challenges_challenge_members",
 				Columns:    []*schema.Column{ChallengeMembersColumns[6]},
 				RefColumns: []*schema.Column{ChallengesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "challenge_members_members_challenge_members",
@@ -75,7 +75,7 @@ var (
 	// ChallengeMemberRulesColumns holds the columns for the "challenge_member_rules" table.
 	ChallengeMemberRulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "total", Type: field.TypeInt64, Nullable: true},
+		{Name: "total", Type: field.TypeInt64, Default: 0},
 		{Name: "rule_id", Type: field.TypeInt64},
 		{Name: "is_completed", Type: field.TypeBool, Default: false},
 		{Name: "time_completed", Type: field.TypeTime, Nullable: true},
@@ -113,7 +113,7 @@ var (
 	// ChallengeRulesColumns holds the columns for the "challenge_rules" table.
 	ChallengeRulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "total", Type: field.TypeInt64},
+		{Name: "goal", Type: field.TypeInt64, Default: 0},
 		{Name: "rule_id", Type: field.TypeInt64},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "challenge_challenge_rules", Type: field.TypeInt64, Nullable: true},
@@ -128,7 +128,7 @@ var (
 				Symbol:     "challenge_rules_challenges_challenge_rules",
 				Columns:    []*schema.Column{ChallengeRulesColumns[4]},
 				RefColumns: []*schema.Column{ChallengesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -177,7 +177,7 @@ var (
 				Symbol:     "members_groupzs_members",
 				Columns:    []*schema.Column{MembersColumns[7]},
 				RefColumns: []*schema.Column{GroupzsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{

@@ -34,6 +34,7 @@ type GroupClient interface {
 	LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opts ...grpc.CallOption) (*LeaveGroupReply, error)
 	// API for challenge
 	CreateChallenge(ctx context.Context, in *CreateChallengeRequest, opts ...grpc.CallOption) (*CreateChallengeReply, error)
+	// rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
 	ListChallenge(ctx context.Context, in *ListChallengeRequest, opts ...grpc.CallOption) (*ListChallengeReply, error)
 	UpdateChallenge(ctx context.Context, in *UpdateChallengeRequest, opts ...grpc.CallOption) (*UpdateChallengeReply, error)
 	DeleteChallenge(ctx context.Context, in *DeleteChallengeRequest, opts ...grpc.CallOption) (*DeleteChallengeReply, error)
@@ -199,6 +200,7 @@ type GroupServer interface {
 	LeaveGroup(context.Context, *LeaveGroupRequest) (*LeaveGroupReply, error)
 	// API for challenge
 	CreateChallenge(context.Context, *CreateChallengeRequest) (*CreateChallengeReply, error)
+	// rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
 	ListChallenge(context.Context, *ListChallengeRequest) (*ListChallengeReply, error)
 	UpdateChallenge(context.Context, *UpdateChallengeRequest) (*UpdateChallengeReply, error)
 	DeleteChallenge(context.Context, *DeleteChallengeRequest) (*DeleteChallengeReply, error)

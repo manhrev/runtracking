@@ -143,6 +143,10 @@ func (cmrc *ChallengeMemberRuleCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cmrc *ChallengeMemberRuleCreate) defaults() {
+	if _, ok := cmrc.mutation.Total(); !ok {
+		v := challengememberrule.DefaultTotal
+		cmrc.mutation.SetTotal(v)
+	}
 	if _, ok := cmrc.mutation.IsCompleted(); !ok {
 		v := challengememberrule.DefaultIsCompleted
 		cmrc.mutation.SetIsCompleted(v)
@@ -155,6 +159,9 @@ func (cmrc *ChallengeMemberRuleCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cmrc *ChallengeMemberRuleCreate) check() error {
+	if _, ok := cmrc.mutation.Total(); !ok {
+		return &ValidationError{Name: "total", err: errors.New(`ent: missing required field "ChallengeMemberRule.total"`)}
+	}
 	if _, ok := cmrc.mutation.RuleID(); !ok {
 		return &ValidationError{Name: "rule_id", err: errors.New(`ent: missing required field "ChallengeMemberRule.rule_id"`)}
 	}

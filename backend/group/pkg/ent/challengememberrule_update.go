@@ -51,12 +51,6 @@ func (cmru *ChallengeMemberRuleUpdate) AddTotal(i int64) *ChallengeMemberRuleUpd
 	return cmru
 }
 
-// ClearTotal clears the value of the "total" field.
-func (cmru *ChallengeMemberRuleUpdate) ClearTotal() *ChallengeMemberRuleUpdate {
-	cmru.mutation.ClearTotal()
-	return cmru
-}
-
 // SetRuleID sets the "rule_id" field.
 func (cmru *ChallengeMemberRuleUpdate) SetRuleID(i int64) *ChallengeMemberRuleUpdate {
 	cmru.mutation.ResetRuleID()
@@ -206,9 +200,6 @@ func (cmru *ChallengeMemberRuleUpdate) sqlSave(ctx context.Context) (n int, err 
 	if value, ok := cmru.mutation.AddedTotal(); ok {
 		_spec.AddField(challengememberrule.FieldTotal, field.TypeInt64, value)
 	}
-	if cmru.mutation.TotalCleared() {
-		_spec.ClearField(challengememberrule.FieldTotal, field.TypeInt64)
-	}
 	if value, ok := cmru.mutation.RuleID(); ok {
 		_spec.SetField(challengememberrule.FieldRuleID, field.TypeInt64, value)
 	}
@@ -302,12 +293,6 @@ func (cmruo *ChallengeMemberRuleUpdateOne) SetNillableTotal(i *int64) *Challenge
 // AddTotal adds i to the "total" field.
 func (cmruo *ChallengeMemberRuleUpdateOne) AddTotal(i int64) *ChallengeMemberRuleUpdateOne {
 	cmruo.mutation.AddTotal(i)
-	return cmruo
-}
-
-// ClearTotal clears the value of the "total" field.
-func (cmruo *ChallengeMemberRuleUpdateOne) ClearTotal() *ChallengeMemberRuleUpdateOne {
-	cmruo.mutation.ClearTotal()
 	return cmruo
 }
 
@@ -483,9 +468,6 @@ func (cmruo *ChallengeMemberRuleUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	if value, ok := cmruo.mutation.AddedTotal(); ok {
 		_spec.AddField(challengememberrule.FieldTotal, field.TypeInt64, value)
-	}
-	if cmruo.mutation.TotalCleared() {
-		_spec.ClearField(challengememberrule.FieldTotal, field.TypeInt64)
 	}
 	if value, ok := cmruo.mutation.RuleID(); ok {
 		_spec.SetField(challengememberrule.FieldRuleID, field.TypeInt64, value)

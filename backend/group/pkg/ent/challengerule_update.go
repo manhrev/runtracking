@@ -31,16 +31,24 @@ func (cru *ChallengeRuleUpdate) Where(ps ...predicate.ChallengeRule) *ChallengeR
 	return cru
 }
 
-// SetTotal sets the "total" field.
-func (cru *ChallengeRuleUpdate) SetTotal(i int64) *ChallengeRuleUpdate {
-	cru.mutation.ResetTotal()
-	cru.mutation.SetTotal(i)
+// SetGoal sets the "goal" field.
+func (cru *ChallengeRuleUpdate) SetGoal(i int64) *ChallengeRuleUpdate {
+	cru.mutation.ResetGoal()
+	cru.mutation.SetGoal(i)
 	return cru
 }
 
-// AddTotal adds i to the "total" field.
-func (cru *ChallengeRuleUpdate) AddTotal(i int64) *ChallengeRuleUpdate {
-	cru.mutation.AddTotal(i)
+// SetNillableGoal sets the "goal" field if the given value is not nil.
+func (cru *ChallengeRuleUpdate) SetNillableGoal(i *int64) *ChallengeRuleUpdate {
+	if i != nil {
+		cru.SetGoal(*i)
+	}
+	return cru
+}
+
+// AddGoal adds i to the "goal" field.
+func (cru *ChallengeRuleUpdate) AddGoal(i int64) *ChallengeRuleUpdate {
+	cru.mutation.AddGoal(i)
 	return cru
 }
 
@@ -188,11 +196,11 @@ func (cru *ChallengeRuleUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			}
 		}
 	}
-	if value, ok := cru.mutation.Total(); ok {
-		_spec.SetField(challengerule.FieldTotal, field.TypeInt64, value)
+	if value, ok := cru.mutation.Goal(); ok {
+		_spec.SetField(challengerule.FieldGoal, field.TypeInt64, value)
 	}
-	if value, ok := cru.mutation.AddedTotal(); ok {
-		_spec.AddField(challengerule.FieldTotal, field.TypeInt64, value)
+	if value, ok := cru.mutation.AddedGoal(); ok {
+		_spec.AddField(challengerule.FieldGoal, field.TypeInt64, value)
 	}
 	if value, ok := cru.mutation.RuleID(); ok {
 		_spec.SetField(challengerule.FieldRuleID, field.TypeInt64, value)
@@ -314,16 +322,24 @@ type ChallengeRuleUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
-// SetTotal sets the "total" field.
-func (cruo *ChallengeRuleUpdateOne) SetTotal(i int64) *ChallengeRuleUpdateOne {
-	cruo.mutation.ResetTotal()
-	cruo.mutation.SetTotal(i)
+// SetGoal sets the "goal" field.
+func (cruo *ChallengeRuleUpdateOne) SetGoal(i int64) *ChallengeRuleUpdateOne {
+	cruo.mutation.ResetGoal()
+	cruo.mutation.SetGoal(i)
 	return cruo
 }
 
-// AddTotal adds i to the "total" field.
-func (cruo *ChallengeRuleUpdateOne) AddTotal(i int64) *ChallengeRuleUpdateOne {
-	cruo.mutation.AddTotal(i)
+// SetNillableGoal sets the "goal" field if the given value is not nil.
+func (cruo *ChallengeRuleUpdateOne) SetNillableGoal(i *int64) *ChallengeRuleUpdateOne {
+	if i != nil {
+		cruo.SetGoal(*i)
+	}
+	return cruo
+}
+
+// AddGoal adds i to the "goal" field.
+func (cruo *ChallengeRuleUpdateOne) AddGoal(i int64) *ChallengeRuleUpdateOne {
+	cruo.mutation.AddGoal(i)
 	return cruo
 }
 
@@ -495,11 +511,11 @@ func (cruo *ChallengeRuleUpdateOne) sqlSave(ctx context.Context) (_node *Challen
 			}
 		}
 	}
-	if value, ok := cruo.mutation.Total(); ok {
-		_spec.SetField(challengerule.FieldTotal, field.TypeInt64, value)
+	if value, ok := cruo.mutation.Goal(); ok {
+		_spec.SetField(challengerule.FieldGoal, field.TypeInt64, value)
 	}
-	if value, ok := cruo.mutation.AddedTotal(); ok {
-		_spec.AddField(challengerule.FieldTotal, field.TypeInt64, value)
+	if value, ok := cruo.mutation.AddedGoal(); ok {
+		_spec.AddField(challengerule.FieldGoal, field.TypeInt64, value)
 	}
 	if value, ok := cruo.mutation.RuleID(); ok {
 		_spec.SetField(challengerule.FieldRuleID, field.TypeInt64, value)

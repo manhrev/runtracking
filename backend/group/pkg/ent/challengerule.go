@@ -17,8 +17,8 @@ type ChallengeRule struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
-	// Total holds the value of the "total" field.
-	Total int64 `json:"total,omitempty"`
+	// Goal holds the value of the "goal" field.
+	Goal int64 `json:"goal,omitempty"`
 	// RuleID holds the value of the "rule_id" field.
 	RuleID int64 `json:"rule_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -67,7 +67,7 @@ func (*ChallengeRule) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challengerule.FieldID, challengerule.FieldTotal, challengerule.FieldRuleID:
+		case challengerule.FieldID, challengerule.FieldGoal, challengerule.FieldRuleID:
 			values[i] = new(sql.NullInt64)
 		case challengerule.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -94,11 +94,11 @@ func (cr *ChallengeRule) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			cr.ID = int64(value.Int64)
-		case challengerule.FieldTotal:
+		case challengerule.FieldGoal:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field total", values[i])
+				return fmt.Errorf("unexpected type %T for field goal", values[i])
 			} else if value.Valid {
-				cr.Total = value.Int64
+				cr.Goal = value.Int64
 			}
 		case challengerule.FieldRuleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -157,8 +157,8 @@ func (cr *ChallengeRule) String() string {
 	var builder strings.Builder
 	builder.WriteString("ChallengeRule(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", cr.ID))
-	builder.WriteString("total=")
-	builder.WriteString(fmt.Sprintf("%v", cr.Total))
+	builder.WriteString("goal=")
+	builder.WriteString(fmt.Sprintf("%v", cr.Goal))
 	builder.WriteString(", ")
 	builder.WriteString("rule_id=")
 	builder.WriteString(fmt.Sprintf("%v", cr.RuleID))

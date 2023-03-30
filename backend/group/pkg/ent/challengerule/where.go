@@ -55,9 +55,9 @@ func IDLTE(id int64) predicate.ChallengeRule {
 	return predicate.ChallengeRule(sql.FieldLTE(FieldID, id))
 }
 
-// Total applies equality check predicate on the "total" field. It's identical to TotalEQ.
-func Total(v int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldEQ(FieldTotal, v))
+// Goal applies equality check predicate on the "goal" field. It's identical to GoalEQ.
+func Goal(v int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldEQ(FieldGoal, v))
 }
 
 // RuleID applies equality check predicate on the "rule_id" field. It's identical to RuleIDEQ.
@@ -70,44 +70,44 @@ func CreatedAt(v time.Time) predicate.ChallengeRule {
 	return predicate.ChallengeRule(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// TotalEQ applies the EQ predicate on the "total" field.
-func TotalEQ(v int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldEQ(FieldTotal, v))
+// GoalEQ applies the EQ predicate on the "goal" field.
+func GoalEQ(v int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldEQ(FieldGoal, v))
 }
 
-// TotalNEQ applies the NEQ predicate on the "total" field.
-func TotalNEQ(v int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldNEQ(FieldTotal, v))
+// GoalNEQ applies the NEQ predicate on the "goal" field.
+func GoalNEQ(v int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldNEQ(FieldGoal, v))
 }
 
-// TotalIn applies the In predicate on the "total" field.
-func TotalIn(vs ...int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldIn(FieldTotal, vs...))
+// GoalIn applies the In predicate on the "goal" field.
+func GoalIn(vs ...int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldIn(FieldGoal, vs...))
 }
 
-// TotalNotIn applies the NotIn predicate on the "total" field.
-func TotalNotIn(vs ...int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldNotIn(FieldTotal, vs...))
+// GoalNotIn applies the NotIn predicate on the "goal" field.
+func GoalNotIn(vs ...int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldNotIn(FieldGoal, vs...))
 }
 
-// TotalGT applies the GT predicate on the "total" field.
-func TotalGT(v int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldGT(FieldTotal, v))
+// GoalGT applies the GT predicate on the "goal" field.
+func GoalGT(v int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldGT(FieldGoal, v))
 }
 
-// TotalGTE applies the GTE predicate on the "total" field.
-func TotalGTE(v int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldGTE(FieldTotal, v))
+// GoalGTE applies the GTE predicate on the "goal" field.
+func GoalGTE(v int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldGTE(FieldGoal, v))
 }
 
-// TotalLT applies the LT predicate on the "total" field.
-func TotalLT(v int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldLT(FieldTotal, v))
+// GoalLT applies the LT predicate on the "goal" field.
+func GoalLT(v int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldLT(FieldGoal, v))
 }
 
-// TotalLTE applies the LTE predicate on the "total" field.
-func TotalLTE(v int64) predicate.ChallengeRule {
-	return predicate.ChallengeRule(sql.FieldLTE(FieldTotal, v))
+// GoalLTE applies the LTE predicate on the "goal" field.
+func GoalLTE(v int64) predicate.ChallengeRule {
+	return predicate.ChallengeRule(sql.FieldLTE(FieldGoal, v))
 }
 
 // RuleIDEQ applies the EQ predicate on the "rule_id" field.
