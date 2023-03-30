@@ -21,6 +21,12 @@ func checkIfPlanExpired(
 	notificationIClient notification.NotificationIClient,
 	timeCheck time.Time,
 ) error {
+	// in case plan not started yet
+	if timeCheck.Before(planned.StartTime) {
+		log.Printf("Plan not started!")
+		return nil
+	}
+
 	updateQuery := entClient.Plan.UpdateOne(planned)
 	// check plan ended but not completed -> change to failed
 	// time Now or ???

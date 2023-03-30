@@ -264,9 +264,14 @@ func (p *planImpl) UpdateProgress(
 	value_increment int64,
 	timestamp *timestamppb.Timestamp,
 ) (int64, string, error) {
+
 	pushNotifyMessage := ""
 	// get current plan
 	planned, err := p.entClient.Plan.Get(ctx, plan_id)
+	if time.Now().Before(planned.StartTime) {
+		log.Printf("Error update plan progress: plan not started")
+		return 0, "", status.Internal("plan not started")
+	}
 
 	if err != nil {
 		log.Printf("Error update plan progress: cannot get plan: %v", err)
