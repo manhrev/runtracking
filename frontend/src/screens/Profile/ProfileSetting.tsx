@@ -28,6 +28,7 @@ export default function ProfileSetting({
     weight,
     age,
     userId,
+    profiePicture,
   } = useAppSelector(selectUserSlice)
 
   const dispatch = useAppDispatch()
@@ -35,6 +36,7 @@ export default function ProfileSetting({
   const [editMode, setEditMode] = useState(false)
 
   const [userInfo, setUserInfo] = useState<UserInfo.AsObject>({
+    profilePicture: profiePicture,
     userId: userId,
     displayName: displayName,
     username: username,
@@ -63,19 +65,18 @@ export default function ProfileSetting({
         return
       }
 
-      const info = new UserInfo()
-      info.setUserId(userInfo.userId)
-      info.setDisplayName(userInfo.displayName)
-      info.setUsername(userInfo.username)
-      info.setEmail(userInfo.email)
-      info.setPhoneNumber(userInfo.phoneNumber)
-      info.setHeight(userInfo.height)
-      info.setWeight(userInfo.weight)
-      info.setAge(userInfo.age)
+      const info = new UserInfo().toObject()
+      info.userId = userInfo.userId
+      info.displayName = userInfo.displayName
+      info.username = userInfo.username
+      info.email = userInfo.email
+      info.phoneNumber = userInfo.phoneNumber
+      info.height = userInfo.height
+      info.weight = userInfo.weight
+      info.age = userInfo.age
 
-      const req = new UpdateUserInfoRequest()
-      req.setUserInfo(info)
-      dispatch(updateUserInfoThunk(req)).unwrap()
+      dispatch(updateUserInfoThunk({ userInfo: info })).unwrap()
+
       toast.success({ message: 'Update successfully!' })
       setEditMode(false)
     } else toast.error({ message: 'Invalid user id!' })
@@ -94,6 +95,7 @@ export default function ProfileSetting({
 
   useEffect(() => {
     setUserInfo({
+      profilePicture: profiePicture,
       userId: userId,
       displayName: displayName,
       username: username,

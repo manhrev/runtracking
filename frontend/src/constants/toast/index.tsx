@@ -1,5 +1,5 @@
-import { Avatar, Button } from 'react-native-paper'
-import Toast, { ErrorToast, SuccessToast } from 'react-native-toast-message'
+import { Avatar } from 'react-native-paper'
+import { ErrorToast, SuccessToast } from 'react-native-toast-message'
 import { AppTheme } from '../../theme'
 
 /*
@@ -28,6 +28,7 @@ const toastConfig = (theme: AppTheme) => {
           borderLeftColor: theme.colors.tertiary,
           backgroundColor: theme.colors.secondaryContainer,
           alignItems: 'center',
+          zIndex: 1001,
         }}
         contentContainerStyle={{ paddingVertical: 0 }}
         text1Style={{ fontSize: 13, color: theme.colors.onTertiaryContainer }}
@@ -56,6 +57,7 @@ const toastConfig = (theme: AppTheme) => {
           borderLeftColor: theme.colors.error,
           backgroundColor: theme.colors.errorContainer,
           alignItems: 'center',
+          zIndex: 1001,
         }}
         contentContainerStyle={{ paddingVertical: 0 }}
         text1Style={{ fontSize: 13, color: theme.colors.onErrorContainer }}
