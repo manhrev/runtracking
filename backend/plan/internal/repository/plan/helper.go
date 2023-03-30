@@ -88,6 +88,8 @@ func checkIfPlanExpired(
 		}
 	}
 
+	log.Printf("Plan not expired")
+
 	return nil
 }
 

@@ -400,7 +400,10 @@ func (p *planImpl) CheckProgressDaily(ctx context.Context, timeCheck time.Time) 
 	}
 
 	for _, planInfo := range planlist {
+		log.Printf("Begin checking plan id: %v - name: %v", planInfo.ID, planInfo.Name)
 		_ = checkIfPlanExpired(ctx, p.entClient, planInfo, p.notificationIClient, timeCheck)
+		log.Printf("Begin checking plan id: %v - name: %v", planInfo.ID, planInfo.Name)
+
 	}
 	return nil
 }
