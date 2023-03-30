@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -34,13 +35,16 @@ func (Season) Fields() []ent.Field {
 		field.Time("end_date").
 			Optional(),
 		// Used to determine current season
-		field.Bool("is_current").
+		field.Bool("is_active").
 			Default(false),
 	}
 }
 
 func (Season) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("season_members", SeasonMember.Type),
+		edge.To("season_members", SeasonMember.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
 	}
 }

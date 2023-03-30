@@ -23,13 +23,17 @@ func init() {
 	challengeFields := schema.Challenge{}.Fields()
 	_ = challengeFields
 	// challengeDescCreatedAt is the schema descriptor for created_at field.
-	challengeDescCreatedAt := challengeFields[1].Descriptor()
+	challengeDescCreatedAt := challengeFields[2].Descriptor()
 	// challenge.DefaultCreatedAt holds the default value on creation for the created_at field.
 	challenge.DefaultCreatedAt = challengeDescCreatedAt.Default.(func() time.Time)
 	// challengeDescPicture is the schema descriptor for picture field.
-	challengeDescPicture := challengeFields[3].Descriptor()
+	challengeDescPicture := challengeFields[4].Descriptor()
 	// challenge.DefaultPicture holds the default value on creation for the picture field.
 	challenge.DefaultPicture = challengeDescPicture.Default.(string)
+	// challengeDescIsActive is the schema descriptor for is_active field.
+	challengeDescIsActive := challengeFields[8].Descriptor()
+	// challenge.DefaultIsActive holds the default value on creation for the is_active field.
+	challenge.DefaultIsActive = challengeDescIsActive.Default.(bool)
 	challengememberFields := schema.ChallengeMember{}.Fields()
 	_ = challengememberFields
 	// challengememberDescPoint is the schema descriptor for point field.
@@ -130,10 +134,10 @@ func init() {
 	season.DefaultUpdatedAt = seasonDescUpdatedAt.Default.(func() time.Time)
 	// season.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	season.UpdateDefaultUpdatedAt = seasonDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// seasonDescIsCurrent is the schema descriptor for is_current field.
-	seasonDescIsCurrent := seasonFields[8].Descriptor()
-	// season.DefaultIsCurrent holds the default value on creation for the is_current field.
-	season.DefaultIsCurrent = seasonDescIsCurrent.Default.(bool)
+	// seasonDescIsActive is the schema descriptor for is_active field.
+	seasonDescIsActive := seasonFields[8].Descriptor()
+	// season.DefaultIsActive holds the default value on creation for the is_active field.
+	season.DefaultIsActive = seasonDescIsActive.Default.(bool)
 	seasonmemberFields := schema.SeasonMember{}.Fields()
 	_ = seasonmemberFields
 	// seasonmemberDescPoint is the schema descriptor for point field.

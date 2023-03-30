@@ -144,16 +144,16 @@ func (su *SeasonUpdate) ClearEndDate() *SeasonUpdate {
 	return su
 }
 
-// SetIsCurrent sets the "is_current" field.
-func (su *SeasonUpdate) SetIsCurrent(b bool) *SeasonUpdate {
-	su.mutation.SetIsCurrent(b)
+// SetIsActive sets the "is_active" field.
+func (su *SeasonUpdate) SetIsActive(b bool) *SeasonUpdate {
+	su.mutation.SetIsActive(b)
 	return su
 }
 
-// SetNillableIsCurrent sets the "is_current" field if the given value is not nil.
-func (su *SeasonUpdate) SetNillableIsCurrent(b *bool) *SeasonUpdate {
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (su *SeasonUpdate) SetNillableIsActive(b *bool) *SeasonUpdate {
 	if b != nil {
-		su.SetIsCurrent(*b)
+		su.SetIsActive(*b)
 	}
 	return su
 }
@@ -292,8 +292,8 @@ func (su *SeasonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.EndDateCleared() {
 		_spec.ClearField(season.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := su.mutation.IsCurrent(); ok {
-		_spec.SetField(season.FieldIsCurrent, field.TypeBool, value)
+	if value, ok := su.mutation.IsActive(); ok {
+		_spec.SetField(season.FieldIsActive, field.TypeBool, value)
 	}
 	if su.mutation.SeasonMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -485,16 +485,16 @@ func (suo *SeasonUpdateOne) ClearEndDate() *SeasonUpdateOne {
 	return suo
 }
 
-// SetIsCurrent sets the "is_current" field.
-func (suo *SeasonUpdateOne) SetIsCurrent(b bool) *SeasonUpdateOne {
-	suo.mutation.SetIsCurrent(b)
+// SetIsActive sets the "is_active" field.
+func (suo *SeasonUpdateOne) SetIsActive(b bool) *SeasonUpdateOne {
+	suo.mutation.SetIsActive(b)
 	return suo
 }
 
-// SetNillableIsCurrent sets the "is_current" field if the given value is not nil.
-func (suo *SeasonUpdateOne) SetNillableIsCurrent(b *bool) *SeasonUpdateOne {
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (suo *SeasonUpdateOne) SetNillableIsActive(b *bool) *SeasonUpdateOne {
 	if b != nil {
-		suo.SetIsCurrent(*b)
+		suo.SetIsActive(*b)
 	}
 	return suo
 }
@@ -657,8 +657,8 @@ func (suo *SeasonUpdateOne) sqlSave(ctx context.Context) (_node *Season, err err
 	if suo.mutation.EndDateCleared() {
 		_spec.ClearField(season.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := suo.mutation.IsCurrent(); ok {
-		_spec.SetField(season.FieldIsCurrent, field.TypeBool, value)
+	if value, ok := suo.mutation.IsActive(); ok {
+		_spec.SetField(season.FieldIsActive, field.TypeBool, value)
 	}
 	if suo.mutation.SeasonMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{

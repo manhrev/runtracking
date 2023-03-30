@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
@@ -191,6 +192,25 @@ func (mu *MemberUpdate) AddSeasonMembers(s ...*SeasonMember) *MemberUpdate {
 	return mu.AddSeasonMemberIDs(ids...)
 }
 
+// SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
+func (mu *MemberUpdate) SetChallengeID(id int64) *MemberUpdate {
+	mu.mutation.SetChallengeID(id)
+	return mu
+}
+
+// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
+func (mu *MemberUpdate) SetNillableChallengeID(id *int64) *MemberUpdate {
+	if id != nil {
+		mu = mu.SetChallengeID(*id)
+	}
+	return mu
+}
+
+// SetChallenge sets the "challenge" edge to the Challenge entity.
+func (mu *MemberUpdate) SetChallenge(c *Challenge) *MemberUpdate {
+	return mu.SetChallengeID(c.ID)
+}
+
 // Mutation returns the MemberMutation object of the builder.
 func (mu *MemberUpdate) Mutation() *MemberMutation {
 	return mu.mutation
@@ -242,6 +262,12 @@ func (mu *MemberUpdate) RemoveSeasonMembers(s ...*SeasonMember) *MemberUpdate {
 		ids[i] = s[i].ID
 	}
 	return mu.RemoveSeasonMemberIDs(ids...)
+}
+
+// ClearChallenge clears the "challenge" edge to the Challenge entity.
+func (mu *MemberUpdate) ClearChallenge() *MemberUpdate {
+	mu.mutation.ClearChallenge()
+	return mu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -471,6 +497,41 @@ func (mu *MemberUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if mu.mutation.ChallengeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   member.ChallengeTable,
+			Columns: []string{member.ChallengeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challenge.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.ChallengeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   member.ChallengeTable,
+			Columns: []string{member.ChallengeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challenge.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(mu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -652,6 +713,25 @@ func (muo *MemberUpdateOne) AddSeasonMembers(s ...*SeasonMember) *MemberUpdateOn
 	return muo.AddSeasonMemberIDs(ids...)
 }
 
+// SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
+func (muo *MemberUpdateOne) SetChallengeID(id int64) *MemberUpdateOne {
+	muo.mutation.SetChallengeID(id)
+	return muo
+}
+
+// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
+func (muo *MemberUpdateOne) SetNillableChallengeID(id *int64) *MemberUpdateOne {
+	if id != nil {
+		muo = muo.SetChallengeID(*id)
+	}
+	return muo
+}
+
+// SetChallenge sets the "challenge" edge to the Challenge entity.
+func (muo *MemberUpdateOne) SetChallenge(c *Challenge) *MemberUpdateOne {
+	return muo.SetChallengeID(c.ID)
+}
+
 // Mutation returns the MemberMutation object of the builder.
 func (muo *MemberUpdateOne) Mutation() *MemberMutation {
 	return muo.mutation
@@ -703,6 +783,12 @@ func (muo *MemberUpdateOne) RemoveSeasonMembers(s ...*SeasonMember) *MemberUpdat
 		ids[i] = s[i].ID
 	}
 	return muo.RemoveSeasonMemberIDs(ids...)
+}
+
+// ClearChallenge clears the "challenge" edge to the Challenge entity.
+func (muo *MemberUpdateOne) ClearChallenge() *MemberUpdateOne {
+	muo.mutation.ClearChallenge()
+	return muo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -948,6 +1034,41 @@ func (muo *MemberUpdateOne) sqlSave(ctx context.Context) (_node *Member, err err
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: seasonmember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.ChallengeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   member.ChallengeTable,
+			Columns: []string{member.ChallengeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challenge.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.ChallengeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   member.ChallengeTable,
+			Columns: []string{member.ChallengeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challenge.FieldID,
 				},
 			},
 		}

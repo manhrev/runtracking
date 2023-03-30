@@ -45,30 +45,32 @@ const (
 // ChallengeMutation represents an operation that mutates the Challenge nodes in the graph.
 type ChallengeMutation struct {
 	config
-	op                           Op
-	typ                          string
-	id                           *int64
-	created_at                   *time.Time
-	start_time                   *time.Time
-	picture                      *string
-	end_time                     *time.Time
-	description                  *string
-	type_id                      *int64
-	addtype_id                   *int64
-	completed_first_member_id    *int64
-	addcompleted_first_member_id *int64
-	clearedFields                map[string]struct{}
-	challenge_members            map[int64]struct{}
-	removedchallenge_members     map[int64]struct{}
-	clearedchallenge_members     bool
-	groupz                       *int64
-	clearedgroupz                bool
-	challenge_rules              map[int64]struct{}
-	removedchallenge_rules       map[int64]struct{}
-	clearedchallenge_rules       bool
-	done                         bool
-	oldValue                     func(context.Context) (*Challenge, error)
-	predicates                   []predicate.Challenge
+	op                       Op
+	typ                      string
+	id                       *int64
+	name                     *string
+	created_at               *time.Time
+	start_time               *time.Time
+	picture                  *string
+	end_time                 *time.Time
+	description              *string
+	type_id                  *int64
+	addtype_id               *int64
+	is_active                *bool
+	clearedFields            map[string]struct{}
+	challenge_members        map[int64]struct{}
+	removedchallenge_members map[int64]struct{}
+	clearedchallenge_members bool
+	groupz                   *int64
+	clearedgroupz            bool
+	challenge_rules          map[int64]struct{}
+	removedchallenge_rules   map[int64]struct{}
+	clearedchallenge_rules   bool
+	first_member             *int64
+	clearedfirst_member      bool
+	done                     bool
+	oldValue                 func(context.Context) (*Challenge, error)
+	predicates               []predicate.Challenge
 }
 
 var _ ent.Mutation = (*ChallengeMutation)(nil)
@@ -173,6 +175,55 @@ func (m *ChallengeMutation) IDs(ctx context.Context) ([]int64, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetName sets the "name" field.
+func (m *ChallengeMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ChallengeMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *ChallengeMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[challenge.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *ChallengeMutation) NameCleared() bool {
+	_, ok := m.clearedFields[challenge.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ChallengeMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, challenge.FieldName)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -450,15 +501,50 @@ func (m *ChallengeMutation) ResetTypeID() {
 	m.addtype_id = nil
 }
 
+// SetIsActive sets the "is_active" field.
+func (m *ChallengeMutation) SetIsActive(b bool) {
+	m.is_active = &b
+}
+
+// IsActive returns the value of the "is_active" field in the mutation.
+func (m *ChallengeMutation) IsActive() (r bool, exists bool) {
+	v := m.is_active
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsActive returns the old "is_active" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldIsActive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsActive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
+	}
+	return oldValue.IsActive, nil
+}
+
+// ResetIsActive resets all changes to the "is_active" field.
+func (m *ChallengeMutation) ResetIsActive() {
+	m.is_active = nil
+}
+
 // SetCompletedFirstMemberID sets the "completed_first_member_id" field.
 func (m *ChallengeMutation) SetCompletedFirstMemberID(i int64) {
-	m.completed_first_member_id = &i
-	m.addcompleted_first_member_id = nil
+	m.first_member = &i
 }
 
 // CompletedFirstMemberID returns the value of the "completed_first_member_id" field in the mutation.
 func (m *ChallengeMutation) CompletedFirstMemberID() (r int64, exists bool) {
-	v := m.completed_first_member_id
+	v := m.first_member
 	if v == nil {
 		return
 	}
@@ -482,28 +568,9 @@ func (m *ChallengeMutation) OldCompletedFirstMemberID(ctx context.Context) (v in
 	return oldValue.CompletedFirstMemberID, nil
 }
 
-// AddCompletedFirstMemberID adds i to the "completed_first_member_id" field.
-func (m *ChallengeMutation) AddCompletedFirstMemberID(i int64) {
-	if m.addcompleted_first_member_id != nil {
-		*m.addcompleted_first_member_id += i
-	} else {
-		m.addcompleted_first_member_id = &i
-	}
-}
-
-// AddedCompletedFirstMemberID returns the value that was added to the "completed_first_member_id" field in this mutation.
-func (m *ChallengeMutation) AddedCompletedFirstMemberID() (r int64, exists bool) {
-	v := m.addcompleted_first_member_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearCompletedFirstMemberID clears the value of the "completed_first_member_id" field.
 func (m *ChallengeMutation) ClearCompletedFirstMemberID() {
-	m.completed_first_member_id = nil
-	m.addcompleted_first_member_id = nil
+	m.first_member = nil
 	m.clearedFields[challenge.FieldCompletedFirstMemberID] = struct{}{}
 }
 
@@ -515,8 +582,7 @@ func (m *ChallengeMutation) CompletedFirstMemberIDCleared() bool {
 
 // ResetCompletedFirstMemberID resets all changes to the "completed_first_member_id" field.
 func (m *ChallengeMutation) ResetCompletedFirstMemberID() {
-	m.completed_first_member_id = nil
-	m.addcompleted_first_member_id = nil
+	m.first_member = nil
 	delete(m.clearedFields, challenge.FieldCompletedFirstMemberID)
 }
 
@@ -667,6 +733,45 @@ func (m *ChallengeMutation) ResetChallengeRules() {
 	m.removedchallenge_rules = nil
 }
 
+// SetFirstMemberID sets the "first_member" edge to the Member entity by id.
+func (m *ChallengeMutation) SetFirstMemberID(id int64) {
+	m.first_member = &id
+}
+
+// ClearFirstMember clears the "first_member" edge to the Member entity.
+func (m *ChallengeMutation) ClearFirstMember() {
+	m.clearedfirst_member = true
+}
+
+// FirstMemberCleared reports if the "first_member" edge to the Member entity was cleared.
+func (m *ChallengeMutation) FirstMemberCleared() bool {
+	return m.CompletedFirstMemberIDCleared() || m.clearedfirst_member
+}
+
+// FirstMemberID returns the "first_member" edge ID in the mutation.
+func (m *ChallengeMutation) FirstMemberID() (id int64, exists bool) {
+	if m.first_member != nil {
+		return *m.first_member, true
+	}
+	return
+}
+
+// FirstMemberIDs returns the "first_member" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FirstMemberID instead. It exists only for internal usage by the builders.
+func (m *ChallengeMutation) FirstMemberIDs() (ids []int64) {
+	if id := m.first_member; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetFirstMember resets all changes to the "first_member" edge.
+func (m *ChallengeMutation) ResetFirstMember() {
+	m.first_member = nil
+	m.clearedfirst_member = false
+}
+
 // Where appends a list predicates to the ChallengeMutation builder.
 func (m *ChallengeMutation) Where(ps ...predicate.Challenge) {
 	m.predicates = append(m.predicates, ps...)
@@ -701,7 +806,10 @@ func (m *ChallengeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChallengeMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
+	if m.name != nil {
+		fields = append(fields, challenge.FieldName)
+	}
 	if m.created_at != nil {
 		fields = append(fields, challenge.FieldCreatedAt)
 	}
@@ -720,7 +828,10 @@ func (m *ChallengeMutation) Fields() []string {
 	if m.type_id != nil {
 		fields = append(fields, challenge.FieldTypeID)
 	}
-	if m.completed_first_member_id != nil {
+	if m.is_active != nil {
+		fields = append(fields, challenge.FieldIsActive)
+	}
+	if m.first_member != nil {
 		fields = append(fields, challenge.FieldCompletedFirstMemberID)
 	}
 	return fields
@@ -731,6 +842,8 @@ func (m *ChallengeMutation) Fields() []string {
 // schema.
 func (m *ChallengeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case challenge.FieldName:
+		return m.Name()
 	case challenge.FieldCreatedAt:
 		return m.CreatedAt()
 	case challenge.FieldStartTime:
@@ -743,6 +856,8 @@ func (m *ChallengeMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case challenge.FieldTypeID:
 		return m.TypeID()
+	case challenge.FieldIsActive:
+		return m.IsActive()
 	case challenge.FieldCompletedFirstMemberID:
 		return m.CompletedFirstMemberID()
 	}
@@ -754,6 +869,8 @@ func (m *ChallengeMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ChallengeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case challenge.FieldName:
+		return m.OldName(ctx)
 	case challenge.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case challenge.FieldStartTime:
@@ -766,6 +883,8 @@ func (m *ChallengeMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldDescription(ctx)
 	case challenge.FieldTypeID:
 		return m.OldTypeID(ctx)
+	case challenge.FieldIsActive:
+		return m.OldIsActive(ctx)
 	case challenge.FieldCompletedFirstMemberID:
 		return m.OldCompletedFirstMemberID(ctx)
 	}
@@ -777,6 +896,13 @@ func (m *ChallengeMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *ChallengeMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case challenge.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
 	case challenge.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -819,6 +945,13 @@ func (m *ChallengeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTypeID(v)
 		return nil
+	case challenge.FieldIsActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsActive(v)
+		return nil
 	case challenge.FieldCompletedFirstMemberID:
 		v, ok := value.(int64)
 		if !ok {
@@ -837,9 +970,6 @@ func (m *ChallengeMutation) AddedFields() []string {
 	if m.addtype_id != nil {
 		fields = append(fields, challenge.FieldTypeID)
 	}
-	if m.addcompleted_first_member_id != nil {
-		fields = append(fields, challenge.FieldCompletedFirstMemberID)
-	}
 	return fields
 }
 
@@ -850,8 +980,6 @@ func (m *ChallengeMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case challenge.FieldTypeID:
 		return m.AddedTypeID()
-	case challenge.FieldCompletedFirstMemberID:
-		return m.AddedCompletedFirstMemberID()
 	}
 	return nil, false
 }
@@ -868,13 +996,6 @@ func (m *ChallengeMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddTypeID(v)
 		return nil
-	case challenge.FieldCompletedFirstMemberID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCompletedFirstMemberID(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Challenge numeric field %s", name)
 }
@@ -883,6 +1004,9 @@ func (m *ChallengeMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ChallengeMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(challenge.FieldName) {
+		fields = append(fields, challenge.FieldName)
+	}
 	if m.FieldCleared(challenge.FieldStartTime) {
 		fields = append(fields, challenge.FieldStartTime)
 	}
@@ -909,6 +1033,9 @@ func (m *ChallengeMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ChallengeMutation) ClearField(name string) error {
 	switch name {
+	case challenge.FieldName:
+		m.ClearName()
+		return nil
 	case challenge.FieldStartTime:
 		m.ClearStartTime()
 		return nil
@@ -929,6 +1056,9 @@ func (m *ChallengeMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ChallengeMutation) ResetField(name string) error {
 	switch name {
+	case challenge.FieldName:
+		m.ResetName()
+		return nil
 	case challenge.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
@@ -947,6 +1077,9 @@ func (m *ChallengeMutation) ResetField(name string) error {
 	case challenge.FieldTypeID:
 		m.ResetTypeID()
 		return nil
+	case challenge.FieldIsActive:
+		m.ResetIsActive()
+		return nil
 	case challenge.FieldCompletedFirstMemberID:
 		m.ResetCompletedFirstMemberID()
 		return nil
@@ -956,7 +1089,7 @@ func (m *ChallengeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChallengeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.challenge_members != nil {
 		edges = append(edges, challenge.EdgeChallengeMembers)
 	}
@@ -965,6 +1098,9 @@ func (m *ChallengeMutation) AddedEdges() []string {
 	}
 	if m.challenge_rules != nil {
 		edges = append(edges, challenge.EdgeChallengeRules)
+	}
+	if m.first_member != nil {
+		edges = append(edges, challenge.EdgeFirstMember)
 	}
 	return edges
 }
@@ -989,13 +1125,17 @@ func (m *ChallengeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case challenge.EdgeFirstMember:
+		if id := m.first_member; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChallengeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedchallenge_members != nil {
 		edges = append(edges, challenge.EdgeChallengeMembers)
 	}
@@ -1027,7 +1167,7 @@ func (m *ChallengeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChallengeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedchallenge_members {
 		edges = append(edges, challenge.EdgeChallengeMembers)
 	}
@@ -1036,6 +1176,9 @@ func (m *ChallengeMutation) ClearedEdges() []string {
 	}
 	if m.clearedchallenge_rules {
 		edges = append(edges, challenge.EdgeChallengeRules)
+	}
+	if m.clearedfirst_member {
+		edges = append(edges, challenge.EdgeFirstMember)
 	}
 	return edges
 }
@@ -1050,6 +1193,8 @@ func (m *ChallengeMutation) EdgeCleared(name string) bool {
 		return m.clearedgroupz
 	case challenge.EdgeChallengeRules:
 		return m.clearedchallenge_rules
+	case challenge.EdgeFirstMember:
+		return m.clearedfirst_member
 	}
 	return false
 }
@@ -1060,6 +1205,9 @@ func (m *ChallengeMutation) ClearEdge(name string) error {
 	switch name {
 	case challenge.EdgeGroupz:
 		m.ClearGroupz()
+		return nil
+	case challenge.EdgeFirstMember:
+		m.ClearFirstMember()
 		return nil
 	}
 	return fmt.Errorf("unknown Challenge unique edge %s", name)
@@ -1077,6 +1225,9 @@ func (m *ChallengeMutation) ResetEdge(name string) error {
 		return nil
 	case challenge.EdgeChallengeRules:
 		m.ResetChallengeRules()
+		return nil
+	case challenge.EdgeFirstMember:
+		m.ResetFirstMember()
 		return nil
 	}
 	return fmt.Errorf("unknown Challenge edge %s", name)
@@ -4280,6 +4431,8 @@ type MemberMutation struct {
 	season_members               map[int64]struct{}
 	removedseason_members        map[int64]struct{}
 	clearedseason_members        bool
+	challenge                    *int64
+	clearedchallenge             bool
 	done                         bool
 	oldValue                     func(context.Context) (*Member, error)
 	predicates                   []predicate.Member
@@ -4845,6 +4998,45 @@ func (m *MemberMutation) ResetSeasonMembers() {
 	m.removedseason_members = nil
 }
 
+// SetChallengeID sets the "challenge" edge to the Challenge entity by id.
+func (m *MemberMutation) SetChallengeID(id int64) {
+	m.challenge = &id
+}
+
+// ClearChallenge clears the "challenge" edge to the Challenge entity.
+func (m *MemberMutation) ClearChallenge() {
+	m.clearedchallenge = true
+}
+
+// ChallengeCleared reports if the "challenge" edge to the Challenge entity was cleared.
+func (m *MemberMutation) ChallengeCleared() bool {
+	return m.clearedchallenge
+}
+
+// ChallengeID returns the "challenge" edge ID in the mutation.
+func (m *MemberMutation) ChallengeID() (id int64, exists bool) {
+	if m.challenge != nil {
+		return *m.challenge, true
+	}
+	return
+}
+
+// ChallengeIDs returns the "challenge" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChallengeID instead. It exists only for internal usage by the builders.
+func (m *MemberMutation) ChallengeIDs() (ids []int64) {
+	if id := m.challenge; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChallenge resets all changes to the "challenge" edge.
+func (m *MemberMutation) ResetChallenge() {
+	m.challenge = nil
+	m.clearedchallenge = false
+}
+
 // Where appends a list predicates to the MemberMutation builder.
 func (m *MemberMutation) Where(ps ...predicate.Member) {
 	m.predicates = append(m.predicates, ps...)
@@ -5123,7 +5315,7 @@ func (m *MemberMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MemberMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.groupz != nil {
 		edges = append(edges, member.EdgeGroupz)
 	}
@@ -5132,6 +5324,9 @@ func (m *MemberMutation) AddedEdges() []string {
 	}
 	if m.season_members != nil {
 		edges = append(edges, member.EdgeSeasonMembers)
+	}
+	if m.challenge != nil {
+		edges = append(edges, member.EdgeChallenge)
 	}
 	return edges
 }
@@ -5156,13 +5351,17 @@ func (m *MemberMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case member.EdgeChallenge:
+		if id := m.challenge; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MemberMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedchallenge_members != nil {
 		edges = append(edges, member.EdgeChallengeMembers)
 	}
@@ -5194,7 +5393,7 @@ func (m *MemberMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MemberMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedgroupz {
 		edges = append(edges, member.EdgeGroupz)
 	}
@@ -5203,6 +5402,9 @@ func (m *MemberMutation) ClearedEdges() []string {
 	}
 	if m.clearedseason_members {
 		edges = append(edges, member.EdgeSeasonMembers)
+	}
+	if m.clearedchallenge {
+		edges = append(edges, member.EdgeChallenge)
 	}
 	return edges
 }
@@ -5217,6 +5419,8 @@ func (m *MemberMutation) EdgeCleared(name string) bool {
 		return m.clearedchallenge_members
 	case member.EdgeSeasonMembers:
 		return m.clearedseason_members
+	case member.EdgeChallenge:
+		return m.clearedchallenge
 	}
 	return false
 }
@@ -5227,6 +5431,9 @@ func (m *MemberMutation) ClearEdge(name string) error {
 	switch name {
 	case member.EdgeGroupz:
 		m.ClearGroupz()
+		return nil
+	case member.EdgeChallenge:
+		m.ClearChallenge()
 		return nil
 	}
 	return fmt.Errorf("unknown Member unique edge %s", name)
@@ -5245,6 +5452,9 @@ func (m *MemberMutation) ResetEdge(name string) error {
 	case member.EdgeSeasonMembers:
 		m.ResetSeasonMembers()
 		return nil
+	case member.EdgeChallenge:
+		m.ResetChallenge()
+		return nil
 	}
 	return fmt.Errorf("unknown Member edge %s", name)
 }
@@ -5262,7 +5472,7 @@ type SeasonMutation struct {
 	updated_at            *time.Time
 	start_date            *time.Time
 	end_date              *time.Time
-	is_current            *bool
+	is_active             *bool
 	clearedFields         map[string]struct{}
 	season_members        map[int64]struct{}
 	removedseason_members map[int64]struct{}
@@ -5680,40 +5890,40 @@ func (m *SeasonMutation) ResetEndDate() {
 	delete(m.clearedFields, season.FieldEndDate)
 }
 
-// SetIsCurrent sets the "is_current" field.
-func (m *SeasonMutation) SetIsCurrent(b bool) {
-	m.is_current = &b
+// SetIsActive sets the "is_active" field.
+func (m *SeasonMutation) SetIsActive(b bool) {
+	m.is_active = &b
 }
 
-// IsCurrent returns the value of the "is_current" field in the mutation.
-func (m *SeasonMutation) IsCurrent() (r bool, exists bool) {
-	v := m.is_current
+// IsActive returns the value of the "is_active" field in the mutation.
+func (m *SeasonMutation) IsActive() (r bool, exists bool) {
+	v := m.is_active
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIsCurrent returns the old "is_current" field's value of the Season entity.
+// OldIsActive returns the old "is_active" field's value of the Season entity.
 // If the Season object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeasonMutation) OldIsCurrent(ctx context.Context) (v bool, err error) {
+func (m *SeasonMutation) OldIsActive(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsCurrent is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsCurrent requires an ID field in the mutation")
+		return v, errors.New("OldIsActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsCurrent: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
 	}
-	return oldValue.IsCurrent, nil
+	return oldValue.IsActive, nil
 }
 
-// ResetIsCurrent resets all changes to the "is_current" field.
-func (m *SeasonMutation) ResetIsCurrent() {
-	m.is_current = nil
+// ResetIsActive resets all changes to the "is_active" field.
+func (m *SeasonMutation) ResetIsActive() {
+	m.is_active = nil
 }
 
 // AddSeasonMemberIDs adds the "season_members" edge to the SeasonMember entity by ids.
@@ -5826,8 +6036,8 @@ func (m *SeasonMutation) Fields() []string {
 	if m.end_date != nil {
 		fields = append(fields, season.FieldEndDate)
 	}
-	if m.is_current != nil {
-		fields = append(fields, season.FieldIsCurrent)
+	if m.is_active != nil {
+		fields = append(fields, season.FieldIsActive)
 	}
 	return fields
 }
@@ -5851,8 +6061,8 @@ func (m *SeasonMutation) Field(name string) (ent.Value, bool) {
 		return m.StartDate()
 	case season.FieldEndDate:
 		return m.EndDate()
-	case season.FieldIsCurrent:
-		return m.IsCurrent()
+	case season.FieldIsActive:
+		return m.IsActive()
 	}
 	return nil, false
 }
@@ -5876,8 +6086,8 @@ func (m *SeasonMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldStartDate(ctx)
 	case season.FieldEndDate:
 		return m.OldEndDate(ctx)
-	case season.FieldIsCurrent:
-		return m.OldIsCurrent(ctx)
+	case season.FieldIsActive:
+		return m.OldIsActive(ctx)
 	}
 	return nil, fmt.Errorf("unknown Season field %s", name)
 }
@@ -5936,12 +6146,12 @@ func (m *SeasonMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEndDate(v)
 		return nil
-	case season.FieldIsCurrent:
+	case season.FieldIsActive:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsCurrent(v)
+		m.SetIsActive(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Season field %s", name)
@@ -6040,8 +6250,8 @@ func (m *SeasonMutation) ResetField(name string) error {
 	case season.FieldEndDate:
 		m.ResetEndDate()
 		return nil
-	case season.FieldIsCurrent:
-		m.ResetIsCurrent()
+	case season.FieldIsActive:
+		m.ResetIsActive()
 		return nil
 	}
 	return fmt.Errorf("unknown Season field %s", name)

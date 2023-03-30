@@ -90,9 +90,9 @@ func EndDate(v time.Time) predicate.Season {
 	return predicate.Season(sql.FieldEQ(FieldEndDate, v))
 }
 
-// IsCurrent applies equality check predicate on the "is_current" field. It's identical to IsCurrentEQ.
-func IsCurrent(v bool) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldIsCurrent, v))
+// IsActive applies equality check predicate on the "is_active" field. It's identical to IsActiveEQ.
+func IsActive(v bool) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldIsActive, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -490,14 +490,14 @@ func EndDateNotNil() predicate.Season {
 	return predicate.Season(sql.FieldNotNull(FieldEndDate))
 }
 
-// IsCurrentEQ applies the EQ predicate on the "is_current" field.
-func IsCurrentEQ(v bool) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldIsCurrent, v))
+// IsActiveEQ applies the EQ predicate on the "is_active" field.
+func IsActiveEQ(v bool) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldIsActive, v))
 }
 
-// IsCurrentNEQ applies the NEQ predicate on the "is_current" field.
-func IsCurrentNEQ(v bool) predicate.Season {
-	return predicate.Season(sql.FieldNEQ(FieldIsCurrent, v))
+// IsActiveNEQ applies the NEQ predicate on the "is_active" field.
+func IsActiveNEQ(v bool) predicate.Season {
+	return predicate.Season(sql.FieldNEQ(FieldIsActive, v))
 }
 
 // HasSeasonMembers applies the HasEdge predicate on the "season_members" edge.

@@ -41,18 +41,20 @@ message ListChallengeRequest{
     ChallengeSortBy sort_by = 4;
     string search_by_name = 5;
     repeated Rule filter_by_rules = 7;
+    ActivityType filter_by_type = 10;
 
     google.protobuf.Timestamp from = 8;
     google.protobuf.Timestamp to = 9;
 
     enum ChallengeSortBy{
         CHALLENGE_SORT_BY_UNSPECIFIED = 0;
-        CHALLENGE_SORT_BY_CREATED_TIME = 1; // Sort by time joined
-        CHALLENGE_SORT_BY_NAME = 2;
+        CHALLENGE_SORT_BY_START_TIME = 1; 
+        CHALLENGE_SORT_BY_END_TIME = 2; 
+        CHALLENGE_SORT_BY_NAME = 3;
     }
 }
 message ListChallengeReply {
-    ChallengeInfo challengeInfo = 1;
+    repeated ChallengeInfo challengeInfoList = 1;
     int64 total = 2;
 }
 
@@ -64,6 +66,7 @@ message UpdateChallengeReply{}
 
 message DeleteChallengeRequest{
     int64 id = 1;
+    int64 group_id = 2;
 }
 message DeleteChallengeReply{}
 
@@ -176,6 +179,8 @@ message GetGroupRequest{
 
 message GetGroupReply{
     GroupInfo groupInfo = 1;
+
+    // Limit 10 item each of below entity type. Click into it to see more clearly
     repeated Member members = 2;
     repeated ChallengeInfo challenges = 3;
     repeated EventInfo events = 4;

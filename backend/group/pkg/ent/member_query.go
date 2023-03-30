@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
@@ -28,6 +29,7 @@ type MemberQuery struct {
 	withGroupz           *GroupzQuery
 	withChallengeMembers *ChallengeMemberQuery
 	withSeasonMembers    *SeasonMemberQuery
+	withChallenge        *ChallengeQuery
 	withFKs              bool
 	modifiers            []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -125,6 +127,28 @@ func (mq *MemberQuery) QuerySeasonMembers() *SeasonMemberQuery {
 			sqlgraph.From(member.Table, member.FieldID, selector),
 			sqlgraph.To(seasonmember.Table, seasonmember.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, member.SeasonMembersTable, member.SeasonMembersColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChallenge chains the current query on the "challenge" edge.
+func (mq *MemberQuery) QueryChallenge() *ChallengeQuery {
+	query := (&ChallengeClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(member.Table, member.FieldID, selector),
+			sqlgraph.To(challenge.Table, challenge.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, member.ChallengeTable, member.ChallengeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -325,6 +349,7 @@ func (mq *MemberQuery) Clone() *MemberQuery {
 		withGroupz:           mq.withGroupz.Clone(),
 		withChallengeMembers: mq.withChallengeMembers.Clone(),
 		withSeasonMembers:    mq.withSeasonMembers.Clone(),
+		withChallenge:        mq.withChallenge.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
@@ -361,6 +386,17 @@ func (mq *MemberQuery) WithSeasonMembers(opts ...func(*SeasonMemberQuery)) *Memb
 		opt(query)
 	}
 	mq.withSeasonMembers = query
+	return mq
+}
+
+// WithChallenge tells the query-builder to eager-load the nodes that are connected to
+// the "challenge" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MemberQuery) WithChallenge(opts ...func(*ChallengeQuery)) *MemberQuery {
+	query := (&ChallengeClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withChallenge = query
 	return mq
 }
 
@@ -445,10 +481,11 @@ func (mq *MemberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Membe
 		nodes       = []*Member{}
 		withFKs     = mq.withFKs
 		_spec       = mq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			mq.withGroupz != nil,
 			mq.withChallengeMembers != nil,
 			mq.withSeasonMembers != nil,
+			mq.withChallenge != nil,
 		}
 	)
 	if mq.withGroupz != nil {
@@ -495,6 +532,12 @@ func (mq *MemberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Membe
 		if err := mq.loadSeasonMembers(ctx, query, nodes,
 			func(n *Member) { n.Edges.SeasonMembers = []*SeasonMember{} },
 			func(n *Member, e *SeasonMember) { n.Edges.SeasonMembers = append(n.Edges.SeasonMembers, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := mq.withChallenge; query != nil {
+		if err := mq.loadChallenge(ctx, query, nodes, nil,
+			func(n *Member, e *Challenge) { n.Edges.Challenge = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -582,6 +625,31 @@ func (mq *MemberQuery) loadSeasonMembers(ctx context.Context, query *SeasonMembe
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "member_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (mq *MemberQuery) loadChallenge(ctx context.Context, query *ChallengeQuery, nodes []*Member, init func(*Member), assign func(*Member, *Challenge)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*Member)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Challenge(func(s *sql.Selector) {
+		s.Where(sql.InValues(member.ChallengeColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CompletedFirstMemberID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "completed_first_member_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

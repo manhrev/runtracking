@@ -18,6 +18,8 @@ func (Challenge) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Unique(),
+		field.String("name").
+			Optional(),
 		field.Time("created_at").
 			Default(time.Now),
 		field.Time("start_time").
@@ -29,9 +31,10 @@ func (Challenge) Fields() []ent.Field {
 		field.String("description").
 			Optional(),
 		field.Int64("type_id"),
+		field.Bool("is_active").
+			Default(false),
 		// id of member who completed with all rules of challenge first
-		field.Int64("completed_first_member_id").
-			Optional(),
+		field.Int64("completed_first_member_id").Optional(),
 	}
 }
 
@@ -48,5 +51,9 @@ func (Challenge) Edges() []ent.Edge {
 			Annotations(entsql.Annotation{
 				OnDelete: entsql.Cascade,
 			}),
+		edge.From("first_member", Member.Type).
+			Ref("challenge").
+			Field("completed_first_member_id").
+			Unique(),
 	}
 }

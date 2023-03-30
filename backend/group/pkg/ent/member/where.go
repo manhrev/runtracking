@@ -416,6 +416,33 @@ func HasSeasonMembersWith(preds ...predicate.SeasonMember) predicate.Member {
 	})
 }
 
+// HasChallenge applies the HasEdge predicate on the "challenge" edge.
+func HasChallenge() predicate.Member {
+	return predicate.Member(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ChallengeTable, ChallengeColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChallengeWith applies the HasEdge predicate on the "challenge" edge with a given conditions (other predicates).
+func HasChallengeWith(preds ...predicate.Challenge) predicate.Member {
+	return predicate.Member(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChallengeInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ChallengeTable, ChallengeColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Member) predicate.Member {
 	return predicate.Member(func(s *sql.Selector) {

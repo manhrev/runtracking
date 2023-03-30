@@ -6,6 +6,7 @@ import (
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/internal/repository"
 	"github.com/manhrev/runtracking/backend/group/internal/status"
+	"github.com/manhrev/runtracking/backend/group/internal/transformer"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 )
@@ -22,6 +23,17 @@ type Challenge interface {
 		userId int64,
 		request *group.UpdateChallengeRequest,
 	) (*group.UpdateChallengeReply, error)
+
+	ListChallenge(
+		ctx context.Context,
+		request *group.ListChallengeRequest,
+	) (*group.ListChallengeReply, error)
+
+	DeleteChallenge(
+		ctx context.Context,
+		userId int64,
+		request *group.DeleteChallengeRequest,
+	) (*group.DeleteChallengeReply, error)
 	// AcceptMember(
 	// 	ctx context.Context,
 	// 	userId int64,
@@ -120,6 +132,73 @@ func (c *challengeImpl) UpdateChallenge(
 	}
 
 	return &group.UpdateChallengeReply{}, nil
+}
+
+func (c *challengeImpl) DeleteChallenge(
+	ctx context.Context,
+	userId int64,
+	request *group.DeleteChallengeRequest,
+) (*group.DeleteChallengeReply, error) {
+	groupEntity, err := c.repository.Group.Get(ctx, request.GetGroupId())
+	if err != nil {
+		return nil, err
+	}
+
+	if userId != groupEntity.LeaderID {
+		return nil, status.Internal("User is not an admin of group")
+	}
+
+	err = c.repository.Challenge.Delete(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &group.DeleteChallengeReply{}, nil
+}
+
+func (c *challengeImpl) ListChallenge(
+	ctx context.Context,
+	request *group.ListChallengeRequest,
+) (*group.ListChallengeReply, error) {
+	challengeEnts, total, err := c.repository.Challenge.List(ctx,
+		request.GroupId, request.SortBy, request.SearchByName, request.FilterByRules,
+		request.FilterByType, request.Ascending, request.From, request.To, request.Limit, request.GetOffset())
+
+	if err != nil {
+		return nil, err
+	}
+
+	var userIds []int64
+	for _, challengeEnt := range challengeEnts {
+		if challengeEnt.Edges.FirstMember != nil {
+			userIds = append(userIds)
+		}
+	}
+
+	// list user completed challenge first
+
+	userInfoMap := make(map[int64]*auth.UserInfo)
+	if len(userIds) > 0 {
+		users, err := c.authClient.ListUser(ctx, &auth.ListUserRequest{
+			UserIds: userIds,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+		for _, userInfo := range users.Users {
+			userInfoMap[userInfo.UserId] = userInfo
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &group.ListChallengeReply{
+		ChallengeInfoList: transformer.TransformChallengeEntListToChallengeInfoList(challengeEnts, request.GroupId, userInfoMap),
+		Total:             total,
+	}, nil
 }
 
 // func (m *memberImpl) LeaveGroup(

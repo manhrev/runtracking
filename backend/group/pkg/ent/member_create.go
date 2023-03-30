@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
@@ -152,6 +153,25 @@ func (mc *MemberCreate) AddSeasonMembers(s ...*SeasonMember) *MemberCreate {
 		ids[i] = s[i].ID
 	}
 	return mc.AddSeasonMemberIDs(ids...)
+}
+
+// SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
+func (mc *MemberCreate) SetChallengeID(id int64) *MemberCreate {
+	mc.mutation.SetChallengeID(id)
+	return mc
+}
+
+// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
+func (mc *MemberCreate) SetNillableChallengeID(id *int64) *MemberCreate {
+	if id != nil {
+		mc = mc.SetChallengeID(*id)
+	}
+	return mc
+}
+
+// SetChallenge sets the "challenge" edge to the Challenge entity.
+func (mc *MemberCreate) SetChallenge(c *Challenge) *MemberCreate {
+	return mc.SetChallengeID(c.ID)
 }
 
 // Mutation returns the MemberMutation object of the builder.
@@ -336,6 +356,25 @@ func (mc *MemberCreate) createSpec() (*Member, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: seasonmember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.ChallengeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   member.ChallengeTable,
+			Columns: []string{member.ChallengeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challenge.FieldID,
 				},
 			},
 		}

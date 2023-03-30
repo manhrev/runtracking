@@ -29,6 +29,8 @@ const (
 	EdgeChallengeMembers = "challenge_members"
 	// EdgeSeasonMembers holds the string denoting the season_members edge name in mutations.
 	EdgeSeasonMembers = "season_members"
+	// EdgeChallenge holds the string denoting the challenge edge name in mutations.
+	EdgeChallenge = "challenge"
 	// Table holds the table name of the member in the database.
 	Table = "members"
 	// GroupzTable is the table that holds the groupz relation/edge.
@@ -52,6 +54,13 @@ const (
 	SeasonMembersInverseTable = "season_members"
 	// SeasonMembersColumn is the table column denoting the season_members relation/edge.
 	SeasonMembersColumn = "member_id"
+	// ChallengeTable is the table that holds the challenge relation/edge.
+	ChallengeTable = "challenges"
+	// ChallengeInverseTable is the table name for the Challenge entity.
+	// It exists in this package in order to avoid circular dependency with the "challenge" package.
+	ChallengeInverseTable = "challenges"
+	// ChallengeColumn is the table column denoting the challenge relation/edge.
+	ChallengeColumn = "completed_first_member_id"
 )
 
 // Columns holds all SQL columns for member fields.

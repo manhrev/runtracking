@@ -351,6 +351,22 @@ func (c *ChallengeClient) QueryChallengeRules(ch *Challenge) *ChallengeRuleQuery
 	return query
 }
 
+// QueryFirstMember queries the first_member edge of a Challenge.
+func (c *ChallengeClient) QueryFirstMember(ch *Challenge) *MemberQuery {
+	query := (&MemberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, id),
+			sqlgraph.To(member.Table, member.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, challenge.FirstMemberTable, challenge.FirstMemberColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ChallengeClient) Hooks() []Hook {
 	return c.hooks.Challenge
@@ -1110,6 +1126,22 @@ func (c *MemberClient) QuerySeasonMembers(m *Member) *SeasonMemberQuery {
 			sqlgraph.From(member.Table, member.FieldID, id),
 			sqlgraph.To(seasonmember.Table, seasonmember.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, member.SeasonMembersTable, member.SeasonMembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChallenge queries the challenge edge of a Member.
+func (c *MemberClient) QueryChallenge(m *Member) *ChallengeQuery {
+	query := (&ChallengeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(member.Table, member.FieldID, id),
+			sqlgraph.To(challenge.Table, challenge.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, member.ChallengeTable, member.ChallengeColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil

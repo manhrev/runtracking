@@ -35,7 +35,7 @@ func (Season) Fields() []ent.Field {
 		field.Time("end_date").
 			Optional(),
 		// Used to determine current season
-		field.Bool("is_current").
+		field.Bool("is_active").
 			Default(false),
 	}
 }

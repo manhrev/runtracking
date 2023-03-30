@@ -20,6 +20,7 @@ type Group interface {
 		userId int64,
 		groupInfo *grouppb.GroupInfo,
 	) error
+	Get(ctx context.Context, request *grouppb.GetGroupRequest) (*ent.Groupz, error)
 	Delete(ctx context.Context, userId int64, groupId int64) error
 	List(ctx context.Context,
 		userId int64,
@@ -82,6 +83,15 @@ func (m *groupImpl) Create(ctx context.Context, userId int64, groupInfo *grouppb
 	}
 
 	return nil
+}
+
+func (m *groupImpl) Get(ctx context.Context, request *grouppb.GetGroupRequest) (*ent.Groupz, error) {
+	groupz, err := m.repository.Group.Get(ctx, request.GetGroupId())
+
+	if err != nil {
+		return nil, err
+	}
+	return groupz, nil
 }
 
 func (m *groupImpl) List(ctx context.Context,

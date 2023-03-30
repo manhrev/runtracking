@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
@@ -43,9 +44,11 @@ type MemberEdges struct {
 	ChallengeMembers []*ChallengeMember `json:"challenge_members,omitempty"`
 	// SeasonMembers holds the value of the season_members edge.
 	SeasonMembers []*SeasonMember `json:"season_members,omitempty"`
+	// Challenge holds the value of the challenge edge.
+	Challenge *Challenge `json:"challenge,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // GroupzOrErr returns the Groupz value or an error if the edge
@@ -77,6 +80,19 @@ func (e MemberEdges) SeasonMembersOrErr() ([]*SeasonMember, error) {
 		return e.SeasonMembers, nil
 	}
 	return nil, &NotLoadedError{edge: "season_members"}
+}
+
+// ChallengeOrErr returns the Challenge value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MemberEdges) ChallengeOrErr() (*Challenge, error) {
+	if e.loadedTypes[3] {
+		if e.Challenge == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: challenge.Label}
+		}
+		return e.Challenge, nil
+	}
+	return nil, &NotLoadedError{edge: "challenge"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -172,6 +188,11 @@ func (m *Member) QueryChallengeMembers() *ChallengeMemberQuery {
 // QuerySeasonMembers queries the "season_members" edge of the Member entity.
 func (m *Member) QuerySeasonMembers() *SeasonMemberQuery {
 	return NewMemberClient(m.config).QuerySeasonMembers(m)
+}
+
+// QueryChallenge queries the "challenge" edge of the Member entity.
+func (m *Member) QueryChallenge() *ChallengeQuery {
+	return NewMemberClient(m.config).QueryChallenge(m)
 }
 
 // Update returns a builder for updating this Member.

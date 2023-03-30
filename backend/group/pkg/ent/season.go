@@ -30,8 +30,8 @@ type Season struct {
 	StartDate time.Time `json:"start_date,omitempty"`
 	// EndDate holds the value of the "end_date" field.
 	EndDate time.Time `json:"end_date,omitempty"`
-	// IsCurrent holds the value of the "is_current" field.
-	IsCurrent bool `json:"is_current,omitempty"`
+	// IsActive holds the value of the "is_active" field.
+	IsActive bool `json:"is_active,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SeasonQuery when eager-loading is set.
 	Edges SeasonEdges `json:"edges"`
@@ -60,7 +60,7 @@ func (*Season) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case season.FieldIsCurrent:
+		case season.FieldIsActive:
 			values[i] = new(sql.NullBool)
 		case season.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -131,11 +131,11 @@ func (s *Season) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.EndDate = value.Time
 			}
-		case season.FieldIsCurrent:
+		case season.FieldIsActive:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_current", values[i])
+				return fmt.Errorf("unexpected type %T for field is_active", values[i])
 			} else if value.Valid {
-				s.IsCurrent = value.Bool
+				s.IsActive = value.Bool
 			}
 		}
 	}
@@ -191,8 +191,8 @@ func (s *Season) String() string {
 	builder.WriteString("end_date=")
 	builder.WriteString(s.EndDate.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("is_current=")
-	builder.WriteString(fmt.Sprintf("%v", s.IsCurrent))
+	builder.WriteString("is_active=")
+	builder.WriteString(fmt.Sprintf("%v", s.IsActive))
 	builder.WriteByte(')')
 	return builder.String()
 }

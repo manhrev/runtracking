@@ -25,8 +25,8 @@ const (
 	FieldStartDate = "start_date"
 	// FieldEndDate holds the string denoting the end_date field in the database.
 	FieldEndDate = "end_date"
-	// FieldIsCurrent holds the string denoting the is_current field in the database.
-	FieldIsCurrent = "is_current"
+	// FieldIsActive holds the string denoting the is_active field in the database.
+	FieldIsActive = "is_active"
 	// EdgeSeasonMembers holds the string denoting the season_members edge name in mutations.
 	EdgeSeasonMembers = "season_members"
 	// Table holds the table name of the season in the database.
@@ -50,7 +50,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldStartDate,
 	FieldEndDate,
-	FieldIsCurrent,
+	FieldIsActive,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -72,6 +72,6 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultIsCurrent holds the default value on creation for the "is_current" field.
-	DefaultIsCurrent bool
+	// DefaultIsActive holds the default value on creation for the "is_active" field.
+	DefaultIsActive bool
 )

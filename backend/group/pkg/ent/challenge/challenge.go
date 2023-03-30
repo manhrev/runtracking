@@ -11,6 +11,8 @@ const (
 	Label = "challenge"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldStartTime holds the string denoting the start_time field in the database.
@@ -23,6 +25,8 @@ const (
 	FieldDescription = "description"
 	// FieldTypeID holds the string denoting the type_id field in the database.
 	FieldTypeID = "type_id"
+	// FieldIsActive holds the string denoting the is_active field in the database.
+	FieldIsActive = "is_active"
 	// FieldCompletedFirstMemberID holds the string denoting the completed_first_member_id field in the database.
 	FieldCompletedFirstMemberID = "completed_first_member_id"
 	// EdgeChallengeMembers holds the string denoting the challenge_members edge name in mutations.
@@ -31,6 +35,8 @@ const (
 	EdgeGroupz = "groupz"
 	// EdgeChallengeRules holds the string denoting the challenge_rules edge name in mutations.
 	EdgeChallengeRules = "challenge_rules"
+	// EdgeFirstMember holds the string denoting the first_member edge name in mutations.
+	EdgeFirstMember = "first_member"
 	// Table holds the table name of the challenge in the database.
 	Table = "challenges"
 	// ChallengeMembersTable is the table that holds the challenge_members relation/edge.
@@ -54,17 +60,26 @@ const (
 	ChallengeRulesInverseTable = "challenge_rules"
 	// ChallengeRulesColumn is the table column denoting the challenge_rules relation/edge.
 	ChallengeRulesColumn = "challenge_challenge_rules"
+	// FirstMemberTable is the table that holds the first_member relation/edge.
+	FirstMemberTable = "challenges"
+	// FirstMemberInverseTable is the table name for the Member entity.
+	// It exists in this package in order to avoid circular dependency with the "member" package.
+	FirstMemberInverseTable = "members"
+	// FirstMemberColumn is the table column denoting the first_member relation/edge.
+	FirstMemberColumn = "completed_first_member_id"
 )
 
 // Columns holds all SQL columns for challenge fields.
 var Columns = []string{
 	FieldID,
+	FieldName,
 	FieldCreatedAt,
 	FieldStartTime,
 	FieldPicture,
 	FieldEndTime,
 	FieldDescription,
 	FieldTypeID,
+	FieldIsActive,
 	FieldCompletedFirstMemberID,
 }
 
@@ -94,4 +109,6 @@ var (
 	DefaultCreatedAt func() time.Time
 	// DefaultPicture holds the default value on creation for the "picture" field.
 	DefaultPicture string
+	// DefaultIsActive holds the default value on creation for the "is_active" field.
+	DefaultIsActive bool
 )

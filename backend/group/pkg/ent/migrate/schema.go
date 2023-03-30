@@ -11,14 +11,16 @@ var (
 	// ChallengesColumns holds the columns for the "challenges" table.
 	ChallengesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "start_time", Type: field.TypeTime, Nullable: true},
 		{Name: "picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
 		{Name: "end_time", Type: field.TypeTime, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "type_id", Type: field.TypeInt64},
-		{Name: "completed_first_member_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "is_active", Type: field.TypeBool, Default: false},
 		{Name: "groupz_challenges", Type: field.TypeInt64, Nullable: true},
+		{Name: "completed_first_member_id", Type: field.TypeInt64, Unique: true, Nullable: true},
 	}
 	// ChallengesTable holds the schema information for the "challenges" table.
 	ChallengesTable = &schema.Table{
@@ -28,9 +30,15 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "challenges_groupzs_challenges",
-				Columns:    []*schema.Column{ChallengesColumns[8]},
+				Columns:    []*schema.Column{ChallengesColumns[9]},
 				RefColumns: []*schema.Column{GroupzsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "challenges_members_challenge",
+				Columns:    []*schema.Column{ChallengesColumns[10]},
+				RefColumns: []*schema.Column{MembersColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -61,7 +69,7 @@ var (
 				Symbol:     "challenge_members_members_challenge_members",
 				Columns:    []*schema.Column{ChallengeMembersColumns[7]},
 				RefColumns: []*schema.Column{MembersColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -93,7 +101,7 @@ var (
 				Symbol:     "challenge_member_rules_challenge_members_challenge_member_rules",
 				Columns:    []*schema.Column{ChallengeMemberRulesColumns[6]},
 				RefColumns: []*schema.Column{ChallengeMembersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "challenge_member_rules_challenge_rules_challenge_member_rules",
@@ -198,7 +206,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "start_date", Type: field.TypeTime, Nullable: true},
 		{Name: "end_date", Type: field.TypeTime, Nullable: true},
-		{Name: "is_current", Type: field.TypeBool, Default: false},
+		{Name: "is_active", Type: field.TypeBool, Default: false},
 	}
 	// SeasonsTable holds the schema information for the "seasons" table.
 	SeasonsTable = &schema.Table{
@@ -225,13 +233,13 @@ var (
 				Symbol:     "season_members_members_season_members",
 				Columns:    []*schema.Column{SeasonMembersColumns[4]},
 				RefColumns: []*schema.Column{MembersColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "season_members_seasons_season_members",
 				Columns:    []*schema.Column{SeasonMembersColumns[5]},
 				RefColumns: []*schema.Column{SeasonsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -257,6 +265,7 @@ var (
 
 func init() {
 	ChallengesTable.ForeignKeys[0].RefTable = GroupzsTable
+	ChallengesTable.ForeignKeys[1].RefTable = MembersTable
 	ChallengeMembersTable.ForeignKeys[0].RefTable = ChallengesTable
 	ChallengeMembersTable.ForeignKeys[1].RefTable = MembersTable
 	ChallengeMemberRulesTable.ForeignKeys[0].RefTable = ChallengeMembersTable

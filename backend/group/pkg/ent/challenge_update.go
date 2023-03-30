@@ -15,6 +15,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -29,6 +30,26 @@ type ChallengeUpdate struct {
 // Where appends a list predicates to the ChallengeUpdate builder.
 func (cu *ChallengeUpdate) Where(ps ...predicate.Challenge) *ChallengeUpdate {
 	cu.mutation.Where(ps...)
+	return cu
+}
+
+// SetName sets the "name" field.
+func (cu *ChallengeUpdate) SetName(s string) *ChallengeUpdate {
+	cu.mutation.SetName(s)
+	return cu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableName(s *string) *ChallengeUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
+// ClearName clears the value of the "name" field.
+func (cu *ChallengeUpdate) ClearName() *ChallengeUpdate {
+	cu.mutation.ClearName()
 	return cu
 }
 
@@ -133,9 +154,22 @@ func (cu *ChallengeUpdate) AddTypeID(i int64) *ChallengeUpdate {
 	return cu
 }
 
+// SetIsActive sets the "is_active" field.
+func (cu *ChallengeUpdate) SetIsActive(b bool) *ChallengeUpdate {
+	cu.mutation.SetIsActive(b)
+	return cu
+}
+
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableIsActive(b *bool) *ChallengeUpdate {
+	if b != nil {
+		cu.SetIsActive(*b)
+	}
+	return cu
+}
+
 // SetCompletedFirstMemberID sets the "completed_first_member_id" field.
 func (cu *ChallengeUpdate) SetCompletedFirstMemberID(i int64) *ChallengeUpdate {
-	cu.mutation.ResetCompletedFirstMemberID()
 	cu.mutation.SetCompletedFirstMemberID(i)
 	return cu
 }
@@ -145,12 +179,6 @@ func (cu *ChallengeUpdate) SetNillableCompletedFirstMemberID(i *int64) *Challeng
 	if i != nil {
 		cu.SetCompletedFirstMemberID(*i)
 	}
-	return cu
-}
-
-// AddCompletedFirstMemberID adds i to the "completed_first_member_id" field.
-func (cu *ChallengeUpdate) AddCompletedFirstMemberID(i int64) *ChallengeUpdate {
-	cu.mutation.AddCompletedFirstMemberID(i)
 	return cu
 }
 
@@ -209,6 +237,25 @@ func (cu *ChallengeUpdate) AddChallengeRules(c ...*ChallengeRule) *ChallengeUpda
 	return cu.AddChallengeRuleIDs(ids...)
 }
 
+// SetFirstMemberID sets the "first_member" edge to the Member entity by ID.
+func (cu *ChallengeUpdate) SetFirstMemberID(id int64) *ChallengeUpdate {
+	cu.mutation.SetFirstMemberID(id)
+	return cu
+}
+
+// SetNillableFirstMemberID sets the "first_member" edge to the Member entity by ID if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableFirstMemberID(id *int64) *ChallengeUpdate {
+	if id != nil {
+		cu = cu.SetFirstMemberID(*id)
+	}
+	return cu
+}
+
+// SetFirstMember sets the "first_member" edge to the Member entity.
+func (cu *ChallengeUpdate) SetFirstMember(m *Member) *ChallengeUpdate {
+	return cu.SetFirstMemberID(m.ID)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cu *ChallengeUpdate) Mutation() *ChallengeMutation {
 	return cu.mutation
@@ -262,6 +309,12 @@ func (cu *ChallengeUpdate) RemoveChallengeRules(c ...*ChallengeRule) *ChallengeU
 	return cu.RemoveChallengeRuleIDs(ids...)
 }
 
+// ClearFirstMember clears the "first_member" edge to the Member entity.
+func (cu *ChallengeUpdate) ClearFirstMember() *ChallengeUpdate {
+	cu.mutation.ClearFirstMember()
+	return cu
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *ChallengeUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks[int, ChallengeMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
@@ -313,6 +366,12 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := cu.mutation.Name(); ok {
+		_spec.SetField(challenge.FieldName, field.TypeString, value)
+	}
+	if cu.mutation.NameCleared() {
+		_spec.ClearField(challenge.FieldName, field.TypeString)
+	}
 	if value, ok := cu.mutation.CreatedAt(); ok {
 		_spec.SetField(challenge.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -343,14 +402,8 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
 	}
-	if value, ok := cu.mutation.CompletedFirstMemberID(); ok {
-		_spec.SetField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
-	}
-	if value, ok := cu.mutation.AddedCompletedFirstMemberID(); ok {
-		_spec.AddField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
-	}
-	if cu.mutation.CompletedFirstMemberIDCleared() {
-		_spec.ClearField(challenge.FieldCompletedFirstMemberID, field.TypeInt64)
+	if value, ok := cu.mutation.IsActive(); ok {
+		_spec.SetField(challenge.FieldIsActive, field.TypeBool, value)
 	}
 	if cu.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -495,6 +548,41 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.FirstMemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.FirstMemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(cu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -515,6 +603,26 @@ type ChallengeUpdateOne struct {
 	hooks     []Hook
 	mutation  *ChallengeMutation
 	modifiers []func(*sql.UpdateBuilder)
+}
+
+// SetName sets the "name" field.
+func (cuo *ChallengeUpdateOne) SetName(s string) *ChallengeUpdateOne {
+	cuo.mutation.SetName(s)
+	return cuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableName(s *string) *ChallengeUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
+	return cuo
+}
+
+// ClearName clears the value of the "name" field.
+func (cuo *ChallengeUpdateOne) ClearName() *ChallengeUpdateOne {
+	cuo.mutation.ClearName()
+	return cuo
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -618,9 +726,22 @@ func (cuo *ChallengeUpdateOne) AddTypeID(i int64) *ChallengeUpdateOne {
 	return cuo
 }
 
+// SetIsActive sets the "is_active" field.
+func (cuo *ChallengeUpdateOne) SetIsActive(b bool) *ChallengeUpdateOne {
+	cuo.mutation.SetIsActive(b)
+	return cuo
+}
+
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableIsActive(b *bool) *ChallengeUpdateOne {
+	if b != nil {
+		cuo.SetIsActive(*b)
+	}
+	return cuo
+}
+
 // SetCompletedFirstMemberID sets the "completed_first_member_id" field.
 func (cuo *ChallengeUpdateOne) SetCompletedFirstMemberID(i int64) *ChallengeUpdateOne {
-	cuo.mutation.ResetCompletedFirstMemberID()
 	cuo.mutation.SetCompletedFirstMemberID(i)
 	return cuo
 }
@@ -630,12 +751,6 @@ func (cuo *ChallengeUpdateOne) SetNillableCompletedFirstMemberID(i *int64) *Chal
 	if i != nil {
 		cuo.SetCompletedFirstMemberID(*i)
 	}
-	return cuo
-}
-
-// AddCompletedFirstMemberID adds i to the "completed_first_member_id" field.
-func (cuo *ChallengeUpdateOne) AddCompletedFirstMemberID(i int64) *ChallengeUpdateOne {
-	cuo.mutation.AddCompletedFirstMemberID(i)
 	return cuo
 }
 
@@ -694,6 +809,25 @@ func (cuo *ChallengeUpdateOne) AddChallengeRules(c ...*ChallengeRule) *Challenge
 	return cuo.AddChallengeRuleIDs(ids...)
 }
 
+// SetFirstMemberID sets the "first_member" edge to the Member entity by ID.
+func (cuo *ChallengeUpdateOne) SetFirstMemberID(id int64) *ChallengeUpdateOne {
+	cuo.mutation.SetFirstMemberID(id)
+	return cuo
+}
+
+// SetNillableFirstMemberID sets the "first_member" edge to the Member entity by ID if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableFirstMemberID(id *int64) *ChallengeUpdateOne {
+	if id != nil {
+		cuo = cuo.SetFirstMemberID(*id)
+	}
+	return cuo
+}
+
+// SetFirstMember sets the "first_member" edge to the Member entity.
+func (cuo *ChallengeUpdateOne) SetFirstMember(m *Member) *ChallengeUpdateOne {
+	return cuo.SetFirstMemberID(m.ID)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cuo *ChallengeUpdateOne) Mutation() *ChallengeMutation {
 	return cuo.mutation
@@ -745,6 +879,12 @@ func (cuo *ChallengeUpdateOne) RemoveChallengeRules(c ...*ChallengeRule) *Challe
 		ids[i] = c[i].ID
 	}
 	return cuo.RemoveChallengeRuleIDs(ids...)
+}
+
+// ClearFirstMember clears the "first_member" edge to the Member entity.
+func (cuo *ChallengeUpdateOne) ClearFirstMember() *ChallengeUpdateOne {
+	cuo.mutation.ClearFirstMember()
+	return cuo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -822,6 +962,12 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 			}
 		}
 	}
+	if value, ok := cuo.mutation.Name(); ok {
+		_spec.SetField(challenge.FieldName, field.TypeString, value)
+	}
+	if cuo.mutation.NameCleared() {
+		_spec.ClearField(challenge.FieldName, field.TypeString)
+	}
 	if value, ok := cuo.mutation.CreatedAt(); ok {
 		_spec.SetField(challenge.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -852,14 +998,8 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	if value, ok := cuo.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
 	}
-	if value, ok := cuo.mutation.CompletedFirstMemberID(); ok {
-		_spec.SetField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
-	}
-	if value, ok := cuo.mutation.AddedCompletedFirstMemberID(); ok {
-		_spec.AddField(challenge.FieldCompletedFirstMemberID, field.TypeInt64, value)
-	}
-	if cuo.mutation.CompletedFirstMemberIDCleared() {
-		_spec.ClearField(challenge.FieldCompletedFirstMemberID, field.TypeInt64)
+	if value, ok := cuo.mutation.IsActive(); ok {
+		_spec.SetField(challenge.FieldIsActive, field.TypeBool, value)
 	}
 	if cuo.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -996,6 +1136,41 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.FirstMemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.FirstMemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
 				},
 			},
 		}

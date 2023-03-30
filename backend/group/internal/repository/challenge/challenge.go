@@ -6,7 +6,12 @@ import (
 
 	"github.com/manhrev/runtracking/backend/group/internal/status"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
+	"github.com/manhrev/runtracking/backend/group/pkg/code"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Challenge interface {
@@ -21,6 +26,20 @@ type Challenge interface {
 		groupId int64,
 		challengeInfo *group.ChallengeInfo,
 	) error
+
+	List(
+		ctx context.Context,
+		groupId int64,
+		sortBy group.ListChallengeRequest_ChallengeSortBy,
+		searchByName string,
+		filterByRules []group.Rule,
+		filterByType group.ActivityType,
+		ascending bool,
+		from *timestamppb.Timestamp,
+		to *timestamppb.Timestamp,
+		limit uint32,
+		offset uint64,
+	) ([]*ent.Challenge, int64, error)
 
 	CreateBulkChallengeRules(
 		ctx context.Context,
@@ -41,6 +60,11 @@ type Challenge interface {
 		challengeMemberEnts []*ent.ChallengeMember,
 		challengeRuleEnts []*ent.ChallengeRule,
 	) ([]*ent.ChallengeMemberRule, error)
+
+	Delete(
+		ctx context.Context,
+		challengeId int64,
+	) error
 	// Update(
 	// 	ctx context.Context,
 	// 	memberId int64,
@@ -120,6 +144,108 @@ func (c *challengeImpl) Update(
 		return status.Internal(err.Error())
 	}
 	return nil
+}
+
+func (m *challengeImpl) Delete(
+	ctx context.Context,
+	challengeId int64,
+) error {
+	err := m.entClient.Challenge.DeleteOneID(challengeId).Exec(ctx)
+
+	if err != nil {
+		return status.Internal(err.Error())
+	}
+
+	return nil
+}
+
+func (c *challengeImpl) List(
+	ctx context.Context,
+	groupId int64,
+	sortBy group.ListChallengeRequest_ChallengeSortBy,
+	searchByName string,
+	filterByRules []group.Rule,
+	filterByType group.ActivityType,
+	ascending bool,
+	from *timestamppb.Timestamp,
+	to *timestamppb.Timestamp,
+	limit uint32,
+	offset uint64,
+) ([]*ent.Challenge, int64, error) {
+	var (
+		byField string
+	)
+	query := c.entClient.Challenge.Query().
+		Where(challenge.HasGroupzWith(groupz.IDEQ(groupId)))
+
+	if filterByType != group.ActivityType_ACTIVITY_TYPE_UNSPECIFIED {
+		query.Where(challenge.TypeIDEQ(int64(filterByType)))
+	}
+
+	if filterByRules != nil && len(filterByRules) > 0 {
+		for _, rule := range filterByRules {
+			query.Where(challenge.HasChallengeRulesWith(challengerule.RuleIDEQ(int64(rule))))
+		}
+	}
+
+	if searchByName != "" {
+		query.Where(challenge.NameContainsFold(searchByName))
+	}
+
+	// sort by type
+	switch sortBy {
+	case group.ListChallengeRequest_CHALLENGE_SORT_BY_END_TIME:
+		byField = challenge.FieldEndTime
+	case group.ListChallengeRequest_CHALLENGE_SORT_BY_START_TIME:
+		byField = challenge.FieldStartTime
+	default:
+		byField = challenge.FieldName
+
+	}
+
+	// ascending?
+	if ascending {
+		query.Order(ent.Asc(byField))
+	} else {
+		query.Order(ent.Desc(byField))
+	}
+
+	// time range
+	if from != nil && to != nil {
+		query.Where(
+			challenge.CreatedAtGTE(from.AsTime().Local()),
+			challenge.CreatedAtLTE(to.AsTime().Local()),
+		)
+	}
+
+	// Count number of records
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, status.Error(code.Code_INTERNAL)
+	}
+
+	//limit offset
+	if limit <= 0 {
+		query.Limit(10)
+	} else {
+		query.Limit(int(limit))
+	}
+
+	if offset > 0 {
+		query.Offset(int(offset))
+	} else {
+		query.Offset(0)
+	}
+
+	query.QueryChallengeRules()
+	query.QueryFirstMember()
+	challenges, err := query.All(ctx)
+	if err != nil {
+		return nil, 0, status.Internal(err.Error())
+	}
+
+	return challenges, int64(total), nil
+
 }
 
 func (c *challengeImpl) CreateBulkChallengeRules(
@@ -262,19 +388,6 @@ func (c *challengeImpl) CreateBulkChallengeMemberRule(
 
 // 	if memberEnt <= 0 {
 // 		return status.Internal(fmt.Sprintf("Member with memberID: %d && groupID: %d not found", memberId, groupId))
-// 	}
-
-// 	return nil
-// }
-
-// func (m *memberImpl) Delete(
-// 	ctx context.Context,
-// 	memberId int64,
-// ) error {
-// 	err := m.entClient.Member.DeleteOneID(memberId).Exec(ctx)
-
-// 	if err != nil {
-// 		return status.Internal(err.Error())
 // 	}
 
 // 	return nil

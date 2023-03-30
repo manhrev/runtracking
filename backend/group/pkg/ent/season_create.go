@@ -119,16 +119,16 @@ func (sc *SeasonCreate) SetNillableEndDate(t *time.Time) *SeasonCreate {
 	return sc
 }
 
-// SetIsCurrent sets the "is_current" field.
-func (sc *SeasonCreate) SetIsCurrent(b bool) *SeasonCreate {
-	sc.mutation.SetIsCurrent(b)
+// SetIsActive sets the "is_active" field.
+func (sc *SeasonCreate) SetIsActive(b bool) *SeasonCreate {
+	sc.mutation.SetIsActive(b)
 	return sc
 }
 
-// SetNillableIsCurrent sets the "is_current" field if the given value is not nil.
-func (sc *SeasonCreate) SetNillableIsCurrent(b *bool) *SeasonCreate {
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (sc *SeasonCreate) SetNillableIsActive(b *bool) *SeasonCreate {
 	if b != nil {
-		sc.SetIsCurrent(*b)
+		sc.SetIsActive(*b)
 	}
 	return sc
 }
@@ -201,9 +201,9 @@ func (sc *SeasonCreate) defaults() {
 		v := season.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := sc.mutation.IsCurrent(); !ok {
-		v := season.DefaultIsCurrent
-		sc.mutation.SetIsCurrent(v)
+	if _, ok := sc.mutation.IsActive(); !ok {
+		v := season.DefaultIsActive
+		sc.mutation.SetIsActive(v)
 	}
 }
 
@@ -218,8 +218,8 @@ func (sc *SeasonCreate) check() error {
 	if _, ok := sc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Season.updated_at"`)}
 	}
-	if _, ok := sc.mutation.IsCurrent(); !ok {
-		return &ValidationError{Name: "is_current", err: errors.New(`ent: missing required field "Season.is_current"`)}
+	if _, ok := sc.mutation.IsActive(); !ok {
+		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "Season.is_active"`)}
 	}
 	return nil
 }
@@ -287,9 +287,9 @@ func (sc *SeasonCreate) createSpec() (*Season, *sqlgraph.CreateSpec) {
 		_spec.SetField(season.FieldEndDate, field.TypeTime, value)
 		_node.EndDate = value
 	}
-	if value, ok := sc.mutation.IsCurrent(); ok {
-		_spec.SetField(season.FieldIsCurrent, field.TypeBool, value)
-		_node.IsCurrent = value
+	if value, ok := sc.mutation.IsActive(); ok {
+		_spec.SetField(season.FieldIsActive, field.TypeBool, value)
+		_node.IsActive = value
 	}
 	if nodes := sc.mutation.SeasonMembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

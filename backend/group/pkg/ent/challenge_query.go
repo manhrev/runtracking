@@ -15,6 +15,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -28,6 +29,7 @@ type ChallengeQuery struct {
 	withChallengeMembers *ChallengeMemberQuery
 	withGroupz           *GroupzQuery
 	withChallengeRules   *ChallengeRuleQuery
+	withFirstMember      *MemberQuery
 	withFKs              bool
 	modifiers            []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -125,6 +127,28 @@ func (cq *ChallengeQuery) QueryChallengeRules() *ChallengeRuleQuery {
 			sqlgraph.From(challenge.Table, challenge.FieldID, selector),
 			sqlgraph.To(challengerule.Table, challengerule.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, challenge.ChallengeRulesTable, challenge.ChallengeRulesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFirstMember chains the current query on the "first_member" edge.
+func (cq *ChallengeQuery) QueryFirstMember() *MemberQuery {
+	query := (&MemberClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, selector),
+			sqlgraph.To(member.Table, member.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, challenge.FirstMemberTable, challenge.FirstMemberColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -325,6 +349,7 @@ func (cq *ChallengeQuery) Clone() *ChallengeQuery {
 		withChallengeMembers: cq.withChallengeMembers.Clone(),
 		withGroupz:           cq.withGroupz.Clone(),
 		withChallengeRules:   cq.withChallengeRules.Clone(),
+		withFirstMember:      cq.withFirstMember.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -364,18 +389,29 @@ func (cq *ChallengeQuery) WithChallengeRules(opts ...func(*ChallengeRuleQuery)) 
 	return cq
 }
 
+// WithFirstMember tells the query-builder to eager-load the nodes that are connected to
+// the "first_member" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ChallengeQuery) WithFirstMember(opts ...func(*MemberQuery)) *ChallengeQuery {
+	query := (&MemberClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withFirstMember = query
+	return cq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Challenge.Query().
-//		GroupBy(challenge.FieldCreatedAt).
+//		GroupBy(challenge.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -394,11 +430,11 @@ func (cq *ChallengeQuery) GroupBy(field string, fields ...string) *ChallengeGrou
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Challenge.Query().
-//		Select(challenge.FieldCreatedAt).
+//		Select(challenge.FieldName).
 //		Scan(ctx, &v)
 //
 func (cq *ChallengeQuery) Select(fields ...string) *ChallengeSelect {
@@ -445,13 +481,14 @@ func (cq *ChallengeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 		nodes       = []*Challenge{}
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			cq.withChallengeMembers != nil,
 			cq.withGroupz != nil,
 			cq.withChallengeRules != nil,
+			cq.withFirstMember != nil,
 		}
 	)
-	if cq.withGroupz != nil {
+	if cq.withGroupz != nil || cq.withFirstMember != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -495,6 +532,12 @@ func (cq *ChallengeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 		if err := cq.loadChallengeRules(ctx, query, nodes,
 			func(n *Challenge) { n.Edges.ChallengeRules = []*ChallengeRule{} },
 			func(n *Challenge, e *ChallengeRule) { n.Edges.ChallengeRules = append(n.Edges.ChallengeRules, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withFirstMember; query != nil {
+		if err := cq.loadFirstMember(ctx, query, nodes, nil,
+			func(n *Challenge, e *Member) { n.Edges.FirstMember = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -588,6 +631,35 @@ func (cq *ChallengeQuery) loadChallengeRules(ctx context.Context, query *Challen
 			return fmt.Errorf(`unexpected foreign-key "challenge_challenge_rules" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (cq *ChallengeQuery) loadFirstMember(ctx context.Context, query *MemberQuery, nodes []*Challenge, init func(*Challenge), assign func(*Challenge, *Member)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*Challenge)
+	for i := range nodes {
+		fk := nodes[i].CompletedFirstMemberID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(member.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "completed_first_member_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
