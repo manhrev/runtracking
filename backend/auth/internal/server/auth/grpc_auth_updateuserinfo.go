@@ -15,17 +15,36 @@ func (s *authServer) UpdateUserInfo(ctx context.Context, request *auth.UpdateUse
 	if err != nil {
 		return nil, status.Unauthenticated
 	}
+	query := s.entClient.User.UpdateOneID(userID)
+	if request.GetUserInfo().GetDisplayName() != "" {
+		query.SetDisplayName(request.UserInfo.DisplayName)
+	}
 
-	_, err = s.entClient.User.UpdateOneID(userID).
-		SetDisplayName(request.UserInfo.DisplayName).
-		SetUsername(request.UserInfo.Username).
-		SetEmail(request.UserInfo.Email).
-		SetPhone(request.UserInfo.PhoneNumber).
-		SetHeight(request.UserInfo.Height).
-		SetWeight(request.UserInfo.Weight).
-		SetAge(request.UserInfo.Age).
-		SetProfilePicture(request.UserInfo.ProfilePicture).
-		Save(ctx)
+	if request.GetUserInfo().GetEmail() != "" {
+		query.SetEmail(request.UserInfo.Email)
+	}
+
+	if request.GetUserInfo().GetPhoneNumber() != "" {
+		query.SetPhone(request.UserInfo.PhoneNumber)
+	}
+
+	if request.GetUserInfo().GetHeight() != 0 {
+		query.SetHeight(request.UserInfo.Height)
+	}
+
+	if request.GetUserInfo().GetWeight() != 0 {
+		query.SetWeight(request.UserInfo.Weight)
+	}
+
+	if request.GetUserInfo().GetAge() != 0 {
+		query.SetAge(request.UserInfo.Age)
+	}
+
+	if request.GetUserInfo().GetProfilePicture() != "" {
+		query.SetProfilePicture(request.UserInfo.ProfilePicture)
+	}
+
+	_, err = query.Save(ctx)
 
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Error when update users: %s", err.Error()))

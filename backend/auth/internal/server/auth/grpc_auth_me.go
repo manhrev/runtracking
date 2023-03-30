@@ -55,7 +55,7 @@ func (s *authServer) Me(ctx context.Context, _ *emptypb.Empty) (*auth.MeReply, e
 			Height:         user.Height,
 			Weight:         user.Weight,
 			DisplayName:    user.DisplayName,
-			Age:            int32(user.Height),
+			Age:            user.Age,
 			ProfilePicture: user.ProfilePicture,
 		},
 	}, nil
