@@ -16,6 +16,17 @@ export default function Monitor(props: any) {
 
   return (
     <View style={styles(theme).container}>
+      <IconButton
+        style={{
+          position: 'absolute',
+          top: 30,
+          left: 0,
+        }}
+        size={30}
+        iconColor={theme.colors.tertiary}
+        icon="close"
+        onPress={() => props.showGoBackDialog()}
+      />
       <View style={styles(theme).firstCtn}>
         <Text style={styles(theme).timer}>{props.displayTime}</Text>
         <Text style={styles(theme).unit}>DURATION</Text>

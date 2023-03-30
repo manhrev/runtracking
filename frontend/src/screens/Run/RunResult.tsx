@@ -24,17 +24,15 @@ export default function RunResult({
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, 'RunResult'>) {
   const theme = useAppTheme()
-  const [activityName, setActivityName] = useState('Sample')
-  const [activityNote, setActivityNote] = useState('Sample Note')
-  const [activityType, setActivityType] = useState<ActivityType>(
-    ActivityType.ACTIVITY_TYPE_RUNNING
-  )
-
   const { weight } = useAppSelector(selectUserSlice)
 
-  // console.log(route.params.savingInfo);
-  const { duration, endTime, routeList, startTime, totalDistance, kcal } =
+  const { duration, endTime, routeList, startTime, totalDistance, kcal, acType } =
     route.params.savingInfo
+
+  const [activityType, setActivityType] = useState<ActivityType>(acType)
+  const [activityName, setActivityName] = useState('Sample')
+  const [activityNote, setActivityNote] = useState('Sample Note')
+
   const saveActivity = () => {
     const activityInfo: ActivityInfo.AsObject = {
       activityName: activityName,

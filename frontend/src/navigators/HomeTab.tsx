@@ -22,7 +22,7 @@ const Tab = createMaterialBottomTabNavigator<RootHomeTabsParamList>()
 export default function HomeTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="RunHome"
+      initialRouteName="GroupHome"
       backBehavior="initialRoute"
       shifting
     >
@@ -40,6 +40,12 @@ export default function HomeTabs() {
         name="RunHome"
         component={RunHome}
         options={{ tabBarIcon: 'run' }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault()
+            navigation.navigate('RunTracking')
+          },
+        })}
       />
       <Tab.Screen
         name="PlanHome"
