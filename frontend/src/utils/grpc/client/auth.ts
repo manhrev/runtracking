@@ -9,7 +9,7 @@ import {
   UpdateUserInfoRequest,
   UpdateUserInfoReply,
   UserInfo,
-} from "../../../lib/auth/auth_pb";
+} from '../../../lib/auth/auth_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
 import gRPCClientAbstract from '../abstract/gRPCClient'
@@ -55,11 +55,23 @@ class rpcAuthClient extends gRPCClientAbstract {
     return await this.gRPCClientRequest<Empty.AsObject>('setHealthRecord', req)
   }
 
-  async updateUserInfo(param: UpdateUserInfoRequest) {
+  async updateUserInfo(param: UpdateUserInfoRequest.AsObject) {
+    const req = new UpdateUserInfoRequest()
+    const userInfo = new UserInfo()
+    userInfo.setDisplayName(param.userInfo?.displayName || '')
+    userInfo.setEmail(param.userInfo?.email || '')
+    userInfo.setPhoneNumber(param.userInfo?.phoneNumber || '')
+    userInfo.setProfilePicture(param.userInfo?.profilePicture || '')
+    userInfo.setAge(param.userInfo?.age || 0)
+    userInfo.setHeight(param.userInfo?.height || 0)
+    userInfo.setWeight(param.userInfo?.weight || 0)
+
+    req.setUserInfo(userInfo)
+
     return await this.gRPCClientRequest<UpdateUserInfoReply.AsObject>(
-      "updateUserInfo",
-      param
-    );
+      'updateUserInfo',
+      req
+    )
   }
 }
 

@@ -236,6 +236,9 @@ export class UserInfo extends jspb.Message {
   getAge(): number;
   setAge(value: number): UserInfo;
 
+  getProfilePicture(): string;
+  setProfilePicture(value: string): UserInfo;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserInfo.AsObject;
   static toObject(includeInstance: boolean, msg: UserInfo): UserInfo.AsObject;
@@ -254,6 +257,7 @@ export namespace UserInfo {
     height: number,
     weight: number,
     age: number,
+    profilePicture: string,
   }
 }
 

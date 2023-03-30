@@ -1,3 +1,4 @@
+import { View } from 'react-native'
 import { Button, Dialog, Portal, Text } from 'react-native-paper'
 
 interface ConfirmDialogProps {
@@ -16,17 +17,19 @@ export const ConfirmDialog = ({
   message,
 }: ConfirmDialogProps) => {
   return (
-    <Portal>
-      <Dialog visible={visible} onDismiss={() => toogleDialog()}>
-        <Dialog.Title>{title || 'Alert'}</Dialog.Title>
-        <Dialog.Content>
-          <Text>{message}</Text>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={() => toogleDialog()}>No</Button>
-          <Button onPress={onSubmit}>Yes</Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
+    <View style={{ zIndex: 900 }}>
+      <Portal>
+        <Dialog visible={visible} onDismiss={() => toogleDialog()}>
+          <Dialog.Title>{title || 'Alert'}</Dialog.Title>
+          <Dialog.Content>
+            <Text>{message}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => toogleDialog()}>No</Button>
+            <Button onPress={onSubmit}>Yes</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </View>
   )
 }

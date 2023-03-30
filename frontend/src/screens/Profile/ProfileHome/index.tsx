@@ -6,19 +6,29 @@ import {
   StatusBar,
   ScrollView,
   RefreshControl,
+  Image,
 } from 'react-native'
-import { Avatar, Button, Divider, IconButton, Text } from 'react-native-paper'
-import { RootHomeTabsParamList } from '../../navigators/HomeTab'
+import {
+  Avatar,
+  Button,
+  Divider,
+  IconButton,
+  Text,
+  TouchableRipple,
+} from 'react-native-paper'
+import { useModal } from '../../../hooks/useModal'
+import { RootHomeTabsParamList } from '../../../navigators/HomeTab'
 import {
   isUserSliceLoading,
   selectUserSlice,
-} from '../../redux/features/user/slice'
-import { getMeThunk } from '../../redux/features/user/thunk'
-import { useAppDispatch, useAppSelector } from '../../redux/store'
-import { AppTheme, useAppTheme } from '../../theme'
-import { baseStyles } from '../baseStyle'
-import ProfileAchievement from './comp/ProfileAchievement'
-import ProfileInfo from './comp/ProfileInfo'
+} from '../../../redux/features/user/slice'
+import { getMeThunk } from '../../../redux/features/user/thunk'
+import { useAppDispatch, useAppSelector } from '../../../redux/store'
+import { AppTheme, useAppTheme } from '../../../theme'
+import { baseStyles } from '../../baseStyle'
+import ProfileAchievement from '../comp/ProfileAchievement'
+import ProfileInfo from '../comp/ProfileInfo'
+import ImagePreview from './comp/ImagePreview'
 
 export default function ProfileHome({
   navigation,
@@ -26,7 +36,8 @@ export default function ProfileHome({
 }: NativeStackScreenProps<RootHomeTabsParamList, 'ProfileHome'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-  const { displayName } = useAppSelector(selectUserSlice)
+  const { displayName, profiePicture } = useAppSelector(selectUserSlice)
+
   const loading = useAppSelector(isUserSliceLoading)
   const [isInfoSelected, setIsInfoSelected] = useState(true)
   const handleEditYourProfile = () => {
@@ -39,6 +50,8 @@ export default function ProfileHome({
     navigation.navigate('NotificationList', {})
   }
 
+  const { closeModal, modalVisible, openModal } = useModal()
+
   const getMe = () => {
     dispatch(getMeThunk())
   }
@@ -49,6 +62,13 @@ export default function ProfileHome({
 
   return (
     <>
+      <ImagePreview
+        imageUrl={profiePicture}
+        hideModal={closeModal}
+        visible={modalVisible}
+        showModal={openModal}
+        displayName={displayName[0]}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ marginTop: StatusBar.currentHeight }}
@@ -56,14 +76,27 @@ export default function ProfileHome({
           <RefreshControl refreshing={loading} onRefresh={getMe} />
         }
       >
-        <View style={styles(theme).profileBackgroundContainer}>
-          <Avatar.Text
-            size={170}
-            label={displayName[0]}
-            style={styles(theme).profilePicture}
-          />
-          <View style={styles(theme).profilePictureBack}></View>
-        </View>
+        <TouchableRipple
+          rippleColor="rgba(0, 0, 0, .32)"
+          onPress={() => openModal()}
+          style={{ zIndex: 10 }}
+        >
+          <View style={styles(theme).profileBackgroundContainer}>
+            {!profiePicture ? (
+              <Avatar.Text
+                size={170}
+                label={displayName[0]}
+                style={styles(theme).profilePicture}
+              />
+            ) : (
+              <Image
+                style={styles(theme).profilePicture}
+                source={{ uri: profiePicture }}
+              />
+            )}
+            <View style={styles(theme).profilePictureBack}></View>
+          </View>
+        </TouchableRipple>
         <View style={styles(theme).extendedBaseContainer}>
           <View style={baseStyles(theme).innerWrapper}>
             <Text
@@ -151,6 +184,9 @@ const styles = (theme: AppTheme) =>
       zIndex: 1,
     },
     profilePicture: {
+      borderRadius: 100,
+      width: 170,
+      height: 170,
       top: 38 + 175,
       left: 13 + 5,
       zIndex: 2,

@@ -1868,7 +1868,8 @@ proto.auth.UserInfo.toObject = function(includeInstance, msg) {
     phoneNumber: jspb.Message.getFieldWithDefault(msg, 4, ""),
     height: jspb.Message.getFloatingPointFieldWithDefault(msg, 5, 0.0),
     weight: jspb.Message.getFloatingPointFieldWithDefault(msg, 6, 0.0),
-    age: jspb.Message.getFieldWithDefault(msg, 8, 0)
+    age: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    profilePicture: jspb.Message.getFieldWithDefault(msg, 9, "")
   };
 
   if (includeInstance) {
@@ -1936,6 +1937,10 @@ proto.auth.UserInfo.deserializeBinaryFromReader = function(msg, reader) {
     case 8:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setAge(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfilePicture(value);
       break;
     default:
       reader.skipField();
@@ -2019,6 +2024,13 @@ proto.auth.UserInfo.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeInt32(
       8,
+      f
+    );
+  }
+  f = message.getProfilePicture();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
       f
     );
   }
@@ -2166,6 +2178,24 @@ proto.auth.UserInfo.prototype.getAge = function() {
  */
 proto.auth.UserInfo.prototype.setAge = function(value) {
   return jspb.Message.setProto3IntField(this, 8, value);
+};
+
+
+/**
+ * optional string profile_picture = 9;
+ * @return {string}
+ */
+proto.auth.UserInfo.prototype.getProfilePicture = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.auth.UserInfo} returns this
+ */
+proto.auth.UserInfo.prototype.setProfilePicture = function(value) {
+  return jspb.Message.setProto3StringField(this, 9, value);
 };
 
 
