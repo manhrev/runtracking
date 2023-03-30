@@ -9,6 +9,7 @@ import Login from '../screens/Authentication/Login'
 import Signup from '../screens/Authentication/Signup'
 import Intro from '../screens/Authentication/Intro'
 import GetInfo from '../screens/Authentication/GetInfo'
+import RunTracking from '../screens/Run/RunTracking'
 import RunResult from '../screens/Run/RunResult'
 import PlanDetail from '../screens/Plan/PlanDetail'
 import PlanAdd from '../screens/Plan/PlanAdd'
@@ -38,6 +39,7 @@ export type RootBaseStackParamList = {
   ActivityList: {}
 
   // Run
+  RunTracking: undefined
   RunResult: {
     display: {
       distance: string
@@ -52,6 +54,7 @@ export type RootBaseStackParamList = {
       routeList: Array<TrackPoint.AsObject>
       startTime: google_protobuf_timestamp_pb.Timestamp.AsObject
       endTime: google_protobuf_timestamp_pb.Timestamp.AsObject
+      acType: ActivityType
     }
     // pass function to reset
     resetRunInfo: () => void
@@ -143,6 +146,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={ActivityDetail}
+          />
+          <Stack.Screen
+            name="RunTracking"
+            options={{
+              title: 'Run Tracking',
+              headerShown: false,
+            }}
+            component={RunTracking}
           />
           <Stack.Screen
             name="RunResult"
