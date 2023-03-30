@@ -24,6 +24,7 @@ func (s *authServer) UpdateUserInfo(ctx context.Context, request *auth.UpdateUse
 		SetHeight(request.UserInfo.Height).
 		SetWeight(request.UserInfo.Weight).
 		SetAge(request.UserInfo.Age).
+		SetProfilePicture(request.UserInfo.ProfilePicture).
 		Save(ctx)
 
 	if err != nil {
