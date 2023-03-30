@@ -130,7 +130,7 @@ const ImagePreview = ({
                   // },
                   {
                     icon: 'pencil',
-                    labelTextColor: theme.colors.onPrimary,
+                    labelTextColor: 'white',
                     label: 'Change profile picture',
                     onPress: pickImage,
                     color: theme.colors.onPrimary,
@@ -141,7 +141,7 @@ const ImagePreview = ({
               ? [
                   {
                     icon: 'check',
-                    labelTextColor: theme.colors.onPrimary,
+                    labelTextColor: 'white',
                     onPress: submitImage,
                     label: 'Save profile picture',
                     color: theme.colors.onPrimary,
@@ -149,7 +149,7 @@ const ImagePreview = ({
                   },
                   {
                     icon: 'file-undo',
-                    labelTextColor: theme.colors.onPrimary,
+                    labelTextColor: 'white',
                     label: 'Revert all changes',
                     onPress: clearSelectedImage,
                     color: theme.colors.onPrimary,
