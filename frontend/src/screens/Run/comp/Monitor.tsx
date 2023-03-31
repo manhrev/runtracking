@@ -25,7 +25,7 @@ export default function Monitor(props: any) {
         size={30}
         iconColor={theme.colors.tertiary}
         icon="close"
-        onPress={() => props.showGoBackDialog()}
+        onPress={() => props.goBackFunc()}
       />
       <View style={styles(theme).firstCtn}>
         <Text style={styles(theme).timer}>{props.displayTime}</Text>
