@@ -56,6 +56,20 @@ func (crc *ChallengeRuleCreate) SetNillableCreatedAt(t *time.Time) *ChallengeRul
 	return crc
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (crc *ChallengeRuleCreate) SetUpdatedAt(t time.Time) *ChallengeRuleCreate {
+	crc.mutation.SetUpdatedAt(t)
+	return crc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (crc *ChallengeRuleCreate) SetNillableUpdatedAt(t *time.Time) *ChallengeRuleCreate {
+	if t != nil {
+		crc.SetUpdatedAt(*t)
+	}
+	return crc
+}
+
 // SetID sets the "id" field.
 func (crc *ChallengeRuleCreate) SetID(i int64) *ChallengeRuleCreate {
 	crc.mutation.SetID(i)
@@ -80,14 +94,6 @@ func (crc *ChallengeRuleCreate) AddChallengeMemberRules(c ...*ChallengeMemberRul
 // SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
 func (crc *ChallengeRuleCreate) SetChallengeID(id int64) *ChallengeRuleCreate {
 	crc.mutation.SetChallengeID(id)
-	return crc
-}
-
-// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
-func (crc *ChallengeRuleCreate) SetNillableChallengeID(id *int64) *ChallengeRuleCreate {
-	if id != nil {
-		crc = crc.SetChallengeID(*id)
-	}
 	return crc
 }
 
@@ -139,6 +145,10 @@ func (crc *ChallengeRuleCreate) defaults() {
 		v := challengerule.DefaultCreatedAt
 		crc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := crc.mutation.UpdatedAt(); !ok {
+		v := challengerule.DefaultUpdatedAt()
+		crc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -151,6 +161,12 @@ func (crc *ChallengeRuleCreate) check() error {
 	}
 	if _, ok := crc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ChallengeRule.created_at"`)}
+	}
+	if _, ok := crc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ChallengeRule.updated_at"`)}
+	}
+	if _, ok := crc.mutation.ChallengeID(); !ok {
+		return &ValidationError{Name: "challenge", err: errors.New(`ent: missing required edge "ChallengeRule.challenge"`)}
 	}
 	return nil
 }
@@ -201,6 +217,10 @@ func (crc *ChallengeRuleCreate) createSpec() (*ChallengeRule, *sqlgraph.CreateSp
 	if value, ok := crc.mutation.CreatedAt(); ok {
 		_spec.SetField(challengerule.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := crc.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengerule.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if nodes := crc.mutation.ChallengeMemberRulesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

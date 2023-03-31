@@ -15,14 +15,16 @@ const (
 	FieldTotal = "total"
 	// FieldRuleID holds the string denoting the rule_id field in the database.
 	FieldRuleID = "rule_id"
-	// FieldIsCompleted holds the string denoting the is_completed field in the database.
-	FieldIsCompleted = "is_completed"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldTimeCompleted holds the string denoting the time_completed field in the database.
 	FieldTimeCompleted = "time_completed"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// EdgeChallengeMember holds the string denoting the challenge_member edge name in mutations.
 	EdgeChallengeMember = "challenge_member"
+	// EdgeChallengeRule holds the string denoting the challenge_rule edge name in mutations.
+	EdgeChallengeRule = "challenge_rule"
 	// Table holds the table name of the challengememberrule in the database.
 	Table = "challenge_member_rules"
 	// ChallengeMemberTable is the table that holds the challenge_member relation/edge.
@@ -32,6 +34,13 @@ const (
 	ChallengeMemberInverseTable = "challenge_members"
 	// ChallengeMemberColumn is the table column denoting the challenge_member relation/edge.
 	ChallengeMemberColumn = "challenge_member_challenge_member_rules"
+	// ChallengeRuleTable is the table that holds the challenge_rule relation/edge.
+	ChallengeRuleTable = "challenge_member_rules"
+	// ChallengeRuleInverseTable is the table name for the ChallengeRule entity.
+	// It exists in this package in order to avoid circular dependency with the "challengerule" package.
+	ChallengeRuleInverseTable = "challenge_rules"
+	// ChallengeRuleColumn is the table column denoting the challenge_rule relation/edge.
+	ChallengeRuleColumn = "challenge_rule_challenge_member_rules"
 )
 
 // Columns holds all SQL columns for challengememberrule fields.
@@ -39,7 +48,7 @@ var Columns = []string{
 	FieldID,
 	FieldTotal,
 	FieldRuleID,
-	FieldIsCompleted,
+	FieldStatus,
 	FieldTimeCompleted,
 	FieldUpdatedAt,
 }
@@ -69,8 +78,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultTotal holds the default value on creation for the "total" field.
 	DefaultTotal int64
-	// DefaultIsCompleted holds the default value on creation for the "is_completed" field.
-	DefaultIsCompleted bool
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int64
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.

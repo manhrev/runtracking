@@ -49,16 +49,16 @@ func (cmc *ChallengeMemberCreate) SetChallengeID(i int64) *ChallengeMemberCreate
 	return cmc
 }
 
-// SetIsCompleted sets the "is_completed" field.
-func (cmc *ChallengeMemberCreate) SetIsCompleted(b bool) *ChallengeMemberCreate {
-	cmc.mutation.SetIsCompleted(b)
+// SetStatus sets the "status" field.
+func (cmc *ChallengeMemberCreate) SetStatus(i int64) *ChallengeMemberCreate {
+	cmc.mutation.SetStatus(i)
 	return cmc
 }
 
-// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
-func (cmc *ChallengeMemberCreate) SetNillableIsCompleted(b *bool) *ChallengeMemberCreate {
-	if b != nil {
-		cmc.SetIsCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cmc *ChallengeMemberCreate) SetNillableStatus(i *int64) *ChallengeMemberCreate {
+	if i != nil {
+		cmc.SetStatus(*i)
 	}
 	return cmc
 }
@@ -175,9 +175,9 @@ func (cmc *ChallengeMemberCreate) defaults() {
 		v := challengemember.DefaultPoint
 		cmc.mutation.SetPoint(v)
 	}
-	if _, ok := cmc.mutation.IsCompleted(); !ok {
-		v := challengemember.DefaultIsCompleted
-		cmc.mutation.SetIsCompleted(v)
+	if _, ok := cmc.mutation.Status(); !ok {
+		v := challengemember.DefaultStatus
+		cmc.mutation.SetStatus(v)
 	}
 	if _, ok := cmc.mutation.CreatedAt(); !ok {
 		v := challengemember.DefaultCreatedAt
@@ -200,8 +200,8 @@ func (cmc *ChallengeMemberCreate) check() error {
 	if _, ok := cmc.mutation.ChallengeID(); !ok {
 		return &ValidationError{Name: "challenge_id", err: errors.New(`ent: missing required field "ChallengeMember.challenge_id"`)}
 	}
-	if _, ok := cmc.mutation.IsCompleted(); !ok {
-		return &ValidationError{Name: "is_completed", err: errors.New(`ent: missing required field "ChallengeMember.is_completed"`)}
+	if _, ok := cmc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ChallengeMember.status"`)}
 	}
 	if _, ok := cmc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ChallengeMember.created_at"`)}
@@ -257,9 +257,9 @@ func (cmc *ChallengeMemberCreate) createSpec() (*ChallengeMember, *sqlgraph.Crea
 		_spec.SetField(challengemember.FieldPoint, field.TypeInt64, value)
 		_node.Point = value
 	}
-	if value, ok := cmc.mutation.IsCompleted(); ok {
-		_spec.SetField(challengemember.FieldIsCompleted, field.TypeBool, value)
-		_node.IsCompleted = value
+	if value, ok := cmc.mutation.Status(); ok {
+		_spec.SetField(challengemember.FieldStatus, field.TypeInt64, value)
+		_node.Status = value
 	}
 	if value, ok := cmc.mutation.TimeCompleted(); ok {
 		_spec.SetField(challengemember.FieldTimeCompleted, field.TypeTime, value)

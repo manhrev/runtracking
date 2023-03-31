@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 )
 
 // ChallengeMemberRuleCreate is the builder for creating a ChallengeMemberRule entity.
@@ -41,16 +42,16 @@ func (cmrc *ChallengeMemberRuleCreate) SetRuleID(i int64) *ChallengeMemberRuleCr
 	return cmrc
 }
 
-// SetIsCompleted sets the "is_completed" field.
-func (cmrc *ChallengeMemberRuleCreate) SetIsCompleted(b bool) *ChallengeMemberRuleCreate {
-	cmrc.mutation.SetIsCompleted(b)
+// SetStatus sets the "status" field.
+func (cmrc *ChallengeMemberRuleCreate) SetStatus(i int64) *ChallengeMemberRuleCreate {
+	cmrc.mutation.SetStatus(i)
 	return cmrc
 }
 
-// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
-func (cmrc *ChallengeMemberRuleCreate) SetNillableIsCompleted(b *bool) *ChallengeMemberRuleCreate {
-	if b != nil {
-		cmrc.SetIsCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cmrc *ChallengeMemberRuleCreate) SetNillableStatus(i *int64) *ChallengeMemberRuleCreate {
+	if i != nil {
+		cmrc.SetStatus(*i)
 	}
 	return cmrc
 }
@@ -108,6 +109,25 @@ func (cmrc *ChallengeMemberRuleCreate) SetChallengeMember(c *ChallengeMember) *C
 	return cmrc.SetChallengeMemberID(c.ID)
 }
 
+// SetChallengeRuleID sets the "challenge_rule" edge to the ChallengeRule entity by ID.
+func (cmrc *ChallengeMemberRuleCreate) SetChallengeRuleID(id int64) *ChallengeMemberRuleCreate {
+	cmrc.mutation.SetChallengeRuleID(id)
+	return cmrc
+}
+
+// SetNillableChallengeRuleID sets the "challenge_rule" edge to the ChallengeRule entity by ID if the given value is not nil.
+func (cmrc *ChallengeMemberRuleCreate) SetNillableChallengeRuleID(id *int64) *ChallengeMemberRuleCreate {
+	if id != nil {
+		cmrc = cmrc.SetChallengeRuleID(*id)
+	}
+	return cmrc
+}
+
+// SetChallengeRule sets the "challenge_rule" edge to the ChallengeRule entity.
+func (cmrc *ChallengeMemberRuleCreate) SetChallengeRule(c *ChallengeRule) *ChallengeMemberRuleCreate {
+	return cmrc.SetChallengeRuleID(c.ID)
+}
+
 // Mutation returns the ChallengeMemberRuleMutation object of the builder.
 func (cmrc *ChallengeMemberRuleCreate) Mutation() *ChallengeMemberRuleMutation {
 	return cmrc.mutation
@@ -147,9 +167,9 @@ func (cmrc *ChallengeMemberRuleCreate) defaults() {
 		v := challengememberrule.DefaultTotal
 		cmrc.mutation.SetTotal(v)
 	}
-	if _, ok := cmrc.mutation.IsCompleted(); !ok {
-		v := challengememberrule.DefaultIsCompleted
-		cmrc.mutation.SetIsCompleted(v)
+	if _, ok := cmrc.mutation.Status(); !ok {
+		v := challengememberrule.DefaultStatus
+		cmrc.mutation.SetStatus(v)
 	}
 	if _, ok := cmrc.mutation.UpdatedAt(); !ok {
 		v := challengememberrule.DefaultUpdatedAt()
@@ -165,8 +185,8 @@ func (cmrc *ChallengeMemberRuleCreate) check() error {
 	if _, ok := cmrc.mutation.RuleID(); !ok {
 		return &ValidationError{Name: "rule_id", err: errors.New(`ent: missing required field "ChallengeMemberRule.rule_id"`)}
 	}
-	if _, ok := cmrc.mutation.IsCompleted(); !ok {
-		return &ValidationError{Name: "is_completed", err: errors.New(`ent: missing required field "ChallengeMemberRule.is_completed"`)}
+	if _, ok := cmrc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ChallengeMemberRule.status"`)}
 	}
 	if _, ok := cmrc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ChallengeMemberRule.updated_at"`)}
@@ -217,9 +237,9 @@ func (cmrc *ChallengeMemberRuleCreate) createSpec() (*ChallengeMemberRule, *sqlg
 		_spec.SetField(challengememberrule.FieldRuleID, field.TypeInt64, value)
 		_node.RuleID = value
 	}
-	if value, ok := cmrc.mutation.IsCompleted(); ok {
-		_spec.SetField(challengememberrule.FieldIsCompleted, field.TypeBool, value)
-		_node.IsCompleted = value
+	if value, ok := cmrc.mutation.Status(); ok {
+		_spec.SetField(challengememberrule.FieldStatus, field.TypeInt64, value)
+		_node.Status = value
 	}
 	if value, ok := cmrc.mutation.TimeCompleted(); ok {
 		_spec.SetField(challengememberrule.FieldTimeCompleted, field.TypeTime, value)
@@ -247,6 +267,26 @@ func (cmrc *ChallengeMemberRuleCreate) createSpec() (*ChallengeMemberRule, *sqlg
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.challenge_member_challenge_member_rules = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cmrc.mutation.ChallengeRuleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengememberrule.ChallengeRuleTable,
+			Columns: []string{challengememberrule.ChallengeRuleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.challenge_rule_challenge_member_rules = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

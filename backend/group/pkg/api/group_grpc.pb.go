@@ -39,6 +39,7 @@ type GroupClient interface {
 	UpdateChallenge(ctx context.Context, in *UpdateChallengeRequest, opts ...grpc.CallOption) (*UpdateChallengeReply, error)
 	DeleteChallenge(ctx context.Context, in *DeleteChallengeRequest, opts ...grpc.CallOption) (*DeleteChallengeReply, error)
 	ListUserRanking(ctx context.Context, in *ListUserRankingRequest, opts ...grpc.CallOption) (*ListUserRankingReply, error)
+	GetChallenge(ctx context.Context, in *GetChallengeRequest, opts ...grpc.CallOption) (*GetChallengeReply, error)
 }
 
 type groupClient struct {
@@ -184,6 +185,15 @@ func (c *groupClient) ListUserRanking(ctx context.Context, in *ListUserRankingRe
 	return out, nil
 }
 
+func (c *groupClient) GetChallenge(ctx context.Context, in *GetChallengeRequest, opts ...grpc.CallOption) (*GetChallengeReply, error) {
+	out := new(GetChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.Group/GetChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupServer is the server API for Group service.
 // All implementations must embed UnimplementedGroupServer
 // for forward compatibility
@@ -205,6 +215,7 @@ type GroupServer interface {
 	UpdateChallenge(context.Context, *UpdateChallengeRequest) (*UpdateChallengeReply, error)
 	DeleteChallenge(context.Context, *DeleteChallengeRequest) (*DeleteChallengeReply, error)
 	ListUserRanking(context.Context, *ListUserRankingRequest) (*ListUserRankingReply, error)
+	GetChallenge(context.Context, *GetChallengeRequest) (*GetChallengeReply, error)
 	mustEmbedUnimplementedGroupServer()
 }
 
@@ -256,6 +267,9 @@ func (UnimplementedGroupServer) DeleteChallenge(context.Context, *DeleteChalleng
 }
 func (UnimplementedGroupServer) ListUserRanking(context.Context, *ListUserRankingRequest) (*ListUserRankingReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListUserRanking not implemented")
+}
+func (UnimplementedGroupServer) GetChallenge(context.Context, *GetChallengeRequest) (*GetChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChallenge not implemented")
 }
 func (UnimplementedGroupServer) mustEmbedUnimplementedGroupServer() {}
 
@@ -540,6 +554,24 @@ func _Group_ListUserRanking_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Group_GetChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).GetChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/GetChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).GetChallenge(ctx, req.(*GetChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Group_ServiceDesc is the grpc.ServiceDesc for Group service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -606,6 +638,10 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListUserRanking",
 			Handler:    _Group_ListUserRanking_Handler,
+		},
+		{
+			MethodName: "GetChallenge",
+			Handler:    _Group_GetChallenge_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

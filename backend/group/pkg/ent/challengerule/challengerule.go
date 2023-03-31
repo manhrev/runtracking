@@ -17,6 +17,8 @@ const (
 	FieldRuleID = "rule_id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// EdgeChallengeMemberRules holds the string denoting the challenge_member_rules edge name in mutations.
 	EdgeChallengeMemberRules = "challenge_member_rules"
 	// EdgeChallenge holds the string denoting the challenge edge name in mutations.
@@ -45,6 +47,7 @@ var Columns = []string{
 	FieldGoal,
 	FieldRuleID,
 	FieldCreatedAt,
+	FieldUpdatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "challenge_rules"
@@ -73,4 +76,8 @@ var (
 	DefaultGoal int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 )

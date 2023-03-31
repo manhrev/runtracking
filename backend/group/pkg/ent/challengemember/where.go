@@ -70,9 +70,9 @@ func ChallengeID(v int64) predicate.ChallengeMember {
 	return predicate.ChallengeMember(sql.FieldEQ(FieldChallengeID, v))
 }
 
-// IsCompleted applies equality check predicate on the "is_completed" field. It's identical to IsCompletedEQ.
-func IsCompleted(v bool) predicate.ChallengeMember {
-	return predicate.ChallengeMember(sql.FieldEQ(FieldIsCompleted, v))
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldStatus, v))
 }
 
 // TimeCompleted applies equality check predicate on the "time_completed" field. It's identical to TimeCompletedEQ.
@@ -170,14 +170,44 @@ func ChallengeIDNotIn(vs ...int64) predicate.ChallengeMember {
 	return predicate.ChallengeMember(sql.FieldNotIn(FieldChallengeID, vs...))
 }
 
-// IsCompletedEQ applies the EQ predicate on the "is_completed" field.
-func IsCompletedEQ(v bool) predicate.ChallengeMember {
-	return predicate.ChallengeMember(sql.FieldEQ(FieldIsCompleted, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldEQ(FieldStatus, v))
 }
 
-// IsCompletedNEQ applies the NEQ predicate on the "is_completed" field.
-func IsCompletedNEQ(v bool) predicate.ChallengeMember {
-	return predicate.ChallengeMember(sql.FieldNEQ(FieldIsCompleted, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int64) predicate.ChallengeMember {
+	return predicate.ChallengeMember(sql.FieldLTE(FieldStatus, v))
 }
 
 // TimeCompletedEQ applies the EQ predicate on the "time_completed" field.

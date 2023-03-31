@@ -17,8 +17,8 @@ const (
 	FieldMemberID = "member_id"
 	// FieldChallengeID holds the string denoting the challenge_id field in the database.
 	FieldChallengeID = "challenge_id"
-	// FieldIsCompleted holds the string denoting the is_completed field in the database.
-	FieldIsCompleted = "is_completed"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldTimeCompleted holds the string denoting the time_completed field in the database.
 	FieldTimeCompleted = "time_completed"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -62,7 +62,7 @@ var Columns = []string{
 	FieldPoint,
 	FieldMemberID,
 	FieldChallengeID,
-	FieldIsCompleted,
+	FieldStatus,
 	FieldTimeCompleted,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -81,8 +81,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultPoint holds the default value on creation for the "point" field.
 	DefaultPoint int64
-	// DefaultIsCompleted holds the default value on creation for the "is_completed" field.
-	DefaultIsCompleted bool
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

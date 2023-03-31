@@ -18,7 +18,7 @@ var (
 		{Name: "end_time", Type: field.TypeTime, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "type_id", Type: field.TypeInt64},
-		{Name: "is_active", Type: field.TypeBool, Default: false},
+		{Name: "status", Type: field.TypeInt64, Default: 3},
 		{Name: "groupz_challenges", Type: field.TypeInt64, Nullable: true},
 		{Name: "completed_first_member_id", Type: field.TypeInt64, Unique: true, Nullable: true},
 	}
@@ -38,7 +38,7 @@ var (
 				Symbol:     "challenges_members_challenge",
 				Columns:    []*schema.Column{ChallengesColumns[10]},
 				RefColumns: []*schema.Column{MembersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -46,7 +46,7 @@ var (
 	ChallengeMembersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "point", Type: field.TypeInt64, Default: 0},
-		{Name: "is_completed", Type: field.TypeBool, Default: false},
+		{Name: "status", Type: field.TypeInt64, Default: 3},
 		{Name: "time_completed", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -85,7 +85,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "total", Type: field.TypeInt64, Default: 0},
 		{Name: "rule_id", Type: field.TypeInt64},
-		{Name: "is_completed", Type: field.TypeBool, Default: false},
+		{Name: "status", Type: field.TypeInt64, Default: 3},
 		{Name: "time_completed", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "challenge_member_challenge_member_rules", Type: field.TypeInt64, Nullable: true},
@@ -107,7 +107,7 @@ var (
 				Symbol:     "challenge_member_rules_challenge_rules_challenge_member_rules",
 				Columns:    []*schema.Column{ChallengeMemberRulesColumns[7]},
 				RefColumns: []*schema.Column{ChallengeRulesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -124,7 +124,8 @@ var (
 		{Name: "goal", Type: field.TypeInt64, Default: 0},
 		{Name: "rule_id", Type: field.TypeInt64},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "challenge_challenge_rules", Type: field.TypeInt64, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "challenge_challenge_rules", Type: field.TypeInt64},
 	}
 	// ChallengeRulesTable holds the schema information for the "challenge_rules" table.
 	ChallengeRulesTable = &schema.Table{
@@ -134,7 +135,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "challenge_rules_challenges_challenge_rules",
-				Columns:    []*schema.Column{ChallengeRulesColumns[4]},
+				Columns:    []*schema.Column{ChallengeRulesColumns[5]},
 				RefColumns: []*schema.Column{ChallengesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -143,7 +144,7 @@ var (
 			{
 				Name:    "challengerule_rule_id_challenge_challenge_rules",
 				Unique:  true,
-				Columns: []*schema.Column{ChallengeRulesColumns[2], ChallengeRulesColumns[4]},
+				Columns: []*schema.Column{ChallengeRulesColumns[2], ChallengeRulesColumns[5]},
 			},
 		},
 	}

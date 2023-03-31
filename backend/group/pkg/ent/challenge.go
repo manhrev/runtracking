@@ -32,8 +32,8 @@ type Challenge struct {
 	Description string `json:"description,omitempty"`
 	// TypeID holds the value of the "type_id" field.
 	TypeID int64 `json:"type_id,omitempty"`
-	// IsActive holds the value of the "is_active" field.
-	IsActive bool `json:"is_active,omitempty"`
+	// Status holds the value of the "status" field.
+	Status int64 `json:"status,omitempty"`
 	// CompletedFirstMemberID holds the value of the "completed_first_member_id" field.
 	CompletedFirstMemberID int64 `json:"completed_first_member_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -106,9 +106,7 @@ func (*Challenge) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challenge.FieldIsActive:
-			values[i] = new(sql.NullBool)
-		case challenge.FieldID, challenge.FieldTypeID, challenge.FieldCompletedFirstMemberID:
+		case challenge.FieldID, challenge.FieldTypeID, challenge.FieldStatus, challenge.FieldCompletedFirstMemberID:
 			values[i] = new(sql.NullInt64)
 		case challenge.FieldName, challenge.FieldPicture, challenge.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -179,11 +177,11 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.TypeID = value.Int64
 			}
-		case challenge.FieldIsActive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_active", values[i])
+		case challenge.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				c.IsActive = value.Bool
+				c.Status = value.Int64
 			}
 		case challenge.FieldCompletedFirstMemberID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -267,8 +265,8 @@ func (c *Challenge) String() string {
 	builder.WriteString("type_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.TypeID))
 	builder.WriteString(", ")
-	builder.WriteString("is_active=")
-	builder.WriteString(fmt.Sprintf("%v", c.IsActive))
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", c.Status))
 	builder.WriteString(", ")
 	builder.WriteString("completed_first_member_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.CompletedFirstMemberID))

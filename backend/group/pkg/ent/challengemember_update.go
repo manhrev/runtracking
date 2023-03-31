@@ -65,17 +65,24 @@ func (cmu *ChallengeMemberUpdate) SetChallengeID(i int64) *ChallengeMemberUpdate
 	return cmu
 }
 
-// SetIsCompleted sets the "is_completed" field.
-func (cmu *ChallengeMemberUpdate) SetIsCompleted(b bool) *ChallengeMemberUpdate {
-	cmu.mutation.SetIsCompleted(b)
+// SetStatus sets the "status" field.
+func (cmu *ChallengeMemberUpdate) SetStatus(i int64) *ChallengeMemberUpdate {
+	cmu.mutation.ResetStatus()
+	cmu.mutation.SetStatus(i)
 	return cmu
 }
 
-// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
-func (cmu *ChallengeMemberUpdate) SetNillableIsCompleted(b *bool) *ChallengeMemberUpdate {
-	if b != nil {
-		cmu.SetIsCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cmu *ChallengeMemberUpdate) SetNillableStatus(i *int64) *ChallengeMemberUpdate {
+	if i != nil {
+		cmu.SetStatus(*i)
 	}
+	return cmu
+}
+
+// AddStatus adds i to the "status" field.
+func (cmu *ChallengeMemberUpdate) AddStatus(i int64) *ChallengeMemberUpdate {
+	cmu.mutation.AddStatus(i)
 	return cmu
 }
 
@@ -262,8 +269,11 @@ func (cmu *ChallengeMemberUpdate) sqlSave(ctx context.Context) (n int, err error
 	if value, ok := cmu.mutation.AddedPoint(); ok {
 		_spec.AddField(challengemember.FieldPoint, field.TypeInt64, value)
 	}
-	if value, ok := cmu.mutation.IsCompleted(); ok {
-		_spec.SetField(challengemember.FieldIsCompleted, field.TypeBool, value)
+	if value, ok := cmu.mutation.Status(); ok {
+		_spec.SetField(challengemember.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cmu.mutation.AddedStatus(); ok {
+		_spec.AddField(challengemember.FieldStatus, field.TypeInt64, value)
 	}
 	if value, ok := cmu.mutation.TimeCompleted(); ok {
 		_spec.SetField(challengemember.FieldTimeCompleted, field.TypeTime, value)
@@ -456,17 +466,24 @@ func (cmuo *ChallengeMemberUpdateOne) SetChallengeID(i int64) *ChallengeMemberUp
 	return cmuo
 }
 
-// SetIsCompleted sets the "is_completed" field.
-func (cmuo *ChallengeMemberUpdateOne) SetIsCompleted(b bool) *ChallengeMemberUpdateOne {
-	cmuo.mutation.SetIsCompleted(b)
+// SetStatus sets the "status" field.
+func (cmuo *ChallengeMemberUpdateOne) SetStatus(i int64) *ChallengeMemberUpdateOne {
+	cmuo.mutation.ResetStatus()
+	cmuo.mutation.SetStatus(i)
 	return cmuo
 }
 
-// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
-func (cmuo *ChallengeMemberUpdateOne) SetNillableIsCompleted(b *bool) *ChallengeMemberUpdateOne {
-	if b != nil {
-		cmuo.SetIsCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cmuo *ChallengeMemberUpdateOne) SetNillableStatus(i *int64) *ChallengeMemberUpdateOne {
+	if i != nil {
+		cmuo.SetStatus(*i)
 	}
+	return cmuo
+}
+
+// AddStatus adds i to the "status" field.
+func (cmuo *ChallengeMemberUpdateOne) AddStatus(i int64) *ChallengeMemberUpdateOne {
+	cmuo.mutation.AddStatus(i)
 	return cmuo
 }
 
@@ -677,8 +694,11 @@ func (cmuo *ChallengeMemberUpdateOne) sqlSave(ctx context.Context) (_node *Chall
 	if value, ok := cmuo.mutation.AddedPoint(); ok {
 		_spec.AddField(challengemember.FieldPoint, field.TypeInt64, value)
 	}
-	if value, ok := cmuo.mutation.IsCompleted(); ok {
-		_spec.SetField(challengemember.FieldIsCompleted, field.TypeBool, value)
+	if value, ok := cmuo.mutation.Status(); ok {
+		_spec.SetField(challengemember.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cmuo.mutation.AddedStatus(); ok {
+		_spec.AddField(challengemember.FieldStatus, field.TypeInt64, value)
 	}
 	if value, ok := cmuo.mutation.TimeCompleted(); ok {
 		_spec.SetField(challengemember.FieldTimeCompleted, field.TypeTime, value)

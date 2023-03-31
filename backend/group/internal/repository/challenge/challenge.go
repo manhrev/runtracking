@@ -25,7 +25,13 @@ type Challenge interface {
 		ctx context.Context,
 		groupId int64,
 		challengeInfo *group.ChallengeInfo,
+		IdsRuleToDelete []int64,
 	) error
+
+	Get(
+		ctx context.Context,
+		challengeId int64,
+	) (*ent.Challenge, error)
 
 	List(
 		ctx context.Context,
@@ -35,6 +41,7 @@ type Challenge interface {
 		filterByRules []group.Rule,
 		filterByType group.ActivityType,
 		ascending bool,
+		challengeStatus group.RuleStatus,
 		from *timestamppb.Timestamp,
 		to *timestamppb.Timestamp,
 		limit uint32,
@@ -65,31 +72,16 @@ type Challenge interface {
 		ctx context.Context,
 		challengeId int64,
 	) error
-	// Update(
-	// 	ctx context.Context,
-	// 	memberId int64,
-	// 	groupId int64,
-	// 	statusMem group.Member_Status,
-	// ) error
-	// Delete(
-	// 	ctx context.Context,
-	// 	memberId int64,
-	// ) error
-	// Get(
-	// 	ctx context.Context,
-	// 	memberId int64,
-	// ) (*ent.Member, error)
 
-	// GetByUserID(
-	// 	ctx context.Context,
-	// 	userId int64,
-	// 	groupId int64,
-	// ) (*ent.Member, error)
+	GetActiveChallenge(
+		ctx context.Context,
+		groupId int64,
+	) (*ent.Challenge, error)
 
-	// ListMemberByUserId(
-	// 	ctx context.Context,
-	// 	userId int64,
-	// ) ([]*ent.Member, error)
+	GetChallengeWithGroup(
+		ctx context.Context,
+		challengeId int64,
+	) (*ent.Challenge, error)
 }
 type challengeImpl struct {
 	entClient *ent.Client
@@ -106,14 +98,23 @@ func (c *challengeImpl) Create(
 	groupId int64,
 	challengeInfo *group.ChallengeInfo,
 ) (*ent.Challenge, error) {
-	newChallenge, err := c.entClient.Challenge.Create().
+	query := c.entClient.Challenge.Create().
 		SetGroupzID(groupId).
 		SetDescription(challengeInfo.Description).
-		SetEndTime(challengeInfo.To.AsTime()).
-		SetStartTime(challengeInfo.From.AsTime()).
 		SetPicture(challengeInfo.Picture).
 		SetTypeID(int64(challengeInfo.GetType())).
-		Save(ctx)
+		SetStatus(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)).
+		SetName(challengeInfo.Name)
+
+	if challengeInfo.From != nil {
+		query.SetStartTime(challengeInfo.From.AsTime())
+	}
+
+	if challengeInfo.To != nil {
+		query.SetEndTime(challengeInfo.To.AsTime())
+	}
+
+	newChallenge, err := query.Save(ctx)
 
 	if err != nil {
 		return nil, status.Internal(err.Error())
@@ -126,17 +127,44 @@ func (c *challengeImpl) Update(
 	ctx context.Context,
 	groupId int64,
 	challengeInfo *group.ChallengeInfo,
+	IdsRuleToDelete []int64,
 ) error {
 	challengeQuery := c.entClient.Challenge.UpdateOneID(challengeInfo.Id).
 		SetGroupzID(groupId).
-		SetStartTime(challengeInfo.From.AsTime()).
-		SetEndTime(challengeInfo.To.AsTime()).
+		SetName(challengeInfo.Name).
 		SetPicture(challengeInfo.Picture).
 		SetDescription(challengeInfo.Description).
-		SetTypeID(int64(challengeInfo.Type))
+		SetTypeID(int64(challengeInfo.Type)).
+		SetStatus(int64(challengeInfo.GetStatus()))
+
+	if challengeInfo.From != nil {
+		challengeQuery.SetStartTime(challengeInfo.From.AsTime())
+	}
+
+	if challengeInfo.To != nil {
+		challengeQuery.SetEndTime(challengeInfo.To.AsTime())
+	}
 
 	if challengeInfo.CompletedFirstMember != nil {
 		challengeQuery.SetCompletedFirstMemberID(challengeInfo.CompletedFirstMember.MemberId)
+	}
+
+	//Update or remove rules of challenge
+	if challengeInfo.ChallengeRules != nil && len(challengeInfo.ChallengeRules) > 0 {
+
+		// Delete rules
+		if IdsRuleToDelete != nil && len(IdsRuleToDelete) > 0 {
+			c.DeleteChallengeRule(ctx, IdsRuleToDelete)
+		}
+		//Update rules
+		for _, challengeRuleInfo := range challengeInfo.ChallengeRules {
+			err := c.UpdateChallengeRule(ctx, challengeRuleInfo)
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		return status.Internal(fmt.Sprintf("At least one rule must be required for challenge"))
 	}
 
 	err := challengeQuery.Exec(ctx)
@@ -159,6 +187,62 @@ func (m *challengeImpl) Delete(
 	return nil
 }
 
+func (m *challengeImpl) GetActiveChallenge(
+	ctx context.Context,
+	groupId int64,
+) (*ent.Challenge, error) {
+	challengeEntList, err := m.entClient.Challenge.Query().
+		Where(challenge.StatusEQ(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))).
+		All(ctx)
+
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+	if len(challengeEntList) > 0 {
+		return challengeEntList[0], nil
+	}
+	return nil, nil
+}
+
+func (m *challengeImpl) GetChallengeWithGroup(
+	ctx context.Context,
+	challengeId int64,
+) (*ent.Challenge, error) {
+	challengeEnt, err := m.entClient.Challenge.Query().
+		Where(challenge.IDEQ(challengeId)).
+		WithGroupz().
+		First(ctx)
+
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
+	return challengeEnt, nil
+}
+
+func (m *challengeImpl) Get(
+	ctx context.Context,
+	challengeId int64,
+) (*ent.Challenge, error) {
+	challengeEnt, err := m.entClient.Challenge.Query().
+		Where(challenge.IDEQ(challengeId)).
+		WithChallengeRules().
+		WithFirstMember().
+		WithGroupz().
+		WithChallengeMembers(func(q *ent.ChallengeMemberQuery) {
+			q.WithMember().
+				WithChallenge().
+				WithChallengeMemberRules()
+		}).
+		First(ctx)
+
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
+	return challengeEnt, nil
+}
+
 func (c *challengeImpl) List(
 	ctx context.Context,
 	groupId int64,
@@ -167,6 +251,7 @@ func (c *challengeImpl) List(
 	filterByRules []group.Rule,
 	filterByType group.ActivityType,
 	ascending bool,
+	challengeStatus group.RuleStatus,
 	from *timestamppb.Timestamp,
 	to *timestamppb.Timestamp,
 	limit uint32,
@@ -190,6 +275,10 @@ func (c *challengeImpl) List(
 
 	if searchByName != "" {
 		query.Where(challenge.NameContainsFold(searchByName))
+	}
+
+	if challengeStatus != group.RuleStatus_RULE_STATUS_UNSPECIFIED {
+		query.Where(challenge.StatusEQ(int64(challengeStatus)))
 	}
 
 	// sort by type
@@ -218,6 +307,10 @@ func (c *challengeImpl) List(
 		)
 	}
 
+	query.WithChallengeRules()
+	query.WithFirstMember()
+	query.WithGroupz()
+
 	// Count number of records
 	total, err := query.Count(ctx)
 	if err != nil {
@@ -237,8 +330,6 @@ func (c *challengeImpl) List(
 		query.Offset(0)
 	}
 
-	query.QueryChallengeRules()
-	query.QueryFirstMember()
 	challenges, err := query.All(ctx)
 	if err != nil {
 		return nil, 0, status.Internal(err.Error())
@@ -246,29 +337,6 @@ func (c *challengeImpl) List(
 
 	return challenges, int64(total), nil
 
-}
-
-func (c *challengeImpl) CreateBulkChallengeRules(
-	ctx context.Context,
-	userId int64,
-	groupId int64,
-	challengeId int64,
-	challengeInfo *group.ChallengeInfo,
-) ([]*ent.ChallengeRule, error) {
-	bulk := make([]*ent.ChallengeRuleCreate, len(challengeInfo.ChallengeRules))
-	for i, rule := range challengeInfo.ChallengeRules {
-		bulk[i] = c.entClient.ChallengeRule.Create().
-			SetChallengeID(challengeId).
-			SetRuleID(int64(rule.GetRule())).
-			SetGoal(rule.Goal)
-	}
-
-	challengeRules, err := c.entClient.ChallengeRule.CreateBulk(bulk...).Save(ctx)
-	if err != nil {
-		status.Internal(fmt.Sprintf("Creating rule for challenge has failed %s\n", err.Error()))
-	}
-
-	return challengeRules, nil
 }
 
 // func (c *challengeImpl) UpdateChallengeRules(
@@ -289,122 +357,4 @@ func (c *challengeImpl) CreateBulkChallengeRules(
 // 		}
 // 	}
 // 	return nil
-// }
-
-func (c *challengeImpl) CreateBulkChallengeMember(
-	ctx context.Context,
-	memberEnts []*ent.Member,
-	challengeEnt *ent.Challenge,
-) ([]*ent.ChallengeMember, error) {
-	bulk := make([]*ent.ChallengeMemberCreate, len(memberEnts))
-
-	for i, memberEnt := range memberEnts {
-		bulk[i] = c.entClient.ChallengeMember.Create().
-			SetChallenge(challengeEnt).
-			SetCreatedAt(challengeEnt.StartTime).
-			SetMember(memberEnt)
-	}
-
-	challengeMembers, err := c.entClient.ChallengeMember.CreateBulk(bulk...).Save(ctx)
-	if err != nil {
-		status.Internal(fmt.Sprintf("Creating challenge members for challenge has failed %s\n", err.Error()))
-	}
-
-	return challengeMembers, nil
-}
-
-func (c *challengeImpl) CreateBulkChallengeMemberRule(
-	ctx context.Context,
-	challengeMemberEnts []*ent.ChallengeMember,
-	challengeRuleEnts []*ent.ChallengeRule,
-) ([]*ent.ChallengeMemberRule, error) {
-	bulk := make([]*ent.ChallengeMemberRuleCreate, len(challengeRuleEnts)*len(challengeMemberEnts))
-	for i, challengeRule := range challengeRuleEnts {
-		for j, challengeMemberEnt := range challengeMemberEnts {
-			bulk[i*len(challengeMemberEnts)+j] = c.entClient.ChallengeMemberRule.Create().
-				SetChallengeMember(challengeMemberEnt).
-				SetRuleID(challengeRule.RuleID)
-		}
-	}
-
-	challengeMemberRules, err := c.entClient.ChallengeMemberRule.CreateBulk(bulk...).Save(ctx)
-	if err != nil {
-		status.Internal(fmt.Sprintf("Creating challenge member rules for challenge has failed %s\n", err.Error()))
-	}
-
-	return challengeMemberRules, nil
-}
-
-// func (m *memberImpl) Get(
-// 	ctx context.Context,
-// 	memberId int64,
-// ) (*ent.Member, error) {
-// 	memberEnt, err := m.entClient.Member.Query().
-// 		Where(member.IDEQ(memberId)).
-// 		First(ctx)
-
-// 	if err != nil {
-// 		return nil, status.Internal(err.Error())
-// 	}
-
-// 	return memberEnt, nil
-// }
-
-// func (m *memberImpl) GetByUserID(
-// 	ctx context.Context,
-// 	userId int64,
-// 	groupId int64,
-// ) (*ent.Member, error) {
-// 	memberEnt, err := m.entClient.Member.Query().
-// 		Where(member.UserIDEQ(userId), member.HasGroupzWith(groupz.IDEQ(groupId))).
-// 		First(ctx)
-
-// 	if err != nil {
-// 		return nil, status.Internal(err.Error())
-// 	}
-// 	log.Printf("Member is: %s", memberEnt)
-// 	if memberEnt == nil {
-// 		return nil, status.Internal(fmt.Sprintf("Member with userID: %s && groupID: %s not found", userId, groupId))
-// 	}
-
-// 	return memberEnt, nil
-// }
-
-// func (m *memberImpl) Update(
-// 	ctx context.Context,
-// 	memberId int64,
-// 	groupId int64,
-// 	statusMem group.Member_Status,
-// ) error {
-// 	memberEnt, err := m.entClient.Member.Update().
-// 		Where(member.IDEQ(memberId), member.HasGroupzWith(groupz.IDEQ(groupId))).
-// 		SetStatus(uint32(statusMem)).
-// 		SetJoiningAt(time.Now()).
-// 		Save(ctx)
-
-// 	if err != nil {
-// 		return status.Internal(err.Error())
-// 	}
-
-// 	if memberEnt <= 0 {
-// 		return status.Internal(fmt.Sprintf("Member with memberID: %d && groupID: %d not found", memberId, groupId))
-// 	}
-
-// 	return nil
-// }
-
-// func (m *memberImpl) ListMemberByUserId(
-// 	ctx context.Context,
-// 	userId int64,
-// ) ([]*ent.Member, error) {
-// 	members, err := m.entClient.Member.Query().
-// 		Where(member.UserIDEQ(userId)).
-// 		WithGroupz().
-// 		All(ctx)
-
-// 	if err != nil {
-// 		return nil, status.Internal(err.Error())
-// 	}
-
-// 	return members, nil
 // }

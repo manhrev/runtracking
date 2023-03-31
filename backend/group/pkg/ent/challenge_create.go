@@ -114,16 +114,16 @@ func (cc *ChallengeCreate) SetTypeID(i int64) *ChallengeCreate {
 	return cc
 }
 
-// SetIsActive sets the "is_active" field.
-func (cc *ChallengeCreate) SetIsActive(b bool) *ChallengeCreate {
-	cc.mutation.SetIsActive(b)
+// SetStatus sets the "status" field.
+func (cc *ChallengeCreate) SetStatus(i int64) *ChallengeCreate {
+	cc.mutation.SetStatus(i)
 	return cc
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (cc *ChallengeCreate) SetNillableIsActive(b *bool) *ChallengeCreate {
-	if b != nil {
-		cc.SetIsActive(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableStatus(i *int64) *ChallengeCreate {
+	if i != nil {
+		cc.SetStatus(*i)
 	}
 	return cc
 }
@@ -259,9 +259,9 @@ func (cc *ChallengeCreate) defaults() {
 		v := challenge.DefaultPicture
 		cc.mutation.SetPicture(v)
 	}
-	if _, ok := cc.mutation.IsActive(); !ok {
-		v := challenge.DefaultIsActive
-		cc.mutation.SetIsActive(v)
+	if _, ok := cc.mutation.Status(); !ok {
+		v := challenge.DefaultStatus
+		cc.mutation.SetStatus(v)
 	}
 }
 
@@ -276,8 +276,8 @@ func (cc *ChallengeCreate) check() error {
 	if _, ok := cc.mutation.TypeID(); !ok {
 		return &ValidationError{Name: "type_id", err: errors.New(`ent: missing required field "Challenge.type_id"`)}
 	}
-	if _, ok := cc.mutation.IsActive(); !ok {
-		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "Challenge.is_active"`)}
+	if _, ok := cc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Challenge.status"`)}
 	}
 	return nil
 }
@@ -345,9 +345,9 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 		_spec.SetField(challenge.FieldTypeID, field.TypeInt64, value)
 		_node.TypeID = value
 	}
-	if value, ok := cc.mutation.IsActive(); ok {
-		_spec.SetField(challenge.FieldIsActive, field.TypeBool, value)
-		_node.IsActive = value
+	if value, ok := cc.mutation.Status(); ok {
+		_spec.SetField(challenge.FieldStatus, field.TypeInt64, value)
+		_node.Status = value
 	}
 	if nodes := cc.mutation.ChallengeMembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

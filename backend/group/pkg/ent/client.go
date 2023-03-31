@@ -667,6 +667,22 @@ func (c *ChallengeMemberRuleClient) QueryChallengeMember(cmr *ChallengeMemberRul
 	return query
 }
 
+// QueryChallengeRule queries the challenge_rule edge of a ChallengeMemberRule.
+func (c *ChallengeMemberRuleClient) QueryChallengeRule(cmr *ChallengeMemberRule) *ChallengeRuleQuery {
+	query := (&ChallengeRuleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cmr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengememberrule.Table, challengememberrule.FieldID, id),
+			sqlgraph.To(challengerule.Table, challengerule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengememberrule.ChallengeRuleTable, challengememberrule.ChallengeRuleColumn),
+		)
+		fromV = sqlgraph.Neighbors(cmr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ChallengeMemberRuleClient) Hooks() []Hook {
 	return c.hooks.ChallengeMemberRule

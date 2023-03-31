@@ -7,6 +7,15 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+func TransformMemberEntToMemberInfo(memberEnt *ent.Member, userInfoMap map[int64]*auth.UserInfo) *group.Member {
+	return &group.Member{
+		UserId:      memberEnt.UserID,
+		MemberId:    memberEnt.ID,
+		DisplayName: userInfoMap[memberEnt.UserID].DisplayName,
+		Username:    userInfoMap[memberEnt.UserID].Username,
+		Email:       userInfoMap[memberEnt.UserID].Email,
+	}
+}
 func TransformGroupEntToGroupInfo(groupEnt *ent.Groupz) *group.GroupInfo {
 	groupInfo := &group.GroupInfo{
 		Id:                groupEnt.ID,
@@ -47,37 +56,6 @@ func TransformUserInfoListToMemberList(userInfoList []*auth.UserInfo, memberMap 
 		memberList = append(memberList, member)
 	}
 	return memberList
-}
-
-func TransformChallengeEntListToChallengeInfoList(challengeEntList []*ent.Challenge, groupId int64, userInfoMap map[int64]*auth.UserInfo) []*group.ChallengeInfo {
-	challengeInfoList := []*group.ChallengeInfo{}
-	for _, challengeEnt := range challengeEntList {
-		challengeInfo := &group.ChallengeInfo{
-			Id:          challengeEnt.ID,
-			GroupId:     groupId,
-			Name:        challengeEnt.Name,
-			Description: challengeEnt.Description,
-			Picture:     challengeEnt.Picture,
-			Type:        group.ActivityType(challengeEnt.TypeID),
-		}
-		if challengeEnt.Edges.ChallengeRules != nil {
-			challengeInfo.ChallengeRules = TransformChallengeRuleEntListToChallengeRuleInfoList(challengeEnt.Edges.ChallengeRules)
-		}
-
-		if challengeEnt.Edges.FirstMember != nil {
-			memberEnt := challengeEnt.Edges.FirstMember
-			challengeInfo.CompletedFirstMember = &group.Member{
-				UserId:      memberEnt.UserID,
-				MemberId:    memberEnt.ID,
-				DisplayName: userInfoMap[memberEnt.UserID].DisplayName,
-				Username:    userInfoMap[memberEnt.UserID].Username,
-				Email:       userInfoMap[memberEnt.UserID].Email,
-			}
-		}
-
-		challengeInfoList = append(challengeInfoList, challengeInfo)
-	}
-	return challengeInfoList
 }
 
 func TransformChallengeRuleEntListToChallengeRuleInfoList(challengeRuleEntList []*ent.ChallengeRule) []*group.ChallengeRuleInfo {

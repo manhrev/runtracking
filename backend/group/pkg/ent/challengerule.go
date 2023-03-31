@@ -23,6 +23,8 @@ type ChallengeRule struct {
 	RuleID int64 `json:"rule_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChallengeRuleQuery when eager-loading is set.
 	Edges                     ChallengeRuleEdges `json:"edges"`
@@ -69,7 +71,7 @@ func (*ChallengeRule) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case challengerule.FieldID, challengerule.FieldGoal, challengerule.FieldRuleID:
 			values[i] = new(sql.NullInt64)
-		case challengerule.FieldCreatedAt:
+		case challengerule.FieldCreatedAt, challengerule.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case challengerule.ForeignKeys[0]: // challenge_challenge_rules
 			values[i] = new(sql.NullInt64)
@@ -111,6 +113,12 @@ func (cr *ChallengeRule) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				cr.CreatedAt = value.Time
+			}
+		case challengerule.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				cr.UpdatedAt = value.Time
 			}
 		case challengerule.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -165,6 +173,9 @@ func (cr *ChallengeRule) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(cr.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(cr.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

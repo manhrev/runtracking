@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 )
 
 // ChallengeMemberRule is the model entity for the ChallengeMemberRule schema.
@@ -21,8 +22,8 @@ type ChallengeMemberRule struct {
 	Total int64 `json:"total,omitempty"`
 	// RuleID holds the value of the "rule_id" field.
 	RuleID int64 `json:"rule_id,omitempty"`
-	// IsCompleted holds the value of the "is_completed" field.
-	IsCompleted bool `json:"is_completed,omitempty"`
+	// Status holds the value of the "status" field.
+	Status int64 `json:"status,omitempty"`
 	// TimeCompleted holds the value of the "time_completed" field.
 	TimeCompleted time.Time `json:"time_completed,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -38,9 +39,11 @@ type ChallengeMemberRule struct {
 type ChallengeMemberRuleEdges struct {
 	// ChallengeMember holds the value of the challenge_member edge.
 	ChallengeMember *ChallengeMember `json:"challenge_member,omitempty"`
+	// ChallengeRule holds the value of the challenge_rule edge.
+	ChallengeRule *ChallengeRule `json:"challenge_rule,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ChallengeMemberOrErr returns the ChallengeMember value or an error if the edge
@@ -56,14 +59,25 @@ func (e ChallengeMemberRuleEdges) ChallengeMemberOrErr() (*ChallengeMember, erro
 	return nil, &NotLoadedError{edge: "challenge_member"}
 }
 
+// ChallengeRuleOrErr returns the ChallengeRule value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ChallengeMemberRuleEdges) ChallengeRuleOrErr() (*ChallengeRule, error) {
+	if e.loadedTypes[1] {
+		if e.ChallengeRule == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: challengerule.Label}
+		}
+		return e.ChallengeRule, nil
+	}
+	return nil, &NotLoadedError{edge: "challenge_rule"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*ChallengeMemberRule) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challengememberrule.FieldIsCompleted:
-			values[i] = new(sql.NullBool)
-		case challengememberrule.FieldID, challengememberrule.FieldTotal, challengememberrule.FieldRuleID:
+		case challengememberrule.FieldID, challengememberrule.FieldTotal, challengememberrule.FieldRuleID, challengememberrule.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case challengememberrule.FieldTimeCompleted, challengememberrule.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -104,11 +118,11 @@ func (cmr *ChallengeMemberRule) assignValues(columns []string, values []any) err
 			} else if value.Valid {
 				cmr.RuleID = value.Int64
 			}
-		case challengememberrule.FieldIsCompleted:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_completed", values[i])
+		case challengememberrule.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				cmr.IsCompleted = value.Bool
+				cmr.Status = value.Int64
 			}
 		case challengememberrule.FieldTimeCompleted:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -146,6 +160,11 @@ func (cmr *ChallengeMemberRule) QueryChallengeMember() *ChallengeMemberQuery {
 	return NewChallengeMemberRuleClient(cmr.config).QueryChallengeMember(cmr)
 }
 
+// QueryChallengeRule queries the "challenge_rule" edge of the ChallengeMemberRule entity.
+func (cmr *ChallengeMemberRule) QueryChallengeRule() *ChallengeRuleQuery {
+	return NewChallengeMemberRuleClient(cmr.config).QueryChallengeRule(cmr)
+}
+
 // Update returns a builder for updating this ChallengeMemberRule.
 // Note that you need to call ChallengeMemberRule.Unwrap() before calling this method if this ChallengeMemberRule
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -175,8 +194,8 @@ func (cmr *ChallengeMemberRule) String() string {
 	builder.WriteString("rule_id=")
 	builder.WriteString(fmt.Sprintf("%v", cmr.RuleID))
 	builder.WriteString(", ")
-	builder.WriteString("is_completed=")
-	builder.WriteString(fmt.Sprintf("%v", cmr.IsCompleted))
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", cmr.Status))
 	builder.WriteString(", ")
 	builder.WriteString("time_completed=")
 	builder.WriteString(cmr.TimeCompleted.Format(time.ANSIC))

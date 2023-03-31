@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -24,6 +25,9 @@ func (ChallengeRule) Fields() []ent.Field {
 		field.Int64("rule_id"),
 		field.Time("created_at").
 			Default(time.Now()),
+		field.Time("updated_at").
+			Default(time.Now).
+			UpdateDefault(time.Now),
 	}
 }
 
@@ -38,9 +42,13 @@ func (ChallengeRule) Indexes() []ent.Index {
 
 func (ChallengeRule) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("challenge_member_rules", ChallengeMemberRule.Type),
+		edge.To("challenge_member_rules", ChallengeMemberRule.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
 		edge.From("challenge", Challenge.Type).
 			Ref("challenge_rules").
-			Unique(),
+			Unique().
+			Required(),
 	}
 }

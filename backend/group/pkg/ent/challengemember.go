@@ -24,8 +24,8 @@ type ChallengeMember struct {
 	MemberID int64 `json:"member_id,omitempty"`
 	// ChallengeID holds the value of the "challenge_id" field.
 	ChallengeID int64 `json:"challenge_id,omitempty"`
-	// IsCompleted holds the value of the "is_completed" field.
-	IsCompleted bool `json:"is_completed,omitempty"`
+	// Status holds the value of the "status" field.
+	Status int64 `json:"status,omitempty"`
 	// TimeCompleted holds the value of the "time_completed" field.
 	TimeCompleted time.Time `json:"time_completed,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -90,9 +90,7 @@ func (*ChallengeMember) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challengemember.FieldIsCompleted:
-			values[i] = new(sql.NullBool)
-		case challengemember.FieldID, challengemember.FieldPoint, challengemember.FieldMemberID, challengemember.FieldChallengeID:
+		case challengemember.FieldID, challengemember.FieldPoint, challengemember.FieldMemberID, challengemember.FieldChallengeID, challengemember.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case challengemember.FieldTimeCompleted, challengemember.FieldCreatedAt, challengemember.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -135,11 +133,11 @@ func (cm *ChallengeMember) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				cm.ChallengeID = value.Int64
 			}
-		case challengemember.FieldIsCompleted:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_completed", values[i])
+		case challengemember.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				cm.IsCompleted = value.Bool
+				cm.Status = value.Int64
 			}
 		case challengemember.FieldTimeCompleted:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -211,8 +209,8 @@ func (cm *ChallengeMember) String() string {
 	builder.WriteString("challenge_id=")
 	builder.WriteString(fmt.Sprintf("%v", cm.ChallengeID))
 	builder.WriteString(", ")
-	builder.WriteString("is_completed=")
-	builder.WriteString(fmt.Sprintf("%v", cm.IsCompleted))
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", cm.Status))
 	builder.WriteString(", ")
 	builder.WriteString("time_completed=")
 	builder.WriteString(cm.TimeCompleted.Format(time.ANSIC))

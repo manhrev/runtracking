@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
 type ChallengeMember struct {
@@ -24,8 +25,8 @@ func (ChallengeMember) Fields() []ent.Field {
 		field.Int64("member_id"),
 		field.Int64("challenge_id"),
 		// if all rules completed then set this field to true
-		field.Bool("is_completed").
-			Default(false),
+		field.Int64("status").
+			Default(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
 		field.Time("time_completed").
 			Optional(),
 		field.Time("created_at").

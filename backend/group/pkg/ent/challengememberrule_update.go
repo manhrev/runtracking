@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -64,17 +65,24 @@ func (cmru *ChallengeMemberRuleUpdate) AddRuleID(i int64) *ChallengeMemberRuleUp
 	return cmru
 }
 
-// SetIsCompleted sets the "is_completed" field.
-func (cmru *ChallengeMemberRuleUpdate) SetIsCompleted(b bool) *ChallengeMemberRuleUpdate {
-	cmru.mutation.SetIsCompleted(b)
+// SetStatus sets the "status" field.
+func (cmru *ChallengeMemberRuleUpdate) SetStatus(i int64) *ChallengeMemberRuleUpdate {
+	cmru.mutation.ResetStatus()
+	cmru.mutation.SetStatus(i)
 	return cmru
 }
 
-// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
-func (cmru *ChallengeMemberRuleUpdate) SetNillableIsCompleted(b *bool) *ChallengeMemberRuleUpdate {
-	if b != nil {
-		cmru.SetIsCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cmru *ChallengeMemberRuleUpdate) SetNillableStatus(i *int64) *ChallengeMemberRuleUpdate {
+	if i != nil {
+		cmru.SetStatus(*i)
 	}
+	return cmru
+}
+
+// AddStatus adds i to the "status" field.
+func (cmru *ChallengeMemberRuleUpdate) AddStatus(i int64) *ChallengeMemberRuleUpdate {
+	cmru.mutation.AddStatus(i)
 	return cmru
 }
 
@@ -123,6 +131,25 @@ func (cmru *ChallengeMemberRuleUpdate) SetChallengeMember(c *ChallengeMember) *C
 	return cmru.SetChallengeMemberID(c.ID)
 }
 
+// SetChallengeRuleID sets the "challenge_rule" edge to the ChallengeRule entity by ID.
+func (cmru *ChallengeMemberRuleUpdate) SetChallengeRuleID(id int64) *ChallengeMemberRuleUpdate {
+	cmru.mutation.SetChallengeRuleID(id)
+	return cmru
+}
+
+// SetNillableChallengeRuleID sets the "challenge_rule" edge to the ChallengeRule entity by ID if the given value is not nil.
+func (cmru *ChallengeMemberRuleUpdate) SetNillableChallengeRuleID(id *int64) *ChallengeMemberRuleUpdate {
+	if id != nil {
+		cmru = cmru.SetChallengeRuleID(*id)
+	}
+	return cmru
+}
+
+// SetChallengeRule sets the "challenge_rule" edge to the ChallengeRule entity.
+func (cmru *ChallengeMemberRuleUpdate) SetChallengeRule(c *ChallengeRule) *ChallengeMemberRuleUpdate {
+	return cmru.SetChallengeRuleID(c.ID)
+}
+
 // Mutation returns the ChallengeMemberRuleMutation object of the builder.
 func (cmru *ChallengeMemberRuleUpdate) Mutation() *ChallengeMemberRuleMutation {
 	return cmru.mutation
@@ -131,6 +158,12 @@ func (cmru *ChallengeMemberRuleUpdate) Mutation() *ChallengeMemberRuleMutation {
 // ClearChallengeMember clears the "challenge_member" edge to the ChallengeMember entity.
 func (cmru *ChallengeMemberRuleUpdate) ClearChallengeMember() *ChallengeMemberRuleUpdate {
 	cmru.mutation.ClearChallengeMember()
+	return cmru
+}
+
+// ClearChallengeRule clears the "challenge_rule" edge to the ChallengeRule entity.
+func (cmru *ChallengeMemberRuleUpdate) ClearChallengeRule() *ChallengeMemberRuleUpdate {
+	cmru.mutation.ClearChallengeRule()
 	return cmru
 }
 
@@ -206,8 +239,11 @@ func (cmru *ChallengeMemberRuleUpdate) sqlSave(ctx context.Context) (n int, err 
 	if value, ok := cmru.mutation.AddedRuleID(); ok {
 		_spec.AddField(challengememberrule.FieldRuleID, field.TypeInt64, value)
 	}
-	if value, ok := cmru.mutation.IsCompleted(); ok {
-		_spec.SetField(challengememberrule.FieldIsCompleted, field.TypeBool, value)
+	if value, ok := cmru.mutation.Status(); ok {
+		_spec.SetField(challengememberrule.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cmru.mutation.AddedStatus(); ok {
+		_spec.AddField(challengememberrule.FieldStatus, field.TypeInt64, value)
 	}
 	if value, ok := cmru.mutation.TimeCompleted(); ok {
 		_spec.SetField(challengememberrule.FieldTimeCompleted, field.TypeTime, value)
@@ -245,6 +281,41 @@ func (cmru *ChallengeMemberRuleUpdate) sqlSave(ctx context.Context) (n int, err 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: challengemember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cmru.mutation.ChallengeRuleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengememberrule.ChallengeRuleTable,
+			Columns: []string{challengememberrule.ChallengeRuleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cmru.mutation.ChallengeRuleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengememberrule.ChallengeRuleTable,
+			Columns: []string{challengememberrule.ChallengeRuleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
 				},
 			},
 		}
@@ -309,17 +380,24 @@ func (cmruo *ChallengeMemberRuleUpdateOne) AddRuleID(i int64) *ChallengeMemberRu
 	return cmruo
 }
 
-// SetIsCompleted sets the "is_completed" field.
-func (cmruo *ChallengeMemberRuleUpdateOne) SetIsCompleted(b bool) *ChallengeMemberRuleUpdateOne {
-	cmruo.mutation.SetIsCompleted(b)
+// SetStatus sets the "status" field.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetStatus(i int64) *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.ResetStatus()
+	cmruo.mutation.SetStatus(i)
 	return cmruo
 }
 
-// SetNillableIsCompleted sets the "is_completed" field if the given value is not nil.
-func (cmruo *ChallengeMemberRuleUpdateOne) SetNillableIsCompleted(b *bool) *ChallengeMemberRuleUpdateOne {
-	if b != nil {
-		cmruo.SetIsCompleted(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetNillableStatus(i *int64) *ChallengeMemberRuleUpdateOne {
+	if i != nil {
+		cmruo.SetStatus(*i)
 	}
+	return cmruo
+}
+
+// AddStatus adds i to the "status" field.
+func (cmruo *ChallengeMemberRuleUpdateOne) AddStatus(i int64) *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.AddStatus(i)
 	return cmruo
 }
 
@@ -368,6 +446,25 @@ func (cmruo *ChallengeMemberRuleUpdateOne) SetChallengeMember(c *ChallengeMember
 	return cmruo.SetChallengeMemberID(c.ID)
 }
 
+// SetChallengeRuleID sets the "challenge_rule" edge to the ChallengeRule entity by ID.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetChallengeRuleID(id int64) *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.SetChallengeRuleID(id)
+	return cmruo
+}
+
+// SetNillableChallengeRuleID sets the "challenge_rule" edge to the ChallengeRule entity by ID if the given value is not nil.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetNillableChallengeRuleID(id *int64) *ChallengeMemberRuleUpdateOne {
+	if id != nil {
+		cmruo = cmruo.SetChallengeRuleID(*id)
+	}
+	return cmruo
+}
+
+// SetChallengeRule sets the "challenge_rule" edge to the ChallengeRule entity.
+func (cmruo *ChallengeMemberRuleUpdateOne) SetChallengeRule(c *ChallengeRule) *ChallengeMemberRuleUpdateOne {
+	return cmruo.SetChallengeRuleID(c.ID)
+}
+
 // Mutation returns the ChallengeMemberRuleMutation object of the builder.
 func (cmruo *ChallengeMemberRuleUpdateOne) Mutation() *ChallengeMemberRuleMutation {
 	return cmruo.mutation
@@ -376,6 +473,12 @@ func (cmruo *ChallengeMemberRuleUpdateOne) Mutation() *ChallengeMemberRuleMutati
 // ClearChallengeMember clears the "challenge_member" edge to the ChallengeMember entity.
 func (cmruo *ChallengeMemberRuleUpdateOne) ClearChallengeMember() *ChallengeMemberRuleUpdateOne {
 	cmruo.mutation.ClearChallengeMember()
+	return cmruo
+}
+
+// ClearChallengeRule clears the "challenge_rule" edge to the ChallengeRule entity.
+func (cmruo *ChallengeMemberRuleUpdateOne) ClearChallengeRule() *ChallengeMemberRuleUpdateOne {
+	cmruo.mutation.ClearChallengeRule()
 	return cmruo
 }
 
@@ -475,8 +578,11 @@ func (cmruo *ChallengeMemberRuleUpdateOne) sqlSave(ctx context.Context) (_node *
 	if value, ok := cmruo.mutation.AddedRuleID(); ok {
 		_spec.AddField(challengememberrule.FieldRuleID, field.TypeInt64, value)
 	}
-	if value, ok := cmruo.mutation.IsCompleted(); ok {
-		_spec.SetField(challengememberrule.FieldIsCompleted, field.TypeBool, value)
+	if value, ok := cmruo.mutation.Status(); ok {
+		_spec.SetField(challengememberrule.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cmruo.mutation.AddedStatus(); ok {
+		_spec.AddField(challengememberrule.FieldStatus, field.TypeInt64, value)
 	}
 	if value, ok := cmruo.mutation.TimeCompleted(); ok {
 		_spec.SetField(challengememberrule.FieldTimeCompleted, field.TypeTime, value)
@@ -514,6 +620,41 @@ func (cmruo *ChallengeMemberRuleUpdateOne) sqlSave(ctx context.Context) (_node *
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: challengemember.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cmruo.mutation.ChallengeRuleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengememberrule.ChallengeRuleTable,
+			Columns: []string{challengememberrule.ChallengeRuleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cmruo.mutation.ChallengeRuleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   challengememberrule.ChallengeRuleTable,
+			Columns: []string{challengememberrule.ChallengeRuleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
 				},
 			},
 		}

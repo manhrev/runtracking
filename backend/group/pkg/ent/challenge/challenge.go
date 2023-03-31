@@ -25,8 +25,8 @@ const (
 	FieldDescription = "description"
 	// FieldTypeID holds the string denoting the type_id field in the database.
 	FieldTypeID = "type_id"
-	// FieldIsActive holds the string denoting the is_active field in the database.
-	FieldIsActive = "is_active"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldCompletedFirstMemberID holds the string denoting the completed_first_member_id field in the database.
 	FieldCompletedFirstMemberID = "completed_first_member_id"
 	// EdgeChallengeMembers holds the string denoting the challenge_members edge name in mutations.
@@ -79,7 +79,7 @@ var Columns = []string{
 	FieldEndTime,
 	FieldDescription,
 	FieldTypeID,
-	FieldIsActive,
+	FieldStatus,
 	FieldCompletedFirstMemberID,
 }
 
@@ -109,6 +109,6 @@ var (
 	DefaultCreatedAt func() time.Time
 	// DefaultPicture holds the default value on creation for the "picture" field.
 	DefaultPicture string
-	// DefaultIsActive holds the default value on creation for the "is_active" field.
-	DefaultIsActive bool
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int64
 )

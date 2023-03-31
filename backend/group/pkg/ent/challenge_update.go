@@ -154,17 +154,24 @@ func (cu *ChallengeUpdate) AddTypeID(i int64) *ChallengeUpdate {
 	return cu
 }
 
-// SetIsActive sets the "is_active" field.
-func (cu *ChallengeUpdate) SetIsActive(b bool) *ChallengeUpdate {
-	cu.mutation.SetIsActive(b)
+// SetStatus sets the "status" field.
+func (cu *ChallengeUpdate) SetStatus(i int64) *ChallengeUpdate {
+	cu.mutation.ResetStatus()
+	cu.mutation.SetStatus(i)
 	return cu
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (cu *ChallengeUpdate) SetNillableIsActive(b *bool) *ChallengeUpdate {
-	if b != nil {
-		cu.SetIsActive(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableStatus(i *int64) *ChallengeUpdate {
+	if i != nil {
+		cu.SetStatus(*i)
 	}
+	return cu
+}
+
+// AddStatus adds i to the "status" field.
+func (cu *ChallengeUpdate) AddStatus(i int64) *ChallengeUpdate {
+	cu.mutation.AddStatus(i)
 	return cu
 }
 
@@ -402,8 +409,11 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
 	}
-	if value, ok := cu.mutation.IsActive(); ok {
-		_spec.SetField(challenge.FieldIsActive, field.TypeBool, value)
+	if value, ok := cu.mutation.Status(); ok {
+		_spec.SetField(challenge.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cu.mutation.AddedStatus(); ok {
+		_spec.AddField(challenge.FieldStatus, field.TypeInt64, value)
 	}
 	if cu.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -726,17 +736,24 @@ func (cuo *ChallengeUpdateOne) AddTypeID(i int64) *ChallengeUpdateOne {
 	return cuo
 }
 
-// SetIsActive sets the "is_active" field.
-func (cuo *ChallengeUpdateOne) SetIsActive(b bool) *ChallengeUpdateOne {
-	cuo.mutation.SetIsActive(b)
+// SetStatus sets the "status" field.
+func (cuo *ChallengeUpdateOne) SetStatus(i int64) *ChallengeUpdateOne {
+	cuo.mutation.ResetStatus()
+	cuo.mutation.SetStatus(i)
 	return cuo
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (cuo *ChallengeUpdateOne) SetNillableIsActive(b *bool) *ChallengeUpdateOne {
-	if b != nil {
-		cuo.SetIsActive(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableStatus(i *int64) *ChallengeUpdateOne {
+	if i != nil {
+		cuo.SetStatus(*i)
 	}
+	return cuo
+}
+
+// AddStatus adds i to the "status" field.
+func (cuo *ChallengeUpdateOne) AddStatus(i int64) *ChallengeUpdateOne {
+	cuo.mutation.AddStatus(i)
 	return cuo
 }
 
@@ -998,8 +1015,11 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	if value, ok := cuo.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
 	}
-	if value, ok := cuo.mutation.IsActive(); ok {
-		_spec.SetField(challenge.FieldIsActive, field.TypeBool, value)
+	if value, ok := cuo.mutation.Status(); ok {
+		_spec.SetField(challenge.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cuo.mutation.AddedStatus(); ok {
+		_spec.AddField(challenge.FieldStatus, field.TypeInt64, value)
 	}
 	if cuo.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{

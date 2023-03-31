@@ -65,9 +65,9 @@ func RuleID(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldRuleID, v))
 }
 
-// IsCompleted applies equality check predicate on the "is_completed" field. It's identical to IsCompletedEQ.
-func IsCompleted(v bool) predicate.ChallengeMemberRule {
-	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldIsCompleted, v))
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldStatus, v))
 }
 
 // TimeCompleted applies equality check predicate on the "time_completed" field. It's identical to TimeCompletedEQ.
@@ -160,14 +160,44 @@ func RuleIDLTE(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldRuleID, v))
 }
 
-// IsCompletedEQ applies the EQ predicate on the "is_completed" field.
-func IsCompletedEQ(v bool) predicate.ChallengeMemberRule {
-	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldIsCompleted, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldStatus, v))
 }
 
-// IsCompletedNEQ applies the NEQ predicate on the "is_completed" field.
-func IsCompletedNEQ(v bool) predicate.ChallengeMemberRule {
-	return predicate.ChallengeMemberRule(sql.FieldNEQ(FieldIsCompleted, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldStatus, v))
 }
 
 // TimeCompletedEQ applies the EQ predicate on the "time_completed" field.
@@ -278,6 +308,33 @@ func HasChallengeMemberWith(preds ...predicate.ChallengeMember) predicate.Challe
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ChallengeMemberInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, ChallengeMemberTable, ChallengeMemberColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChallengeRule applies the HasEdge predicate on the "challenge_rule" edge.
+func HasChallengeRule() predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ChallengeRuleTable, ChallengeRuleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChallengeRuleWith applies the HasEdge predicate on the "challenge_rule" edge with a given conditions (other predicates).
+func HasChallengeRuleWith(preds ...predicate.ChallengeRule) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChallengeRuleInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ChallengeRuleTable, ChallengeRuleColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

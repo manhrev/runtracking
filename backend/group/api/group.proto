@@ -25,6 +25,15 @@ service Group {
     rpc UpdateChallenge(UpdateChallengeRequest) returns(UpdateChallengeReply) {};
     rpc DeleteChallenge(DeleteChallengeRequest) returns(DeleteChallengeReply) {};
     rpc ListUserRanking(ListUserRankingRequest) returns(ListUserRankingReply){};
+    rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
+}
+
+message GetChallengeRequest{
+    int64 id = 1;
+}
+
+message GetChallengeReply{
+    ChallengeInfo challengeInfo = 1;
 }
 
 message CreateChallengeRequest{
@@ -42,6 +51,7 @@ message ListChallengeRequest{
     string search_by_name = 5;
     repeated Rule filter_by_rules = 7;
     ActivityType filter_by_type = 10;
+    RuleStatus status = 12;
 
     google.protobuf.Timestamp from = 8;
     google.protobuf.Timestamp to = 9;
@@ -61,12 +71,12 @@ message ListChallengeReply {
 message UpdateChallengeRequest{
     ChallengeInfo challengeInfo = 1;
     int64 group_id = 2;
+    repeated int64 ids_rule_to_delete = 3;
 }
 message UpdateChallengeReply{}
 
 message DeleteChallengeRequest{
     int64 id = 1;
-    int64 group_id = 2;
 }
 message DeleteChallengeReply{}
 
@@ -206,6 +216,14 @@ enum Rule {
     RULE_TOTAL_CALORIES = 3;
 }
 
+enum RuleStatus {
+    RULE_STATUS_UNSPECIFIED = 0;
+    RULE_STATUS_FAILED = 1;
+    RULE_STATUS_COMPLETED = 2;
+    RULE_STATUS_INPROGRESS = 3;
+}
+
+
 enum ActivityType {
     ACTIVITY_TYPE_UNSPECIFIED = 0;
     ACTIVITY_TYPE_RUNNING = 1;
@@ -247,15 +265,36 @@ message ChallengeInfo{
     int64 group_id = 14;
     Member completed_first_member = 13;
 
+    
+
+    //just appear when get challenge
+    repeated MemberProgress member_progress_list = 16;
+
     //used both list and CRUD
     string name = 2;
     string description = 3;
     string picture = 12;
     repeated ChallengeRuleInfo challengeRules = 8;
     ActivityType type = 9;
+    RuleStatus status = 15;
     google.protobuf.Timestamp from = 6;
     google.protobuf.Timestamp to = 7;
     
+}
+
+message MemberProgress{
+    bool is_completed_first = 6;
+    RuleStatus challenge_progress = 5;
+    Member member_info = 1;
+    repeated RuleProgress rule_progress_list =  7;
+
+    // list progress of each rule
+    message RuleProgress{
+        Rule rule = 1;
+        RuleStatus status = 2;
+        int64 total = 4;
+        google.protobuf.Timestamp time_completed = 3;
+    }
 }
 
 message ChallengeRuleInfo{
@@ -266,6 +305,9 @@ message ChallengeRuleInfo{
     //both list and crud
     int64 goal = 2;
     Rule rule = 3;
+
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
 }
 
 
@@ -280,6 +322,8 @@ message EventInfo{
     google.protobuf.Timestamp from = 6;
     google.protobuf.Timestamp to = 7;
 }
+
+
 
 
 

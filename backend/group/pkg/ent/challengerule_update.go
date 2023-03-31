@@ -79,6 +79,12 @@ func (cru *ChallengeRuleUpdate) SetNillableCreatedAt(t *time.Time) *ChallengeRul
 	return cru
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (cru *ChallengeRuleUpdate) SetUpdatedAt(t time.Time) *ChallengeRuleUpdate {
+	cru.mutation.SetUpdatedAt(t)
+	return cru
+}
+
 // AddChallengeMemberRuleIDs adds the "challenge_member_rules" edge to the ChallengeMemberRule entity by IDs.
 func (cru *ChallengeRuleUpdate) AddChallengeMemberRuleIDs(ids ...int64) *ChallengeRuleUpdate {
 	cru.mutation.AddChallengeMemberRuleIDs(ids...)
@@ -97,14 +103,6 @@ func (cru *ChallengeRuleUpdate) AddChallengeMemberRules(c ...*ChallengeMemberRul
 // SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
 func (cru *ChallengeRuleUpdate) SetChallengeID(id int64) *ChallengeRuleUpdate {
 	cru.mutation.SetChallengeID(id)
-	return cru
-}
-
-// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
-func (cru *ChallengeRuleUpdate) SetNillableChallengeID(id *int64) *ChallengeRuleUpdate {
-	if id != nil {
-		cru = cru.SetChallengeID(*id)
-	}
 	return cru
 }
 
@@ -147,6 +145,7 @@ func (cru *ChallengeRuleUpdate) ClearChallenge() *ChallengeRuleUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cru *ChallengeRuleUpdate) Save(ctx context.Context) (int, error) {
+	cru.defaults()
 	return withHooks[int, ChallengeRuleMutation](ctx, cru.sqlSave, cru.mutation, cru.hooks)
 }
 
@@ -172,6 +171,22 @@ func (cru *ChallengeRuleUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cru *ChallengeRuleUpdate) defaults() {
+	if _, ok := cru.mutation.UpdatedAt(); !ok {
+		v := challengerule.UpdateDefaultUpdatedAt()
+		cru.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (cru *ChallengeRuleUpdate) check() error {
+	if _, ok := cru.mutation.ChallengeID(); cru.mutation.ChallengeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ChallengeRule.challenge"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cru *ChallengeRuleUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ChallengeRuleUpdate {
 	cru.modifiers = append(cru.modifiers, modifiers...)
@@ -179,6 +194,9 @@ func (cru *ChallengeRuleUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) 
 }
 
 func (cru *ChallengeRuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cru.check(); err != nil {
+		return n, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   challengerule.Table,
@@ -210,6 +228,9 @@ func (cru *ChallengeRuleUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if value, ok := cru.mutation.CreatedAt(); ok {
 		_spec.SetField(challengerule.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := cru.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengerule.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if cru.mutation.ChallengeMemberRulesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -370,6 +391,12 @@ func (cruo *ChallengeRuleUpdateOne) SetNillableCreatedAt(t *time.Time) *Challeng
 	return cruo
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (cruo *ChallengeRuleUpdateOne) SetUpdatedAt(t time.Time) *ChallengeRuleUpdateOne {
+	cruo.mutation.SetUpdatedAt(t)
+	return cruo
+}
+
 // AddChallengeMemberRuleIDs adds the "challenge_member_rules" edge to the ChallengeMemberRule entity by IDs.
 func (cruo *ChallengeRuleUpdateOne) AddChallengeMemberRuleIDs(ids ...int64) *ChallengeRuleUpdateOne {
 	cruo.mutation.AddChallengeMemberRuleIDs(ids...)
@@ -388,14 +415,6 @@ func (cruo *ChallengeRuleUpdateOne) AddChallengeMemberRules(c ...*ChallengeMembe
 // SetChallengeID sets the "challenge" edge to the Challenge entity by ID.
 func (cruo *ChallengeRuleUpdateOne) SetChallengeID(id int64) *ChallengeRuleUpdateOne {
 	cruo.mutation.SetChallengeID(id)
-	return cruo
-}
-
-// SetNillableChallengeID sets the "challenge" edge to the Challenge entity by ID if the given value is not nil.
-func (cruo *ChallengeRuleUpdateOne) SetNillableChallengeID(id *int64) *ChallengeRuleUpdateOne {
-	if id != nil {
-		cruo = cruo.SetChallengeID(*id)
-	}
 	return cruo
 }
 
@@ -445,6 +464,7 @@ func (cruo *ChallengeRuleUpdateOne) Select(field string, fields ...string) *Chal
 
 // Save executes the query and returns the updated ChallengeRule entity.
 func (cruo *ChallengeRuleUpdateOne) Save(ctx context.Context) (*ChallengeRule, error) {
+	cruo.defaults()
 	return withHooks[*ChallengeRule, ChallengeRuleMutation](ctx, cruo.sqlSave, cruo.mutation, cruo.hooks)
 }
 
@@ -470,6 +490,22 @@ func (cruo *ChallengeRuleUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cruo *ChallengeRuleUpdateOne) defaults() {
+	if _, ok := cruo.mutation.UpdatedAt(); !ok {
+		v := challengerule.UpdateDefaultUpdatedAt()
+		cruo.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (cruo *ChallengeRuleUpdateOne) check() error {
+	if _, ok := cruo.mutation.ChallengeID(); cruo.mutation.ChallengeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ChallengeRule.challenge"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cruo *ChallengeRuleUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ChallengeRuleUpdateOne {
 	cruo.modifiers = append(cruo.modifiers, modifiers...)
@@ -477,6 +513,9 @@ func (cruo *ChallengeRuleUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilde
 }
 
 func (cruo *ChallengeRuleUpdateOne) sqlSave(ctx context.Context) (_node *ChallengeRule, err error) {
+	if err := cruo.check(); err != nil {
+		return _node, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   challengerule.Table,
@@ -525,6 +564,9 @@ func (cruo *ChallengeRuleUpdateOne) sqlSave(ctx context.Context) (_node *Challen
 	}
 	if value, ok := cruo.mutation.CreatedAt(); ok {
 		_spec.SetField(challengerule.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := cruo.mutation.UpdatedAt(); ok {
+		_spec.SetField(challengerule.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if cruo.mutation.ChallengeMemberRulesCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
 type Challenge struct {
@@ -31,8 +32,8 @@ func (Challenge) Fields() []ent.Field {
 		field.String("description").
 			Optional(),
 		field.Int64("type_id"),
-		field.Bool("is_active").
-			Default(false),
+		field.Int64("status").
+			Default(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
 		// id of member who completed with all rules of challenge first
 		field.Int64("completed_first_member_id").Optional(),
 	}
