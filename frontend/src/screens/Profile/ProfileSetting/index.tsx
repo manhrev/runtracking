@@ -1,18 +1,17 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { StyleSheet, View } from 'react-native'
-import { RootBaseStackParamList } from '../../navigators/BaseStack'
-import { selectUserSlice } from '../../redux/features/user/slice'
-import { useAppSelector } from '../../redux/store'
-import { AppTheme, useAppTheme } from '../../theme'
-import SettingItem from './comp/SettingItem'
+import { RootBaseStackParamList } from '../../../navigators/BaseStack'
+import { selectUserSlice } from '../../../redux/features/user/slice'
+import { useAppSelector } from '../../../redux/store'
+import { AppTheme, useAppTheme } from '../../../theme'
+import SettingItem from './../comp/SettingItem'
 import { useEffect, useState } from 'react'
-import { Button, TextInput } from 'react-native-paper'
-import { useAppDispatch } from '../../redux/store'
-
-import { UserInfo, UpdateUserInfoRequest } from '../../lib/auth/auth_pb'
-
-import { updateUserInfoThunk } from '../../redux/features/user/thunk'
-import { toast } from '../../utils/toast/toast'
+import { Button, Text, TextInput } from 'react-native-paper'
+import { useAppDispatch } from '../../../redux/store'
+import { UserInfo } from '../../../lib/auth/auth_pb'
+import { updateUserInfoThunk } from '../../../redux/features/user/thunk'
+import { toast } from '../../../utils/toast/toast'
+import { LoadingOverlay } from '../../../comp/LoadingOverlay'
 
 export default function ProfileSetting({
   navigation,
@@ -30,6 +29,7 @@ export default function ProfileSetting({
     userId,
     profiePicture,
   } = useAppSelector(selectUserSlice)
+  const [loading, setLoading] = useState(false)
 
   const dispatch = useAppDispatch()
 
@@ -74,10 +74,13 @@ export default function ProfileSetting({
       info.height = userInfo.height
       info.weight = userInfo.weight
       info.age = userInfo.age
-
+      setLoading(true)
       dispatch(updateUserInfoThunk({ userInfo: info })).unwrap()
 
+      setLoading(false)
+
       toast.success({ message: 'Update successfully!' })
+
       setEditMode(false)
     } else toast.error({ message: 'Invalid user id!' })
   }
@@ -110,6 +113,7 @@ export default function ProfileSetting({
   return (
     <View style={styles(theme).container}>
       <View style={styles(theme).settingGroup}>
+        <LoadingOverlay loading={loading} />
         <SettingItem
           left="Fullname"
           right={
