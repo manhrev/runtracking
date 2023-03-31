@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -26,6 +27,12 @@ func (Member) Fields() []ent.Field {
 			Default(uint32(group.Member_MEMBER_STATUS_UNSPECIFIED)),
 		field.Time("joining_at").
 			Optional(),
+		// field used to ranking members of group
+		field.Int64("point").
+			Default(0),
+		// how many challenge completed by this member will be set into this field
+		field.Int64("completed_challenge_count").
+			Default(0),
 	}
 }
 
@@ -34,6 +41,19 @@ func (Member) Edges() []ent.Edge {
 		edge.From("groupz", Groupz.Type).
 			Ref("members").
 			Unique(),
+		edge.To("challenge_members", ChallengeMember.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
+		edge.To("season_members", SeasonMember.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
+		edge.To("challenge", Challenge.Type).
+			Unique().
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
 	}
 }
 

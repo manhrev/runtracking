@@ -1,18 +1,17 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { StyleSheet, View } from 'react-native'
-import { RootBaseStackParamList } from '../../navigators/BaseStack'
-import { selectUserSlice } from '../../redux/features/user/slice'
-import { useAppSelector } from '../../redux/store'
-import { AppTheme, useAppTheme } from '../../theme'
-import SettingItem from './comp/SettingItem'
+import { RootBaseStackParamList } from '../../../navigators/BaseStack'
+import { selectUserSlice } from '../../../redux/features/user/slice'
+import { useAppSelector } from '../../../redux/store'
+import { AppTheme, useAppTheme } from '../../../theme'
+import SettingItem from './../comp/SettingItem'
 import { useEffect, useState } from 'react'
-import { Button, TextInput } from 'react-native-paper'
-import { useAppDispatch } from '../../redux/store'
-
-import { UserInfo, UpdateUserInfoRequest } from '../../lib/auth/auth_pb'
-
-import { updateUserInfoThunk } from '../../redux/features/user/thunk'
-import { toast } from '../../utils/toast/toast'
+import { Button, Text, TextInput } from 'react-native-paper'
+import { useAppDispatch } from '../../../redux/store'
+import { UserInfo } from '../../../lib/auth/auth_pb'
+import { updateUserInfoThunk } from '../../../redux/features/user/thunk'
+import { toast } from '../../../utils/toast/toast'
+import { LoadingOverlay } from '../../../comp/LoadingOverlay'
 
 export default function ProfileSetting({
   navigation,
@@ -28,13 +27,16 @@ export default function ProfileSetting({
     weight,
     age,
     userId,
+    profiePicture,
   } = useAppSelector(selectUserSlice)
+  const [loading, setLoading] = useState(false)
 
   const dispatch = useAppDispatch()
 
   const [editMode, setEditMode] = useState(false)
 
   const [userInfo, setUserInfo] = useState<UserInfo.AsObject>({
+    profilePicture: profiePicture,
     userId: userId,
     displayName: displayName,
     username: username,
@@ -63,20 +65,22 @@ export default function ProfileSetting({
         return
       }
 
-      const info = new UserInfo()
-      info.setUserId(userInfo.userId)
-      info.setDisplayName(userInfo.displayName)
-      info.setUsername(userInfo.username)
-      info.setEmail(userInfo.email)
-      info.setPhoneNumber(userInfo.phoneNumber)
-      info.setHeight(userInfo.height)
-      info.setWeight(userInfo.weight)
-      info.setAge(userInfo.age)
+      const info = new UserInfo().toObject()
+      info.userId = userInfo.userId
+      info.displayName = userInfo.displayName
+      info.username = userInfo.username
+      info.email = userInfo.email
+      info.phoneNumber = userInfo.phoneNumber
+      info.height = userInfo.height
+      info.weight = userInfo.weight
+      info.age = userInfo.age
+      setLoading(true)
+      dispatch(updateUserInfoThunk({ userInfo: info })).unwrap()
 
-      const req = new UpdateUserInfoRequest()
-      req.setUserInfo(info)
-      dispatch(updateUserInfoThunk(req)).unwrap()
+      setLoading(false)
+
       toast.success({ message: 'Update successfully!' })
+
       setEditMode(false)
     } else toast.error({ message: 'Invalid user id!' })
   }
@@ -94,6 +98,7 @@ export default function ProfileSetting({
 
   useEffect(() => {
     setUserInfo({
+      profilePicture: profiePicture,
       userId: userId,
       displayName: displayName,
       username: username,
@@ -108,6 +113,7 @@ export default function ProfileSetting({
   return (
     <View style={styles(theme).container}>
       <View style={styles(theme).settingGroup}>
+        <LoadingOverlay loading={loading} />
         <SettingItem
           left="Fullname"
           right={

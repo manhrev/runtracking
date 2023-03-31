@@ -14,8 +14,11 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/season"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/seasonmember"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -46,8 +49,11 @@ func columnChecker(table string) func(string) error {
 		challenge.Table:           challenge.ValidColumn,
 		challengemember.Table:     challengemember.ValidColumn,
 		challengememberrule.Table: challengememberrule.ValidColumn,
+		challengerule.Table:       challengerule.ValidColumn,
 		groupz.Table:              groupz.ValidColumn,
 		member.Table:              member.ValidColumn,
+		season.Table:              season.ValidColumn,
+		seasonmember.Table:        seasonmember.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

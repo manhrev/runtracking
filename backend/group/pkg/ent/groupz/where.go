@@ -65,6 +65,11 @@ func Description(v string) predicate.Groupz {
 	return predicate.Groupz(sql.FieldEQ(FieldDescription, v))
 }
 
+// GroupPicture applies equality check predicate on the "group_picture" field. It's identical to GroupPictureEQ.
+func GroupPicture(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldEQ(FieldGroupPicture, v))
+}
+
 // BackgroundPicture applies equality check predicate on the "background_picture" field. It's identical to BackgroundPictureEQ.
 func BackgroundPicture(v string) predicate.Groupz {
 	return predicate.Groupz(sql.FieldEQ(FieldBackgroundPicture, v))
@@ -233,6 +238,71 @@ func DescriptionEqualFold(v string) predicate.Groupz {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.Groupz {
 	return predicate.Groupz(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// GroupPictureEQ applies the EQ predicate on the "group_picture" field.
+func GroupPictureEQ(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldEQ(FieldGroupPicture, v))
+}
+
+// GroupPictureNEQ applies the NEQ predicate on the "group_picture" field.
+func GroupPictureNEQ(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldNEQ(FieldGroupPicture, v))
+}
+
+// GroupPictureIn applies the In predicate on the "group_picture" field.
+func GroupPictureIn(vs ...string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldIn(FieldGroupPicture, vs...))
+}
+
+// GroupPictureNotIn applies the NotIn predicate on the "group_picture" field.
+func GroupPictureNotIn(vs ...string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldNotIn(FieldGroupPicture, vs...))
+}
+
+// GroupPictureGT applies the GT predicate on the "group_picture" field.
+func GroupPictureGT(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldGT(FieldGroupPicture, v))
+}
+
+// GroupPictureGTE applies the GTE predicate on the "group_picture" field.
+func GroupPictureGTE(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldGTE(FieldGroupPicture, v))
+}
+
+// GroupPictureLT applies the LT predicate on the "group_picture" field.
+func GroupPictureLT(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldLT(FieldGroupPicture, v))
+}
+
+// GroupPictureLTE applies the LTE predicate on the "group_picture" field.
+func GroupPictureLTE(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldLTE(FieldGroupPicture, v))
+}
+
+// GroupPictureContains applies the Contains predicate on the "group_picture" field.
+func GroupPictureContains(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldContains(FieldGroupPicture, v))
+}
+
+// GroupPictureHasPrefix applies the HasPrefix predicate on the "group_picture" field.
+func GroupPictureHasPrefix(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldHasPrefix(FieldGroupPicture, v))
+}
+
+// GroupPictureHasSuffix applies the HasSuffix predicate on the "group_picture" field.
+func GroupPictureHasSuffix(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldHasSuffix(FieldGroupPicture, v))
+}
+
+// GroupPictureEqualFold applies the EqualFold predicate on the "group_picture" field.
+func GroupPictureEqualFold(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldEqualFold(FieldGroupPicture, v))
+}
+
+// GroupPictureContainsFold applies the ContainsFold predicate on the "group_picture" field.
+func GroupPictureContainsFold(v string) predicate.Groupz {
+	return predicate.Groupz(sql.FieldContainsFold(FieldGroupPicture, v))
 }
 
 // BackgroundPictureEQ applies the EQ predicate on the "background_picture" field.

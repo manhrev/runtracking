@@ -104,7 +104,7 @@ func (m *memberImpl) GetByUserID(
 	}
 	log.Printf("Member is: %s", memberEnt)
 	if memberEnt == nil {
-		return nil, status.Internal(fmt.Sprintf("Member with userID: %s && groupID: %s not found", userId, groupId))
+		return nil, status.Internal(fmt.Sprintf("Member with userID: %d && groupID: %s not found", userId, groupId))
 	}
 
 	return memberEnt, nil

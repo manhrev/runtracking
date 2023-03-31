@@ -71,6 +71,20 @@ func (gu *GroupzUpdate) ClearDescription() *GroupzUpdate {
 	return gu
 }
 
+// SetGroupPicture sets the "group_picture" field.
+func (gu *GroupzUpdate) SetGroupPicture(s string) *GroupzUpdate {
+	gu.mutation.SetGroupPicture(s)
+	return gu
+}
+
+// SetNillableGroupPicture sets the "group_picture" field if the given value is not nil.
+func (gu *GroupzUpdate) SetNillableGroupPicture(s *string) *GroupzUpdate {
+	if s != nil {
+		gu.SetGroupPicture(*s)
+	}
+	return gu
+}
+
 // SetBackgroundPicture sets the "background_picture" field.
 func (gu *GroupzUpdate) SetBackgroundPicture(s string) *GroupzUpdate {
 	gu.mutation.SetBackgroundPicture(s)
@@ -267,6 +281,9 @@ func (gu *GroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if gu.mutation.DescriptionCleared() {
 		_spec.ClearField(groupz.FieldDescription, field.TypeString)
 	}
+	if value, ok := gu.mutation.GroupPicture(); ok {
+		_spec.SetField(groupz.FieldGroupPicture, field.TypeString, value)
+	}
 	if value, ok := gu.mutation.BackgroundPicture(); ok {
 		_spec.SetField(groupz.FieldBackgroundPicture, field.TypeString, value)
 	}
@@ -449,6 +466,20 @@ func (guo *GroupzUpdateOne) SetNillableDescription(s *string) *GroupzUpdateOne {
 // ClearDescription clears the value of the "description" field.
 func (guo *GroupzUpdateOne) ClearDescription() *GroupzUpdateOne {
 	guo.mutation.ClearDescription()
+	return guo
+}
+
+// SetGroupPicture sets the "group_picture" field.
+func (guo *GroupzUpdateOne) SetGroupPicture(s string) *GroupzUpdateOne {
+	guo.mutation.SetGroupPicture(s)
+	return guo
+}
+
+// SetNillableGroupPicture sets the "group_picture" field if the given value is not nil.
+func (guo *GroupzUpdateOne) SetNillableGroupPicture(s *string) *GroupzUpdateOne {
+	if s != nil {
+		guo.SetGroupPicture(*s)
+	}
 	return guo
 }
 
@@ -671,6 +702,9 @@ func (guo *GroupzUpdateOne) sqlSave(ctx context.Context) (_node *Groupz, err err
 	}
 	if guo.mutation.DescriptionCleared() {
 		_spec.ClearField(groupz.FieldDescription, field.TypeString)
+	}
+	if value, ok := guo.mutation.GroupPicture(); ok {
+		_spec.SetField(groupz.FieldGroupPicture, field.TypeString, value)
 	}
 	if value, ok := guo.mutation.BackgroundPicture(); ok {
 		_spec.SetField(groupz.FieldBackgroundPicture, field.TypeString, value)

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 // Challenge is the model entity for the Challenge schema.
@@ -17,16 +18,24 @@ type Challenge struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// StartTime holds the value of the "start_time" field.
 	StartTime time.Time `json:"start_time,omitempty"`
+	// Picture holds the value of the "picture" field.
+	Picture string `json:"picture,omitempty"`
 	// EndTime holds the value of the "end_time" field.
 	EndTime time.Time `json:"end_time,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// TypeID holds the value of the "type_id" field.
 	TypeID int64 `json:"type_id,omitempty"`
+	// Status holds the value of the "status" field.
+	Status int64 `json:"status,omitempty"`
+	// CompletedFirstMemberID holds the value of the "completed_first_member_id" field.
+	CompletedFirstMemberID int64 `json:"completed_first_member_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChallengeQuery when eager-loading is set.
 	Edges             ChallengeEdges `json:"edges"`
@@ -39,9 +48,13 @@ type ChallengeEdges struct {
 	ChallengeMembers []*ChallengeMember `json:"challenge_members,omitempty"`
 	// Groupz holds the value of the groupz edge.
 	Groupz *Groupz `json:"groupz,omitempty"`
+	// ChallengeRules holds the value of the challenge_rules edge.
+	ChallengeRules []*ChallengeRule `json:"challenge_rules,omitempty"`
+	// FirstMember holds the value of the first_member edge.
+	FirstMember *Member `json:"first_member,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 }
 
 // ChallengeMembersOrErr returns the ChallengeMembers value or an error if the edge
@@ -66,14 +79,36 @@ func (e ChallengeEdges) GroupzOrErr() (*Groupz, error) {
 	return nil, &NotLoadedError{edge: "groupz"}
 }
 
+// ChallengeRulesOrErr returns the ChallengeRules value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChallengeEdges) ChallengeRulesOrErr() ([]*ChallengeRule, error) {
+	if e.loadedTypes[2] {
+		return e.ChallengeRules, nil
+	}
+	return nil, &NotLoadedError{edge: "challenge_rules"}
+}
+
+// FirstMemberOrErr returns the FirstMember value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ChallengeEdges) FirstMemberOrErr() (*Member, error) {
+	if e.loadedTypes[3] {
+		if e.FirstMember == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: member.Label}
+		}
+		return e.FirstMember, nil
+	}
+	return nil, &NotLoadedError{edge: "first_member"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Challenge) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challenge.FieldID, challenge.FieldTypeID:
+		case challenge.FieldID, challenge.FieldTypeID, challenge.FieldStatus, challenge.FieldCompletedFirstMemberID:
 			values[i] = new(sql.NullInt64)
-		case challenge.FieldDescription:
+		case challenge.FieldName, challenge.FieldPicture, challenge.FieldDescription:
 			values[i] = new(sql.NullString)
 		case challenge.FieldCreatedAt, challenge.FieldStartTime, challenge.FieldEndTime:
 			values[i] = new(sql.NullTime)
@@ -100,6 +135,12 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int64(value.Int64)
+		case challenge.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				c.Name = value.String
+			}
 		case challenge.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -111,6 +152,12 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field start_time", values[i])
 			} else if value.Valid {
 				c.StartTime = value.Time
+			}
+		case challenge.FieldPicture:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field picture", values[i])
+			} else if value.Valid {
+				c.Picture = value.String
 			}
 		case challenge.FieldEndTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -129,6 +176,18 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field type_id", values[i])
 			} else if value.Valid {
 				c.TypeID = value.Int64
+			}
+		case challenge.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				c.Status = value.Int64
+			}
+		case challenge.FieldCompletedFirstMemberID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field completed_first_member_id", values[i])
+			} else if value.Valid {
+				c.CompletedFirstMemberID = value.Int64
 			}
 		case challenge.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -150,6 +209,16 @@ func (c *Challenge) QueryChallengeMembers() *ChallengeMemberQuery {
 // QueryGroupz queries the "groupz" edge of the Challenge entity.
 func (c *Challenge) QueryGroupz() *GroupzQuery {
 	return NewChallengeClient(c.config).QueryGroupz(c)
+}
+
+// QueryChallengeRules queries the "challenge_rules" edge of the Challenge entity.
+func (c *Challenge) QueryChallengeRules() *ChallengeRuleQuery {
+	return NewChallengeClient(c.config).QueryChallengeRules(c)
+}
+
+// QueryFirstMember queries the "first_member" edge of the Challenge entity.
+func (c *Challenge) QueryFirstMember() *MemberQuery {
+	return NewChallengeClient(c.config).QueryFirstMember(c)
 }
 
 // Update returns a builder for updating this Challenge.
@@ -175,11 +244,17 @@ func (c *Challenge) String() string {
 	var builder strings.Builder
 	builder.WriteString("Challenge(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString("name=")
+	builder.WriteString(c.Name)
+	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("start_time=")
 	builder.WriteString(c.StartTime.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("picture=")
+	builder.WriteString(c.Picture)
 	builder.WriteString(", ")
 	builder.WriteString("end_time=")
 	builder.WriteString(c.EndTime.Format(time.ANSIC))
@@ -189,6 +264,12 @@ func (c *Challenge) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("type_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.TypeID))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", c.Status))
+	builder.WriteString(", ")
+	builder.WriteString("completed_first_member_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.CompletedFirstMemberID))
 	builder.WriteByte(')')
 	return builder.String()
 }

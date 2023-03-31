@@ -4,15 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "backend/auth"
-		},
-		{
-			"path": "backend/notification"
-		},
-		{
-			"path": "backend/intermediary"
-		},
-		{
 			"path": "backend/group"
 		}
 	],

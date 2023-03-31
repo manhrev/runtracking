@@ -7,9 +7,9 @@ generate-code:
 	protoc --go_out=./pkg/code --go-grpc_out=./pkg/code  ./api/auth_code.proto
 
 generate-ts:
-	mkdir -p ./npm/code
-	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth.proto
-	protoc -I=./api --js_out=import_style=commonjs:./npm/code --grpc-web_out=import_style=typescript,mode=grpcwebtext:./npm/code ./api/auth_code.proto
+	mkdir -p ./pkg/ts
+	protoc -I=./api --js_out=import_style=commonjs:./pkg/ts --grpc-web_out=import_style=typescript,mode=grpcwebtext:./pkg/ts ./api/auth.proto
+	protoc -I=./api --js_out=import_style=commonjs:./pkg/ts --grpc-web_out=import_style=typescript,mode=grpcwebtext:./pkg/ts ./api/auth_code.proto
 
 generate-cache:
 	mkdir -p ./pkg/data

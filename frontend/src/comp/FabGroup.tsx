@@ -23,6 +23,7 @@ interface FabGroupProps {
   right?: number
   icon?: string
   type?: 'primary' | 'secondary' | 'tertiary' | 'error'
+  forceOpen?: boolean
 }
 
 export const FabGroup = ({
@@ -32,6 +33,7 @@ export const FabGroup = ({
   right,
   icon,
   type,
+  forceOpen,
 }: FabGroupProps) => {
   const isFocused = useIsFocused()
   const onStateChange = ({ open }: { open: boolean }) => setState({ open })
@@ -43,6 +45,7 @@ export const FabGroup = ({
   )
 
   const { open } = state
+
   return (
     <Portal>
       <FAB.Group
@@ -55,7 +58,7 @@ export const FabGroup = ({
         color={backgroundColor}
         backdropColor={theme.colors.backdrop}
         open={open && isFocused}
-        visible={isFocused}
+        visible={forceOpen !== undefined ? forceOpen : isFocused}
         icon={open ? 'window-close' : icon || 'dots-horizontal'}
         actions={actions}
         onStateChange={onStateChange}

@@ -30,15 +30,21 @@ type (
 		Challenge           []ent.Hook
 		ChallengeMember     []ent.Hook
 		ChallengeMemberRule []ent.Hook
+		ChallengeRule       []ent.Hook
 		Groupz              []ent.Hook
 		Member              []ent.Hook
+		Season              []ent.Hook
+		SeasonMember        []ent.Hook
 	}
 	inters struct {
 		Challenge           []ent.Interceptor
 		ChallengeMember     []ent.Interceptor
 		ChallengeMemberRule []ent.Interceptor
+		ChallengeRule       []ent.Interceptor
 		Groupz              []ent.Interceptor
 		Member              []ent.Interceptor
+		Season              []ent.Interceptor
+		SeasonMember        []ent.Interceptor
 	}
 )
 

@@ -1,11 +1,8 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
-import React from 'react'
-import ExampleScreen from '../screens/ExampleScreen'
 import Activity from '../screens/Activity/ActivityHome'
-import ProfileHome from '../screens/Profile/ProfileHome'
+import ProfileHome from '../screens/Profile/ProfileHome/index'
 import RunHome from '../screens/Run/RunHome'
 import { RootBaseStackParamList } from './BaseStack'
-import ComingSoon from '../screens/ComingSoon'
 import PlanHome from '../screens/Plan/PlanHome'
 import GroupTopTabs from './GroupTopTab'
 

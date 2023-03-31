@@ -17,7 +17,71 @@ service Group {
     rpc AcceptMember(AcceptMemberRequest) returns(AcceptMemberReply) {};
     rpc BanMember(BanMemberRequest) returns (BanMemberReply) {};
     rpc LeaveGroup(LeaveGroupRequest) returns(LeaveGroupReply){};
+    
+    // API for challenge
+    rpc CreateChallenge(CreateChallengeRequest) returns(CreateChallengeReply){};
+    // rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
+    rpc ListChallenge(ListChallengeRequest) returns(ListChallengeReply) {};
+    rpc UpdateChallenge(UpdateChallengeRequest) returns(UpdateChallengeReply) {};
+    rpc DeleteChallenge(DeleteChallengeRequest) returns(DeleteChallengeReply) {};
+    rpc ListUserRanking(ListUserRankingRequest) returns(ListUserRankingReply){};
+    rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
 }
+
+message GetChallengeRequest{
+    int64 id = 1;
+}
+
+message GetChallengeReply{
+    ChallengeInfo challengeInfo = 1;
+}
+
+message CreateChallengeRequest{
+    ChallengeInfo challengeInfo = 1;
+    int64 group_id = 2;
+}
+message CreateChallengeReply {}
+
+message ListChallengeRequest{
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    int64 group_id = 6;
+    ChallengeSortBy sort_by = 4;
+    string search_by_name = 5;
+    repeated Rule filter_by_rules = 7;
+    ActivityType filter_by_type = 10;
+    RuleStatus status = 12;
+
+    google.protobuf.Timestamp from = 8;
+    google.protobuf.Timestamp to = 9;
+
+    enum ChallengeSortBy{
+        CHALLENGE_SORT_BY_UNSPECIFIED = 0;
+        CHALLENGE_SORT_BY_START_TIME = 1; 
+        CHALLENGE_SORT_BY_END_TIME = 2; 
+        CHALLENGE_SORT_BY_NAME = 3;
+    }
+}
+message ListChallengeReply {
+    repeated ChallengeInfo challengeInfoList = 1;
+    int64 total = 2;
+}
+
+message UpdateChallengeRequest{
+    ChallengeInfo challengeInfo = 1;
+    int64 group_id = 2;
+    repeated int64 ids_rule_to_delete = 3;
+}
+message UpdateChallengeReply{}
+
+message DeleteChallengeRequest{
+    int64 id = 1;
+}
+message DeleteChallengeReply{}
+
+message ListUserRankingRequest{}
+message ListUserRankingReply{}
 
 message LeaveGroupRequest{
     int64 group_id = 1;
@@ -125,6 +189,8 @@ message GetGroupRequest{
 
 message GetGroupReply{
     GroupInfo groupInfo = 1;
+
+    // Limit 10 item each of below entity type. Click into it to see more clearly
     repeated Member members = 2;
     repeated ChallengeInfo challenges = 3;
     repeated EventInfo events = 4;
@@ -149,6 +215,14 @@ enum Rule {
     RULE_TOTAL_TIME = 2;
     RULE_TOTAL_CALORIES = 3;
 }
+
+enum RuleStatus {
+    RULE_STATUS_UNSPECIFIED = 0;
+    RULE_STATUS_FAILED = 1;
+    RULE_STATUS_COMPLETED = 2;
+    RULE_STATUS_INPROGRESS = 3;
+}
+
 
 enum ActivityType {
     ACTIVITY_TYPE_UNSPECIFIED = 0;
@@ -185,17 +259,55 @@ message Member{
 }
 
 
-
 message ChallengeInfo{
+    // just appear when list
     int64 id = 1;
+    int64 group_id = 14;
+    Member completed_first_member = 13;
+
+    
+
+    //just appear when get challenge
+    repeated MemberProgress member_progress_list = 16;
+
+    //used both list and CRUD
     string name = 2;
     string description = 3;
-    repeated Rule rules = 8;
+    string picture = 12;
+    repeated ChallengeRuleInfo challengeRules = 8;
     ActivityType type = 9;
-    int64 goal = 10;
-    int64 total = 11;
+    RuleStatus status = 15;
     google.protobuf.Timestamp from = 6;
     google.protobuf.Timestamp to = 7;
+    
+}
+
+message MemberProgress{
+    bool is_completed_first = 6;
+    RuleStatus challenge_progress = 5;
+    Member member_info = 1;
+    repeated RuleProgress rule_progress_list =  7;
+
+    // list progress of each rule
+    message RuleProgress{
+        Rule rule = 1;
+        RuleStatus status = 2;
+        int64 total = 4;
+        google.protobuf.Timestamp time_completed = 3;
+    }
+}
+
+message ChallengeRuleInfo{
+
+    //use only for listing
+    int64 id = 1;
+
+    //both list and crud
+    int64 goal = 2;
+    Rule rule = 3;
+
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
 }
 
 
@@ -210,6 +322,8 @@ message EventInfo{
     google.protobuf.Timestamp from = 6;
     google.protobuf.Timestamp to = 7;
 }
+
+
 
 
 

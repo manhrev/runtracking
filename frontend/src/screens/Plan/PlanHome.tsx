@@ -16,30 +16,31 @@ import { RootHomeTabsParamList } from '../../navigators/HomeTab'
 import { useState, useEffect, useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
 import * as Progress from 'react-native-progress'
-import { getPlanList, isPlanListLoading } from '../../redux/features/planList/slice'
+import {
+  getPlanList,
+  isPlanListLoading,
+} from '../../redux/features/planList/slice'
 
 import { listPlanThunk } from '../../redux/features/planList/thunk'
 
-import { RuleStatus, DeletePlansRequest, PlanSortBy } from '../../lib/plan/plan_pb'
+import {
+  RuleStatus,
+  DeletePlansRequest,
+  PlanSortBy,
+} from '../../lib/plan/plan_pb'
 
 import { deletePlansThunk } from '../../redux/features/planList/thunk'
 
 import { ActivityType } from '../../lib/activity/activity_pb'
 
-import {
-  displayValue,
-  getProgressOfDailyActivity,
-  isDailyActivity,
-  toDate,
-} from '../../utils/helpers'
 import { toast } from '../../utils/toast/toast'
 import { FabGroup } from '../../comp/FabGroup'
 import { RefreshControl } from 'react-native-gesture-handler'
 import Filter from './comp/Filter'
 import PlanItem from './comp/PlanItem'
 import { baseStyles } from '../baseStyle'
-
-const windowWidth = Dimensions.get('window').width
+import { useDialog } from '../../hooks/useDialog'
+import { ConfirmDialog } from '../../comp/ConfirmDialog'
 
 export default function Plan({
   navigation,
@@ -49,17 +50,18 @@ export default function Plan({
 
   const dispatch = useAppDispatch()
   const { planList } = useAppSelector(getPlanList)
-  const isLoading = useAppSelector(isPlanListLoading);
+  const isLoading = useAppSelector(isPlanListLoading)
   const noData = planList.length === 0 && !isLoading
   const [tabState, setTabState] = useState('current')
   const [deleteListId, setDeleteListId] = useState<number[]>([])
   const [selectedAll, setSelectedAll] = useState(false)
+  const { toggleDialog, open } = useDialog()
 
   // filter
   const [asc, setAsc] = useState(false)
   const [sortBy, setSortBy] = useState(PlanSortBy.PLAN_SORT_BY_CREATED_TIME)
-  const [filteredActivityType, setFilteredActivityType] = useState<ActivityType>(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
-  
+  const [filteredActivityType, setFilteredActivityType] =
+    useState<ActivityType>(ActivityType.ACTIVITY_TYPE_UNSPECIFIED)
 
   const fetchPlanList = async () => {
     const { error } = await dispatch(
@@ -74,7 +76,7 @@ export default function Plan({
     ).unwrap()
 
     if (error) {
-      toast.error({ message: "Something went wrong. Please try again later!" })
+      toast.error({ message: 'Something went wrong. Please try again later!' })
     }
   }
 
@@ -83,7 +85,6 @@ export default function Plan({
       fetchPlanList()
     }, [filteredActivityType, asc, sortBy])
   )
-
 
   // if tab or filter change, reset selected all and delete list
   useEffect(() => {
@@ -109,18 +110,7 @@ export default function Plan({
       return
     }
 
-    Alert.alert(
-      'Delete Plan',
-      'Are you sure you want to delete ' + deleteListId.length + ' plan(s)?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        { text: 'Yes', onPress: () => deletePlanConfirmed() },
-      ],
-      { cancelable: false }
-    )
+    toggleDialog()
   }
 
   const deletePlanConfirmed = () => {
@@ -131,6 +121,7 @@ export default function Plan({
     toast.success({ message: 'Deleted plans successfully' })
     setDeleteListId([])
     setSelectedAll(false)
+    toggleDialog()
   }
 
   const selectOrUnselectAll = () => {
@@ -149,14 +140,23 @@ export default function Plan({
 
   const filteredPlanList = planList.filter(
     (item) =>
-      ((item.status === RuleStatus.RULE_STATUS_INPROGRESS &&
+      (item.status === RuleStatus.RULE_STATUS_INPROGRESS &&
         tabState === 'current') ||
-        (item.status !== RuleStatus.RULE_STATUS_INPROGRESS &&
-          tabState === 'history'))
+      (item.status !== RuleStatus.RULE_STATUS_INPROGRESS &&
+        tabState === 'history')
   )
 
   return (
     <>
+      <ConfirmDialog
+        message={
+          'Are you sure you want to delete ' + deleteListId.length + ' plan(s)?'
+        }
+        title="Delete Plan"
+        visible={open}
+        onSubmit={() => deletePlanConfirmed()}
+        toogleDialog={toggleDialog}
+      />
       <View style={baseStyles(theme).homeContainer}>
         <View style={baseStyles(theme).innerWrapper}>
           <ScrollView
@@ -174,7 +174,8 @@ export default function Plan({
                   actions={[
                     {
                       icon: 'delete',
-                      label: 'Remove ' + deleteListId.length + ' selected plan(s)',
+                      label:
+                        'Remove ' + deleteListId.length + ' selected plan(s)',
                       labelTextColor: theme.colors.onError,
                       onPress: () => deletePlanOrNot(),
                       color: theme.colors.onError,
@@ -216,7 +217,7 @@ export default function Plan({
                 },
               ]}
             />
-      
+
             <Filter
               asc={asc}
               setAsc={setAsc}
@@ -228,23 +229,23 @@ export default function Plan({
               selectOrUnselectAll={selectOrUnselectAll}
             />
 
-            <Divider style={{ height: 1 }}/>
+            <Divider style={{ height: 1 }} />
 
             {filteredPlanList.map((plan, idx) => (
-                <PlanItem
-                  key={idx}
-                  plan={plan}
-                  hideTopDivider={idx === 0}
-                  showBottomDivider={idx === filteredPlanList.length - 1}
-                  navigateFunc={() => {
-                    navigation.navigate('PlanDetail', {
-                      planId: plan.id,
-                      canEdit: plan.status === RuleStatus.RULE_STATUS_INPROGRESS,
-                    })
-                  }}
-                  deleteListId={deleteListId}
-                  addOrRemoveFromDeleteList={addOrRemoveFromDeleteList}
-                />
+              <PlanItem
+                key={idx}
+                plan={plan}
+                hideTopDivider={idx === 0}
+                showBottomDivider={idx === filteredPlanList.length - 1}
+                navigateFunc={() => {
+                  navigation.navigate('PlanDetail', {
+                    planId: plan.id,
+                    canEdit: plan.status === RuleStatus.RULE_STATUS_INPROGRESS,
+                  })
+                }}
+                deleteListId={deleteListId}
+                addOrRemoveFromDeleteList={addOrRemoveFromDeleteList}
+              />
             ))}
             {noData && (
               <Text
