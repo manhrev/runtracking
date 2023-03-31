@@ -20,13 +20,14 @@ import { ActivityType } from '../../lib/activity/activity_pb'
 import { Rule, CreatePlanRequest } from '../../lib/plan/plan_pb'
 import moment from 'moment'
 import { toast } from '../../utils/toast/toast'
+import { useDispatchWithLoading } from '../../hooks/useDispatchWithLoading'
 
 export default function PlanAdd({
   navigation,
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, 'PlanAdd'>) {
   const theme = useAppTheme()
-  const dispatch = useAppDispatch()
+  const { dispatch, dispatchLoading, loading } = useDispatchWithLoading()
 
   const data = [
     { label: 'Total Km', value: Rule.RULE_TOTAL_DISTANCE.toString() },
@@ -166,9 +167,14 @@ export default function PlanAdd({
       return
     }
 
-    const { error } = await dispatch(createPlanThunk(planData)).unwrap()
+    const { error } = await dispatchLoading(createPlanThunk, planData)
 
-    const list = await dispatch(
+    if (!error) {
+      toast.success({ message: 'Plan created!' })
+      navigation.goBack()
+    } else toast.error({ message: 'An error occured, please try again!' })
+
+    dispatch(
       listPlanThunk({
         activityType: 0,
         ascending: false,
@@ -177,11 +183,7 @@ export default function PlanAdd({
         sortBy: 1,
         idsList: [],
       })
-    ).unwrap()
-    if (!error) {
-      toast.success({ message: 'Plan created!' })
-      navigation.goBack()
-    } else toast.error({ message: 'An error occured, please try again!' })
+    )
   }
 
   return (
@@ -350,6 +352,7 @@ export default function PlanAdd({
               mode="contained"
               onPress={() => savePlan()}
               style={styles(theme).button}
+              loading={loading}
             >
               Create
             </Button>
