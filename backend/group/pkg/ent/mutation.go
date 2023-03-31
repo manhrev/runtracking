@@ -12,9 +12,12 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/season"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/seasonmember"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -32,8 +35,11 @@ const (
 	TypeChallenge           = "Challenge"
 	TypeChallengeMember     = "ChallengeMember"
 	TypeChallengeMemberRule = "ChallengeMemberRule"
+	TypeChallengeRule       = "ChallengeRule"
 	TypeGroupz              = "Groupz"
 	TypeMember              = "Member"
+	TypeSeason              = "Season"
+	TypeSeasonMember        = "SeasonMember"
 )
 
 // ChallengeMutation represents an operation that mutates the Challenge nodes in the graph.
@@ -42,18 +48,27 @@ type ChallengeMutation struct {
 	op                       Op
 	typ                      string
 	id                       *int64
+	name                     *string
 	created_at               *time.Time
 	start_time               *time.Time
+	picture                  *string
 	end_time                 *time.Time
 	description              *string
 	type_id                  *int64
 	addtype_id               *int64
+	status                   *int64
+	addstatus                *int64
 	clearedFields            map[string]struct{}
 	challenge_members        map[int64]struct{}
 	removedchallenge_members map[int64]struct{}
 	clearedchallenge_members bool
 	groupz                   *int64
 	clearedgroupz            bool
+	challenge_rules          map[int64]struct{}
+	removedchallenge_rules   map[int64]struct{}
+	clearedchallenge_rules   bool
+	first_member             *int64
+	clearedfirst_member      bool
 	done                     bool
 	oldValue                 func(context.Context) (*Challenge, error)
 	predicates               []predicate.Challenge
@@ -163,6 +178,55 @@ func (m *ChallengeMutation) IDs(ctx context.Context) ([]int64, error) {
 	}
 }
 
+// SetName sets the "name" field.
+func (m *ChallengeMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ChallengeMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *ChallengeMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[challenge.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *ChallengeMutation) NameCleared() bool {
+	_, ok := m.clearedFields[challenge.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ChallengeMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, challenge.FieldName)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ChallengeMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -246,6 +310,42 @@ func (m *ChallengeMutation) StartTimeCleared() bool {
 func (m *ChallengeMutation) ResetStartTime() {
 	m.start_time = nil
 	delete(m.clearedFields, challenge.FieldStartTime)
+}
+
+// SetPicture sets the "picture" field.
+func (m *ChallengeMutation) SetPicture(s string) {
+	m.picture = &s
+}
+
+// Picture returns the value of the "picture" field in the mutation.
+func (m *ChallengeMutation) Picture() (r string, exists bool) {
+	v := m.picture
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPicture returns the old "picture" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldPicture(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPicture is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPicture requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPicture: %w", err)
+	}
+	return oldValue.Picture, nil
+}
+
+// ResetPicture resets all changes to the "picture" field.
+func (m *ChallengeMutation) ResetPicture() {
+	m.picture = nil
 }
 
 // SetEndTime sets the "end_time" field.
@@ -402,6 +502,111 @@ func (m *ChallengeMutation) ResetTypeID() {
 	m.addtype_id = nil
 }
 
+// SetStatus sets the "status" field.
+func (m *ChallengeMutation) SetStatus(i int64) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ChallengeMutation) Status() (r int64, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldStatus(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *ChallengeMutation) AddStatus(i int64) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *ChallengeMutation) AddedStatus() (r int64, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ChallengeMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetCompletedFirstMemberID sets the "completed_first_member_id" field.
+func (m *ChallengeMutation) SetCompletedFirstMemberID(i int64) {
+	m.first_member = &i
+}
+
+// CompletedFirstMemberID returns the value of the "completed_first_member_id" field in the mutation.
+func (m *ChallengeMutation) CompletedFirstMemberID() (r int64, exists bool) {
+	v := m.first_member
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCompletedFirstMemberID returns the old "completed_first_member_id" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldCompletedFirstMemberID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCompletedFirstMemberID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCompletedFirstMemberID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCompletedFirstMemberID: %w", err)
+	}
+	return oldValue.CompletedFirstMemberID, nil
+}
+
+// ClearCompletedFirstMemberID clears the value of the "completed_first_member_id" field.
+func (m *ChallengeMutation) ClearCompletedFirstMemberID() {
+	m.first_member = nil
+	m.clearedFields[challenge.FieldCompletedFirstMemberID] = struct{}{}
+}
+
+// CompletedFirstMemberIDCleared returns if the "completed_first_member_id" field was cleared in this mutation.
+func (m *ChallengeMutation) CompletedFirstMemberIDCleared() bool {
+	_, ok := m.clearedFields[challenge.FieldCompletedFirstMemberID]
+	return ok
+}
+
+// ResetCompletedFirstMemberID resets all changes to the "completed_first_member_id" field.
+func (m *ChallengeMutation) ResetCompletedFirstMemberID() {
+	m.first_member = nil
+	delete(m.clearedFields, challenge.FieldCompletedFirstMemberID)
+}
+
 // AddChallengeMemberIDs adds the "challenge_members" edge to the ChallengeMember entity by ids.
 func (m *ChallengeMutation) AddChallengeMemberIDs(ids ...int64) {
 	if m.challenge_members == nil {
@@ -495,6 +700,99 @@ func (m *ChallengeMutation) ResetGroupz() {
 	m.clearedgroupz = false
 }
 
+// AddChallengeRuleIDs adds the "challenge_rules" edge to the ChallengeRule entity by ids.
+func (m *ChallengeMutation) AddChallengeRuleIDs(ids ...int64) {
+	if m.challenge_rules == nil {
+		m.challenge_rules = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.challenge_rules[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChallengeRules clears the "challenge_rules" edge to the ChallengeRule entity.
+func (m *ChallengeMutation) ClearChallengeRules() {
+	m.clearedchallenge_rules = true
+}
+
+// ChallengeRulesCleared reports if the "challenge_rules" edge to the ChallengeRule entity was cleared.
+func (m *ChallengeMutation) ChallengeRulesCleared() bool {
+	return m.clearedchallenge_rules
+}
+
+// RemoveChallengeRuleIDs removes the "challenge_rules" edge to the ChallengeRule entity by IDs.
+func (m *ChallengeMutation) RemoveChallengeRuleIDs(ids ...int64) {
+	if m.removedchallenge_rules == nil {
+		m.removedchallenge_rules = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.challenge_rules, ids[i])
+		m.removedchallenge_rules[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChallengeRules returns the removed IDs of the "challenge_rules" edge to the ChallengeRule entity.
+func (m *ChallengeMutation) RemovedChallengeRulesIDs() (ids []int64) {
+	for id := range m.removedchallenge_rules {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChallengeRulesIDs returns the "challenge_rules" edge IDs in the mutation.
+func (m *ChallengeMutation) ChallengeRulesIDs() (ids []int64) {
+	for id := range m.challenge_rules {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChallengeRules resets all changes to the "challenge_rules" edge.
+func (m *ChallengeMutation) ResetChallengeRules() {
+	m.challenge_rules = nil
+	m.clearedchallenge_rules = false
+	m.removedchallenge_rules = nil
+}
+
+// SetFirstMemberID sets the "first_member" edge to the Member entity by id.
+func (m *ChallengeMutation) SetFirstMemberID(id int64) {
+	m.first_member = &id
+}
+
+// ClearFirstMember clears the "first_member" edge to the Member entity.
+func (m *ChallengeMutation) ClearFirstMember() {
+	m.clearedfirst_member = true
+}
+
+// FirstMemberCleared reports if the "first_member" edge to the Member entity was cleared.
+func (m *ChallengeMutation) FirstMemberCleared() bool {
+	return m.CompletedFirstMemberIDCleared() || m.clearedfirst_member
+}
+
+// FirstMemberID returns the "first_member" edge ID in the mutation.
+func (m *ChallengeMutation) FirstMemberID() (id int64, exists bool) {
+	if m.first_member != nil {
+		return *m.first_member, true
+	}
+	return
+}
+
+// FirstMemberIDs returns the "first_member" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FirstMemberID instead. It exists only for internal usage by the builders.
+func (m *ChallengeMutation) FirstMemberIDs() (ids []int64) {
+	if id := m.first_member; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetFirstMember resets all changes to the "first_member" edge.
+func (m *ChallengeMutation) ResetFirstMember() {
+	m.first_member = nil
+	m.clearedfirst_member = false
+}
+
 // Where appends a list predicates to the ChallengeMutation builder.
 func (m *ChallengeMutation) Where(ps ...predicate.Challenge) {
 	m.predicates = append(m.predicates, ps...)
@@ -529,12 +827,18 @@ func (m *ChallengeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChallengeMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 9)
+	if m.name != nil {
+		fields = append(fields, challenge.FieldName)
+	}
 	if m.created_at != nil {
 		fields = append(fields, challenge.FieldCreatedAt)
 	}
 	if m.start_time != nil {
 		fields = append(fields, challenge.FieldStartTime)
+	}
+	if m.picture != nil {
+		fields = append(fields, challenge.FieldPicture)
 	}
 	if m.end_time != nil {
 		fields = append(fields, challenge.FieldEndTime)
@@ -545,6 +849,12 @@ func (m *ChallengeMutation) Fields() []string {
 	if m.type_id != nil {
 		fields = append(fields, challenge.FieldTypeID)
 	}
+	if m.status != nil {
+		fields = append(fields, challenge.FieldStatus)
+	}
+	if m.first_member != nil {
+		fields = append(fields, challenge.FieldCompletedFirstMemberID)
+	}
 	return fields
 }
 
@@ -553,16 +863,24 @@ func (m *ChallengeMutation) Fields() []string {
 // schema.
 func (m *ChallengeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case challenge.FieldName:
+		return m.Name()
 	case challenge.FieldCreatedAt:
 		return m.CreatedAt()
 	case challenge.FieldStartTime:
 		return m.StartTime()
+	case challenge.FieldPicture:
+		return m.Picture()
 	case challenge.FieldEndTime:
 		return m.EndTime()
 	case challenge.FieldDescription:
 		return m.Description()
 	case challenge.FieldTypeID:
 		return m.TypeID()
+	case challenge.FieldStatus:
+		return m.Status()
+	case challenge.FieldCompletedFirstMemberID:
+		return m.CompletedFirstMemberID()
 	}
 	return nil, false
 }
@@ -572,16 +890,24 @@ func (m *ChallengeMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ChallengeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case challenge.FieldName:
+		return m.OldName(ctx)
 	case challenge.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case challenge.FieldStartTime:
 		return m.OldStartTime(ctx)
+	case challenge.FieldPicture:
+		return m.OldPicture(ctx)
 	case challenge.FieldEndTime:
 		return m.OldEndTime(ctx)
 	case challenge.FieldDescription:
 		return m.OldDescription(ctx)
 	case challenge.FieldTypeID:
 		return m.OldTypeID(ctx)
+	case challenge.FieldStatus:
+		return m.OldStatus(ctx)
+	case challenge.FieldCompletedFirstMemberID:
+		return m.OldCompletedFirstMemberID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Challenge field %s", name)
 }
@@ -591,6 +917,13 @@ func (m *ChallengeMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *ChallengeMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case challenge.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
 	case challenge.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -604,6 +937,13 @@ func (m *ChallengeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStartTime(v)
+		return nil
+	case challenge.FieldPicture:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPicture(v)
 		return nil
 	case challenge.FieldEndTime:
 		v, ok := value.(time.Time)
@@ -626,6 +966,20 @@ func (m *ChallengeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTypeID(v)
 		return nil
+	case challenge.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case challenge.FieldCompletedFirstMemberID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCompletedFirstMemberID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Challenge field %s", name)
 }
@@ -637,6 +991,9 @@ func (m *ChallengeMutation) AddedFields() []string {
 	if m.addtype_id != nil {
 		fields = append(fields, challenge.FieldTypeID)
 	}
+	if m.addstatus != nil {
+		fields = append(fields, challenge.FieldStatus)
+	}
 	return fields
 }
 
@@ -647,6 +1004,8 @@ func (m *ChallengeMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case challenge.FieldTypeID:
 		return m.AddedTypeID()
+	case challenge.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -663,6 +1022,13 @@ func (m *ChallengeMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddTypeID(v)
 		return nil
+	case challenge.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Challenge numeric field %s", name)
 }
@@ -671,6 +1037,9 @@ func (m *ChallengeMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ChallengeMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(challenge.FieldName) {
+		fields = append(fields, challenge.FieldName)
+	}
 	if m.FieldCleared(challenge.FieldStartTime) {
 		fields = append(fields, challenge.FieldStartTime)
 	}
@@ -679,6 +1048,9 @@ func (m *ChallengeMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(challenge.FieldDescription) {
 		fields = append(fields, challenge.FieldDescription)
+	}
+	if m.FieldCleared(challenge.FieldCompletedFirstMemberID) {
+		fields = append(fields, challenge.FieldCompletedFirstMemberID)
 	}
 	return fields
 }
@@ -694,6 +1066,9 @@ func (m *ChallengeMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ChallengeMutation) ClearField(name string) error {
 	switch name {
+	case challenge.FieldName:
+		m.ClearName()
+		return nil
 	case challenge.FieldStartTime:
 		m.ClearStartTime()
 		return nil
@@ -703,6 +1078,9 @@ func (m *ChallengeMutation) ClearField(name string) error {
 	case challenge.FieldDescription:
 		m.ClearDescription()
 		return nil
+	case challenge.FieldCompletedFirstMemberID:
+		m.ClearCompletedFirstMemberID()
+		return nil
 	}
 	return fmt.Errorf("unknown Challenge nullable field %s", name)
 }
@@ -711,11 +1089,17 @@ func (m *ChallengeMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ChallengeMutation) ResetField(name string) error {
 	switch name {
+	case challenge.FieldName:
+		m.ResetName()
+		return nil
 	case challenge.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
 	case challenge.FieldStartTime:
 		m.ResetStartTime()
+		return nil
+	case challenge.FieldPicture:
+		m.ResetPicture()
 		return nil
 	case challenge.FieldEndTime:
 		m.ResetEndTime()
@@ -726,18 +1110,30 @@ func (m *ChallengeMutation) ResetField(name string) error {
 	case challenge.FieldTypeID:
 		m.ResetTypeID()
 		return nil
+	case challenge.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case challenge.FieldCompletedFirstMemberID:
+		m.ResetCompletedFirstMemberID()
+		return nil
 	}
 	return fmt.Errorf("unknown Challenge field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChallengeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.challenge_members != nil {
 		edges = append(edges, challenge.EdgeChallengeMembers)
 	}
 	if m.groupz != nil {
 		edges = append(edges, challenge.EdgeGroupz)
+	}
+	if m.challenge_rules != nil {
+		edges = append(edges, challenge.EdgeChallengeRules)
+	}
+	if m.first_member != nil {
+		edges = append(edges, challenge.EdgeFirstMember)
 	}
 	return edges
 }
@@ -756,15 +1152,28 @@ func (m *ChallengeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.groupz; id != nil {
 			return []ent.Value{*id}
 		}
+	case challenge.EdgeChallengeRules:
+		ids := make([]ent.Value, 0, len(m.challenge_rules))
+		for id := range m.challenge_rules {
+			ids = append(ids, id)
+		}
+		return ids
+	case challenge.EdgeFirstMember:
+		if id := m.first_member; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChallengeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.removedchallenge_members != nil {
 		edges = append(edges, challenge.EdgeChallengeMembers)
+	}
+	if m.removedchallenge_rules != nil {
+		edges = append(edges, challenge.EdgeChallengeRules)
 	}
 	return edges
 }
@@ -779,18 +1188,30 @@ func (m *ChallengeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case challenge.EdgeChallengeRules:
+		ids := make([]ent.Value, 0, len(m.removedchallenge_rules))
+		for id := range m.removedchallenge_rules {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChallengeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.clearedchallenge_members {
 		edges = append(edges, challenge.EdgeChallengeMembers)
 	}
 	if m.clearedgroupz {
 		edges = append(edges, challenge.EdgeGroupz)
+	}
+	if m.clearedchallenge_rules {
+		edges = append(edges, challenge.EdgeChallengeRules)
+	}
+	if m.clearedfirst_member {
+		edges = append(edges, challenge.EdgeFirstMember)
 	}
 	return edges
 }
@@ -803,6 +1224,10 @@ func (m *ChallengeMutation) EdgeCleared(name string) bool {
 		return m.clearedchallenge_members
 	case challenge.EdgeGroupz:
 		return m.clearedgroupz
+	case challenge.EdgeChallengeRules:
+		return m.clearedchallenge_rules
+	case challenge.EdgeFirstMember:
+		return m.clearedfirst_member
 	}
 	return false
 }
@@ -813,6 +1238,9 @@ func (m *ChallengeMutation) ClearEdge(name string) error {
 	switch name {
 	case challenge.EdgeGroupz:
 		m.ClearGroupz()
+		return nil
+	case challenge.EdgeFirstMember:
+		m.ClearFirstMember()
 		return nil
 	}
 	return fmt.Errorf("unknown Challenge unique edge %s", name)
@@ -828,6 +1256,12 @@ func (m *ChallengeMutation) ResetEdge(name string) error {
 	case challenge.EdgeGroupz:
 		m.ResetGroupz()
 		return nil
+	case challenge.EdgeChallengeRules:
+		m.ResetChallengeRules()
+		return nil
+	case challenge.EdgeFirstMember:
+		m.ResetFirstMember()
+		return nil
 	}
 	return fmt.Errorf("unknown Challenge edge %s", name)
 }
@@ -838,14 +1272,21 @@ type ChallengeMemberMutation struct {
 	op                            Op
 	typ                           string
 	id                            *int64
-	member_id                     *int64
-	addmember_id                  *int64
+	point                         *int64
+	addpoint                      *int64
+	status                        *int64
+	addstatus                     *int64
+	time_completed                *time.Time
+	created_at                    *time.Time
+	updated_at                    *time.Time
 	clearedFields                 map[string]struct{}
 	challenge_member_rules        map[int64]struct{}
 	removedchallenge_member_rules map[int64]struct{}
 	clearedchallenge_member_rules bool
 	challenge                     *int64
 	clearedchallenge              bool
+	member                        *int64
+	clearedmember                 bool
 	done                          bool
 	oldValue                      func(context.Context) (*ChallengeMember, error)
 	predicates                    []predicate.ChallengeMember
@@ -955,15 +1396,70 @@ func (m *ChallengeMemberMutation) IDs(ctx context.Context) ([]int64, error) {
 	}
 }
 
+// SetPoint sets the "point" field.
+func (m *ChallengeMemberMutation) SetPoint(i int64) {
+	m.point = &i
+	m.addpoint = nil
+}
+
+// Point returns the value of the "point" field in the mutation.
+func (m *ChallengeMemberMutation) Point() (r int64, exists bool) {
+	v := m.point
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoint returns the old "point" field's value of the ChallengeMember entity.
+// If the ChallengeMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberMutation) OldPoint(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoint: %w", err)
+	}
+	return oldValue.Point, nil
+}
+
+// AddPoint adds i to the "point" field.
+func (m *ChallengeMemberMutation) AddPoint(i int64) {
+	if m.addpoint != nil {
+		*m.addpoint += i
+	} else {
+		m.addpoint = &i
+	}
+}
+
+// AddedPoint returns the value that was added to the "point" field in this mutation.
+func (m *ChallengeMemberMutation) AddedPoint() (r int64, exists bool) {
+	v := m.addpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPoint resets all changes to the "point" field.
+func (m *ChallengeMemberMutation) ResetPoint() {
+	m.point = nil
+	m.addpoint = nil
+}
+
 // SetMemberID sets the "member_id" field.
 func (m *ChallengeMemberMutation) SetMemberID(i int64) {
-	m.member_id = &i
-	m.addmember_id = nil
+	m.member = &i
 }
 
 // MemberID returns the value of the "member_id" field in the mutation.
 func (m *ChallengeMemberMutation) MemberID() (r int64, exists bool) {
-	v := m.member_id
+	v := m.member
 	if v == nil {
 		return
 	}
@@ -987,28 +1483,222 @@ func (m *ChallengeMemberMutation) OldMemberID(ctx context.Context) (v int64, err
 	return oldValue.MemberID, nil
 }
 
-// AddMemberID adds i to the "member_id" field.
-func (m *ChallengeMemberMutation) AddMemberID(i int64) {
-	if m.addmember_id != nil {
-		*m.addmember_id += i
-	} else {
-		m.addmember_id = &i
-	}
+// ResetMemberID resets all changes to the "member_id" field.
+func (m *ChallengeMemberMutation) ResetMemberID() {
+	m.member = nil
 }
 
-// AddedMemberID returns the value that was added to the "member_id" field in this mutation.
-func (m *ChallengeMemberMutation) AddedMemberID() (r int64, exists bool) {
-	v := m.addmember_id
+// SetChallengeID sets the "challenge_id" field.
+func (m *ChallengeMemberMutation) SetChallengeID(i int64) {
+	m.challenge = &i
+}
+
+// ChallengeID returns the value of the "challenge_id" field in the mutation.
+func (m *ChallengeMemberMutation) ChallengeID() (r int64, exists bool) {
+	v := m.challenge
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetMemberID resets all changes to the "member_id" field.
-func (m *ChallengeMemberMutation) ResetMemberID() {
-	m.member_id = nil
-	m.addmember_id = nil
+// OldChallengeID returns the old "challenge_id" field's value of the ChallengeMember entity.
+// If the ChallengeMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberMutation) OldChallengeID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChallengeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChallengeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChallengeID: %w", err)
+	}
+	return oldValue.ChallengeID, nil
+}
+
+// ResetChallengeID resets all changes to the "challenge_id" field.
+func (m *ChallengeMemberMutation) ResetChallengeID() {
+	m.challenge = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *ChallengeMemberMutation) SetStatus(i int64) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ChallengeMemberMutation) Status() (r int64, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the ChallengeMember entity.
+// If the ChallengeMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberMutation) OldStatus(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *ChallengeMemberMutation) AddStatus(i int64) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *ChallengeMemberMutation) AddedStatus() (r int64, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ChallengeMemberMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (m *ChallengeMemberMutation) SetTimeCompleted(t time.Time) {
+	m.time_completed = &t
+}
+
+// TimeCompleted returns the value of the "time_completed" field in the mutation.
+func (m *ChallengeMemberMutation) TimeCompleted() (r time.Time, exists bool) {
+	v := m.time_completed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimeCompleted returns the old "time_completed" field's value of the ChallengeMember entity.
+// If the ChallengeMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberMutation) OldTimeCompleted(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimeCompleted is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimeCompleted requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimeCompleted: %w", err)
+	}
+	return oldValue.TimeCompleted, nil
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (m *ChallengeMemberMutation) ClearTimeCompleted() {
+	m.time_completed = nil
+	m.clearedFields[challengemember.FieldTimeCompleted] = struct{}{}
+}
+
+// TimeCompletedCleared returns if the "time_completed" field was cleared in this mutation.
+func (m *ChallengeMemberMutation) TimeCompletedCleared() bool {
+	_, ok := m.clearedFields[challengemember.FieldTimeCompleted]
+	return ok
+}
+
+// ResetTimeCompleted resets all changes to the "time_completed" field.
+func (m *ChallengeMemberMutation) ResetTimeCompleted() {
+	m.time_completed = nil
+	delete(m.clearedFields, challengemember.FieldTimeCompleted)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ChallengeMemberMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ChallengeMemberMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ChallengeMember entity.
+// If the ChallengeMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ChallengeMemberMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ChallengeMemberMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ChallengeMemberMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ChallengeMember entity.
+// If the ChallengeMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ChallengeMemberMutation) ResetUpdatedAt() {
+	m.updated_at = nil
 }
 
 // AddChallengeMemberRuleIDs adds the "challenge_member_rules" edge to the ChallengeMemberRule entity by ids.
@@ -1065,11 +1755,6 @@ func (m *ChallengeMemberMutation) ResetChallengeMemberRules() {
 	m.removedchallenge_member_rules = nil
 }
 
-// SetChallengeID sets the "challenge" edge to the Challenge entity by id.
-func (m *ChallengeMemberMutation) SetChallengeID(id int64) {
-	m.challenge = &id
-}
-
 // ClearChallenge clears the "challenge" edge to the Challenge entity.
 func (m *ChallengeMemberMutation) ClearChallenge() {
 	m.clearedchallenge = true
@@ -1078,14 +1763,6 @@ func (m *ChallengeMemberMutation) ClearChallenge() {
 // ChallengeCleared reports if the "challenge" edge to the Challenge entity was cleared.
 func (m *ChallengeMemberMutation) ChallengeCleared() bool {
 	return m.clearedchallenge
-}
-
-// ChallengeID returns the "challenge" edge ID in the mutation.
-func (m *ChallengeMemberMutation) ChallengeID() (id int64, exists bool) {
-	if m.challenge != nil {
-		return *m.challenge, true
-	}
-	return
 }
 
 // ChallengeIDs returns the "challenge" edge IDs in the mutation.
@@ -1102,6 +1779,32 @@ func (m *ChallengeMemberMutation) ChallengeIDs() (ids []int64) {
 func (m *ChallengeMemberMutation) ResetChallenge() {
 	m.challenge = nil
 	m.clearedchallenge = false
+}
+
+// ClearMember clears the "member" edge to the Member entity.
+func (m *ChallengeMemberMutation) ClearMember() {
+	m.clearedmember = true
+}
+
+// MemberCleared reports if the "member" edge to the Member entity was cleared.
+func (m *ChallengeMemberMutation) MemberCleared() bool {
+	return m.clearedmember
+}
+
+// MemberIDs returns the "member" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MemberID instead. It exists only for internal usage by the builders.
+func (m *ChallengeMemberMutation) MemberIDs() (ids []int64) {
+	if id := m.member; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMember resets all changes to the "member" edge.
+func (m *ChallengeMemberMutation) ResetMember() {
+	m.member = nil
+	m.clearedmember = false
 }
 
 // Where appends a list predicates to the ChallengeMemberMutation builder.
@@ -1138,9 +1841,27 @@ func (m *ChallengeMemberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChallengeMemberMutation) Fields() []string {
-	fields := make([]string, 0, 1)
-	if m.member_id != nil {
+	fields := make([]string, 0, 7)
+	if m.point != nil {
+		fields = append(fields, challengemember.FieldPoint)
+	}
+	if m.member != nil {
 		fields = append(fields, challengemember.FieldMemberID)
+	}
+	if m.challenge != nil {
+		fields = append(fields, challengemember.FieldChallengeID)
+	}
+	if m.status != nil {
+		fields = append(fields, challengemember.FieldStatus)
+	}
+	if m.time_completed != nil {
+		fields = append(fields, challengemember.FieldTimeCompleted)
+	}
+	if m.created_at != nil {
+		fields = append(fields, challengemember.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, challengemember.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -1150,8 +1871,20 @@ func (m *ChallengeMemberMutation) Fields() []string {
 // schema.
 func (m *ChallengeMemberMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case challengemember.FieldPoint:
+		return m.Point()
 	case challengemember.FieldMemberID:
 		return m.MemberID()
+	case challengemember.FieldChallengeID:
+		return m.ChallengeID()
+	case challengemember.FieldStatus:
+		return m.Status()
+	case challengemember.FieldTimeCompleted:
+		return m.TimeCompleted()
+	case challengemember.FieldCreatedAt:
+		return m.CreatedAt()
+	case challengemember.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -1161,8 +1894,20 @@ func (m *ChallengeMemberMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ChallengeMemberMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case challengemember.FieldPoint:
+		return m.OldPoint(ctx)
 	case challengemember.FieldMemberID:
 		return m.OldMemberID(ctx)
+	case challengemember.FieldChallengeID:
+		return m.OldChallengeID(ctx)
+	case challengemember.FieldStatus:
+		return m.OldStatus(ctx)
+	case challengemember.FieldTimeCompleted:
+		return m.OldTimeCompleted(ctx)
+	case challengemember.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case challengemember.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown ChallengeMember field %s", name)
 }
@@ -1172,12 +1917,54 @@ func (m *ChallengeMemberMutation) OldField(ctx context.Context, name string) (en
 // type.
 func (m *ChallengeMemberMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case challengemember.FieldPoint:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoint(v)
+		return nil
 	case challengemember.FieldMemberID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMemberID(v)
+		return nil
+	case challengemember.FieldChallengeID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChallengeID(v)
+		return nil
+	case challengemember.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case challengemember.FieldTimeCompleted:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimeCompleted(v)
+		return nil
+	case challengemember.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case challengemember.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMember field %s", name)
@@ -1187,8 +1974,11 @@ func (m *ChallengeMemberMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ChallengeMemberMutation) AddedFields() []string {
 	var fields []string
-	if m.addmember_id != nil {
-		fields = append(fields, challengemember.FieldMemberID)
+	if m.addpoint != nil {
+		fields = append(fields, challengemember.FieldPoint)
+	}
+	if m.addstatus != nil {
+		fields = append(fields, challengemember.FieldStatus)
 	}
 	return fields
 }
@@ -1198,8 +1988,10 @@ func (m *ChallengeMemberMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ChallengeMemberMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case challengemember.FieldMemberID:
-		return m.AddedMemberID()
+	case challengemember.FieldPoint:
+		return m.AddedPoint()
+	case challengemember.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -1209,12 +2001,19 @@ func (m *ChallengeMemberMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ChallengeMemberMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case challengemember.FieldMemberID:
+	case challengemember.FieldPoint:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddMemberID(v)
+		m.AddPoint(v)
+		return nil
+	case challengemember.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMember numeric field %s", name)
@@ -1223,7 +2022,11 @@ func (m *ChallengeMemberMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ChallengeMemberMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(challengemember.FieldTimeCompleted) {
+		fields = append(fields, challengemember.FieldTimeCompleted)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1236,6 +2039,11 @@ func (m *ChallengeMemberMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ChallengeMemberMutation) ClearField(name string) error {
+	switch name {
+	case challengemember.FieldTimeCompleted:
+		m.ClearTimeCompleted()
+		return nil
+	}
 	return fmt.Errorf("unknown ChallengeMember nullable field %s", name)
 }
 
@@ -1243,8 +2051,26 @@ func (m *ChallengeMemberMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ChallengeMemberMutation) ResetField(name string) error {
 	switch name {
+	case challengemember.FieldPoint:
+		m.ResetPoint()
+		return nil
 	case challengemember.FieldMemberID:
 		m.ResetMemberID()
+		return nil
+	case challengemember.FieldChallengeID:
+		m.ResetChallengeID()
+		return nil
+	case challengemember.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case challengemember.FieldTimeCompleted:
+		m.ResetTimeCompleted()
+		return nil
+	case challengemember.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case challengemember.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMember field %s", name)
@@ -1252,12 +2078,15 @@ func (m *ChallengeMemberMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChallengeMemberMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.challenge_member_rules != nil {
 		edges = append(edges, challengemember.EdgeChallengeMemberRules)
 	}
 	if m.challenge != nil {
 		edges = append(edges, challengemember.EdgeChallenge)
+	}
+	if m.member != nil {
+		edges = append(edges, challengemember.EdgeMember)
 	}
 	return edges
 }
@@ -1276,13 +2105,17 @@ func (m *ChallengeMemberMutation) AddedIDs(name string) []ent.Value {
 		if id := m.challenge; id != nil {
 			return []ent.Value{*id}
 		}
+	case challengemember.EdgeMember:
+		if id := m.member; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChallengeMemberMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedchallenge_member_rules != nil {
 		edges = append(edges, challengemember.EdgeChallengeMemberRules)
 	}
@@ -1305,12 +2138,15 @@ func (m *ChallengeMemberMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChallengeMemberMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedchallenge_member_rules {
 		edges = append(edges, challengemember.EdgeChallengeMemberRules)
 	}
 	if m.clearedchallenge {
 		edges = append(edges, challengemember.EdgeChallenge)
+	}
+	if m.clearedmember {
+		edges = append(edges, challengemember.EdgeMember)
 	}
 	return edges
 }
@@ -1323,6 +2159,8 @@ func (m *ChallengeMemberMutation) EdgeCleared(name string) bool {
 		return m.clearedchallenge_member_rules
 	case challengemember.EdgeChallenge:
 		return m.clearedchallenge
+	case challengemember.EdgeMember:
+		return m.clearedmember
 	}
 	return false
 }
@@ -1333,6 +2171,9 @@ func (m *ChallengeMemberMutation) ClearEdge(name string) error {
 	switch name {
 	case challengemember.EdgeChallenge:
 		m.ClearChallenge()
+		return nil
+	case challengemember.EdgeMember:
+		m.ClearMember()
 		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMember unique edge %s", name)
@@ -1348,6 +2189,9 @@ func (m *ChallengeMemberMutation) ResetEdge(name string) error {
 	case challengemember.EdgeChallenge:
 		m.ResetChallenge()
 		return nil
+	case challengemember.EdgeMember:
+		m.ResetMember()
+		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMember edge %s", name)
 }
@@ -1362,9 +2206,15 @@ type ChallengeMemberRuleMutation struct {
 	addtotal                *int64
 	rule_id                 *int64
 	addrule_id              *int64
+	status                  *int64
+	addstatus               *int64
+	time_completed          *time.Time
+	updated_at              *time.Time
 	clearedFields           map[string]struct{}
 	challenge_member        *int64
 	clearedchallenge_member bool
+	challenge_rule          *int64
+	clearedchallenge_rule   bool
 	done                    bool
 	oldValue                func(context.Context) (*ChallengeMemberRule, error)
 	predicates              []predicate.ChallengeMemberRule
@@ -1524,24 +2374,10 @@ func (m *ChallengeMemberRuleMutation) AddedTotal() (r int64, exists bool) {
 	return *v, true
 }
 
-// ClearTotal clears the value of the "total" field.
-func (m *ChallengeMemberRuleMutation) ClearTotal() {
-	m.total = nil
-	m.addtotal = nil
-	m.clearedFields[challengememberrule.FieldTotal] = struct{}{}
-}
-
-// TotalCleared returns if the "total" field was cleared in this mutation.
-func (m *ChallengeMemberRuleMutation) TotalCleared() bool {
-	_, ok := m.clearedFields[challengememberrule.FieldTotal]
-	return ok
-}
-
 // ResetTotal resets all changes to the "total" field.
 func (m *ChallengeMemberRuleMutation) ResetTotal() {
 	m.total = nil
 	m.addtotal = nil
-	delete(m.clearedFields, challengememberrule.FieldTotal)
 }
 
 // SetRuleID sets the "rule_id" field.
@@ -1600,6 +2436,147 @@ func (m *ChallengeMemberRuleMutation) ResetRuleID() {
 	m.addrule_id = nil
 }
 
+// SetStatus sets the "status" field.
+func (m *ChallengeMemberRuleMutation) SetStatus(i int64) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ChallengeMemberRuleMutation) Status() (r int64, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the ChallengeMemberRule entity.
+// If the ChallengeMemberRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberRuleMutation) OldStatus(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *ChallengeMemberRuleMutation) AddStatus(i int64) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *ChallengeMemberRuleMutation) AddedStatus() (r int64, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ChallengeMemberRuleMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (m *ChallengeMemberRuleMutation) SetTimeCompleted(t time.Time) {
+	m.time_completed = &t
+}
+
+// TimeCompleted returns the value of the "time_completed" field in the mutation.
+func (m *ChallengeMemberRuleMutation) TimeCompleted() (r time.Time, exists bool) {
+	v := m.time_completed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimeCompleted returns the old "time_completed" field's value of the ChallengeMemberRule entity.
+// If the ChallengeMemberRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberRuleMutation) OldTimeCompleted(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimeCompleted is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimeCompleted requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimeCompleted: %w", err)
+	}
+	return oldValue.TimeCompleted, nil
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (m *ChallengeMemberRuleMutation) ClearTimeCompleted() {
+	m.time_completed = nil
+	m.clearedFields[challengememberrule.FieldTimeCompleted] = struct{}{}
+}
+
+// TimeCompletedCleared returns if the "time_completed" field was cleared in this mutation.
+func (m *ChallengeMemberRuleMutation) TimeCompletedCleared() bool {
+	_, ok := m.clearedFields[challengememberrule.FieldTimeCompleted]
+	return ok
+}
+
+// ResetTimeCompleted resets all changes to the "time_completed" field.
+func (m *ChallengeMemberRuleMutation) ResetTimeCompleted() {
+	m.time_completed = nil
+	delete(m.clearedFields, challengememberrule.FieldTimeCompleted)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ChallengeMemberRuleMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ChallengeMemberRuleMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ChallengeMemberRule entity.
+// If the ChallengeMemberRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMemberRuleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ChallengeMemberRuleMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
 // SetChallengeMemberID sets the "challenge_member" edge to the ChallengeMember entity by id.
 func (m *ChallengeMemberRuleMutation) SetChallengeMemberID(id int64) {
 	m.challenge_member = &id
@@ -1639,6 +2616,45 @@ func (m *ChallengeMemberRuleMutation) ResetChallengeMember() {
 	m.clearedchallenge_member = false
 }
 
+// SetChallengeRuleID sets the "challenge_rule" edge to the ChallengeRule entity by id.
+func (m *ChallengeMemberRuleMutation) SetChallengeRuleID(id int64) {
+	m.challenge_rule = &id
+}
+
+// ClearChallengeRule clears the "challenge_rule" edge to the ChallengeRule entity.
+func (m *ChallengeMemberRuleMutation) ClearChallengeRule() {
+	m.clearedchallenge_rule = true
+}
+
+// ChallengeRuleCleared reports if the "challenge_rule" edge to the ChallengeRule entity was cleared.
+func (m *ChallengeMemberRuleMutation) ChallengeRuleCleared() bool {
+	return m.clearedchallenge_rule
+}
+
+// ChallengeRuleID returns the "challenge_rule" edge ID in the mutation.
+func (m *ChallengeMemberRuleMutation) ChallengeRuleID() (id int64, exists bool) {
+	if m.challenge_rule != nil {
+		return *m.challenge_rule, true
+	}
+	return
+}
+
+// ChallengeRuleIDs returns the "challenge_rule" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChallengeRuleID instead. It exists only for internal usage by the builders.
+func (m *ChallengeMemberRuleMutation) ChallengeRuleIDs() (ids []int64) {
+	if id := m.challenge_rule; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChallengeRule resets all changes to the "challenge_rule" edge.
+func (m *ChallengeMemberRuleMutation) ResetChallengeRule() {
+	m.challenge_rule = nil
+	m.clearedchallenge_rule = false
+}
+
 // Where appends a list predicates to the ChallengeMemberRuleMutation builder.
 func (m *ChallengeMemberRuleMutation) Where(ps ...predicate.ChallengeMemberRule) {
 	m.predicates = append(m.predicates, ps...)
@@ -1673,12 +2689,21 @@ func (m *ChallengeMemberRuleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChallengeMemberRuleMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 5)
 	if m.total != nil {
 		fields = append(fields, challengememberrule.FieldTotal)
 	}
 	if m.rule_id != nil {
 		fields = append(fields, challengememberrule.FieldRuleID)
+	}
+	if m.status != nil {
+		fields = append(fields, challengememberrule.FieldStatus)
+	}
+	if m.time_completed != nil {
+		fields = append(fields, challengememberrule.FieldTimeCompleted)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, challengememberrule.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -1692,6 +2717,12 @@ func (m *ChallengeMemberRuleMutation) Field(name string) (ent.Value, bool) {
 		return m.Total()
 	case challengememberrule.FieldRuleID:
 		return m.RuleID()
+	case challengememberrule.FieldStatus:
+		return m.Status()
+	case challengememberrule.FieldTimeCompleted:
+		return m.TimeCompleted()
+	case challengememberrule.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -1705,6 +2736,12 @@ func (m *ChallengeMemberRuleMutation) OldField(ctx context.Context, name string)
 		return m.OldTotal(ctx)
 	case challengememberrule.FieldRuleID:
 		return m.OldRuleID(ctx)
+	case challengememberrule.FieldStatus:
+		return m.OldStatus(ctx)
+	case challengememberrule.FieldTimeCompleted:
+		return m.OldTimeCompleted(ctx)
+	case challengememberrule.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown ChallengeMemberRule field %s", name)
 }
@@ -1728,6 +2765,27 @@ func (m *ChallengeMemberRuleMutation) SetField(name string, value ent.Value) err
 		}
 		m.SetRuleID(v)
 		return nil
+	case challengememberrule.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case challengememberrule.FieldTimeCompleted:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimeCompleted(v)
+		return nil
+	case challengememberrule.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMemberRule field %s", name)
 }
@@ -1742,6 +2800,9 @@ func (m *ChallengeMemberRuleMutation) AddedFields() []string {
 	if m.addrule_id != nil {
 		fields = append(fields, challengememberrule.FieldRuleID)
 	}
+	if m.addstatus != nil {
+		fields = append(fields, challengememberrule.FieldStatus)
+	}
 	return fields
 }
 
@@ -1754,6 +2815,8 @@ func (m *ChallengeMemberRuleMutation) AddedField(name string) (ent.Value, bool) 
 		return m.AddedTotal()
 	case challengememberrule.FieldRuleID:
 		return m.AddedRuleID()
+	case challengememberrule.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -1777,6 +2840,13 @@ func (m *ChallengeMemberRuleMutation) AddField(name string, value ent.Value) err
 		}
 		m.AddRuleID(v)
 		return nil
+	case challengememberrule.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMemberRule numeric field %s", name)
 }
@@ -1785,8 +2855,8 @@ func (m *ChallengeMemberRuleMutation) AddField(name string, value ent.Value) err
 // mutation.
 func (m *ChallengeMemberRuleMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(challengememberrule.FieldTotal) {
-		fields = append(fields, challengememberrule.FieldTotal)
+	if m.FieldCleared(challengememberrule.FieldTimeCompleted) {
+		fields = append(fields, challengememberrule.FieldTimeCompleted)
 	}
 	return fields
 }
@@ -1802,8 +2872,8 @@ func (m *ChallengeMemberRuleMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ChallengeMemberRuleMutation) ClearField(name string) error {
 	switch name {
-	case challengememberrule.FieldTotal:
-		m.ClearTotal()
+	case challengememberrule.FieldTimeCompleted:
+		m.ClearTimeCompleted()
 		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMemberRule nullable field %s", name)
@@ -1819,15 +2889,27 @@ func (m *ChallengeMemberRuleMutation) ResetField(name string) error {
 	case challengememberrule.FieldRuleID:
 		m.ResetRuleID()
 		return nil
+	case challengememberrule.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case challengememberrule.FieldTimeCompleted:
+		m.ResetTimeCompleted()
+		return nil
+	case challengememberrule.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMemberRule field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChallengeMemberRuleMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.challenge_member != nil {
 		edges = append(edges, challengememberrule.EdgeChallengeMember)
+	}
+	if m.challenge_rule != nil {
+		edges = append(edges, challengememberrule.EdgeChallengeRule)
 	}
 	return edges
 }
@@ -1840,13 +2922,17 @@ func (m *ChallengeMemberRuleMutation) AddedIDs(name string) []ent.Value {
 		if id := m.challenge_member; id != nil {
 			return []ent.Value{*id}
 		}
+	case challengememberrule.EdgeChallengeRule:
+		if id := m.challenge_rule; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChallengeMemberRuleMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -1858,9 +2944,12 @@ func (m *ChallengeMemberRuleMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChallengeMemberRuleMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedchallenge_member {
 		edges = append(edges, challengememberrule.EdgeChallengeMember)
+	}
+	if m.clearedchallenge_rule {
+		edges = append(edges, challengememberrule.EdgeChallengeRule)
 	}
 	return edges
 }
@@ -1871,6 +2960,8 @@ func (m *ChallengeMemberRuleMutation) EdgeCleared(name string) bool {
 	switch name {
 	case challengememberrule.EdgeChallengeMember:
 		return m.clearedchallenge_member
+	case challengememberrule.EdgeChallengeRule:
+		return m.clearedchallenge_rule
 	}
 	return false
 }
@@ -1881,6 +2972,9 @@ func (m *ChallengeMemberRuleMutation) ClearEdge(name string) error {
 	switch name {
 	case challengememberrule.EdgeChallengeMember:
 		m.ClearChallengeMember()
+		return nil
+	case challengememberrule.EdgeChallengeRule:
+		m.ClearChallengeRule()
 		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMemberRule unique edge %s", name)
@@ -1893,8 +2987,726 @@ func (m *ChallengeMemberRuleMutation) ResetEdge(name string) error {
 	case challengememberrule.EdgeChallengeMember:
 		m.ResetChallengeMember()
 		return nil
+	case challengememberrule.EdgeChallengeRule:
+		m.ResetChallengeRule()
+		return nil
 	}
 	return fmt.Errorf("unknown ChallengeMemberRule edge %s", name)
+}
+
+// ChallengeRuleMutation represents an operation that mutates the ChallengeRule nodes in the graph.
+type ChallengeRuleMutation struct {
+	config
+	op                            Op
+	typ                           string
+	id                            *int64
+	goal                          *int64
+	addgoal                       *int64
+	rule_id                       *int64
+	addrule_id                    *int64
+	created_at                    *time.Time
+	updated_at                    *time.Time
+	clearedFields                 map[string]struct{}
+	challenge_member_rules        map[int64]struct{}
+	removedchallenge_member_rules map[int64]struct{}
+	clearedchallenge_member_rules bool
+	challenge                     *int64
+	clearedchallenge              bool
+	done                          bool
+	oldValue                      func(context.Context) (*ChallengeRule, error)
+	predicates                    []predicate.ChallengeRule
+}
+
+var _ ent.Mutation = (*ChallengeRuleMutation)(nil)
+
+// challengeruleOption allows management of the mutation configuration using functional options.
+type challengeruleOption func(*ChallengeRuleMutation)
+
+// newChallengeRuleMutation creates new mutation for the ChallengeRule entity.
+func newChallengeRuleMutation(c config, op Op, opts ...challengeruleOption) *ChallengeRuleMutation {
+	m := &ChallengeRuleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeChallengeRule,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withChallengeRuleID sets the ID field of the mutation.
+func withChallengeRuleID(id int64) challengeruleOption {
+	return func(m *ChallengeRuleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ChallengeRule
+		)
+		m.oldValue = func(ctx context.Context) (*ChallengeRule, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ChallengeRule.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withChallengeRule sets the old ChallengeRule of the mutation.
+func withChallengeRule(node *ChallengeRule) challengeruleOption {
+	return func(m *ChallengeRuleMutation) {
+		m.oldValue = func(context.Context) (*ChallengeRule, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ChallengeRuleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ChallengeRuleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ChallengeRule entities.
+func (m *ChallengeRuleMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ChallengeRuleMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ChallengeRuleMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ChallengeRule.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetGoal sets the "goal" field.
+func (m *ChallengeRuleMutation) SetGoal(i int64) {
+	m.goal = &i
+	m.addgoal = nil
+}
+
+// Goal returns the value of the "goal" field in the mutation.
+func (m *ChallengeRuleMutation) Goal() (r int64, exists bool) {
+	v := m.goal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGoal returns the old "goal" field's value of the ChallengeRule entity.
+// If the ChallengeRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeRuleMutation) OldGoal(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGoal is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGoal requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGoal: %w", err)
+	}
+	return oldValue.Goal, nil
+}
+
+// AddGoal adds i to the "goal" field.
+func (m *ChallengeRuleMutation) AddGoal(i int64) {
+	if m.addgoal != nil {
+		*m.addgoal += i
+	} else {
+		m.addgoal = &i
+	}
+}
+
+// AddedGoal returns the value that was added to the "goal" field in this mutation.
+func (m *ChallengeRuleMutation) AddedGoal() (r int64, exists bool) {
+	v := m.addgoal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGoal resets all changes to the "goal" field.
+func (m *ChallengeRuleMutation) ResetGoal() {
+	m.goal = nil
+	m.addgoal = nil
+}
+
+// SetRuleID sets the "rule_id" field.
+func (m *ChallengeRuleMutation) SetRuleID(i int64) {
+	m.rule_id = &i
+	m.addrule_id = nil
+}
+
+// RuleID returns the value of the "rule_id" field in the mutation.
+func (m *ChallengeRuleMutation) RuleID() (r int64, exists bool) {
+	v := m.rule_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRuleID returns the old "rule_id" field's value of the ChallengeRule entity.
+// If the ChallengeRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeRuleMutation) OldRuleID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRuleID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRuleID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRuleID: %w", err)
+	}
+	return oldValue.RuleID, nil
+}
+
+// AddRuleID adds i to the "rule_id" field.
+func (m *ChallengeRuleMutation) AddRuleID(i int64) {
+	if m.addrule_id != nil {
+		*m.addrule_id += i
+	} else {
+		m.addrule_id = &i
+	}
+}
+
+// AddedRuleID returns the value that was added to the "rule_id" field in this mutation.
+func (m *ChallengeRuleMutation) AddedRuleID() (r int64, exists bool) {
+	v := m.addrule_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRuleID resets all changes to the "rule_id" field.
+func (m *ChallengeRuleMutation) ResetRuleID() {
+	m.rule_id = nil
+	m.addrule_id = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ChallengeRuleMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ChallengeRuleMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ChallengeRule entity.
+// If the ChallengeRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeRuleMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ChallengeRuleMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ChallengeRuleMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ChallengeRuleMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ChallengeRule entity.
+// If the ChallengeRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeRuleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ChallengeRuleMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// AddChallengeMemberRuleIDs adds the "challenge_member_rules" edge to the ChallengeMemberRule entity by ids.
+func (m *ChallengeRuleMutation) AddChallengeMemberRuleIDs(ids ...int64) {
+	if m.challenge_member_rules == nil {
+		m.challenge_member_rules = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.challenge_member_rules[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChallengeMemberRules clears the "challenge_member_rules" edge to the ChallengeMemberRule entity.
+func (m *ChallengeRuleMutation) ClearChallengeMemberRules() {
+	m.clearedchallenge_member_rules = true
+}
+
+// ChallengeMemberRulesCleared reports if the "challenge_member_rules" edge to the ChallengeMemberRule entity was cleared.
+func (m *ChallengeRuleMutation) ChallengeMemberRulesCleared() bool {
+	return m.clearedchallenge_member_rules
+}
+
+// RemoveChallengeMemberRuleIDs removes the "challenge_member_rules" edge to the ChallengeMemberRule entity by IDs.
+func (m *ChallengeRuleMutation) RemoveChallengeMemberRuleIDs(ids ...int64) {
+	if m.removedchallenge_member_rules == nil {
+		m.removedchallenge_member_rules = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.challenge_member_rules, ids[i])
+		m.removedchallenge_member_rules[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChallengeMemberRules returns the removed IDs of the "challenge_member_rules" edge to the ChallengeMemberRule entity.
+func (m *ChallengeRuleMutation) RemovedChallengeMemberRulesIDs() (ids []int64) {
+	for id := range m.removedchallenge_member_rules {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChallengeMemberRulesIDs returns the "challenge_member_rules" edge IDs in the mutation.
+func (m *ChallengeRuleMutation) ChallengeMemberRulesIDs() (ids []int64) {
+	for id := range m.challenge_member_rules {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChallengeMemberRules resets all changes to the "challenge_member_rules" edge.
+func (m *ChallengeRuleMutation) ResetChallengeMemberRules() {
+	m.challenge_member_rules = nil
+	m.clearedchallenge_member_rules = false
+	m.removedchallenge_member_rules = nil
+}
+
+// SetChallengeID sets the "challenge" edge to the Challenge entity by id.
+func (m *ChallengeRuleMutation) SetChallengeID(id int64) {
+	m.challenge = &id
+}
+
+// ClearChallenge clears the "challenge" edge to the Challenge entity.
+func (m *ChallengeRuleMutation) ClearChallenge() {
+	m.clearedchallenge = true
+}
+
+// ChallengeCleared reports if the "challenge" edge to the Challenge entity was cleared.
+func (m *ChallengeRuleMutation) ChallengeCleared() bool {
+	return m.clearedchallenge
+}
+
+// ChallengeID returns the "challenge" edge ID in the mutation.
+func (m *ChallengeRuleMutation) ChallengeID() (id int64, exists bool) {
+	if m.challenge != nil {
+		return *m.challenge, true
+	}
+	return
+}
+
+// ChallengeIDs returns the "challenge" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChallengeID instead. It exists only for internal usage by the builders.
+func (m *ChallengeRuleMutation) ChallengeIDs() (ids []int64) {
+	if id := m.challenge; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChallenge resets all changes to the "challenge" edge.
+func (m *ChallengeRuleMutation) ResetChallenge() {
+	m.challenge = nil
+	m.clearedchallenge = false
+}
+
+// Where appends a list predicates to the ChallengeRuleMutation builder.
+func (m *ChallengeRuleMutation) Where(ps ...predicate.ChallengeRule) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ChallengeRuleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ChallengeRuleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ChallengeRule, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ChallengeRuleMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ChallengeRuleMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ChallengeRule).
+func (m *ChallengeRuleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ChallengeRuleMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.goal != nil {
+		fields = append(fields, challengerule.FieldGoal)
+	}
+	if m.rule_id != nil {
+		fields = append(fields, challengerule.FieldRuleID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, challengerule.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, challengerule.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ChallengeRuleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case challengerule.FieldGoal:
+		return m.Goal()
+	case challengerule.FieldRuleID:
+		return m.RuleID()
+	case challengerule.FieldCreatedAt:
+		return m.CreatedAt()
+	case challengerule.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ChallengeRuleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case challengerule.FieldGoal:
+		return m.OldGoal(ctx)
+	case challengerule.FieldRuleID:
+		return m.OldRuleID(ctx)
+	case challengerule.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case challengerule.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ChallengeRule field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ChallengeRuleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case challengerule.FieldGoal:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGoal(v)
+		return nil
+	case challengerule.FieldRuleID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRuleID(v)
+		return nil
+	case challengerule.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case challengerule.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ChallengeRule field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ChallengeRuleMutation) AddedFields() []string {
+	var fields []string
+	if m.addgoal != nil {
+		fields = append(fields, challengerule.FieldGoal)
+	}
+	if m.addrule_id != nil {
+		fields = append(fields, challengerule.FieldRuleID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ChallengeRuleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case challengerule.FieldGoal:
+		return m.AddedGoal()
+	case challengerule.FieldRuleID:
+		return m.AddedRuleID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ChallengeRuleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case challengerule.FieldGoal:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGoal(v)
+		return nil
+	case challengerule.FieldRuleID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRuleID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ChallengeRule numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ChallengeRuleMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ChallengeRuleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ChallengeRuleMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ChallengeRule nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ChallengeRuleMutation) ResetField(name string) error {
+	switch name {
+	case challengerule.FieldGoal:
+		m.ResetGoal()
+		return nil
+	case challengerule.FieldRuleID:
+		m.ResetRuleID()
+		return nil
+	case challengerule.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case challengerule.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ChallengeRule field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ChallengeRuleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.challenge_member_rules != nil {
+		edges = append(edges, challengerule.EdgeChallengeMemberRules)
+	}
+	if m.challenge != nil {
+		edges = append(edges, challengerule.EdgeChallenge)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ChallengeRuleMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case challengerule.EdgeChallengeMemberRules:
+		ids := make([]ent.Value, 0, len(m.challenge_member_rules))
+		for id := range m.challenge_member_rules {
+			ids = append(ids, id)
+		}
+		return ids
+	case challengerule.EdgeChallenge:
+		if id := m.challenge; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ChallengeRuleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedchallenge_member_rules != nil {
+		edges = append(edges, challengerule.EdgeChallengeMemberRules)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ChallengeRuleMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case challengerule.EdgeChallengeMemberRules:
+		ids := make([]ent.Value, 0, len(m.removedchallenge_member_rules))
+		for id := range m.removedchallenge_member_rules {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ChallengeRuleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedchallenge_member_rules {
+		edges = append(edges, challengerule.EdgeChallengeMemberRules)
+	}
+	if m.clearedchallenge {
+		edges = append(edges, challengerule.EdgeChallenge)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ChallengeRuleMutation) EdgeCleared(name string) bool {
+	switch name {
+	case challengerule.EdgeChallengeMemberRules:
+		return m.clearedchallenge_member_rules
+	case challengerule.EdgeChallenge:
+		return m.clearedchallenge
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ChallengeRuleMutation) ClearEdge(name string) error {
+	switch name {
+	case challengerule.EdgeChallenge:
+		m.ClearChallenge()
+		return nil
+	}
+	return fmt.Errorf("unknown ChallengeRule unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ChallengeRuleMutation) ResetEdge(name string) error {
+	switch name {
+	case challengerule.EdgeChallengeMemberRules:
+		m.ResetChallengeMemberRules()
+		return nil
+	case challengerule.EdgeChallenge:
+		m.ResetChallenge()
+		return nil
+	}
+	return fmt.Errorf("unknown ChallengeRule edge %s", name)
 }
 
 // GroupzMutation represents an operation that mutates the Groupz nodes in the graph.
@@ -1905,6 +3717,7 @@ type GroupzMutation struct {
 	id                 *int64
 	name               *string
 	description        *string
+	group_picture      *string
 	background_picture *string
 	created_at         *time.Time
 	updated_at         *time.Time
@@ -2122,6 +3935,42 @@ func (m *GroupzMutation) DescriptionCleared() bool {
 func (m *GroupzMutation) ResetDescription() {
 	m.description = nil
 	delete(m.clearedFields, groupz.FieldDescription)
+}
+
+// SetGroupPicture sets the "group_picture" field.
+func (m *GroupzMutation) SetGroupPicture(s string) {
+	m.group_picture = &s
+}
+
+// GroupPicture returns the value of the "group_picture" field in the mutation.
+func (m *GroupzMutation) GroupPicture() (r string, exists bool) {
+	v := m.group_picture
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGroupPicture returns the old "group_picture" field's value of the Groupz entity.
+// If the Groupz object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupzMutation) OldGroupPicture(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGroupPicture is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGroupPicture requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGroupPicture: %w", err)
+	}
+	return oldValue.GroupPicture, nil
+}
+
+// ResetGroupPicture resets all changes to the "group_picture" field.
+func (m *GroupzMutation) ResetGroupPicture() {
+	m.group_picture = nil
 }
 
 // SetBackgroundPicture sets the "background_picture" field.
@@ -2430,12 +4279,15 @@ func (m *GroupzMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GroupzMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, groupz.FieldName)
 	}
 	if m.description != nil {
 		fields = append(fields, groupz.FieldDescription)
+	}
+	if m.group_picture != nil {
+		fields = append(fields, groupz.FieldGroupPicture)
 	}
 	if m.background_picture != nil {
 		fields = append(fields, groupz.FieldBackgroundPicture)
@@ -2461,6 +4313,8 @@ func (m *GroupzMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case groupz.FieldDescription:
 		return m.Description()
+	case groupz.FieldGroupPicture:
+		return m.GroupPicture()
 	case groupz.FieldBackgroundPicture:
 		return m.BackgroundPicture()
 	case groupz.FieldCreatedAt:
@@ -2482,6 +4336,8 @@ func (m *GroupzMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldName(ctx)
 	case groupz.FieldDescription:
 		return m.OldDescription(ctx)
+	case groupz.FieldGroupPicture:
+		return m.OldGroupPicture(ctx)
 	case groupz.FieldBackgroundPicture:
 		return m.OldBackgroundPicture(ctx)
 	case groupz.FieldCreatedAt:
@@ -2512,6 +4368,13 @@ func (m *GroupzMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case groupz.FieldGroupPicture:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGroupPicture(v)
 		return nil
 	case groupz.FieldBackgroundPicture:
 		v, ok := value.(string)
@@ -2625,6 +4488,9 @@ func (m *GroupzMutation) ResetField(name string) error {
 		return nil
 	case groupz.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case groupz.FieldGroupPicture:
+		m.ResetGroupPicture()
 		return nil
 	case groupz.FieldBackgroundPicture:
 		m.ResetBackgroundPicture()
@@ -2755,21 +4621,33 @@ func (m *GroupzMutation) ResetEdge(name string) error {
 // MemberMutation represents an operation that mutates the Member nodes in the graph.
 type MemberMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	created_at    *time.Time
-	user_id       *int64
-	adduser_id    *int64
-	status        *uint32
-	addstatus     *int32
-	joining_at    *time.Time
-	clearedFields map[string]struct{}
-	groupz        *int64
-	clearedgroupz bool
-	done          bool
-	oldValue      func(context.Context) (*Member, error)
-	predicates    []predicate.Member
+	op                           Op
+	typ                          string
+	id                           *int64
+	created_at                   *time.Time
+	user_id                      *int64
+	adduser_id                   *int64
+	status                       *uint32
+	addstatus                    *int32
+	joining_at                   *time.Time
+	point                        *int64
+	addpoint                     *int64
+	completed_challenge_count    *int64
+	addcompleted_challenge_count *int64
+	clearedFields                map[string]struct{}
+	groupz                       *int64
+	clearedgroupz                bool
+	challenge_members            map[int64]struct{}
+	removedchallenge_members     map[int64]struct{}
+	clearedchallenge_members     bool
+	season_members               map[int64]struct{}
+	removedseason_members        map[int64]struct{}
+	clearedseason_members        bool
+	challenge                    *int64
+	clearedchallenge             bool
+	done                         bool
+	oldValue                     func(context.Context) (*Member, error)
+	predicates                   []predicate.Member
 }
 
 var _ ent.Mutation = (*MemberMutation)(nil)
@@ -3073,6 +4951,118 @@ func (m *MemberMutation) ResetJoiningAt() {
 	delete(m.clearedFields, member.FieldJoiningAt)
 }
 
+// SetPoint sets the "point" field.
+func (m *MemberMutation) SetPoint(i int64) {
+	m.point = &i
+	m.addpoint = nil
+}
+
+// Point returns the value of the "point" field in the mutation.
+func (m *MemberMutation) Point() (r int64, exists bool) {
+	v := m.point
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoint returns the old "point" field's value of the Member entity.
+// If the Member object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MemberMutation) OldPoint(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoint: %w", err)
+	}
+	return oldValue.Point, nil
+}
+
+// AddPoint adds i to the "point" field.
+func (m *MemberMutation) AddPoint(i int64) {
+	if m.addpoint != nil {
+		*m.addpoint += i
+	} else {
+		m.addpoint = &i
+	}
+}
+
+// AddedPoint returns the value that was added to the "point" field in this mutation.
+func (m *MemberMutation) AddedPoint() (r int64, exists bool) {
+	v := m.addpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPoint resets all changes to the "point" field.
+func (m *MemberMutation) ResetPoint() {
+	m.point = nil
+	m.addpoint = nil
+}
+
+// SetCompletedChallengeCount sets the "completed_challenge_count" field.
+func (m *MemberMutation) SetCompletedChallengeCount(i int64) {
+	m.completed_challenge_count = &i
+	m.addcompleted_challenge_count = nil
+}
+
+// CompletedChallengeCount returns the value of the "completed_challenge_count" field in the mutation.
+func (m *MemberMutation) CompletedChallengeCount() (r int64, exists bool) {
+	v := m.completed_challenge_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCompletedChallengeCount returns the old "completed_challenge_count" field's value of the Member entity.
+// If the Member object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MemberMutation) OldCompletedChallengeCount(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCompletedChallengeCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCompletedChallengeCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCompletedChallengeCount: %w", err)
+	}
+	return oldValue.CompletedChallengeCount, nil
+}
+
+// AddCompletedChallengeCount adds i to the "completed_challenge_count" field.
+func (m *MemberMutation) AddCompletedChallengeCount(i int64) {
+	if m.addcompleted_challenge_count != nil {
+		*m.addcompleted_challenge_count += i
+	} else {
+		m.addcompleted_challenge_count = &i
+	}
+}
+
+// AddedCompletedChallengeCount returns the value that was added to the "completed_challenge_count" field in this mutation.
+func (m *MemberMutation) AddedCompletedChallengeCount() (r int64, exists bool) {
+	v := m.addcompleted_challenge_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCompletedChallengeCount resets all changes to the "completed_challenge_count" field.
+func (m *MemberMutation) ResetCompletedChallengeCount() {
+	m.completed_challenge_count = nil
+	m.addcompleted_challenge_count = nil
+}
+
 // SetGroupzID sets the "groupz" edge to the Groupz entity by id.
 func (m *MemberMutation) SetGroupzID(id int64) {
 	m.groupz = &id
@@ -3112,6 +5102,153 @@ func (m *MemberMutation) ResetGroupz() {
 	m.clearedgroupz = false
 }
 
+// AddChallengeMemberIDs adds the "challenge_members" edge to the ChallengeMember entity by ids.
+func (m *MemberMutation) AddChallengeMemberIDs(ids ...int64) {
+	if m.challenge_members == nil {
+		m.challenge_members = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.challenge_members[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChallengeMembers clears the "challenge_members" edge to the ChallengeMember entity.
+func (m *MemberMutation) ClearChallengeMembers() {
+	m.clearedchallenge_members = true
+}
+
+// ChallengeMembersCleared reports if the "challenge_members" edge to the ChallengeMember entity was cleared.
+func (m *MemberMutation) ChallengeMembersCleared() bool {
+	return m.clearedchallenge_members
+}
+
+// RemoveChallengeMemberIDs removes the "challenge_members" edge to the ChallengeMember entity by IDs.
+func (m *MemberMutation) RemoveChallengeMemberIDs(ids ...int64) {
+	if m.removedchallenge_members == nil {
+		m.removedchallenge_members = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.challenge_members, ids[i])
+		m.removedchallenge_members[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChallengeMembers returns the removed IDs of the "challenge_members" edge to the ChallengeMember entity.
+func (m *MemberMutation) RemovedChallengeMembersIDs() (ids []int64) {
+	for id := range m.removedchallenge_members {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChallengeMembersIDs returns the "challenge_members" edge IDs in the mutation.
+func (m *MemberMutation) ChallengeMembersIDs() (ids []int64) {
+	for id := range m.challenge_members {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChallengeMembers resets all changes to the "challenge_members" edge.
+func (m *MemberMutation) ResetChallengeMembers() {
+	m.challenge_members = nil
+	m.clearedchallenge_members = false
+	m.removedchallenge_members = nil
+}
+
+// AddSeasonMemberIDs adds the "season_members" edge to the SeasonMember entity by ids.
+func (m *MemberMutation) AddSeasonMemberIDs(ids ...int64) {
+	if m.season_members == nil {
+		m.season_members = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.season_members[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSeasonMembers clears the "season_members" edge to the SeasonMember entity.
+func (m *MemberMutation) ClearSeasonMembers() {
+	m.clearedseason_members = true
+}
+
+// SeasonMembersCleared reports if the "season_members" edge to the SeasonMember entity was cleared.
+func (m *MemberMutation) SeasonMembersCleared() bool {
+	return m.clearedseason_members
+}
+
+// RemoveSeasonMemberIDs removes the "season_members" edge to the SeasonMember entity by IDs.
+func (m *MemberMutation) RemoveSeasonMemberIDs(ids ...int64) {
+	if m.removedseason_members == nil {
+		m.removedseason_members = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.season_members, ids[i])
+		m.removedseason_members[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSeasonMembers returns the removed IDs of the "season_members" edge to the SeasonMember entity.
+func (m *MemberMutation) RemovedSeasonMembersIDs() (ids []int64) {
+	for id := range m.removedseason_members {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SeasonMembersIDs returns the "season_members" edge IDs in the mutation.
+func (m *MemberMutation) SeasonMembersIDs() (ids []int64) {
+	for id := range m.season_members {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSeasonMembers resets all changes to the "season_members" edge.
+func (m *MemberMutation) ResetSeasonMembers() {
+	m.season_members = nil
+	m.clearedseason_members = false
+	m.removedseason_members = nil
+}
+
+// SetChallengeID sets the "challenge" edge to the Challenge entity by id.
+func (m *MemberMutation) SetChallengeID(id int64) {
+	m.challenge = &id
+}
+
+// ClearChallenge clears the "challenge" edge to the Challenge entity.
+func (m *MemberMutation) ClearChallenge() {
+	m.clearedchallenge = true
+}
+
+// ChallengeCleared reports if the "challenge" edge to the Challenge entity was cleared.
+func (m *MemberMutation) ChallengeCleared() bool {
+	return m.clearedchallenge
+}
+
+// ChallengeID returns the "challenge" edge ID in the mutation.
+func (m *MemberMutation) ChallengeID() (id int64, exists bool) {
+	if m.challenge != nil {
+		return *m.challenge, true
+	}
+	return
+}
+
+// ChallengeIDs returns the "challenge" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChallengeID instead. It exists only for internal usage by the builders.
+func (m *MemberMutation) ChallengeIDs() (ids []int64) {
+	if id := m.challenge; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChallenge resets all changes to the "challenge" edge.
+func (m *MemberMutation) ResetChallenge() {
+	m.challenge = nil
+	m.clearedchallenge = false
+}
+
 // Where appends a list predicates to the MemberMutation builder.
 func (m *MemberMutation) Where(ps ...predicate.Member) {
 	m.predicates = append(m.predicates, ps...)
@@ -3146,7 +5283,7 @@ func (m *MemberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MemberMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, member.FieldCreatedAt)
 	}
@@ -3158,6 +5295,12 @@ func (m *MemberMutation) Fields() []string {
 	}
 	if m.joining_at != nil {
 		fields = append(fields, member.FieldJoiningAt)
+	}
+	if m.point != nil {
+		fields = append(fields, member.FieldPoint)
+	}
+	if m.completed_challenge_count != nil {
+		fields = append(fields, member.FieldCompletedChallengeCount)
 	}
 	return fields
 }
@@ -3175,6 +5318,10 @@ func (m *MemberMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case member.FieldJoiningAt:
 		return m.JoiningAt()
+	case member.FieldPoint:
+		return m.Point()
+	case member.FieldCompletedChallengeCount:
+		return m.CompletedChallengeCount()
 	}
 	return nil, false
 }
@@ -3192,6 +5339,10 @@ func (m *MemberMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldStatus(ctx)
 	case member.FieldJoiningAt:
 		return m.OldJoiningAt(ctx)
+	case member.FieldPoint:
+		return m.OldPoint(ctx)
+	case member.FieldCompletedChallengeCount:
+		return m.OldCompletedChallengeCount(ctx)
 	}
 	return nil, fmt.Errorf("unknown Member field %s", name)
 }
@@ -3229,6 +5380,20 @@ func (m *MemberMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetJoiningAt(v)
 		return nil
+	case member.FieldPoint:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoint(v)
+		return nil
+	case member.FieldCompletedChallengeCount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCompletedChallengeCount(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Member field %s", name)
 }
@@ -3243,6 +5408,12 @@ func (m *MemberMutation) AddedFields() []string {
 	if m.addstatus != nil {
 		fields = append(fields, member.FieldStatus)
 	}
+	if m.addpoint != nil {
+		fields = append(fields, member.FieldPoint)
+	}
+	if m.addcompleted_challenge_count != nil {
+		fields = append(fields, member.FieldCompletedChallengeCount)
+	}
 	return fields
 }
 
@@ -3255,6 +5426,10 @@ func (m *MemberMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUserID()
 	case member.FieldStatus:
 		return m.AddedStatus()
+	case member.FieldPoint:
+		return m.AddedPoint()
+	case member.FieldCompletedChallengeCount:
+		return m.AddedCompletedChallengeCount()
 	}
 	return nil, false
 }
@@ -3277,6 +5452,20 @@ func (m *MemberMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStatus(v)
+		return nil
+	case member.FieldPoint:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPoint(v)
+		return nil
+	case member.FieldCompletedChallengeCount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCompletedChallengeCount(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Member numeric field %s", name)
@@ -3326,15 +5515,30 @@ func (m *MemberMutation) ResetField(name string) error {
 	case member.FieldJoiningAt:
 		m.ResetJoiningAt()
 		return nil
+	case member.FieldPoint:
+		m.ResetPoint()
+		return nil
+	case member.FieldCompletedChallengeCount:
+		m.ResetCompletedChallengeCount()
+		return nil
 	}
 	return fmt.Errorf("unknown Member field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MemberMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 4)
 	if m.groupz != nil {
 		edges = append(edges, member.EdgeGroupz)
+	}
+	if m.challenge_members != nil {
+		edges = append(edges, member.EdgeChallengeMembers)
+	}
+	if m.season_members != nil {
+		edges = append(edges, member.EdgeSeasonMembers)
+	}
+	if m.challenge != nil {
+		edges = append(edges, member.EdgeChallenge)
 	}
 	return edges
 }
@@ -3347,27 +5551,72 @@ func (m *MemberMutation) AddedIDs(name string) []ent.Value {
 		if id := m.groupz; id != nil {
 			return []ent.Value{*id}
 		}
+	case member.EdgeChallengeMembers:
+		ids := make([]ent.Value, 0, len(m.challenge_members))
+		for id := range m.challenge_members {
+			ids = append(ids, id)
+		}
+		return ids
+	case member.EdgeSeasonMembers:
+		ids := make([]ent.Value, 0, len(m.season_members))
+		for id := range m.season_members {
+			ids = append(ids, id)
+		}
+		return ids
+	case member.EdgeChallenge:
+		if id := m.challenge; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MemberMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 4)
+	if m.removedchallenge_members != nil {
+		edges = append(edges, member.EdgeChallengeMembers)
+	}
+	if m.removedseason_members != nil {
+		edges = append(edges, member.EdgeSeasonMembers)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *MemberMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case member.EdgeChallengeMembers:
+		ids := make([]ent.Value, 0, len(m.removedchallenge_members))
+		for id := range m.removedchallenge_members {
+			ids = append(ids, id)
+		}
+		return ids
+	case member.EdgeSeasonMembers:
+		ids := make([]ent.Value, 0, len(m.removedseason_members))
+		for id := range m.removedseason_members {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MemberMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 4)
 	if m.clearedgroupz {
 		edges = append(edges, member.EdgeGroupz)
+	}
+	if m.clearedchallenge_members {
+		edges = append(edges, member.EdgeChallengeMembers)
+	}
+	if m.clearedseason_members {
+		edges = append(edges, member.EdgeSeasonMembers)
+	}
+	if m.clearedchallenge {
+		edges = append(edges, member.EdgeChallenge)
 	}
 	return edges
 }
@@ -3378,6 +5627,12 @@ func (m *MemberMutation) EdgeCleared(name string) bool {
 	switch name {
 	case member.EdgeGroupz:
 		return m.clearedgroupz
+	case member.EdgeChallengeMembers:
+		return m.clearedchallenge_members
+	case member.EdgeSeasonMembers:
+		return m.clearedseason_members
+	case member.EdgeChallenge:
+		return m.clearedchallenge
 	}
 	return false
 }
@@ -3388,6 +5643,9 @@ func (m *MemberMutation) ClearEdge(name string) error {
 	switch name {
 	case member.EdgeGroupz:
 		m.ClearGroupz()
+		return nil
+	case member.EdgeChallenge:
+		m.ClearChallenge()
 		return nil
 	}
 	return fmt.Errorf("unknown Member unique edge %s", name)
@@ -3400,6 +5658,1579 @@ func (m *MemberMutation) ResetEdge(name string) error {
 	case member.EdgeGroupz:
 		m.ResetGroupz()
 		return nil
+	case member.EdgeChallengeMembers:
+		m.ResetChallengeMembers()
+		return nil
+	case member.EdgeSeasonMembers:
+		m.ResetSeasonMembers()
+		return nil
+	case member.EdgeChallenge:
+		m.ResetChallenge()
+		return nil
 	}
 	return fmt.Errorf("unknown Member edge %s", name)
+}
+
+// SeasonMutation represents an operation that mutates the Season nodes in the graph.
+type SeasonMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *int64
+	name                  *string
+	description           *string
+	picture               *string
+	created_at            *time.Time
+	updated_at            *time.Time
+	start_date            *time.Time
+	end_date              *time.Time
+	is_active             *bool
+	clearedFields         map[string]struct{}
+	season_members        map[int64]struct{}
+	removedseason_members map[int64]struct{}
+	clearedseason_members bool
+	done                  bool
+	oldValue              func(context.Context) (*Season, error)
+	predicates            []predicate.Season
+}
+
+var _ ent.Mutation = (*SeasonMutation)(nil)
+
+// seasonOption allows management of the mutation configuration using functional options.
+type seasonOption func(*SeasonMutation)
+
+// newSeasonMutation creates new mutation for the Season entity.
+func newSeasonMutation(c config, op Op, opts ...seasonOption) *SeasonMutation {
+	m := &SeasonMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSeason,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSeasonID sets the ID field of the mutation.
+func withSeasonID(id int64) seasonOption {
+	return func(m *SeasonMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Season
+		)
+		m.oldValue = func(ctx context.Context) (*Season, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Season.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSeason sets the old Season of the mutation.
+func withSeason(node *Season) seasonOption {
+	return func(m *SeasonMutation) {
+		m.oldValue = func(context.Context) (*Season, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SeasonMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SeasonMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Season entities.
+func (m *SeasonMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SeasonMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SeasonMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Season.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *SeasonMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *SeasonMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *SeasonMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[season.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *SeasonMutation) NameCleared() bool {
+	_, ok := m.clearedFields[season.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *SeasonMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, season.FieldName)
+}
+
+// SetDescription sets the "description" field.
+func (m *SeasonMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *SeasonMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *SeasonMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[season.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *SeasonMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[season.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *SeasonMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, season.FieldDescription)
+}
+
+// SetPicture sets the "picture" field.
+func (m *SeasonMutation) SetPicture(s string) {
+	m.picture = &s
+}
+
+// Picture returns the value of the "picture" field in the mutation.
+func (m *SeasonMutation) Picture() (r string, exists bool) {
+	v := m.picture
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPicture returns the old "picture" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldPicture(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPicture is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPicture requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPicture: %w", err)
+	}
+	return oldValue.Picture, nil
+}
+
+// ResetPicture resets all changes to the "picture" field.
+func (m *SeasonMutation) ResetPicture() {
+	m.picture = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *SeasonMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *SeasonMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *SeasonMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *SeasonMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *SeasonMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *SeasonMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetStartDate sets the "start_date" field.
+func (m *SeasonMutation) SetStartDate(t time.Time) {
+	m.start_date = &t
+}
+
+// StartDate returns the value of the "start_date" field in the mutation.
+func (m *SeasonMutation) StartDate() (r time.Time, exists bool) {
+	v := m.start_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartDate returns the old "start_date" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldStartDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartDate: %w", err)
+	}
+	return oldValue.StartDate, nil
+}
+
+// ClearStartDate clears the value of the "start_date" field.
+func (m *SeasonMutation) ClearStartDate() {
+	m.start_date = nil
+	m.clearedFields[season.FieldStartDate] = struct{}{}
+}
+
+// StartDateCleared returns if the "start_date" field was cleared in this mutation.
+func (m *SeasonMutation) StartDateCleared() bool {
+	_, ok := m.clearedFields[season.FieldStartDate]
+	return ok
+}
+
+// ResetStartDate resets all changes to the "start_date" field.
+func (m *SeasonMutation) ResetStartDate() {
+	m.start_date = nil
+	delete(m.clearedFields, season.FieldStartDate)
+}
+
+// SetEndDate sets the "end_date" field.
+func (m *SeasonMutation) SetEndDate(t time.Time) {
+	m.end_date = &t
+}
+
+// EndDate returns the value of the "end_date" field in the mutation.
+func (m *SeasonMutation) EndDate() (r time.Time, exists bool) {
+	v := m.end_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndDate returns the old "end_date" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldEndDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndDate: %w", err)
+	}
+	return oldValue.EndDate, nil
+}
+
+// ClearEndDate clears the value of the "end_date" field.
+func (m *SeasonMutation) ClearEndDate() {
+	m.end_date = nil
+	m.clearedFields[season.FieldEndDate] = struct{}{}
+}
+
+// EndDateCleared returns if the "end_date" field was cleared in this mutation.
+func (m *SeasonMutation) EndDateCleared() bool {
+	_, ok := m.clearedFields[season.FieldEndDate]
+	return ok
+}
+
+// ResetEndDate resets all changes to the "end_date" field.
+func (m *SeasonMutation) ResetEndDate() {
+	m.end_date = nil
+	delete(m.clearedFields, season.FieldEndDate)
+}
+
+// SetIsActive sets the "is_active" field.
+func (m *SeasonMutation) SetIsActive(b bool) {
+	m.is_active = &b
+}
+
+// IsActive returns the value of the "is_active" field in the mutation.
+func (m *SeasonMutation) IsActive() (r bool, exists bool) {
+	v := m.is_active
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsActive returns the old "is_active" field's value of the Season entity.
+// If the Season object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMutation) OldIsActive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsActive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
+	}
+	return oldValue.IsActive, nil
+}
+
+// ResetIsActive resets all changes to the "is_active" field.
+func (m *SeasonMutation) ResetIsActive() {
+	m.is_active = nil
+}
+
+// AddSeasonMemberIDs adds the "season_members" edge to the SeasonMember entity by ids.
+func (m *SeasonMutation) AddSeasonMemberIDs(ids ...int64) {
+	if m.season_members == nil {
+		m.season_members = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.season_members[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSeasonMembers clears the "season_members" edge to the SeasonMember entity.
+func (m *SeasonMutation) ClearSeasonMembers() {
+	m.clearedseason_members = true
+}
+
+// SeasonMembersCleared reports if the "season_members" edge to the SeasonMember entity was cleared.
+func (m *SeasonMutation) SeasonMembersCleared() bool {
+	return m.clearedseason_members
+}
+
+// RemoveSeasonMemberIDs removes the "season_members" edge to the SeasonMember entity by IDs.
+func (m *SeasonMutation) RemoveSeasonMemberIDs(ids ...int64) {
+	if m.removedseason_members == nil {
+		m.removedseason_members = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.season_members, ids[i])
+		m.removedseason_members[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSeasonMembers returns the removed IDs of the "season_members" edge to the SeasonMember entity.
+func (m *SeasonMutation) RemovedSeasonMembersIDs() (ids []int64) {
+	for id := range m.removedseason_members {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SeasonMembersIDs returns the "season_members" edge IDs in the mutation.
+func (m *SeasonMutation) SeasonMembersIDs() (ids []int64) {
+	for id := range m.season_members {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSeasonMembers resets all changes to the "season_members" edge.
+func (m *SeasonMutation) ResetSeasonMembers() {
+	m.season_members = nil
+	m.clearedseason_members = false
+	m.removedseason_members = nil
+}
+
+// Where appends a list predicates to the SeasonMutation builder.
+func (m *SeasonMutation) Where(ps ...predicate.Season) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SeasonMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SeasonMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Season, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SeasonMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SeasonMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Season).
+func (m *SeasonMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SeasonMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.name != nil {
+		fields = append(fields, season.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, season.FieldDescription)
+	}
+	if m.picture != nil {
+		fields = append(fields, season.FieldPicture)
+	}
+	if m.created_at != nil {
+		fields = append(fields, season.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, season.FieldUpdatedAt)
+	}
+	if m.start_date != nil {
+		fields = append(fields, season.FieldStartDate)
+	}
+	if m.end_date != nil {
+		fields = append(fields, season.FieldEndDate)
+	}
+	if m.is_active != nil {
+		fields = append(fields, season.FieldIsActive)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SeasonMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case season.FieldName:
+		return m.Name()
+	case season.FieldDescription:
+		return m.Description()
+	case season.FieldPicture:
+		return m.Picture()
+	case season.FieldCreatedAt:
+		return m.CreatedAt()
+	case season.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case season.FieldStartDate:
+		return m.StartDate()
+	case season.FieldEndDate:
+		return m.EndDate()
+	case season.FieldIsActive:
+		return m.IsActive()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SeasonMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case season.FieldName:
+		return m.OldName(ctx)
+	case season.FieldDescription:
+		return m.OldDescription(ctx)
+	case season.FieldPicture:
+		return m.OldPicture(ctx)
+	case season.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case season.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case season.FieldStartDate:
+		return m.OldStartDate(ctx)
+	case season.FieldEndDate:
+		return m.OldEndDate(ctx)
+	case season.FieldIsActive:
+		return m.OldIsActive(ctx)
+	}
+	return nil, fmt.Errorf("unknown Season field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SeasonMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case season.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case season.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case season.FieldPicture:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPicture(v)
+		return nil
+	case season.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case season.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case season.FieldStartDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartDate(v)
+		return nil
+	case season.FieldEndDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndDate(v)
+		return nil
+	case season.FieldIsActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsActive(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Season field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SeasonMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SeasonMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SeasonMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Season numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SeasonMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(season.FieldName) {
+		fields = append(fields, season.FieldName)
+	}
+	if m.FieldCleared(season.FieldDescription) {
+		fields = append(fields, season.FieldDescription)
+	}
+	if m.FieldCleared(season.FieldStartDate) {
+		fields = append(fields, season.FieldStartDate)
+	}
+	if m.FieldCleared(season.FieldEndDate) {
+		fields = append(fields, season.FieldEndDate)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SeasonMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SeasonMutation) ClearField(name string) error {
+	switch name {
+	case season.FieldName:
+		m.ClearName()
+		return nil
+	case season.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case season.FieldStartDate:
+		m.ClearStartDate()
+		return nil
+	case season.FieldEndDate:
+		m.ClearEndDate()
+		return nil
+	}
+	return fmt.Errorf("unknown Season nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SeasonMutation) ResetField(name string) error {
+	switch name {
+	case season.FieldName:
+		m.ResetName()
+		return nil
+	case season.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case season.FieldPicture:
+		m.ResetPicture()
+		return nil
+	case season.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case season.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case season.FieldStartDate:
+		m.ResetStartDate()
+		return nil
+	case season.FieldEndDate:
+		m.ResetEndDate()
+		return nil
+	case season.FieldIsActive:
+		m.ResetIsActive()
+		return nil
+	}
+	return fmt.Errorf("unknown Season field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SeasonMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.season_members != nil {
+		edges = append(edges, season.EdgeSeasonMembers)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SeasonMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case season.EdgeSeasonMembers:
+		ids := make([]ent.Value, 0, len(m.season_members))
+		for id := range m.season_members {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SeasonMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedseason_members != nil {
+		edges = append(edges, season.EdgeSeasonMembers)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SeasonMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case season.EdgeSeasonMembers:
+		ids := make([]ent.Value, 0, len(m.removedseason_members))
+		for id := range m.removedseason_members {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SeasonMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedseason_members {
+		edges = append(edges, season.EdgeSeasonMembers)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SeasonMutation) EdgeCleared(name string) bool {
+	switch name {
+	case season.EdgeSeasonMembers:
+		return m.clearedseason_members
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SeasonMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Season unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SeasonMutation) ResetEdge(name string) error {
+	switch name {
+	case season.EdgeSeasonMembers:
+		m.ResetSeasonMembers()
+		return nil
+	}
+	return fmt.Errorf("unknown Season edge %s", name)
+}
+
+// SeasonMemberMutation represents an operation that mutates the SeasonMember nodes in the graph.
+type SeasonMemberMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	point         *int64
+	addpoint      *int64
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	season        *int64
+	clearedseason bool
+	member        *int64
+	clearedmember bool
+	done          bool
+	oldValue      func(context.Context) (*SeasonMember, error)
+	predicates    []predicate.SeasonMember
+}
+
+var _ ent.Mutation = (*SeasonMemberMutation)(nil)
+
+// seasonmemberOption allows management of the mutation configuration using functional options.
+type seasonmemberOption func(*SeasonMemberMutation)
+
+// newSeasonMemberMutation creates new mutation for the SeasonMember entity.
+func newSeasonMemberMutation(c config, op Op, opts ...seasonmemberOption) *SeasonMemberMutation {
+	m := &SeasonMemberMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSeasonMember,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSeasonMemberID sets the ID field of the mutation.
+func withSeasonMemberID(id int64) seasonmemberOption {
+	return func(m *SeasonMemberMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *SeasonMember
+		)
+		m.oldValue = func(ctx context.Context) (*SeasonMember, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().SeasonMember.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSeasonMember sets the old SeasonMember of the mutation.
+func withSeasonMember(node *SeasonMember) seasonmemberOption {
+	return func(m *SeasonMemberMutation) {
+		m.oldValue = func(context.Context) (*SeasonMember, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SeasonMemberMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SeasonMemberMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of SeasonMember entities.
+func (m *SeasonMemberMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SeasonMemberMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SeasonMemberMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().SeasonMember.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetPoint sets the "point" field.
+func (m *SeasonMemberMutation) SetPoint(i int64) {
+	m.point = &i
+	m.addpoint = nil
+}
+
+// Point returns the value of the "point" field in the mutation.
+func (m *SeasonMemberMutation) Point() (r int64, exists bool) {
+	v := m.point
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoint returns the old "point" field's value of the SeasonMember entity.
+// If the SeasonMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMemberMutation) OldPoint(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoint: %w", err)
+	}
+	return oldValue.Point, nil
+}
+
+// AddPoint adds i to the "point" field.
+func (m *SeasonMemberMutation) AddPoint(i int64) {
+	if m.addpoint != nil {
+		*m.addpoint += i
+	} else {
+		m.addpoint = &i
+	}
+}
+
+// AddedPoint returns the value that was added to the "point" field in this mutation.
+func (m *SeasonMemberMutation) AddedPoint() (r int64, exists bool) {
+	v := m.addpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPoint resets all changes to the "point" field.
+func (m *SeasonMemberMutation) ResetPoint() {
+	m.point = nil
+	m.addpoint = nil
+}
+
+// SetMemberID sets the "member_id" field.
+func (m *SeasonMemberMutation) SetMemberID(i int64) {
+	m.member = &i
+}
+
+// MemberID returns the value of the "member_id" field in the mutation.
+func (m *SeasonMemberMutation) MemberID() (r int64, exists bool) {
+	v := m.member
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemberID returns the old "member_id" field's value of the SeasonMember entity.
+// If the SeasonMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMemberMutation) OldMemberID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemberID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemberID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemberID: %w", err)
+	}
+	return oldValue.MemberID, nil
+}
+
+// ResetMemberID resets all changes to the "member_id" field.
+func (m *SeasonMemberMutation) ResetMemberID() {
+	m.member = nil
+}
+
+// SetSeasonID sets the "season_id" field.
+func (m *SeasonMemberMutation) SetSeasonID(i int64) {
+	m.season = &i
+}
+
+// SeasonID returns the value of the "season_id" field in the mutation.
+func (m *SeasonMemberMutation) SeasonID() (r int64, exists bool) {
+	v := m.season
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSeasonID returns the old "season_id" field's value of the SeasonMember entity.
+// If the SeasonMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMemberMutation) OldSeasonID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSeasonID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSeasonID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSeasonID: %w", err)
+	}
+	return oldValue.SeasonID, nil
+}
+
+// ResetSeasonID resets all changes to the "season_id" field.
+func (m *SeasonMemberMutation) ResetSeasonID() {
+	m.season = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *SeasonMemberMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *SeasonMemberMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the SeasonMember entity.
+// If the SeasonMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMemberMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *SeasonMemberMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *SeasonMemberMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *SeasonMemberMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the SeasonMember entity.
+// If the SeasonMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMemberMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *SeasonMemberMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// ClearSeason clears the "season" edge to the Season entity.
+func (m *SeasonMemberMutation) ClearSeason() {
+	m.clearedseason = true
+}
+
+// SeasonCleared reports if the "season" edge to the Season entity was cleared.
+func (m *SeasonMemberMutation) SeasonCleared() bool {
+	return m.clearedseason
+}
+
+// SeasonIDs returns the "season" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SeasonID instead. It exists only for internal usage by the builders.
+func (m *SeasonMemberMutation) SeasonIDs() (ids []int64) {
+	if id := m.season; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSeason resets all changes to the "season" edge.
+func (m *SeasonMemberMutation) ResetSeason() {
+	m.season = nil
+	m.clearedseason = false
+}
+
+// ClearMember clears the "member" edge to the Member entity.
+func (m *SeasonMemberMutation) ClearMember() {
+	m.clearedmember = true
+}
+
+// MemberCleared reports if the "member" edge to the Member entity was cleared.
+func (m *SeasonMemberMutation) MemberCleared() bool {
+	return m.clearedmember
+}
+
+// MemberIDs returns the "member" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MemberID instead. It exists only for internal usage by the builders.
+func (m *SeasonMemberMutation) MemberIDs() (ids []int64) {
+	if id := m.member; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMember resets all changes to the "member" edge.
+func (m *SeasonMemberMutation) ResetMember() {
+	m.member = nil
+	m.clearedmember = false
+}
+
+// Where appends a list predicates to the SeasonMemberMutation builder.
+func (m *SeasonMemberMutation) Where(ps ...predicate.SeasonMember) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SeasonMemberMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SeasonMemberMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.SeasonMember, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SeasonMemberMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SeasonMemberMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (SeasonMember).
+func (m *SeasonMemberMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SeasonMemberMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.point != nil {
+		fields = append(fields, seasonmember.FieldPoint)
+	}
+	if m.member != nil {
+		fields = append(fields, seasonmember.FieldMemberID)
+	}
+	if m.season != nil {
+		fields = append(fields, seasonmember.FieldSeasonID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, seasonmember.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, seasonmember.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SeasonMemberMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case seasonmember.FieldPoint:
+		return m.Point()
+	case seasonmember.FieldMemberID:
+		return m.MemberID()
+	case seasonmember.FieldSeasonID:
+		return m.SeasonID()
+	case seasonmember.FieldCreatedAt:
+		return m.CreatedAt()
+	case seasonmember.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SeasonMemberMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case seasonmember.FieldPoint:
+		return m.OldPoint(ctx)
+	case seasonmember.FieldMemberID:
+		return m.OldMemberID(ctx)
+	case seasonmember.FieldSeasonID:
+		return m.OldSeasonID(ctx)
+	case seasonmember.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case seasonmember.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown SeasonMember field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SeasonMemberMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case seasonmember.FieldPoint:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoint(v)
+		return nil
+	case seasonmember.FieldMemberID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemberID(v)
+		return nil
+	case seasonmember.FieldSeasonID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSeasonID(v)
+		return nil
+	case seasonmember.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case seasonmember.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown SeasonMember field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SeasonMemberMutation) AddedFields() []string {
+	var fields []string
+	if m.addpoint != nil {
+		fields = append(fields, seasonmember.FieldPoint)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SeasonMemberMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case seasonmember.FieldPoint:
+		return m.AddedPoint()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SeasonMemberMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case seasonmember.FieldPoint:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPoint(v)
+		return nil
+	}
+	return fmt.Errorf("unknown SeasonMember numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SeasonMemberMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SeasonMemberMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SeasonMemberMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown SeasonMember nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SeasonMemberMutation) ResetField(name string) error {
+	switch name {
+	case seasonmember.FieldPoint:
+		m.ResetPoint()
+		return nil
+	case seasonmember.FieldMemberID:
+		m.ResetMemberID()
+		return nil
+	case seasonmember.FieldSeasonID:
+		m.ResetSeasonID()
+		return nil
+	case seasonmember.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case seasonmember.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown SeasonMember field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SeasonMemberMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.season != nil {
+		edges = append(edges, seasonmember.EdgeSeason)
+	}
+	if m.member != nil {
+		edges = append(edges, seasonmember.EdgeMember)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SeasonMemberMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case seasonmember.EdgeSeason:
+		if id := m.season; id != nil {
+			return []ent.Value{*id}
+		}
+	case seasonmember.EdgeMember:
+		if id := m.member; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SeasonMemberMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SeasonMemberMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SeasonMemberMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedseason {
+		edges = append(edges, seasonmember.EdgeSeason)
+	}
+	if m.clearedmember {
+		edges = append(edges, seasonmember.EdgeMember)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SeasonMemberMutation) EdgeCleared(name string) bool {
+	switch name {
+	case seasonmember.EdgeSeason:
+		return m.clearedseason
+	case seasonmember.EdgeMember:
+		return m.clearedmember
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SeasonMemberMutation) ClearEdge(name string) error {
+	switch name {
+	case seasonmember.EdgeSeason:
+		m.ClearSeason()
+		return nil
+	case seasonmember.EdgeMember:
+		m.ClearMember()
+		return nil
+	}
+	return fmt.Errorf("unknown SeasonMember unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SeasonMemberMutation) ResetEdge(name string) error {
+	switch name {
+	case seasonmember.EdgeSeason:
+		m.ResetSeason()
+		return nil
+	case seasonmember.EdgeMember:
+		m.ResetMember()
+		return nil
+	}
+	return fmt.Errorf("unknown SeasonMember edge %s", name)
 }

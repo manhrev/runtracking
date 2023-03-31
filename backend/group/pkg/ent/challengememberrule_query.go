@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -23,6 +24,7 @@ type ChallengeMemberRuleQuery struct {
 	inters              []Interceptor
 	predicates          []predicate.ChallengeMemberRule
 	withChallengeMember *ChallengeMemberQuery
+	withChallengeRule   *ChallengeRuleQuery
 	withFKs             bool
 	modifiers           []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -76,6 +78,28 @@ func (cmrq *ChallengeMemberRuleQuery) QueryChallengeMember() *ChallengeMemberQue
 			sqlgraph.From(challengememberrule.Table, challengememberrule.FieldID, selector),
 			sqlgraph.To(challengemember.Table, challengemember.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, challengememberrule.ChallengeMemberTable, challengememberrule.ChallengeMemberColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cmrq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChallengeRule chains the current query on the "challenge_rule" edge.
+func (cmrq *ChallengeMemberRuleQuery) QueryChallengeRule() *ChallengeRuleQuery {
+	query := (&ChallengeRuleClient{config: cmrq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cmrq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cmrq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengememberrule.Table, challengememberrule.FieldID, selector),
+			sqlgraph.To(challengerule.Table, challengerule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengememberrule.ChallengeRuleTable, challengememberrule.ChallengeRuleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cmrq.driver.Dialect(), step)
 		return fromU, nil
@@ -274,6 +298,7 @@ func (cmrq *ChallengeMemberRuleQuery) Clone() *ChallengeMemberRuleQuery {
 		inters:              append([]Interceptor{}, cmrq.inters...),
 		predicates:          append([]predicate.ChallengeMemberRule{}, cmrq.predicates...),
 		withChallengeMember: cmrq.withChallengeMember.Clone(),
+		withChallengeRule:   cmrq.withChallengeRule.Clone(),
 		// clone intermediate query.
 		sql:  cmrq.sql.Clone(),
 		path: cmrq.path,
@@ -288,6 +313,17 @@ func (cmrq *ChallengeMemberRuleQuery) WithChallengeMember(opts ...func(*Challeng
 		opt(query)
 	}
 	cmrq.withChallengeMember = query
+	return cmrq
+}
+
+// WithChallengeRule tells the query-builder to eager-load the nodes that are connected to
+// the "challenge_rule" edge. The optional arguments are used to configure the query builder of the edge.
+func (cmrq *ChallengeMemberRuleQuery) WithChallengeRule(opts ...func(*ChallengeRuleQuery)) *ChallengeMemberRuleQuery {
+	query := (&ChallengeRuleClient{config: cmrq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cmrq.withChallengeRule = query
 	return cmrq
 }
 
@@ -372,11 +408,12 @@ func (cmrq *ChallengeMemberRuleQuery) sqlAll(ctx context.Context, hooks ...query
 		nodes       = []*ChallengeMemberRule{}
 		withFKs     = cmrq.withFKs
 		_spec       = cmrq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			cmrq.withChallengeMember != nil,
+			cmrq.withChallengeRule != nil,
 		}
 	)
-	if cmrq.withChallengeMember != nil {
+	if cmrq.withChallengeMember != nil || cmrq.withChallengeRule != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -409,6 +446,12 @@ func (cmrq *ChallengeMemberRuleQuery) sqlAll(ctx context.Context, hooks ...query
 			return nil, err
 		}
 	}
+	if query := cmrq.withChallengeRule; query != nil {
+		if err := cmrq.loadChallengeRule(ctx, query, nodes, nil,
+			func(n *ChallengeMemberRule, e *ChallengeRule) { n.Edges.ChallengeRule = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -437,6 +480,38 @@ func (cmrq *ChallengeMemberRuleQuery) loadChallengeMember(ctx context.Context, q
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "challenge_member_challenge_member_rules" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cmrq *ChallengeMemberRuleQuery) loadChallengeRule(ctx context.Context, query *ChallengeRuleQuery, nodes []*ChallengeMemberRule, init func(*ChallengeMemberRule), assign func(*ChallengeMemberRule, *ChallengeRule)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*ChallengeMemberRule)
+	for i := range nodes {
+		if nodes[i].challenge_rule_challenge_member_rules == nil {
+			continue
+		}
+		fk := *nodes[i].challenge_rule_challenge_member_rules
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(challengerule.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "challenge_rule_challenge_member_rules" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

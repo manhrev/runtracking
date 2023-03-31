@@ -18,10 +18,16 @@ type Tx struct {
 	ChallengeMember *ChallengeMemberClient
 	// ChallengeMemberRule is the client for interacting with the ChallengeMemberRule builders.
 	ChallengeMemberRule *ChallengeMemberRuleClient
+	// ChallengeRule is the client for interacting with the ChallengeRule builders.
+	ChallengeRule *ChallengeRuleClient
 	// Groupz is the client for interacting with the Groupz builders.
 	Groupz *GroupzClient
 	// Member is the client for interacting with the Member builders.
 	Member *MemberClient
+	// Season is the client for interacting with the Season builders.
+	Season *SeasonClient
+	// SeasonMember is the client for interacting with the SeasonMember builders.
+	SeasonMember *SeasonMemberClient
 
 	// lazily loaded.
 	client     *Client
@@ -156,8 +162,11 @@ func (tx *Tx) init() {
 	tx.Challenge = NewChallengeClient(tx.config)
 	tx.ChallengeMember = NewChallengeMemberClient(tx.config)
 	tx.ChallengeMemberRule = NewChallengeMemberRuleClient(tx.config)
+	tx.ChallengeRule = NewChallengeRuleClient(tx.config)
 	tx.Groupz = NewGroupzClient(tx.config)
 	tx.Member = NewMemberClient(tx.config)
+	tx.Season = NewSeasonClient(tx.config)
+	tx.SeasonMember = NewSeasonMemberClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

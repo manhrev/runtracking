@@ -5,10 +5,12 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 // ChallengeMember is the model entity for the ChallengeMember schema.
@@ -16,12 +18,23 @@ type ChallengeMember struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// Point holds the value of the "point" field.
+	Point int64 `json:"point,omitempty"`
 	// MemberID holds the value of the "member_id" field.
 	MemberID int64 `json:"member_id,omitempty"`
+	// ChallengeID holds the value of the "challenge_id" field.
+	ChallengeID int64 `json:"challenge_id,omitempty"`
+	// Status holds the value of the "status" field.
+	Status int64 `json:"status,omitempty"`
+	// TimeCompleted holds the value of the "time_completed" field.
+	TimeCompleted time.Time `json:"time_completed,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChallengeMemberQuery when eager-loading is set.
-	Edges                       ChallengeMemberEdges `json:"edges"`
-	challenge_challenge_members *int64
+	Edges ChallengeMemberEdges `json:"edges"`
 }
 
 // ChallengeMemberEdges holds the relations/edges for other nodes in the graph.
@@ -30,9 +43,11 @@ type ChallengeMemberEdges struct {
 	ChallengeMemberRules []*ChallengeMemberRule `json:"challenge_member_rules,omitempty"`
 	// Challenge holds the value of the challenge edge.
 	Challenge *Challenge `json:"challenge,omitempty"`
+	// Member holds the value of the member edge.
+	Member *Member `json:"member,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // ChallengeMemberRulesOrErr returns the ChallengeMemberRules value or an error if the edge
@@ -57,15 +72,28 @@ func (e ChallengeMemberEdges) ChallengeOrErr() (*Challenge, error) {
 	return nil, &NotLoadedError{edge: "challenge"}
 }
 
+// MemberOrErr returns the Member value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ChallengeMemberEdges) MemberOrErr() (*Member, error) {
+	if e.loadedTypes[2] {
+		if e.Member == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: member.Label}
+		}
+		return e.Member, nil
+	}
+	return nil, &NotLoadedError{edge: "member"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*ChallengeMember) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challengemember.FieldID, challengemember.FieldMemberID:
+		case challengemember.FieldID, challengemember.FieldPoint, challengemember.FieldMemberID, challengemember.FieldChallengeID, challengemember.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case challengemember.ForeignKeys[0]: // challenge_challenge_members
-			values[i] = new(sql.NullInt64)
+		case challengemember.FieldTimeCompleted, challengemember.FieldCreatedAt, challengemember.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ChallengeMember", columns[i])
 		}
@@ -87,18 +115,47 @@ func (cm *ChallengeMember) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			cm.ID = int64(value.Int64)
+		case challengemember.FieldPoint:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field point", values[i])
+			} else if value.Valid {
+				cm.Point = value.Int64
+			}
 		case challengemember.FieldMemberID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field member_id", values[i])
 			} else if value.Valid {
 				cm.MemberID = value.Int64
 			}
-		case challengemember.ForeignKeys[0]:
+		case challengemember.FieldChallengeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field challenge_challenge_members", value)
+				return fmt.Errorf("unexpected type %T for field challenge_id", values[i])
 			} else if value.Valid {
-				cm.challenge_challenge_members = new(int64)
-				*cm.challenge_challenge_members = int64(value.Int64)
+				cm.ChallengeID = value.Int64
+			}
+		case challengemember.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				cm.Status = value.Int64
+			}
+		case challengemember.FieldTimeCompleted:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field time_completed", values[i])
+			} else if value.Valid {
+				cm.TimeCompleted = value.Time
+			}
+		case challengemember.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				cm.CreatedAt = value.Time
+			}
+		case challengemember.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				cm.UpdatedAt = value.Time
 			}
 		}
 	}
@@ -113,6 +170,11 @@ func (cm *ChallengeMember) QueryChallengeMemberRules() *ChallengeMemberRuleQuery
 // QueryChallenge queries the "challenge" edge of the ChallengeMember entity.
 func (cm *ChallengeMember) QueryChallenge() *ChallengeQuery {
 	return NewChallengeMemberClient(cm.config).QueryChallenge(cm)
+}
+
+// QueryMember queries the "member" edge of the ChallengeMember entity.
+func (cm *ChallengeMember) QueryMember() *MemberQuery {
+	return NewChallengeMemberClient(cm.config).QueryMember(cm)
 }
 
 // Update returns a builder for updating this ChallengeMember.
@@ -138,8 +200,26 @@ func (cm *ChallengeMember) String() string {
 	var builder strings.Builder
 	builder.WriteString("ChallengeMember(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", cm.ID))
+	builder.WriteString("point=")
+	builder.WriteString(fmt.Sprintf("%v", cm.Point))
+	builder.WriteString(", ")
 	builder.WriteString("member_id=")
 	builder.WriteString(fmt.Sprintf("%v", cm.MemberID))
+	builder.WriteString(", ")
+	builder.WriteString("challenge_id=")
+	builder.WriteString(fmt.Sprintf("%v", cm.ChallengeID))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", cm.Status))
+	builder.WriteString(", ")
+	builder.WriteString("time_completed=")
+	builder.WriteString(cm.TimeCompleted.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(cm.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(cm.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

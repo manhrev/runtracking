@@ -13,7 +13,9 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -28,6 +30,26 @@ type ChallengeUpdate struct {
 // Where appends a list predicates to the ChallengeUpdate builder.
 func (cu *ChallengeUpdate) Where(ps ...predicate.Challenge) *ChallengeUpdate {
 	cu.mutation.Where(ps...)
+	return cu
+}
+
+// SetName sets the "name" field.
+func (cu *ChallengeUpdate) SetName(s string) *ChallengeUpdate {
+	cu.mutation.SetName(s)
+	return cu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableName(s *string) *ChallengeUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
+// ClearName clears the value of the "name" field.
+func (cu *ChallengeUpdate) ClearName() *ChallengeUpdate {
+	cu.mutation.ClearName()
 	return cu
 }
 
@@ -62,6 +84,20 @@ func (cu *ChallengeUpdate) SetNillableStartTime(t *time.Time) *ChallengeUpdate {
 // ClearStartTime clears the value of the "start_time" field.
 func (cu *ChallengeUpdate) ClearStartTime() *ChallengeUpdate {
 	cu.mutation.ClearStartTime()
+	return cu
+}
+
+// SetPicture sets the "picture" field.
+func (cu *ChallengeUpdate) SetPicture(s string) *ChallengeUpdate {
+	cu.mutation.SetPicture(s)
+	return cu
+}
+
+// SetNillablePicture sets the "picture" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillablePicture(s *string) *ChallengeUpdate {
+	if s != nil {
+		cu.SetPicture(*s)
+	}
 	return cu
 }
 
@@ -118,6 +154,47 @@ func (cu *ChallengeUpdate) AddTypeID(i int64) *ChallengeUpdate {
 	return cu
 }
 
+// SetStatus sets the "status" field.
+func (cu *ChallengeUpdate) SetStatus(i int64) *ChallengeUpdate {
+	cu.mutation.ResetStatus()
+	cu.mutation.SetStatus(i)
+	return cu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableStatus(i *int64) *ChallengeUpdate {
+	if i != nil {
+		cu.SetStatus(*i)
+	}
+	return cu
+}
+
+// AddStatus adds i to the "status" field.
+func (cu *ChallengeUpdate) AddStatus(i int64) *ChallengeUpdate {
+	cu.mutation.AddStatus(i)
+	return cu
+}
+
+// SetCompletedFirstMemberID sets the "completed_first_member_id" field.
+func (cu *ChallengeUpdate) SetCompletedFirstMemberID(i int64) *ChallengeUpdate {
+	cu.mutation.SetCompletedFirstMemberID(i)
+	return cu
+}
+
+// SetNillableCompletedFirstMemberID sets the "completed_first_member_id" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableCompletedFirstMemberID(i *int64) *ChallengeUpdate {
+	if i != nil {
+		cu.SetCompletedFirstMemberID(*i)
+	}
+	return cu
+}
+
+// ClearCompletedFirstMemberID clears the value of the "completed_first_member_id" field.
+func (cu *ChallengeUpdate) ClearCompletedFirstMemberID() *ChallengeUpdate {
+	cu.mutation.ClearCompletedFirstMemberID()
+	return cu
+}
+
 // AddChallengeMemberIDs adds the "challenge_members" edge to the ChallengeMember entity by IDs.
 func (cu *ChallengeUpdate) AddChallengeMemberIDs(ids ...int64) *ChallengeUpdate {
 	cu.mutation.AddChallengeMemberIDs(ids...)
@@ -152,6 +229,40 @@ func (cu *ChallengeUpdate) SetGroupz(g *Groupz) *ChallengeUpdate {
 	return cu.SetGroupzID(g.ID)
 }
 
+// AddChallengeRuleIDs adds the "challenge_rules" edge to the ChallengeRule entity by IDs.
+func (cu *ChallengeUpdate) AddChallengeRuleIDs(ids ...int64) *ChallengeUpdate {
+	cu.mutation.AddChallengeRuleIDs(ids...)
+	return cu
+}
+
+// AddChallengeRules adds the "challenge_rules" edges to the ChallengeRule entity.
+func (cu *ChallengeUpdate) AddChallengeRules(c ...*ChallengeRule) *ChallengeUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddChallengeRuleIDs(ids...)
+}
+
+// SetFirstMemberID sets the "first_member" edge to the Member entity by ID.
+func (cu *ChallengeUpdate) SetFirstMemberID(id int64) *ChallengeUpdate {
+	cu.mutation.SetFirstMemberID(id)
+	return cu
+}
+
+// SetNillableFirstMemberID sets the "first_member" edge to the Member entity by ID if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableFirstMemberID(id *int64) *ChallengeUpdate {
+	if id != nil {
+		cu = cu.SetFirstMemberID(*id)
+	}
+	return cu
+}
+
+// SetFirstMember sets the "first_member" edge to the Member entity.
+func (cu *ChallengeUpdate) SetFirstMember(m *Member) *ChallengeUpdate {
+	return cu.SetFirstMemberID(m.ID)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cu *ChallengeUpdate) Mutation() *ChallengeMutation {
 	return cu.mutation
@@ -181,6 +292,33 @@ func (cu *ChallengeUpdate) RemoveChallengeMembers(c ...*ChallengeMember) *Challe
 // ClearGroupz clears the "groupz" edge to the Groupz entity.
 func (cu *ChallengeUpdate) ClearGroupz() *ChallengeUpdate {
 	cu.mutation.ClearGroupz()
+	return cu
+}
+
+// ClearChallengeRules clears all "challenge_rules" edges to the ChallengeRule entity.
+func (cu *ChallengeUpdate) ClearChallengeRules() *ChallengeUpdate {
+	cu.mutation.ClearChallengeRules()
+	return cu
+}
+
+// RemoveChallengeRuleIDs removes the "challenge_rules" edge to ChallengeRule entities by IDs.
+func (cu *ChallengeUpdate) RemoveChallengeRuleIDs(ids ...int64) *ChallengeUpdate {
+	cu.mutation.RemoveChallengeRuleIDs(ids...)
+	return cu
+}
+
+// RemoveChallengeRules removes "challenge_rules" edges to ChallengeRule entities.
+func (cu *ChallengeUpdate) RemoveChallengeRules(c ...*ChallengeRule) *ChallengeUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveChallengeRuleIDs(ids...)
+}
+
+// ClearFirstMember clears the "first_member" edge to the Member entity.
+func (cu *ChallengeUpdate) ClearFirstMember() *ChallengeUpdate {
+	cu.mutation.ClearFirstMember()
 	return cu
 }
 
@@ -235,6 +373,12 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := cu.mutation.Name(); ok {
+		_spec.SetField(challenge.FieldName, field.TypeString, value)
+	}
+	if cu.mutation.NameCleared() {
+		_spec.ClearField(challenge.FieldName, field.TypeString)
+	}
 	if value, ok := cu.mutation.CreatedAt(); ok {
 		_spec.SetField(challenge.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -243,6 +387,9 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.StartTimeCleared() {
 		_spec.ClearField(challenge.FieldStartTime, field.TypeTime)
+	}
+	if value, ok := cu.mutation.Picture(); ok {
+		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)
@@ -261,6 +408,12 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
+	}
+	if value, ok := cu.mutation.Status(); ok {
+		_spec.SetField(challenge.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cu.mutation.AddedStatus(); ok {
+		_spec.AddField(challenge.FieldStatus, field.TypeInt64, value)
 	}
 	if cu.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -351,6 +504,95 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedChallengeRulesIDs(); len(nodes) > 0 && !cu.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ChallengeRulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.FirstMemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.FirstMemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(cu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -371,6 +613,26 @@ type ChallengeUpdateOne struct {
 	hooks     []Hook
 	mutation  *ChallengeMutation
 	modifiers []func(*sql.UpdateBuilder)
+}
+
+// SetName sets the "name" field.
+func (cuo *ChallengeUpdateOne) SetName(s string) *ChallengeUpdateOne {
+	cuo.mutation.SetName(s)
+	return cuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableName(s *string) *ChallengeUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
+	return cuo
+}
+
+// ClearName clears the value of the "name" field.
+func (cuo *ChallengeUpdateOne) ClearName() *ChallengeUpdateOne {
+	cuo.mutation.ClearName()
+	return cuo
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -404,6 +666,20 @@ func (cuo *ChallengeUpdateOne) SetNillableStartTime(t *time.Time) *ChallengeUpda
 // ClearStartTime clears the value of the "start_time" field.
 func (cuo *ChallengeUpdateOne) ClearStartTime() *ChallengeUpdateOne {
 	cuo.mutation.ClearStartTime()
+	return cuo
+}
+
+// SetPicture sets the "picture" field.
+func (cuo *ChallengeUpdateOne) SetPicture(s string) *ChallengeUpdateOne {
+	cuo.mutation.SetPicture(s)
+	return cuo
+}
+
+// SetNillablePicture sets the "picture" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillablePicture(s *string) *ChallengeUpdateOne {
+	if s != nil {
+		cuo.SetPicture(*s)
+	}
 	return cuo
 }
 
@@ -460,6 +736,47 @@ func (cuo *ChallengeUpdateOne) AddTypeID(i int64) *ChallengeUpdateOne {
 	return cuo
 }
 
+// SetStatus sets the "status" field.
+func (cuo *ChallengeUpdateOne) SetStatus(i int64) *ChallengeUpdateOne {
+	cuo.mutation.ResetStatus()
+	cuo.mutation.SetStatus(i)
+	return cuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableStatus(i *int64) *ChallengeUpdateOne {
+	if i != nil {
+		cuo.SetStatus(*i)
+	}
+	return cuo
+}
+
+// AddStatus adds i to the "status" field.
+func (cuo *ChallengeUpdateOne) AddStatus(i int64) *ChallengeUpdateOne {
+	cuo.mutation.AddStatus(i)
+	return cuo
+}
+
+// SetCompletedFirstMemberID sets the "completed_first_member_id" field.
+func (cuo *ChallengeUpdateOne) SetCompletedFirstMemberID(i int64) *ChallengeUpdateOne {
+	cuo.mutation.SetCompletedFirstMemberID(i)
+	return cuo
+}
+
+// SetNillableCompletedFirstMemberID sets the "completed_first_member_id" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableCompletedFirstMemberID(i *int64) *ChallengeUpdateOne {
+	if i != nil {
+		cuo.SetCompletedFirstMemberID(*i)
+	}
+	return cuo
+}
+
+// ClearCompletedFirstMemberID clears the value of the "completed_first_member_id" field.
+func (cuo *ChallengeUpdateOne) ClearCompletedFirstMemberID() *ChallengeUpdateOne {
+	cuo.mutation.ClearCompletedFirstMemberID()
+	return cuo
+}
+
 // AddChallengeMemberIDs adds the "challenge_members" edge to the ChallengeMember entity by IDs.
 func (cuo *ChallengeUpdateOne) AddChallengeMemberIDs(ids ...int64) *ChallengeUpdateOne {
 	cuo.mutation.AddChallengeMemberIDs(ids...)
@@ -494,6 +811,40 @@ func (cuo *ChallengeUpdateOne) SetGroupz(g *Groupz) *ChallengeUpdateOne {
 	return cuo.SetGroupzID(g.ID)
 }
 
+// AddChallengeRuleIDs adds the "challenge_rules" edge to the ChallengeRule entity by IDs.
+func (cuo *ChallengeUpdateOne) AddChallengeRuleIDs(ids ...int64) *ChallengeUpdateOne {
+	cuo.mutation.AddChallengeRuleIDs(ids...)
+	return cuo
+}
+
+// AddChallengeRules adds the "challenge_rules" edges to the ChallengeRule entity.
+func (cuo *ChallengeUpdateOne) AddChallengeRules(c ...*ChallengeRule) *ChallengeUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddChallengeRuleIDs(ids...)
+}
+
+// SetFirstMemberID sets the "first_member" edge to the Member entity by ID.
+func (cuo *ChallengeUpdateOne) SetFirstMemberID(id int64) *ChallengeUpdateOne {
+	cuo.mutation.SetFirstMemberID(id)
+	return cuo
+}
+
+// SetNillableFirstMemberID sets the "first_member" edge to the Member entity by ID if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableFirstMemberID(id *int64) *ChallengeUpdateOne {
+	if id != nil {
+		cuo = cuo.SetFirstMemberID(*id)
+	}
+	return cuo
+}
+
+// SetFirstMember sets the "first_member" edge to the Member entity.
+func (cuo *ChallengeUpdateOne) SetFirstMember(m *Member) *ChallengeUpdateOne {
+	return cuo.SetFirstMemberID(m.ID)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cuo *ChallengeUpdateOne) Mutation() *ChallengeMutation {
 	return cuo.mutation
@@ -523,6 +874,33 @@ func (cuo *ChallengeUpdateOne) RemoveChallengeMembers(c ...*ChallengeMember) *Ch
 // ClearGroupz clears the "groupz" edge to the Groupz entity.
 func (cuo *ChallengeUpdateOne) ClearGroupz() *ChallengeUpdateOne {
 	cuo.mutation.ClearGroupz()
+	return cuo
+}
+
+// ClearChallengeRules clears all "challenge_rules" edges to the ChallengeRule entity.
+func (cuo *ChallengeUpdateOne) ClearChallengeRules() *ChallengeUpdateOne {
+	cuo.mutation.ClearChallengeRules()
+	return cuo
+}
+
+// RemoveChallengeRuleIDs removes the "challenge_rules" edge to ChallengeRule entities by IDs.
+func (cuo *ChallengeUpdateOne) RemoveChallengeRuleIDs(ids ...int64) *ChallengeUpdateOne {
+	cuo.mutation.RemoveChallengeRuleIDs(ids...)
+	return cuo
+}
+
+// RemoveChallengeRules removes "challenge_rules" edges to ChallengeRule entities.
+func (cuo *ChallengeUpdateOne) RemoveChallengeRules(c ...*ChallengeRule) *ChallengeUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveChallengeRuleIDs(ids...)
+}
+
+// ClearFirstMember clears the "first_member" edge to the Member entity.
+func (cuo *ChallengeUpdateOne) ClearFirstMember() *ChallengeUpdateOne {
+	cuo.mutation.ClearFirstMember()
 	return cuo
 }
 
@@ -601,6 +979,12 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 			}
 		}
 	}
+	if value, ok := cuo.mutation.Name(); ok {
+		_spec.SetField(challenge.FieldName, field.TypeString, value)
+	}
+	if cuo.mutation.NameCleared() {
+		_spec.ClearField(challenge.FieldName, field.TypeString)
+	}
 	if value, ok := cuo.mutation.CreatedAt(); ok {
 		_spec.SetField(challenge.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -609,6 +993,9 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	}
 	if cuo.mutation.StartTimeCleared() {
 		_spec.ClearField(challenge.FieldStartTime, field.TypeTime)
+	}
+	if value, ok := cuo.mutation.Picture(); ok {
+		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)
@@ -627,6 +1014,12 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	}
 	if value, ok := cuo.mutation.AddedTypeID(); ok {
 		_spec.AddField(challenge.FieldTypeID, field.TypeInt64, value)
+	}
+	if value, ok := cuo.mutation.Status(); ok {
+		_spec.SetField(challenge.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cuo.mutation.AddedStatus(); ok {
+		_spec.AddField(challenge.FieldStatus, field.TypeInt64, value)
 	}
 	if cuo.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -709,6 +1102,95 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt64,
 					Column: groupz.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedChallengeRulesIDs(); len(nodes) > 0 && !cuo.mutation.ChallengeRulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ChallengeRulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.FirstMemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.FirstMemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
 				},
 			},
 		}

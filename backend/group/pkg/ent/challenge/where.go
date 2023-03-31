@@ -55,6 +55,11 @@ func IDLTE(id int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldLTE(FieldID, id))
 }
 
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldName, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldCreatedAt, v))
@@ -63,6 +68,11 @@ func CreatedAt(v time.Time) predicate.Challenge {
 // StartTime applies equality check predicate on the "start_time" field. It's identical to StartTimeEQ.
 func StartTime(v time.Time) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldStartTime, v))
+}
+
+// Picture applies equality check predicate on the "picture" field. It's identical to PictureEQ.
+func Picture(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldPicture, v))
 }
 
 // EndTime applies equality check predicate on the "end_time" field. It's identical to EndTimeEQ.
@@ -78,6 +88,91 @@ func Description(v string) predicate.Challenge {
 // TypeID applies equality check predicate on the "type_id" field. It's identical to TypeIDEQ.
 func TypeID(v int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldTypeID, v))
+}
+
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldStatus, v))
+}
+
+// CompletedFirstMemberID applies equality check predicate on the "completed_first_member_id" field. It's identical to CompletedFirstMemberIDEQ.
+func CompletedFirstMemberID(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldCompletedFirstMemberID, v))
+}
+
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldName, v))
+}
+
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNEQ(FieldName, v))
+}
+
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldIn(FieldName, vs...))
+}
+
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotIn(FieldName, vs...))
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGT(FieldName, v))
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGTE(FieldName, v))
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLT(FieldName, v))
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLTE(FieldName, v))
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldContains(FieldName, v))
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldHasPrefix(FieldName, v))
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldHasSuffix(FieldName, v))
+}
+
+// NameIsNil applies the IsNil predicate on the "name" field.
+func NameIsNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldIsNull(FieldName))
+}
+
+// NameNotNil applies the NotNil predicate on the "name" field.
+func NameNotNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotNull(FieldName))
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldContainsFold(FieldName, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -168,6 +263,71 @@ func StartTimeIsNil() predicate.Challenge {
 // StartTimeNotNil applies the NotNil predicate on the "start_time" field.
 func StartTimeNotNil() predicate.Challenge {
 	return predicate.Challenge(sql.FieldNotNull(FieldStartTime))
+}
+
+// PictureEQ applies the EQ predicate on the "picture" field.
+func PictureEQ(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldPicture, v))
+}
+
+// PictureNEQ applies the NEQ predicate on the "picture" field.
+func PictureNEQ(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNEQ(FieldPicture, v))
+}
+
+// PictureIn applies the In predicate on the "picture" field.
+func PictureIn(vs ...string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldIn(FieldPicture, vs...))
+}
+
+// PictureNotIn applies the NotIn predicate on the "picture" field.
+func PictureNotIn(vs ...string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotIn(FieldPicture, vs...))
+}
+
+// PictureGT applies the GT predicate on the "picture" field.
+func PictureGT(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGT(FieldPicture, v))
+}
+
+// PictureGTE applies the GTE predicate on the "picture" field.
+func PictureGTE(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGTE(FieldPicture, v))
+}
+
+// PictureLT applies the LT predicate on the "picture" field.
+func PictureLT(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLT(FieldPicture, v))
+}
+
+// PictureLTE applies the LTE predicate on the "picture" field.
+func PictureLTE(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLTE(FieldPicture, v))
+}
+
+// PictureContains applies the Contains predicate on the "picture" field.
+func PictureContains(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldContains(FieldPicture, v))
+}
+
+// PictureHasPrefix applies the HasPrefix predicate on the "picture" field.
+func PictureHasPrefix(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldHasPrefix(FieldPicture, v))
+}
+
+// PictureHasSuffix applies the HasSuffix predicate on the "picture" field.
+func PictureHasSuffix(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldHasSuffix(FieldPicture, v))
+}
+
+// PictureEqualFold applies the EqualFold predicate on the "picture" field.
+func PictureEqualFold(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEqualFold(FieldPicture, v))
+}
+
+// PictureContainsFold applies the ContainsFold predicate on the "picture" field.
+func PictureContainsFold(v string) predicate.Challenge {
+	return predicate.Challenge(sql.FieldContainsFold(FieldPicture, v))
 }
 
 // EndTimeEQ applies the EQ predicate on the "end_time" field.
@@ -335,6 +495,76 @@ func TypeIDLTE(v int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldLTE(FieldTypeID, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLTE(FieldStatus, v))
+}
+
+// CompletedFirstMemberIDEQ applies the EQ predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDEQ(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDNEQ applies the NEQ predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDNEQ(v int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNEQ(FieldCompletedFirstMemberID, v))
+}
+
+// CompletedFirstMemberIDIn applies the In predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDIn(vs ...int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldIn(FieldCompletedFirstMemberID, vs...))
+}
+
+// CompletedFirstMemberIDNotIn applies the NotIn predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDNotIn(vs ...int64) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotIn(FieldCompletedFirstMemberID, vs...))
+}
+
+// CompletedFirstMemberIDIsNil applies the IsNil predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDIsNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldIsNull(FieldCompletedFirstMemberID))
+}
+
+// CompletedFirstMemberIDNotNil applies the NotNil predicate on the "completed_first_member_id" field.
+func CompletedFirstMemberIDNotNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotNull(FieldCompletedFirstMemberID))
+}
+
 // HasChallengeMembers applies the HasEdge predicate on the "challenge_members" edge.
 func HasChallengeMembers() predicate.Challenge {
 	return predicate.Challenge(func(s *sql.Selector) {
@@ -380,6 +610,60 @@ func HasGroupzWith(preds ...predicate.Groupz) predicate.Challenge {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(GroupzInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, GroupzTable, GroupzColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChallengeRules applies the HasEdge predicate on the "challenge_rules" edge.
+func HasChallengeRules() predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChallengeRulesTable, ChallengeRulesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChallengeRulesWith applies the HasEdge predicate on the "challenge_rules" edge with a given conditions (other predicates).
+func HasChallengeRulesWith(preds ...predicate.ChallengeRule) predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChallengeRulesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChallengeRulesTable, ChallengeRulesColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFirstMember applies the HasEdge predicate on the "first_member" edge.
+func HasFirstMember() predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, FirstMemberTable, FirstMemberColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFirstMemberWith applies the HasEdge predicate on the "first_member" edge with a given conditions (other predicates).
+func HasFirstMemberWith(preds ...predicate.Member) predicate.Challenge {
+	return predicate.Challenge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(FirstMemberInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, FirstMemberTable, FirstMemberColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

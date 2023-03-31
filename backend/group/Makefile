@@ -30,3 +30,12 @@ generate:
 
 run:
 	go run ./cmd/.
+
+reset-schema:
+	rm -rf ./pkg/ent
+	make generate-ent
+	sudo rm -rf ../../tmp/db/group
+	docker rm --force --volumes db-group
+	docker compose build group
+	go mod tidy
+	go mod vendor

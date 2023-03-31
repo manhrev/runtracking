@@ -30,7 +30,7 @@ if(inDevelopmentMode){
 else{
   HOST = `https://gateway-jzg35jprna-as.a.run.app`
 }
-
+console.log(process.env.NODE_ENV)
 console.log("You're running on " + HOST)
 
 const authConfig = {
