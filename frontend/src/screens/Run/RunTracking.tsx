@@ -63,7 +63,9 @@ export default function RunTracking({
   const [focusMode, setFocusMode] = useState(false)
 
   // some info
-  const [activityType, setActivityType] = useState(ActivityType.ACTIVITY_TYPE_RUNNING)
+  const [activityType, setActivityType] = useState(
+    ActivityType.ACTIVITY_TYPE_RUNNING
+  )
   const [totalDistance, setTotalDistance] = useState(0)
   const [totalTime, setTotalTime] = useState(0) // seconds
   const [userState, setUserState] = useState('ready') // ready, running, paused, stopped
@@ -90,11 +92,10 @@ export default function RunTracking({
   }
 
   const showGoBackDialog = () => {
-    if(userState == 'running' || userState == 'paused') {
+    if (userState == 'running' || userState == 'paused') {
       setUserState('paused')
       setGoBackVisible(true)
-    }
-    else {
+    } else {
       navigation.goBack()
     }
   }
@@ -264,7 +265,7 @@ export default function RunTracking({
       },
       savingInfo: {
         duration: totalTime,
-        kcal: 0,
+        kcal: kcalBurned,
         totalDistance: totalDistance,
         routeList: coordinates,
         startTime: {
@@ -346,7 +347,7 @@ export default function RunTracking({
   const switchActivityType = () => {
     if (activityType == ActivityType.ACTIVITY_TYPE_RUNNING) {
       setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)
-    } else if(activityType == ActivityType.ACTIVITY_TYPE_WALKING) {
+    } else if (activityType == ActivityType.ACTIVITY_TYPE_WALKING) {
       setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)
     } else {
       setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)
@@ -372,7 +373,9 @@ export default function RunTracking({
         <Dialog visible={goBackVisible} onDismiss={hideGoBackDialog}>
           <Dialog.Title>Alert</Dialog.Title>
           <Dialog.Content>
-            <Text>Your activity will be deleted. Do you want to continue ?</Text>
+            <Text>
+              Your activity will be deleted. Do you want to continue ?
+            </Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => navigation.goBack()}> Yes </Button>
@@ -438,42 +441,60 @@ export default function RunTracking({
         ))}
       </MapView>
 
-
       <Divider style={{ height: 1 }} />
-      {!isClosedBottomMenu && <View style={{
-        height: 100,
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection: 'row',
-      }}>
+      {!isClosedBottomMenu && (
+        <View
+          style={{
+            height: 100,
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
           <View
             style={{
               justifyContent: 'center',
               alignItems: 'flex-start',
               flex: 1,
-              marginLeft: 10
+              marginLeft: 10,
             }}
           >
-            <View style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
               <IconButton
-                icon={activityType == ActivityType.ACTIVITY_TYPE_RUNNING ? 'run-fast' : (activityType == ActivityType.ACTIVITY_TYPE_WALKING ? 'walk' : 'bike')}
+                icon={
+                  activityType == ActivityType.ACTIVITY_TYPE_RUNNING
+                    ? 'run-fast'
+                    : activityType == ActivityType.ACTIVITY_TYPE_WALKING
+                    ? 'walk'
+                    : 'bike'
+                }
                 iconColor={theme.colors.tertiary}
                 mode="outlined"
                 size={30}
                 onPress={() => switchActivityType()}
               />
-              <Text style={styles(theme).underText}>{activityType == ActivityType.ACTIVITY_TYPE_RUNNING ? 'Running' : (activityType == ActivityType.ACTIVITY_TYPE_WALKING ? 'Walking' : 'Cycling')}</Text>
+              <Text style={styles(theme).underText}>
+                {activityType == ActivityType.ACTIVITY_TYPE_RUNNING
+                  ? 'Running'
+                  : activityType == ActivityType.ACTIVITY_TYPE_WALKING
+                  ? 'Walking'
+                  : 'Cycling'}
+              </Text>
             </View>
           </View>
 
-          <View style={{
-            display: 'flex',
-            flexDirection: 'row',
-          }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+          >
             <IconButton // start button
               icon={
                 userState == 'ready' || userState == 'paused'
@@ -484,14 +505,14 @@ export default function RunTracking({
               iconColor={theme.colors.primary}
               onPress={() => startOrPause()}
             />
-            {userState == 'paused' &&
+            {userState == 'paused' && (
               <IconButton // paused button
                 icon="stop-circle"
                 size={75}
                 iconColor={theme.colors.error}
                 onPress={() => stopRun()}
               />
-            }
+            )}
           </View>
 
           <View
@@ -501,14 +522,16 @@ export default function RunTracking({
               flex: 1,
             }}
           >
-            <View style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              marginRight: 10
-            }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                marginRight: 10,
+              }}
+            >
               <IconButton
-                icon='chevron-double-down'
+                icon="chevron-double-down"
                 mode="outlined"
                 size={26}
                 iconColor={theme.colors.tertiary}
@@ -518,22 +541,25 @@ export default function RunTracking({
               <Text style={styles(theme).underText}>Hide</Text>
             </View>
           </View>
-      </View>}
-      
-      {isClosedBottomMenu && <IconButton // show bottom menu button
-        style={{
-          position: 'absolute',
-          bottom: 10,
-          right: 0,
-          margin: 10,
-        }}
-        icon='chevron-double-up'
-        mode="outlined"
-        size={26}
-        iconColor={theme.colors.tertiary}
-        containerColor="white"
-        onPress={() => setIsClosedBottomMenu(!isClosedBottomMenu)}
-      />}
+        </View>
+      )}
+
+      {isClosedBottomMenu && (
+        <IconButton // show bottom menu button
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 0,
+            margin: 10,
+          }}
+          icon="chevron-double-up"
+          mode="outlined"
+          size={26}
+          iconColor={theme.colors.tertiary}
+          containerColor="white"
+          onPress={() => setIsClosedBottomMenu(!isClosedBottomMenu)}
+        />
+      )}
 
       <IconButton // reset button
         style={styles(theme).resetBtn}

@@ -1,11 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createSlice } from '@reduxjs/toolkit'
+import {
+  AchievementDetail,
+  UserAchievement,
+} from '../../../lib/activity/activity_pb'
 import { KEY_ACCESS_TOKEN } from '../../../utils/grpc'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
 import {
   getMeThunk,
+  getUserAchievementThunk,
   loginThunk,
   logoutThunk,
   updateUserInfoThunk,
@@ -22,6 +27,7 @@ type UserState = {
   age: number
   userId: number
   profiePicture: string
+  achievement: [number, AchievementDetail.AsObject][]
 } & CommonState
 
 export const initialState: UserState = {
@@ -36,6 +42,7 @@ export const initialState: UserState = {
   profiePicture: '',
   age: 0,
   userId: 0,
+  achievement: [],
 }
 
 const slice = createSlice({
@@ -44,6 +51,9 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getMeThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING
+    })
+    builder.addCase(getUserAchievementThunk.pending, (state) => {
       state.status = StatusEnum.LOADING
     })
     builder.addCase(getMeThunk.fulfilled, (state, { payload }) => {
@@ -99,6 +109,23 @@ const slice = createSlice({
         state.userId = updateData?.userId || 0
       }
     )
+    builder.addCase(getUserAchievementThunk.fulfilled, (state, { payload }) => {
+      const { response, error } = payload
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
+      const aMap = response?.userAchievementsMap
+      if (aMap) {
+        const check = aMap.find((a) => a[0] === state.userId)
+        if (check) {
+          state.achievement = check[1].achievementsMap.sort(
+            (a, b) => a[0] - b[0]
+          )
+        }
+      }
+      state.status = StatusEnum.SUCCEEDED
+    })
   },
 })
 

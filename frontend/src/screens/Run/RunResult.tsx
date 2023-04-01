@@ -26,8 +26,15 @@ export default function RunResult({
   const theme = useAppTheme()
   const { weight } = useAppSelector(selectUserSlice)
 
-  const { duration, endTime, routeList, startTime, totalDistance, kcal, acType } =
-    route.params.savingInfo
+  const {
+    duration,
+    endTime,
+    routeList,
+    startTime,
+    totalDistance,
+    kcal,
+    acType,
+  } = route.params.savingInfo
 
   const [activityType, setActivityType] = useState<ActivityType>(acType)
   const [activityName, setActivityName] = useState('Sample')

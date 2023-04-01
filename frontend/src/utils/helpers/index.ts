@@ -28,6 +28,10 @@ export function formatDate(time: Timestamp.AsObject | undefined): string {
   return 'NA'
 }
 
+export function mToKm(meters: number): string {
+  return (meters / 1000).toFixed(2)
+}
+
 export function formatDateWithoutTime(
   time: Timestamp.AsObject | undefined
 ): string {
@@ -135,11 +139,14 @@ export function toDate(seconds: number, withoutYear: boolean = false) {
   const month = date.getMonth() + 1
   const year = date.getFullYear()
 
-  if (withoutYear) return `${day < 10 ? '0' + day : day}/${ // mm/dd
-    month < 10 ? '0' + month : month
-  }`
+  if (withoutYear)
+    return `${day < 10 ? '0' + day : day}/${
+      // mm/dd
+      month < 10 ? '0' + month : month
+    }`
 
-  return `${day < 10 ? '0' + day : day}/${ // mm/dd/yyyy
+  return `${day < 10 ? '0' + day : day}/${
+    // mm/dd/yyyy
     month < 10 ? '0' + month : month
   }/${year}`
 }
