@@ -54,6 +54,10 @@ type Activity interface {
 		commitType activitypb.CommitType,
 		targetId int64, // challenge id or plan id or ... id
 	) error
+	GetUsersAchievement(
+		ctx context.Context,
+		userIds []int64,
+	) ([]*AchievementDetailData, error)
 }
 
 type activityImpl struct {
@@ -223,6 +227,38 @@ func (m *activityImpl) SetCommit(
 	}
 
 	return nil
+}
+
+type AchievementDetailData struct {
+	UserID       int64                   `json:"user_id"`
+	ActivityType activitypb.ActivityType `json:"type"`
+	activitypb.AchievementDetail
+}
+
+func (m *activityImpl) GetUsersAchievement(
+	ctx context.Context,
+	userIds []int64,
+) ([]*AchievementDetailData, error) {
+	var achivementList []*AchievementDetailData
+
+	err := m.entClient.Activity.Query().
+		Where(
+			activity.UserIDIn(userIds...),
+		).
+		GroupBy(activity.FieldUserID, activity.FieldType).
+		Aggregate(
+			ent.As(ent.Sum(activity.FieldTotalDistance), "total_distance"),
+			ent.As(ent.Sum(activity.FieldKcal), "total_kcal"),
+			ent.As(ent.Sum(activity.FieldDuration), "total_duration"),
+			ent.As(ent.Count(), "number_of_activities"),
+		).Scan(ctx, &achivementList)
+
+	if err != nil {
+		log.Printf("Error GetUsersAchievement: %v", err)
+		return nil, status.Internal(err.Error())
+	}
+
+	return achivementList, nil
 }
 
 type ActivityStatisticData struct {

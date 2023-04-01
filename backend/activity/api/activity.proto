@@ -7,12 +7,14 @@ option go_package = "github.com/manhrev/runtracking/backend/activity/pkg/api;act
 import "google/protobuf/timestamp.proto";
 
 service Activity {
+    // for each user
     rpc CreateActivityInfo(CreateActivityInfoRequest) returns (CreateActivityInfoReply);
     rpc ListActivityInfo(ListActivityInfoRequest) returns (ListActivityInfoReply);
     rpc DeleteActivityInfo(DeleteActivityInfoRequest) returns (DeleteActivityInfoReply);
     rpc GetActivityStatistic(GetActivityStatisticRequest) returns (GetActivityStatisticReply);
-
     rpc CommitActivity(CommitActivityRequest) returns (CommitActivityReply);
+
+    rpc GetUsersAchievement(GetUsersAchievementRequest) returns (GetUsersAchievementReply);
 }
 
 enum ActivityType {
@@ -126,4 +128,33 @@ message CommitActivityRequest {
 }
 
 message CommitActivityReply {
+}
+
+message GetUsersAchievementRequest {
+    repeated int64 user_ids = 1;
+}
+
+message GetUsersAchievementReply {
+    map<int64, UserAchievement> user_achievements = 1;
+}
+
+message UserAchievement {
+    // activity type -> achievementDetail
+    map<uint32, AchievementDetail> achievements = 1;
+}
+
+message AchievementDetail {
+    AchievementLevel level = 1;
+    uint32 number_of_activities = 2;
+    double total_distance = 3;
+    uint64 total_duration = 4;
+    double total_kcal = 5; 
+}
+
+enum AchievementLevel {
+    ACHIEVEMENT_LEVEL_UNSPECIFIED = 0;
+    ACHIEVEMENT_LEVEL_BEGINNER = 1;
+    ACHIEVEMENT_LEVEL_INTERMEDIATE = 2;
+    ACHIEVEMENT_LEVEL_ADVANCED = 3;
+    ACHIEVEMENT_LEVEL_EXPERT = 4;
 }
