@@ -21,6 +21,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/manhrev/runtracking/backend/auth v0.0.0-20230325061540-13f7d26d1a60
+	github.com/manhrev/runtracking/backend/notification v0.0.0-20230331105450-d587db80f970
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect

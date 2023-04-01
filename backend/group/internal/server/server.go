@@ -13,6 +13,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/internal/server/group"
 	pb "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -24,6 +25,9 @@ var (
 	db_domain    string = os.Getenv("DB_HOST")
 	db_port      string = os.Getenv("DB_PORT")
 	db_name      string = os.Getenv("DB_NAME")
+
+	notification_service string = os.Getenv("NOTIFICATION_SERVICE")
+	notification_port    string = os.Getenv("NOTIFICATION_PORT")
 
 	auth_service string = os.Getenv("AUTH_SERVICE")
 	auth_port    string = os.Getenv("AUTH_PORT")
@@ -69,8 +73,14 @@ func Serve(server *grpc.Server) {
 	}
 	authClient := auth.NewAuthIClient(conn)
 
+	notiConn, err := grpc.Dial(fmt.Sprintf("%s:%s", notification_service, notification_port), grpc.WithTransportCredentials(creds))
+	// log.Printf("Conn : %v", conn)
+	if err != nil {
+		log.Fatalf("error while create connect to notification service: %v", err)
+	}
+	notificationClient := notification.NewNotificationIClient(notiConn)
 	// register main and other server servers
-	pb.RegisterGroupServer(server, group.NewServer(entClient, authClient))
+	pb.RegisterGroupServer(server, group.NewServer(entClient, authClient, notificationClient))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {
