@@ -1,18 +1,12 @@
 package activity
 
 import (
-	"context"
-	"log"
-	"testing"
-
 	_ "github.com/go-sql-driver/mysql"
-	activitypb "github.com/manhrev/runtracking/backend/activity/pkg/api"
-	"github.com/manhrev/runtracking/backend/activity/pkg/ent"
 )
 
 const (
 	_driver = "mysql"
-	_url    = "root:password@1@tcp(localhost:33308)/activity?charset=utf8&parseTime=true"
+	_url    = "root:password@1@tcp(34.87.17.105:3306)/activity?charset=utf8&parseTime=true"
 )
 
 // func Test_List(t *testing.T) {
@@ -68,23 +62,42 @@ const (
 
 // }
 
-func Test_ListStatistic(t *testing.T) {
-	entClient, err := ent.Open(_driver, _url)
-	if err != nil {
-		log.Fatalf("error creating connection to database%v", err.Error())
-	}
-	var (
-		ctx    = context.Background()
-		client = entClient
-	)
-	activityRepo := New(client)
-	activityRepo.GetStatistic(
-		ctx,
-		3,
-		activitypb.ActivityType_ACTIVITY_TYPE_RUNNING,
-		nil,
-		nil,
-		activitypb.GetActivityStatisticRequest_GORUP_BY_MONTH,
-		7,
-	)
-}
+// func Test_ListStatistic(t *testing.T) {
+// 	entClient, err := ent.Open(_driver, _url)
+// 	if err != nil {
+// 		log.Fatalf("error creating connection to database%v", err.Error())
+// 	}
+// 	var (
+// 		ctx    = context.Background()
+// 		client = entClient
+// 	)
+// 	activityRepo := New(client)
+// 	activityRepo.GetStatistic(
+// 		ctx,
+// 		3,
+// 		activitypb.ActivityType_ACTIVITY_TYPE_RUNNING,
+// 		nil,
+// 		nil,
+// 		activitypb.GetActivityStatisticRequest_GORUP_BY_MONTH,
+// 		7,
+// 	)
+// }
+
+// func Test_GetUsersAchievement(t *testing.T) {
+// 	entClient, err := ent.Open(_driver, _url)
+// 	if err != nil {
+// 		log.Fatalf("error creating connection to database%v", err.Error())
+// 	}
+// 	var (
+// 		ctx    = context.Background()
+// 		client = entClient
+// 	)
+// 	activityRepo := New(client)
+// 	a, err := activityRepo.GetUsersAchievement(
+// 		ctx,
+// 		[]int64{1},
+// 	)
+
+// 	log.Printf("%v", a)
+
+// }
