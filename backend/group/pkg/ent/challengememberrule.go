@@ -5,10 +5,12 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 )
 
 // ChallengeMemberRule is the model entity for the ChallengeMemberRule schema.
@@ -20,19 +22,28 @@ type ChallengeMemberRule struct {
 	Total int64 `json:"total,omitempty"`
 	// RuleID holds the value of the "rule_id" field.
 	RuleID int64 `json:"rule_id,omitempty"`
+	// Status holds the value of the "status" field.
+	Status int64 `json:"status,omitempty"`
+	// TimeCompleted holds the value of the "time_completed" field.
+	TimeCompleted time.Time `json:"time_completed,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChallengeMemberRuleQuery when eager-loading is set.
 	Edges                                   ChallengeMemberRuleEdges `json:"edges"`
 	challenge_member_challenge_member_rules *int64
+	challenge_rule_challenge_member_rules   *int64
 }
 
 // ChallengeMemberRuleEdges holds the relations/edges for other nodes in the graph.
 type ChallengeMemberRuleEdges struct {
 	// ChallengeMember holds the value of the challenge_member edge.
 	ChallengeMember *ChallengeMember `json:"challenge_member,omitempty"`
+	// ChallengeRule holds the value of the challenge_rule edge.
+	ChallengeRule *ChallengeRule `json:"challenge_rule,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ChallengeMemberOrErr returns the ChallengeMember value or an error if the edge
@@ -48,14 +59,31 @@ func (e ChallengeMemberRuleEdges) ChallengeMemberOrErr() (*ChallengeMember, erro
 	return nil, &NotLoadedError{edge: "challenge_member"}
 }
 
+// ChallengeRuleOrErr returns the ChallengeRule value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ChallengeMemberRuleEdges) ChallengeRuleOrErr() (*ChallengeRule, error) {
+	if e.loadedTypes[1] {
+		if e.ChallengeRule == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: challengerule.Label}
+		}
+		return e.ChallengeRule, nil
+	}
+	return nil, &NotLoadedError{edge: "challenge_rule"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*ChallengeMemberRule) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case challengememberrule.FieldID, challengememberrule.FieldTotal, challengememberrule.FieldRuleID:
+		case challengememberrule.FieldID, challengememberrule.FieldTotal, challengememberrule.FieldRuleID, challengememberrule.FieldStatus:
 			values[i] = new(sql.NullInt64)
+		case challengememberrule.FieldTimeCompleted, challengememberrule.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case challengememberrule.ForeignKeys[0]: // challenge_member_challenge_member_rules
+			values[i] = new(sql.NullInt64)
+		case challengememberrule.ForeignKeys[1]: // challenge_rule_challenge_member_rules
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ChallengeMemberRule", columns[i])
@@ -90,12 +118,37 @@ func (cmr *ChallengeMemberRule) assignValues(columns []string, values []any) err
 			} else if value.Valid {
 				cmr.RuleID = value.Int64
 			}
+		case challengememberrule.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				cmr.Status = value.Int64
+			}
+		case challengememberrule.FieldTimeCompleted:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field time_completed", values[i])
+			} else if value.Valid {
+				cmr.TimeCompleted = value.Time
+			}
+		case challengememberrule.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				cmr.UpdatedAt = value.Time
+			}
 		case challengememberrule.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field challenge_member_challenge_member_rules", value)
 			} else if value.Valid {
 				cmr.challenge_member_challenge_member_rules = new(int64)
 				*cmr.challenge_member_challenge_member_rules = int64(value.Int64)
+			}
+		case challengememberrule.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field challenge_rule_challenge_member_rules", value)
+			} else if value.Valid {
+				cmr.challenge_rule_challenge_member_rules = new(int64)
+				*cmr.challenge_rule_challenge_member_rules = int64(value.Int64)
 			}
 		}
 	}
@@ -105,6 +158,11 @@ func (cmr *ChallengeMemberRule) assignValues(columns []string, values []any) err
 // QueryChallengeMember queries the "challenge_member" edge of the ChallengeMemberRule entity.
 func (cmr *ChallengeMemberRule) QueryChallengeMember() *ChallengeMemberQuery {
 	return NewChallengeMemberRuleClient(cmr.config).QueryChallengeMember(cmr)
+}
+
+// QueryChallengeRule queries the "challenge_rule" edge of the ChallengeMemberRule entity.
+func (cmr *ChallengeMemberRule) QueryChallengeRule() *ChallengeRuleQuery {
+	return NewChallengeMemberRuleClient(cmr.config).QueryChallengeRule(cmr)
 }
 
 // Update returns a builder for updating this ChallengeMemberRule.
@@ -135,6 +193,15 @@ func (cmr *ChallengeMemberRule) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("rule_id=")
 	builder.WriteString(fmt.Sprintf("%v", cmr.RuleID))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", cmr.Status))
+	builder.WriteString(", ")
+	builder.WriteString("time_completed=")
+	builder.WriteString(cmr.TimeCompleted.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(cmr.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

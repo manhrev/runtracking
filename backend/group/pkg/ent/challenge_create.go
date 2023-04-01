@@ -12,7 +12,9 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 // ChallengeCreate is the builder for creating a Challenge entity.
@@ -20,6 +22,20 @@ type ChallengeCreate struct {
 	config
 	mutation *ChallengeMutation
 	hooks    []Hook
+}
+
+// SetName sets the "name" field.
+func (cc *ChallengeCreate) SetName(s string) *ChallengeCreate {
+	cc.mutation.SetName(s)
+	return cc
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableName(s *string) *ChallengeCreate {
+	if s != nil {
+		cc.SetName(*s)
+	}
+	return cc
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -46,6 +62,20 @@ func (cc *ChallengeCreate) SetStartTime(t time.Time) *ChallengeCreate {
 func (cc *ChallengeCreate) SetNillableStartTime(t *time.Time) *ChallengeCreate {
 	if t != nil {
 		cc.SetStartTime(*t)
+	}
+	return cc
+}
+
+// SetPicture sets the "picture" field.
+func (cc *ChallengeCreate) SetPicture(s string) *ChallengeCreate {
+	cc.mutation.SetPicture(s)
+	return cc
+}
+
+// SetNillablePicture sets the "picture" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillablePicture(s *string) *ChallengeCreate {
+	if s != nil {
+		cc.SetPicture(*s)
 	}
 	return cc
 }
@@ -81,6 +111,34 @@ func (cc *ChallengeCreate) SetNillableDescription(s *string) *ChallengeCreate {
 // SetTypeID sets the "type_id" field.
 func (cc *ChallengeCreate) SetTypeID(i int64) *ChallengeCreate {
 	cc.mutation.SetTypeID(i)
+	return cc
+}
+
+// SetStatus sets the "status" field.
+func (cc *ChallengeCreate) SetStatus(i int64) *ChallengeCreate {
+	cc.mutation.SetStatus(i)
+	return cc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableStatus(i *int64) *ChallengeCreate {
+	if i != nil {
+		cc.SetStatus(*i)
+	}
+	return cc
+}
+
+// SetCompletedFirstMemberID sets the "completed_first_member_id" field.
+func (cc *ChallengeCreate) SetCompletedFirstMemberID(i int64) *ChallengeCreate {
+	cc.mutation.SetCompletedFirstMemberID(i)
+	return cc
+}
+
+// SetNillableCompletedFirstMemberID sets the "completed_first_member_id" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableCompletedFirstMemberID(i *int64) *ChallengeCreate {
+	if i != nil {
+		cc.SetCompletedFirstMemberID(*i)
+	}
 	return cc
 }
 
@@ -124,6 +182,40 @@ func (cc *ChallengeCreate) SetGroupz(g *Groupz) *ChallengeCreate {
 	return cc.SetGroupzID(g.ID)
 }
 
+// AddChallengeRuleIDs adds the "challenge_rules" edge to the ChallengeRule entity by IDs.
+func (cc *ChallengeCreate) AddChallengeRuleIDs(ids ...int64) *ChallengeCreate {
+	cc.mutation.AddChallengeRuleIDs(ids...)
+	return cc
+}
+
+// AddChallengeRules adds the "challenge_rules" edges to the ChallengeRule entity.
+func (cc *ChallengeCreate) AddChallengeRules(c ...*ChallengeRule) *ChallengeCreate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddChallengeRuleIDs(ids...)
+}
+
+// SetFirstMemberID sets the "first_member" edge to the Member entity by ID.
+func (cc *ChallengeCreate) SetFirstMemberID(id int64) *ChallengeCreate {
+	cc.mutation.SetFirstMemberID(id)
+	return cc
+}
+
+// SetNillableFirstMemberID sets the "first_member" edge to the Member entity by ID if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableFirstMemberID(id *int64) *ChallengeCreate {
+	if id != nil {
+		cc = cc.SetFirstMemberID(*id)
+	}
+	return cc
+}
+
+// SetFirstMember sets the "first_member" edge to the Member entity.
+func (cc *ChallengeCreate) SetFirstMember(m *Member) *ChallengeCreate {
+	return cc.SetFirstMemberID(m.ID)
+}
+
 // Mutation returns the ChallengeMutation object of the builder.
 func (cc *ChallengeCreate) Mutation() *ChallengeMutation {
 	return cc.mutation
@@ -163,6 +255,14 @@ func (cc *ChallengeCreate) defaults() {
 		v := challenge.DefaultCreatedAt()
 		cc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := cc.mutation.Picture(); !ok {
+		v := challenge.DefaultPicture
+		cc.mutation.SetPicture(v)
+	}
+	if _, ok := cc.mutation.Status(); !ok {
+		v := challenge.DefaultStatus
+		cc.mutation.SetStatus(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -170,8 +270,14 @@ func (cc *ChallengeCreate) check() error {
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Challenge.created_at"`)}
 	}
+	if _, ok := cc.mutation.Picture(); !ok {
+		return &ValidationError{Name: "picture", err: errors.New(`ent: missing required field "Challenge.picture"`)}
+	}
 	if _, ok := cc.mutation.TypeID(); !ok {
 		return &ValidationError{Name: "type_id", err: errors.New(`ent: missing required field "Challenge.type_id"`)}
+	}
+	if _, ok := cc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Challenge.status"`)}
 	}
 	return nil
 }
@@ -211,6 +317,10 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := cc.mutation.Name(); ok {
+		_spec.SetField(challenge.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.SetField(challenge.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -218,6 +328,10 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.StartTime(); ok {
 		_spec.SetField(challenge.FieldStartTime, field.TypeTime, value)
 		_node.StartTime = value
+	}
+	if value, ok := cc.mutation.Picture(); ok {
+		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
+		_node.Picture = value
 	}
 	if value, ok := cc.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)
@@ -230,6 +344,10 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.TypeID(); ok {
 		_spec.SetField(challenge.FieldTypeID, field.TypeInt64, value)
 		_node.TypeID = value
+	}
+	if value, ok := cc.mutation.Status(); ok {
+		_spec.SetField(challenge.FieldStatus, field.TypeInt64, value)
+		_node.Status = value
 	}
 	if nodes := cc.mutation.ChallengeMembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -268,6 +386,45 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.groupz_challenges = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ChallengeRulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   challenge.ChallengeRulesTable,
+			Columns: []string{challenge.ChallengeRulesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: challengerule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.FirstMemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   challenge.FirstMemberTable,
+			Columns: []string{challenge.FirstMemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt64,
+					Column: member.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CompletedFirstMemberID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

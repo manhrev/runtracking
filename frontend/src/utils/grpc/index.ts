@@ -19,12 +19,12 @@ const onAuthError = (error: any, serviceName: any) => {
 
 export var HOST: string
 
-// if (inDevelopmentMode) {
-//   HOST = `http://${manifest?.debuggerHost?.split(':').shift()?.concat(':8080')}`
-// } else {
-HOST = `https://gateway-jzg35jprna-as.a.run.app`
-// }
-
+if (inDevelopmentMode) {
+  HOST = `http://${manifest?.debuggerHost?.split(':').shift()?.concat(':8080')}`
+} else {
+  HOST = `https://gateway-jzg35jprna-as.a.run.app`
+}
+console.log(process.env.NODE_ENV)
 console.log("You're running on " + HOST)
 
 const authConfig = {

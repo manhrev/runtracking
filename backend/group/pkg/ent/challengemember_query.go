@@ -14,6 +14,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
 )
 
@@ -26,7 +27,7 @@ type ChallengeMemberQuery struct {
 	predicates               []predicate.ChallengeMember
 	withChallengeMemberRules *ChallengeMemberRuleQuery
 	withChallenge            *ChallengeQuery
-	withFKs                  bool
+	withMember               *MemberQuery
 	modifiers                []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -101,6 +102,28 @@ func (cmq *ChallengeMemberQuery) QueryChallenge() *ChallengeQuery {
 			sqlgraph.From(challengemember.Table, challengemember.FieldID, selector),
 			sqlgraph.To(challenge.Table, challenge.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, challengemember.ChallengeTable, challengemember.ChallengeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cmq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMember chains the current query on the "member" edge.
+func (cmq *ChallengeMemberQuery) QueryMember() *MemberQuery {
+	query := (&MemberClient{config: cmq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cmq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cmq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengemember.Table, challengemember.FieldID, selector),
+			sqlgraph.To(member.Table, member.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengemember.MemberTable, challengemember.MemberColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cmq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,6 +323,7 @@ func (cmq *ChallengeMemberQuery) Clone() *ChallengeMemberQuery {
 		predicates:               append([]predicate.ChallengeMember{}, cmq.predicates...),
 		withChallengeMemberRules: cmq.withChallengeMemberRules.Clone(),
 		withChallenge:            cmq.withChallenge.Clone(),
+		withMember:               cmq.withMember.Clone(),
 		// clone intermediate query.
 		sql:  cmq.sql.Clone(),
 		path: cmq.path,
@@ -328,18 +352,29 @@ func (cmq *ChallengeMemberQuery) WithChallenge(opts ...func(*ChallengeQuery)) *C
 	return cmq
 }
 
+// WithMember tells the query-builder to eager-load the nodes that are connected to
+// the "member" edge. The optional arguments are used to configure the query builder of the edge.
+func (cmq *ChallengeMemberQuery) WithMember(opts ...func(*MemberQuery)) *ChallengeMemberQuery {
+	query := (&MemberClient{config: cmq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cmq.withMember = query
+	return cmq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		MemberID int64 `json:"member_id,omitempty"`
+//		Point int64 `json:"point,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ChallengeMember.Query().
-//		GroupBy(challengemember.FieldMemberID).
+//		GroupBy(challengemember.FieldPoint).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -358,11 +393,11 @@ func (cmq *ChallengeMemberQuery) GroupBy(field string, fields ...string) *Challe
 // Example:
 //
 //	var v []struct {
-//		MemberID int64 `json:"member_id,omitempty"`
+//		Point int64 `json:"point,omitempty"`
 //	}
 //
 //	client.ChallengeMember.Query().
-//		Select(challengemember.FieldMemberID).
+//		Select(challengemember.FieldPoint).
 //		Scan(ctx, &v)
 //
 func (cmq *ChallengeMemberQuery) Select(fields ...string) *ChallengeMemberSelect {
@@ -407,19 +442,13 @@ func (cmq *ChallengeMemberQuery) prepareQuery(ctx context.Context) error {
 func (cmq *ChallengeMemberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ChallengeMember, error) {
 	var (
 		nodes       = []*ChallengeMember{}
-		withFKs     = cmq.withFKs
 		_spec       = cmq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			cmq.withChallengeMemberRules != nil,
 			cmq.withChallenge != nil,
+			cmq.withMember != nil,
 		}
 	)
-	if cmq.withChallenge != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, challengemember.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*ChallengeMember).scanValues(nil, columns)
 	}
@@ -453,6 +482,12 @@ func (cmq *ChallengeMemberQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 	if query := cmq.withChallenge; query != nil {
 		if err := cmq.loadChallenge(ctx, query, nodes, nil,
 			func(n *ChallengeMember, e *Challenge) { n.Edges.Challenge = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cmq.withMember; query != nil {
+		if err := cmq.loadMember(ctx, query, nodes, nil,
+			func(n *ChallengeMember, e *Member) { n.Edges.Member = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -494,10 +529,7 @@ func (cmq *ChallengeMemberQuery) loadChallenge(ctx context.Context, query *Chall
 	ids := make([]int64, 0, len(nodes))
 	nodeids := make(map[int64][]*ChallengeMember)
 	for i := range nodes {
-		if nodes[i].challenge_challenge_members == nil {
-			continue
-		}
-		fk := *nodes[i].challenge_challenge_members
+		fk := nodes[i].ChallengeID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -514,7 +546,36 @@ func (cmq *ChallengeMemberQuery) loadChallenge(ctx context.Context, query *Chall
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "challenge_challenge_members" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "challenge_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cmq *ChallengeMemberQuery) loadMember(ctx context.Context, query *MemberQuery, nodes []*ChallengeMember, init func(*ChallengeMember), assign func(*ChallengeMember, *Member)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*ChallengeMember)
+	for i := range nodes {
+		fk := nodes[i].MemberID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(member.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "member_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

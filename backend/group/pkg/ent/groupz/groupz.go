@@ -15,6 +15,8 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldGroupPicture holds the string denoting the group_picture field in the database.
+	FieldGroupPicture = "group_picture"
 	// FieldBackgroundPicture holds the string denoting the background_picture field in the database.
 	FieldBackgroundPicture = "background_picture"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -50,6 +52,7 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldDescription,
+	FieldGroupPicture,
 	FieldBackgroundPicture,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -67,6 +70,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultGroupPicture holds the default value on creation for the "group_picture" field.
+	DefaultGroupPicture string
 	// DefaultBackgroundPicture holds the default value on creation for the "background_picture" field.
 	DefaultBackgroundPicture string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

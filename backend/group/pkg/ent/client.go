@@ -13,8 +13,11 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/season"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/seasonmember"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -32,10 +35,16 @@ type Client struct {
 	ChallengeMember *ChallengeMemberClient
 	// ChallengeMemberRule is the client for interacting with the ChallengeMemberRule builders.
 	ChallengeMemberRule *ChallengeMemberRuleClient
+	// ChallengeRule is the client for interacting with the ChallengeRule builders.
+	ChallengeRule *ChallengeRuleClient
 	// Groupz is the client for interacting with the Groupz builders.
 	Groupz *GroupzClient
 	// Member is the client for interacting with the Member builders.
 	Member *MemberClient
+	// Season is the client for interacting with the Season builders.
+	Season *SeasonClient
+	// SeasonMember is the client for interacting with the SeasonMember builders.
+	SeasonMember *SeasonMemberClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -52,8 +61,11 @@ func (c *Client) init() {
 	c.Challenge = NewChallengeClient(c.config)
 	c.ChallengeMember = NewChallengeMemberClient(c.config)
 	c.ChallengeMemberRule = NewChallengeMemberRuleClient(c.config)
+	c.ChallengeRule = NewChallengeRuleClient(c.config)
 	c.Groupz = NewGroupzClient(c.config)
 	c.Member = NewMemberClient(c.config)
+	c.Season = NewSeasonClient(c.config)
+	c.SeasonMember = NewSeasonMemberClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -90,8 +102,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Challenge:           NewChallengeClient(cfg),
 		ChallengeMember:     NewChallengeMemberClient(cfg),
 		ChallengeMemberRule: NewChallengeMemberRuleClient(cfg),
+		ChallengeRule:       NewChallengeRuleClient(cfg),
 		Groupz:              NewGroupzClient(cfg),
 		Member:              NewMemberClient(cfg),
+		Season:              NewSeasonClient(cfg),
+		SeasonMember:        NewSeasonMemberClient(cfg),
 	}, nil
 }
 
@@ -114,8 +129,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Challenge:           NewChallengeClient(cfg),
 		ChallengeMember:     NewChallengeMemberClient(cfg),
 		ChallengeMemberRule: NewChallengeMemberRuleClient(cfg),
+		ChallengeRule:       NewChallengeRuleClient(cfg),
 		Groupz:              NewGroupzClient(cfg),
 		Member:              NewMemberClient(cfg),
+		Season:              NewSeasonClient(cfg),
+		SeasonMember:        NewSeasonMemberClient(cfg),
 	}, nil
 }
 
@@ -148,8 +166,11 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Challenge.Use(hooks...)
 	c.ChallengeMember.Use(hooks...)
 	c.ChallengeMemberRule.Use(hooks...)
+	c.ChallengeRule.Use(hooks...)
 	c.Groupz.Use(hooks...)
 	c.Member.Use(hooks...)
+	c.Season.Use(hooks...)
+	c.SeasonMember.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
@@ -158,8 +179,11 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Challenge.Intercept(interceptors...)
 	c.ChallengeMember.Intercept(interceptors...)
 	c.ChallengeMemberRule.Intercept(interceptors...)
+	c.ChallengeRule.Intercept(interceptors...)
 	c.Groupz.Intercept(interceptors...)
 	c.Member.Intercept(interceptors...)
+	c.Season.Intercept(interceptors...)
+	c.SeasonMember.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -171,10 +195,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ChallengeMember.mutate(ctx, m)
 	case *ChallengeMemberRuleMutation:
 		return c.ChallengeMemberRule.mutate(ctx, m)
+	case *ChallengeRuleMutation:
+		return c.ChallengeRule.mutate(ctx, m)
 	case *GroupzMutation:
 		return c.Groupz.mutate(ctx, m)
 	case *MemberMutation:
 		return c.Member.mutate(ctx, m)
+	case *SeasonMutation:
+		return c.Season.mutate(ctx, m)
+	case *SeasonMemberMutation:
+		return c.SeasonMember.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -298,6 +328,38 @@ func (c *ChallengeClient) QueryGroupz(ch *Challenge) *GroupzQuery {
 			sqlgraph.From(challenge.Table, challenge.FieldID, id),
 			sqlgraph.To(groupz.Table, groupz.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, challenge.GroupzTable, challenge.GroupzColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChallengeRules queries the challenge_rules edge of a Challenge.
+func (c *ChallengeClient) QueryChallengeRules(ch *Challenge) *ChallengeRuleQuery {
+	query := (&ChallengeRuleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, id),
+			sqlgraph.To(challengerule.Table, challengerule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, challenge.ChallengeRulesTable, challenge.ChallengeRulesColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFirstMember queries the first_member edge of a Challenge.
+func (c *ChallengeClient) QueryFirstMember(ch *Challenge) *MemberQuery {
+	query := (&MemberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challenge.Table, challenge.FieldID, id),
+			sqlgraph.To(member.Table, member.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, challenge.FirstMemberTable, challenge.FirstMemberColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
@@ -455,6 +517,22 @@ func (c *ChallengeMemberClient) QueryChallenge(cm *ChallengeMember) *ChallengeQu
 	return query
 }
 
+// QueryMember queries the member edge of a ChallengeMember.
+func (c *ChallengeMemberClient) QueryMember(cm *ChallengeMember) *MemberQuery {
+	query := (&MemberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cm.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengemember.Table, challengemember.FieldID, id),
+			sqlgraph.To(member.Table, member.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengemember.MemberTable, challengemember.MemberColumn),
+		)
+		fromV = sqlgraph.Neighbors(cm.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ChallengeMemberClient) Hooks() []Hook {
 	return c.hooks.ChallengeMember
@@ -589,6 +667,22 @@ func (c *ChallengeMemberRuleClient) QueryChallengeMember(cmr *ChallengeMemberRul
 	return query
 }
 
+// QueryChallengeRule queries the challenge_rule edge of a ChallengeMemberRule.
+func (c *ChallengeMemberRuleClient) QueryChallengeRule(cmr *ChallengeMemberRule) *ChallengeRuleQuery {
+	query := (&ChallengeRuleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cmr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengememberrule.Table, challengememberrule.FieldID, id),
+			sqlgraph.To(challengerule.Table, challengerule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengememberrule.ChallengeRuleTable, challengememberrule.ChallengeRuleColumn),
+		)
+		fromV = sqlgraph.Neighbors(cmr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ChallengeMemberRuleClient) Hooks() []Hook {
 	return c.hooks.ChallengeMemberRule
@@ -611,6 +705,156 @@ func (c *ChallengeMemberRuleClient) mutate(ctx context.Context, m *ChallengeMemb
 		return (&ChallengeMemberRuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ChallengeMemberRule mutation op: %q", m.Op())
+	}
+}
+
+// ChallengeRuleClient is a client for the ChallengeRule schema.
+type ChallengeRuleClient struct {
+	config
+}
+
+// NewChallengeRuleClient returns a client for the ChallengeRule from the given config.
+func NewChallengeRuleClient(c config) *ChallengeRuleClient {
+	return &ChallengeRuleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `challengerule.Hooks(f(g(h())))`.
+func (c *ChallengeRuleClient) Use(hooks ...Hook) {
+	c.hooks.ChallengeRule = append(c.hooks.ChallengeRule, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `challengerule.Intercept(f(g(h())))`.
+func (c *ChallengeRuleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ChallengeRule = append(c.inters.ChallengeRule, interceptors...)
+}
+
+// Create returns a builder for creating a ChallengeRule entity.
+func (c *ChallengeRuleClient) Create() *ChallengeRuleCreate {
+	mutation := newChallengeRuleMutation(c.config, OpCreate)
+	return &ChallengeRuleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ChallengeRule entities.
+func (c *ChallengeRuleClient) CreateBulk(builders ...*ChallengeRuleCreate) *ChallengeRuleCreateBulk {
+	return &ChallengeRuleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ChallengeRule.
+func (c *ChallengeRuleClient) Update() *ChallengeRuleUpdate {
+	mutation := newChallengeRuleMutation(c.config, OpUpdate)
+	return &ChallengeRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ChallengeRuleClient) UpdateOne(cr *ChallengeRule) *ChallengeRuleUpdateOne {
+	mutation := newChallengeRuleMutation(c.config, OpUpdateOne, withChallengeRule(cr))
+	return &ChallengeRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ChallengeRuleClient) UpdateOneID(id int64) *ChallengeRuleUpdateOne {
+	mutation := newChallengeRuleMutation(c.config, OpUpdateOne, withChallengeRuleID(id))
+	return &ChallengeRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ChallengeRule.
+func (c *ChallengeRuleClient) Delete() *ChallengeRuleDelete {
+	mutation := newChallengeRuleMutation(c.config, OpDelete)
+	return &ChallengeRuleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ChallengeRuleClient) DeleteOne(cr *ChallengeRule) *ChallengeRuleDeleteOne {
+	return c.DeleteOneID(cr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ChallengeRuleClient) DeleteOneID(id int64) *ChallengeRuleDeleteOne {
+	builder := c.Delete().Where(challengerule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ChallengeRuleDeleteOne{builder}
+}
+
+// Query returns a query builder for ChallengeRule.
+func (c *ChallengeRuleClient) Query() *ChallengeRuleQuery {
+	return &ChallengeRuleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeChallengeRule},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ChallengeRule entity by its id.
+func (c *ChallengeRuleClient) Get(ctx context.Context, id int64) (*ChallengeRule, error) {
+	return c.Query().Where(challengerule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ChallengeRuleClient) GetX(ctx context.Context, id int64) *ChallengeRule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChallengeMemberRules queries the challenge_member_rules edge of a ChallengeRule.
+func (c *ChallengeRuleClient) QueryChallengeMemberRules(cr *ChallengeRule) *ChallengeMemberRuleQuery {
+	query := (&ChallengeMemberRuleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengerule.Table, challengerule.FieldID, id),
+			sqlgraph.To(challengememberrule.Table, challengememberrule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, challengerule.ChallengeMemberRulesTable, challengerule.ChallengeMemberRulesColumn),
+		)
+		fromV = sqlgraph.Neighbors(cr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChallenge queries the challenge edge of a ChallengeRule.
+func (c *ChallengeRuleClient) QueryChallenge(cr *ChallengeRule) *ChallengeQuery {
+	query := (&ChallengeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(challengerule.Table, challengerule.FieldID, id),
+			sqlgraph.To(challenge.Table, challenge.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, challengerule.ChallengeTable, challengerule.ChallengeColumn),
+		)
+		fromV = sqlgraph.Neighbors(cr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ChallengeRuleClient) Hooks() []Hook {
+	return c.hooks.ChallengeRule
+}
+
+// Interceptors returns the client interceptors.
+func (c *ChallengeRuleClient) Interceptors() []Interceptor {
+	return c.inters.ChallengeRule
+}
+
+func (c *ChallengeRuleClient) mutate(ctx context.Context, m *ChallengeRuleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ChallengeRuleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ChallengeRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ChallengeRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ChallengeRuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ChallengeRule mutation op: %q", m.Op())
 	}
 }
 
@@ -873,6 +1117,54 @@ func (c *MemberClient) QueryGroupz(m *Member) *GroupzQuery {
 	return query
 }
 
+// QueryChallengeMembers queries the challenge_members edge of a Member.
+func (c *MemberClient) QueryChallengeMembers(m *Member) *ChallengeMemberQuery {
+	query := (&ChallengeMemberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(member.Table, member.FieldID, id),
+			sqlgraph.To(challengemember.Table, challengemember.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, member.ChallengeMembersTable, member.ChallengeMembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySeasonMembers queries the season_members edge of a Member.
+func (c *MemberClient) QuerySeasonMembers(m *Member) *SeasonMemberQuery {
+	query := (&SeasonMemberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(member.Table, member.FieldID, id),
+			sqlgraph.To(seasonmember.Table, seasonmember.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, member.SeasonMembersTable, member.SeasonMembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChallenge queries the challenge edge of a Member.
+func (c *MemberClient) QueryChallenge(m *Member) *ChallengeQuery {
+	query := (&ChallengeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(member.Table, member.FieldID, id),
+			sqlgraph.To(challenge.Table, challenge.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, member.ChallengeTable, member.ChallengeColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *MemberClient) Hooks() []Hook {
 	return c.hooks.Member
@@ -895,5 +1187,289 @@ func (c *MemberClient) mutate(ctx context.Context, m *MemberMutation) (Value, er
 		return (&MemberDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Member mutation op: %q", m.Op())
+	}
+}
+
+// SeasonClient is a client for the Season schema.
+type SeasonClient struct {
+	config
+}
+
+// NewSeasonClient returns a client for the Season from the given config.
+func NewSeasonClient(c config) *SeasonClient {
+	return &SeasonClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `season.Hooks(f(g(h())))`.
+func (c *SeasonClient) Use(hooks ...Hook) {
+	c.hooks.Season = append(c.hooks.Season, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `season.Intercept(f(g(h())))`.
+func (c *SeasonClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Season = append(c.inters.Season, interceptors...)
+}
+
+// Create returns a builder for creating a Season entity.
+func (c *SeasonClient) Create() *SeasonCreate {
+	mutation := newSeasonMutation(c.config, OpCreate)
+	return &SeasonCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Season entities.
+func (c *SeasonClient) CreateBulk(builders ...*SeasonCreate) *SeasonCreateBulk {
+	return &SeasonCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Season.
+func (c *SeasonClient) Update() *SeasonUpdate {
+	mutation := newSeasonMutation(c.config, OpUpdate)
+	return &SeasonUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SeasonClient) UpdateOne(s *Season) *SeasonUpdateOne {
+	mutation := newSeasonMutation(c.config, OpUpdateOne, withSeason(s))
+	return &SeasonUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SeasonClient) UpdateOneID(id int64) *SeasonUpdateOne {
+	mutation := newSeasonMutation(c.config, OpUpdateOne, withSeasonID(id))
+	return &SeasonUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Season.
+func (c *SeasonClient) Delete() *SeasonDelete {
+	mutation := newSeasonMutation(c.config, OpDelete)
+	return &SeasonDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SeasonClient) DeleteOne(s *Season) *SeasonDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SeasonClient) DeleteOneID(id int64) *SeasonDeleteOne {
+	builder := c.Delete().Where(season.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SeasonDeleteOne{builder}
+}
+
+// Query returns a query builder for Season.
+func (c *SeasonClient) Query() *SeasonQuery {
+	return &SeasonQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSeason},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Season entity by its id.
+func (c *SeasonClient) Get(ctx context.Context, id int64) (*Season, error) {
+	return c.Query().Where(season.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SeasonClient) GetX(ctx context.Context, id int64) *Season {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySeasonMembers queries the season_members edge of a Season.
+func (c *SeasonClient) QuerySeasonMembers(s *Season) *SeasonMemberQuery {
+	query := (&SeasonMemberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(season.Table, season.FieldID, id),
+			sqlgraph.To(seasonmember.Table, seasonmember.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, season.SeasonMembersTable, season.SeasonMembersColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SeasonClient) Hooks() []Hook {
+	return c.hooks.Season
+}
+
+// Interceptors returns the client interceptors.
+func (c *SeasonClient) Interceptors() []Interceptor {
+	return c.inters.Season
+}
+
+func (c *SeasonClient) mutate(ctx context.Context, m *SeasonMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SeasonCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SeasonUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SeasonUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SeasonDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Season mutation op: %q", m.Op())
+	}
+}
+
+// SeasonMemberClient is a client for the SeasonMember schema.
+type SeasonMemberClient struct {
+	config
+}
+
+// NewSeasonMemberClient returns a client for the SeasonMember from the given config.
+func NewSeasonMemberClient(c config) *SeasonMemberClient {
+	return &SeasonMemberClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `seasonmember.Hooks(f(g(h())))`.
+func (c *SeasonMemberClient) Use(hooks ...Hook) {
+	c.hooks.SeasonMember = append(c.hooks.SeasonMember, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `seasonmember.Intercept(f(g(h())))`.
+func (c *SeasonMemberClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SeasonMember = append(c.inters.SeasonMember, interceptors...)
+}
+
+// Create returns a builder for creating a SeasonMember entity.
+func (c *SeasonMemberClient) Create() *SeasonMemberCreate {
+	mutation := newSeasonMemberMutation(c.config, OpCreate)
+	return &SeasonMemberCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SeasonMember entities.
+func (c *SeasonMemberClient) CreateBulk(builders ...*SeasonMemberCreate) *SeasonMemberCreateBulk {
+	return &SeasonMemberCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SeasonMember.
+func (c *SeasonMemberClient) Update() *SeasonMemberUpdate {
+	mutation := newSeasonMemberMutation(c.config, OpUpdate)
+	return &SeasonMemberUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SeasonMemberClient) UpdateOne(sm *SeasonMember) *SeasonMemberUpdateOne {
+	mutation := newSeasonMemberMutation(c.config, OpUpdateOne, withSeasonMember(sm))
+	return &SeasonMemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SeasonMemberClient) UpdateOneID(id int64) *SeasonMemberUpdateOne {
+	mutation := newSeasonMemberMutation(c.config, OpUpdateOne, withSeasonMemberID(id))
+	return &SeasonMemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SeasonMember.
+func (c *SeasonMemberClient) Delete() *SeasonMemberDelete {
+	mutation := newSeasonMemberMutation(c.config, OpDelete)
+	return &SeasonMemberDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SeasonMemberClient) DeleteOne(sm *SeasonMember) *SeasonMemberDeleteOne {
+	return c.DeleteOneID(sm.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SeasonMemberClient) DeleteOneID(id int64) *SeasonMemberDeleteOne {
+	builder := c.Delete().Where(seasonmember.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SeasonMemberDeleteOne{builder}
+}
+
+// Query returns a query builder for SeasonMember.
+func (c *SeasonMemberClient) Query() *SeasonMemberQuery {
+	return &SeasonMemberQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSeasonMember},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SeasonMember entity by its id.
+func (c *SeasonMemberClient) Get(ctx context.Context, id int64) (*SeasonMember, error) {
+	return c.Query().Where(seasonmember.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SeasonMemberClient) GetX(ctx context.Context, id int64) *SeasonMember {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySeason queries the season edge of a SeasonMember.
+func (c *SeasonMemberClient) QuerySeason(sm *SeasonMember) *SeasonQuery {
+	query := (&SeasonClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sm.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(seasonmember.Table, seasonmember.FieldID, id),
+			sqlgraph.To(season.Table, season.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, seasonmember.SeasonTable, seasonmember.SeasonColumn),
+		)
+		fromV = sqlgraph.Neighbors(sm.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMember queries the member edge of a SeasonMember.
+func (c *SeasonMemberClient) QueryMember(sm *SeasonMember) *MemberQuery {
+	query := (&MemberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sm.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(seasonmember.Table, seasonmember.FieldID, id),
+			sqlgraph.To(member.Table, member.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, seasonmember.MemberTable, seasonmember.MemberColumn),
+		)
+		fromV = sqlgraph.Neighbors(sm.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SeasonMemberClient) Hooks() []Hook {
+	return c.hooks.SeasonMember
+}
+
+// Interceptors returns the client interceptors.
+func (c *SeasonMemberClient) Interceptors() []Interceptor {
+	return c.inters.SeasonMember
+}
+
+func (c *SeasonMemberClient) mutate(ctx context.Context, m *SeasonMemberMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SeasonMemberCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SeasonMemberUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SeasonMemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SeasonMemberDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SeasonMember mutation op: %q", m.Op())
 	}
 }

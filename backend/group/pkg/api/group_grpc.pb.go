@@ -32,6 +32,14 @@ type GroupClient interface {
 	AcceptMember(ctx context.Context, in *AcceptMemberRequest, opts ...grpc.CallOption) (*AcceptMemberReply, error)
 	BanMember(ctx context.Context, in *BanMemberRequest, opts ...grpc.CallOption) (*BanMemberReply, error)
 	LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opts ...grpc.CallOption) (*LeaveGroupReply, error)
+	// API for challenge
+	CreateChallenge(ctx context.Context, in *CreateChallengeRequest, opts ...grpc.CallOption) (*CreateChallengeReply, error)
+	// rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
+	ListChallenge(ctx context.Context, in *ListChallengeRequest, opts ...grpc.CallOption) (*ListChallengeReply, error)
+	UpdateChallenge(ctx context.Context, in *UpdateChallengeRequest, opts ...grpc.CallOption) (*UpdateChallengeReply, error)
+	DeleteChallenge(ctx context.Context, in *DeleteChallengeRequest, opts ...grpc.CallOption) (*DeleteChallengeReply, error)
+	ListUserRanking(ctx context.Context, in *ListUserRankingRequest, opts ...grpc.CallOption) (*ListUserRankingReply, error)
+	GetChallenge(ctx context.Context, in *GetChallengeRequest, opts ...grpc.CallOption) (*GetChallengeReply, error)
 }
 
 type groupClient struct {
@@ -132,6 +140,60 @@ func (c *groupClient) LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opt
 	return out, nil
 }
 
+func (c *groupClient) CreateChallenge(ctx context.Context, in *CreateChallengeRequest, opts ...grpc.CallOption) (*CreateChallengeReply, error) {
+	out := new(CreateChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.Group/CreateChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) ListChallenge(ctx context.Context, in *ListChallengeRequest, opts ...grpc.CallOption) (*ListChallengeReply, error) {
+	out := new(ListChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.Group/ListChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) UpdateChallenge(ctx context.Context, in *UpdateChallengeRequest, opts ...grpc.CallOption) (*UpdateChallengeReply, error) {
+	out := new(UpdateChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.Group/UpdateChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) DeleteChallenge(ctx context.Context, in *DeleteChallengeRequest, opts ...grpc.CallOption) (*DeleteChallengeReply, error) {
+	out := new(DeleteChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.Group/DeleteChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) ListUserRanking(ctx context.Context, in *ListUserRankingRequest, opts ...grpc.CallOption) (*ListUserRankingReply, error) {
+	out := new(ListUserRankingReply)
+	err := c.cc.Invoke(ctx, "/group.Group/ListUserRanking", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) GetChallenge(ctx context.Context, in *GetChallengeRequest, opts ...grpc.CallOption) (*GetChallengeReply, error) {
+	out := new(GetChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.Group/GetChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupServer is the server API for Group service.
 // All implementations must embed UnimplementedGroupServer
 // for forward compatibility
@@ -146,6 +208,14 @@ type GroupServer interface {
 	AcceptMember(context.Context, *AcceptMemberRequest) (*AcceptMemberReply, error)
 	BanMember(context.Context, *BanMemberRequest) (*BanMemberReply, error)
 	LeaveGroup(context.Context, *LeaveGroupRequest) (*LeaveGroupReply, error)
+	// API for challenge
+	CreateChallenge(context.Context, *CreateChallengeRequest) (*CreateChallengeReply, error)
+	// rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
+	ListChallenge(context.Context, *ListChallengeRequest) (*ListChallengeReply, error)
+	UpdateChallenge(context.Context, *UpdateChallengeRequest) (*UpdateChallengeReply, error)
+	DeleteChallenge(context.Context, *DeleteChallengeRequest) (*DeleteChallengeReply, error)
+	ListUserRanking(context.Context, *ListUserRankingRequest) (*ListUserRankingReply, error)
+	GetChallenge(context.Context, *GetChallengeRequest) (*GetChallengeReply, error)
 	mustEmbedUnimplementedGroupServer()
 }
 
@@ -182,6 +252,24 @@ func (UnimplementedGroupServer) BanMember(context.Context, *BanMemberRequest) (*
 }
 func (UnimplementedGroupServer) LeaveGroup(context.Context, *LeaveGroupRequest) (*LeaveGroupReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LeaveGroup not implemented")
+}
+func (UnimplementedGroupServer) CreateChallenge(context.Context, *CreateChallengeRequest) (*CreateChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateChallenge not implemented")
+}
+func (UnimplementedGroupServer) ListChallenge(context.Context, *ListChallengeRequest) (*ListChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListChallenge not implemented")
+}
+func (UnimplementedGroupServer) UpdateChallenge(context.Context, *UpdateChallengeRequest) (*UpdateChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateChallenge not implemented")
+}
+func (UnimplementedGroupServer) DeleteChallenge(context.Context, *DeleteChallengeRequest) (*DeleteChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteChallenge not implemented")
+}
+func (UnimplementedGroupServer) ListUserRanking(context.Context, *ListUserRankingRequest) (*ListUserRankingReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUserRanking not implemented")
+}
+func (UnimplementedGroupServer) GetChallenge(context.Context, *GetChallengeRequest) (*GetChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChallenge not implemented")
 }
 func (UnimplementedGroupServer) mustEmbedUnimplementedGroupServer() {}
 
@@ -376,6 +464,114 @@ func _Group_LeaveGroup_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Group_CreateChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).CreateChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/CreateChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).CreateChallenge(ctx, req.(*CreateChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_ListChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).ListChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/ListChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).ListChallenge(ctx, req.(*ListChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_UpdateChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).UpdateChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/UpdateChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).UpdateChallenge(ctx, req.(*UpdateChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_DeleteChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).DeleteChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/DeleteChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).DeleteChallenge(ctx, req.(*DeleteChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_ListUserRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserRankingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).ListUserRanking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/ListUserRanking",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).ListUserRanking(ctx, req.(*ListUserRankingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_GetChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).GetChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/GetChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).GetChallenge(ctx, req.(*GetChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Group_ServiceDesc is the grpc.ServiceDesc for Group service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -422,6 +618,30 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LeaveGroup",
 			Handler:    _Group_LeaveGroup_Handler,
+		},
+		{
+			MethodName: "CreateChallenge",
+			Handler:    _Group_CreateChallenge_Handler,
+		},
+		{
+			MethodName: "ListChallenge",
+			Handler:    _Group_ListChallenge_Handler,
+		},
+		{
+			MethodName: "UpdateChallenge",
+			Handler:    _Group_UpdateChallenge_Handler,
+		},
+		{
+			MethodName: "DeleteChallenge",
+			Handler:    _Group_DeleteChallenge_Handler,
+		},
+		{
+			MethodName: "ListUserRanking",
+			Handler:    _Group_ListUserRanking_Handler,
+		},
+		{
+			MethodName: "GetChallenge",
+			Handler:    _Group_GetChallenge_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

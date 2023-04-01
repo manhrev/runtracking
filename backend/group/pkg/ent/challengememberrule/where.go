@@ -3,6 +3,8 @@
 package challengememberrule
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/predicate"
@@ -63,6 +65,21 @@ func RuleID(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldRuleID, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldStatus, v))
+}
+
+// TimeCompleted applies equality check predicate on the "time_completed" field. It's identical to TimeCompletedEQ.
+func TimeCompleted(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldTimeCompleted, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
 // TotalEQ applies the EQ predicate on the "total" field.
 func TotalEQ(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldTotal, v))
@@ -101,16 +118,6 @@ func TotalLT(v int64) predicate.ChallengeMemberRule {
 // TotalLTE applies the LTE predicate on the "total" field.
 func TotalLTE(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldTotal, v))
-}
-
-// TotalIsNil applies the IsNil predicate on the "total" field.
-func TotalIsNil() predicate.ChallengeMemberRule {
-	return predicate.ChallengeMemberRule(sql.FieldIsNull(FieldTotal))
-}
-
-// TotalNotNil applies the NotNil predicate on the "total" field.
-func TotalNotNil() predicate.ChallengeMemberRule {
-	return predicate.ChallengeMemberRule(sql.FieldNotNull(FieldTotal))
 }
 
 // RuleIDEQ applies the EQ predicate on the "rule_id" field.
@@ -153,6 +160,136 @@ func RuleIDLTE(v int64) predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldRuleID, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int64) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldStatus, v))
+}
+
+// TimeCompletedEQ applies the EQ predicate on the "time_completed" field.
+func TimeCompletedEQ(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldTimeCompleted, v))
+}
+
+// TimeCompletedNEQ applies the NEQ predicate on the "time_completed" field.
+func TimeCompletedNEQ(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNEQ(FieldTimeCompleted, v))
+}
+
+// TimeCompletedIn applies the In predicate on the "time_completed" field.
+func TimeCompletedIn(vs ...time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldIn(FieldTimeCompleted, vs...))
+}
+
+// TimeCompletedNotIn applies the NotIn predicate on the "time_completed" field.
+func TimeCompletedNotIn(vs ...time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNotIn(FieldTimeCompleted, vs...))
+}
+
+// TimeCompletedGT applies the GT predicate on the "time_completed" field.
+func TimeCompletedGT(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGT(FieldTimeCompleted, v))
+}
+
+// TimeCompletedGTE applies the GTE predicate on the "time_completed" field.
+func TimeCompletedGTE(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGTE(FieldTimeCompleted, v))
+}
+
+// TimeCompletedLT applies the LT predicate on the "time_completed" field.
+func TimeCompletedLT(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLT(FieldTimeCompleted, v))
+}
+
+// TimeCompletedLTE applies the LTE predicate on the "time_completed" field.
+func TimeCompletedLTE(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldTimeCompleted, v))
+}
+
+// TimeCompletedIsNil applies the IsNil predicate on the "time_completed" field.
+func TimeCompletedIsNil() predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldIsNull(FieldTimeCompleted))
+}
+
+// TimeCompletedNotNil applies the NotNil predicate on the "time_completed" field.
+func TimeCompletedNotNil() predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNotNull(FieldTimeCompleted))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
 // HasChallengeMember applies the HasEdge predicate on the "challenge_member" edge.
 func HasChallengeMember() predicate.ChallengeMemberRule {
 	return predicate.ChallengeMemberRule(func(s *sql.Selector) {
@@ -171,6 +308,33 @@ func HasChallengeMemberWith(preds ...predicate.ChallengeMember) predicate.Challe
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ChallengeMemberInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, ChallengeMemberTable, ChallengeMemberColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChallengeRule applies the HasEdge predicate on the "challenge_rule" edge.
+func HasChallengeRule() predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ChallengeRuleTable, ChallengeRuleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChallengeRuleWith applies the HasEdge predicate on the "challenge_rule" edge with a given conditions (other predicates).
+func HasChallengeRuleWith(preds ...predicate.ChallengeRule) predicate.ChallengeMemberRule {
+	return predicate.ChallengeMemberRule(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChallengeRuleInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ChallengeRuleTable, ChallengeRuleColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

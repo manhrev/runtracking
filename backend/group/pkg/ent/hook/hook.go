@@ -45,6 +45,18 @@ func (f ChallengeMemberRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (en
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeMemberRuleMutation", m)
 }
 
+// The ChallengeRuleFunc type is an adapter to allow the use of ordinary
+// function as ChallengeRule mutator.
+type ChallengeRuleFunc func(context.Context, *ent.ChallengeRuleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChallengeRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ChallengeRuleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChallengeRuleMutation", m)
+}
+
 // The GroupzFunc type is an adapter to allow the use of ordinary
 // function as Groupz mutator.
 type GroupzFunc func(context.Context, *ent.GroupzMutation) (ent.Value, error)
@@ -67,6 +79,30 @@ func (f MemberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MemberMutation", m)
+}
+
+// The SeasonFunc type is an adapter to allow the use of ordinary
+// function as Season mutator.
+type SeasonFunc func(context.Context, *ent.SeasonMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SeasonFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SeasonMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SeasonMutation", m)
+}
+
+// The SeasonMemberFunc type is an adapter to allow the use of ordinary
+// function as SeasonMember mutator.
+type SeasonMemberFunc func(context.Context, *ent.SeasonMemberMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SeasonMemberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SeasonMemberMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SeasonMemberMutation", m)
 }
 
 // Condition is a hook condition function.
