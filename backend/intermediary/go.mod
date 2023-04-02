@@ -8,7 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/manhrev/runtracking/backend/auth v0.0.0-20230325061540-13f7d26d1a60
-	github.com/manhrev/runtracking/backend/group v0.0.0-20230401104250-c29b1b087cd8
+	github.com/manhrev/runtracking/backend/group v0.0.0-20230402134925-280cc17f5adf
 	github.com/manhrev/runtracking/backend/notification v0.0.0-20230331105450-d587db80f970
 	github.com/manhrev/runtracking/backend/plan v0.0.0-20230327023051-f3941ed82fbf
 	github.com/oliveroneill/exponent-server-sdk-golang v0.0.0-20210823140141-d050598be512
