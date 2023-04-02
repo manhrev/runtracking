@@ -10,6 +10,7 @@ service AuthI {
     rpc GetAllUsers(google.protobuf.Empty) returns (GetAllUsersReply) {};
     rpc GetUsersByIds(GetByIdsRequest) returns (GetAllUsersReply) {};
     rpc ListUser(ListUserRequest) returns (ListUserReply) {};
+    rpc GetUserById(GetByIdRequest) returns(GetUserReply){};
 }
 
 message ListUserRequest{
@@ -33,4 +34,8 @@ message ListUserReply{
 
 message GetByIdsRequest{
     repeated int64 ids = 1;
+}
+
+message GetUserReply{
+    UserInfo userInfo = 1;
 }

@@ -27,7 +27,7 @@ func (s *groupServer) JoinGroup(
 		return nil, err
 	}
 
-	groupEnt, err := s.service.Group.Get(ctx, &group.GetGroupRequest{GroupId: request.GetGroupId()})
+	groupInfo, err := s.service.Group.Get(ctx, userId, &group.GetGroupRequest{GroupId: request.GetGroupId()})
 
 	if err != nil {
 		return nil, err
@@ -44,10 +44,10 @@ func (s *groupServer) JoinGroup(
 	}
 	//Push notification to user
 	_, err = s.notificationClient.PushNotification(ctx, &notification.PushNotiRequest{
-		Messeage:      fmt.Sprintf("%s has recently sent a join group request to you group", userInfos.GetUsers()[0].Username),
+		Messeage:      fmt.Sprintf("%s has recently sent a join group request to you group", userInfos.GetUsers()[0].DisplayName),
 		SourceType:    notification.SOURCE_TYPE_PERSONAL,
 		ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
-		ReceiveIds:    []int64{groupEnt.LeaderID},
+		ReceiveIds:    []int64{groupInfo.LeaderId},
 	})
 
 	if err != nil {

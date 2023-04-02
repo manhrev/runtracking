@@ -95,6 +95,11 @@ func Status(v int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldStatus, v))
 }
 
+// TimeCompleted applies equality check predicate on the "time_completed" field. It's identical to TimeCompletedEQ.
+func TimeCompleted(v time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldTimeCompleted, v))
+}
+
 // CompletedFirstMemberID applies equality check predicate on the "completed_first_member_id" field. It's identical to CompletedFirstMemberIDEQ.
 func CompletedFirstMemberID(v int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldCompletedFirstMemberID, v))
@@ -255,16 +260,6 @@ func StartTimeLTE(v time.Time) predicate.Challenge {
 	return predicate.Challenge(sql.FieldLTE(FieldStartTime, v))
 }
 
-// StartTimeIsNil applies the IsNil predicate on the "start_time" field.
-func StartTimeIsNil() predicate.Challenge {
-	return predicate.Challenge(sql.FieldIsNull(FieldStartTime))
-}
-
-// StartTimeNotNil applies the NotNil predicate on the "start_time" field.
-func StartTimeNotNil() predicate.Challenge {
-	return predicate.Challenge(sql.FieldNotNull(FieldStartTime))
-}
-
 // PictureEQ applies the EQ predicate on the "picture" field.
 func PictureEQ(v string) predicate.Challenge {
 	return predicate.Challenge(sql.FieldEQ(FieldPicture, v))
@@ -368,16 +363,6 @@ func EndTimeLT(v time.Time) predicate.Challenge {
 // EndTimeLTE applies the LTE predicate on the "end_time" field.
 func EndTimeLTE(v time.Time) predicate.Challenge {
 	return predicate.Challenge(sql.FieldLTE(FieldEndTime, v))
-}
-
-// EndTimeIsNil applies the IsNil predicate on the "end_time" field.
-func EndTimeIsNil() predicate.Challenge {
-	return predicate.Challenge(sql.FieldIsNull(FieldEndTime))
-}
-
-// EndTimeNotNil applies the NotNil predicate on the "end_time" field.
-func EndTimeNotNil() predicate.Challenge {
-	return predicate.Challenge(sql.FieldNotNull(FieldEndTime))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.
@@ -533,6 +518,56 @@ func StatusLT(v int64) predicate.Challenge {
 // StatusLTE applies the LTE predicate on the "status" field.
 func StatusLTE(v int64) predicate.Challenge {
 	return predicate.Challenge(sql.FieldLTE(FieldStatus, v))
+}
+
+// TimeCompletedEQ applies the EQ predicate on the "time_completed" field.
+func TimeCompletedEQ(v time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldEQ(FieldTimeCompleted, v))
+}
+
+// TimeCompletedNEQ applies the NEQ predicate on the "time_completed" field.
+func TimeCompletedNEQ(v time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNEQ(FieldTimeCompleted, v))
+}
+
+// TimeCompletedIn applies the In predicate on the "time_completed" field.
+func TimeCompletedIn(vs ...time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldIn(FieldTimeCompleted, vs...))
+}
+
+// TimeCompletedNotIn applies the NotIn predicate on the "time_completed" field.
+func TimeCompletedNotIn(vs ...time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotIn(FieldTimeCompleted, vs...))
+}
+
+// TimeCompletedGT applies the GT predicate on the "time_completed" field.
+func TimeCompletedGT(v time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGT(FieldTimeCompleted, v))
+}
+
+// TimeCompletedGTE applies the GTE predicate on the "time_completed" field.
+func TimeCompletedGTE(v time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldGTE(FieldTimeCompleted, v))
+}
+
+// TimeCompletedLT applies the LT predicate on the "time_completed" field.
+func TimeCompletedLT(v time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLT(FieldTimeCompleted, v))
+}
+
+// TimeCompletedLTE applies the LTE predicate on the "time_completed" field.
+func TimeCompletedLTE(v time.Time) predicate.Challenge {
+	return predicate.Challenge(sql.FieldLTE(FieldTimeCompleted, v))
+}
+
+// TimeCompletedIsNil applies the IsNil predicate on the "time_completed" field.
+func TimeCompletedIsNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldIsNull(FieldTimeCompleted))
+}
+
+// TimeCompletedNotNil applies the NotNil predicate on the "time_completed" field.
+func TimeCompletedNotNil() predicate.Challenge {
+	return predicate.Challenge(sql.FieldNotNull(FieldTimeCompleted))
 }
 
 // CompletedFirstMemberIDEQ applies the EQ predicate on the "completed_first_member_id" field.

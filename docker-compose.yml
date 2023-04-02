@@ -136,6 +136,8 @@ services:
       PLAN_SERVICE: plan
       PLAN_PORT: 8080
       IS_SECURE_CONNECTION: "false"
+      GROUP_SERVICE: group
+      GROUP_PORT: 8080
     ports:
       - 8082:8080
   # umage:

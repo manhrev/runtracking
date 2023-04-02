@@ -16,7 +16,7 @@ type Group interface {
 		userId int64,
 		groupInfo *grouppb.GroupInfo,
 	) error
-	Get(ctx context.Context, request *grouppb.GetGroupRequest) (*ent.Groupz, error)
+	Get(ctx context.Context, userId int64, request *grouppb.GetGroupRequest) (*grouppb.GroupInfo, error)
 	Delete(ctx context.Context, userId int64, groupId int64) error
 	List(ctx context.Context,
 		userId int64,

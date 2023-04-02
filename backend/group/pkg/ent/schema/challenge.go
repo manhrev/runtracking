@@ -23,17 +23,17 @@ func (Challenge) Fields() []ent.Field {
 			Optional(),
 		field.Time("created_at").
 			Default(time.Now),
-		field.Time("start_time").
-			Optional(),
+		field.Time("start_time"),
 		field.String("picture").
 			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
-		field.Time("end_time").
-			Optional(),
+		field.Time("end_time"),
 		field.String("description").
 			Optional(),
 		field.Int64("type_id"),
 		field.Int64("status").
 			Default(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
+		field.Time("time_completed").
+			Optional(),
 		// id of member who completed with all rules of challenge first
 		field.Int64("completed_first_member_id").Optional(),
 	}

@@ -2,7 +2,6 @@ package challenge
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/manhrev/runtracking/backend/group/internal/status"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
@@ -13,22 +12,13 @@ func (c *challengeImpl) CreateChallenge(
 	userId int64,
 	request *group.CreateChallengeRequest,
 ) (*group.CreateChallengeReply, error) {
-	groupEntity, err := c.repository.Group.Get(ctx, request.GetGroupId())
+	groupEntity, err := c.repository.Group.Get(ctx, request.GetGroupId(), false, false)
 	if err != nil {
 		return nil, err
 	}
 
 	if userId != groupEntity.LeaderID {
 		return nil, status.Internal("User is not an admin of group")
-	}
-
-	isChallengeActiveExisted, err := c.isActiveChallengeExisted(ctx, request.GroupId)
-	if err != nil {
-		return nil, err
-	}
-
-	if isChallengeActiveExisted {
-		return nil, status.Internal(fmt.Sprintf("There was one active challenge in group. You need to deactivate it before creating the new one"))
 	}
 
 	challengeEnt, err := c.repository.Challenge.Create(ctx, groupEntity.ID, request.ChallengeInfo)
@@ -38,7 +28,7 @@ func (c *challengeImpl) CreateChallenge(
 
 	// set challenge rules
 	challengeRules, err := c.repository.Challenge.CreateBulkChallengeRules(ctx,
-		userId, groupEntity.ID, challengeEnt.ID, request.ChallengeInfo)
+		userId, groupEntity.ID, challengeEnt, request.ChallengeInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +43,7 @@ func (c *challengeImpl) CreateChallenge(
 
 	// Create challenge Member rules
 	_, err = c.repository.Challenge.CreateBulkChallengeMemberRule(ctx,
-		challengeMembers, challengeRules)
+		challengeMembers, challengeRules, challengeEnt)
 	if err != nil {
 		return nil, err
 	}
