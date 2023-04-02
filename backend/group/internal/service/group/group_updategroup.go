@@ -8,7 +8,7 @@ import (
 )
 
 func (m *groupImpl) Update(ctx context.Context, userId int64, groupInfo *grouppb.GroupInfo) error {
-	groupEntity, err := m.repository.Group.Get(ctx, groupInfo.GetId())
+	groupEntity, err := m.repository.Group.Get(ctx, groupInfo.GetId(), false, false)
 	if err != nil {
 		return err
 	}

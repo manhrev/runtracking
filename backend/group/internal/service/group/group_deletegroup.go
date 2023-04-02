@@ -7,7 +7,7 @@ import (
 )
 
 func (m *groupImpl) Delete(ctx context.Context, userId int64, groupId int64) error {
-	groupEntity, err := m.repository.Group.Get(ctx, groupId)
+	groupEntity, err := m.repository.Group.Get(ctx, groupId, false, false)
 	if err != nil {
 		return err
 	}

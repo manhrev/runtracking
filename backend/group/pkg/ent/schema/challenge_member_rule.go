@@ -51,3 +51,7 @@ func (ChallengeMemberRule) Edges() []ent.Edge {
 			Unique(),
 	}
 }
+
+type Progress struct {
+	ProgressDays []*group.ChallengeProgress
+}

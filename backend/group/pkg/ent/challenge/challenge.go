@@ -27,6 +27,8 @@ const (
 	FieldTypeID = "type_id"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldTimeCompleted holds the string denoting the time_completed field in the database.
+	FieldTimeCompleted = "time_completed"
 	// FieldCompletedFirstMemberID holds the string denoting the completed_first_member_id field in the database.
 	FieldCompletedFirstMemberID = "completed_first_member_id"
 	// EdgeChallengeMembers holds the string denoting the challenge_members edge name in mutations.
@@ -80,6 +82,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldTypeID,
 	FieldStatus,
+	FieldTimeCompleted,
 	FieldCompletedFirstMemberID,
 }
 

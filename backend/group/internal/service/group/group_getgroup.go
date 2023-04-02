@@ -3,15 +3,26 @@ package group
 import (
 	"context"
 
+	"github.com/manhrev/runtracking/backend/group/internal/transformer"
 	grouppb "github.com/manhrev/runtracking/backend/group/pkg/api"
-	"github.com/manhrev/runtracking/backend/group/pkg/ent"
+	groupz "github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	member "github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
-func (m *groupImpl) Get(ctx context.Context, request *grouppb.GetGroupRequest) (*ent.Groupz, error) {
-	groupz, err := m.repository.Group.Get(ctx, request.GetGroupId())
+func (m *groupImpl) Get(ctx context.Context, userId int64, request *grouppb.GetGroupRequest) (*grouppb.GroupInfo, error) {
+	groupEnt, err := m.repository.Group.GetGroupWithMemberActive(ctx, request.GroupId)
 
 	if err != nil {
 		return nil, err
 	}
-	return groupz, nil
+
+	groupInfo := transformer.TransformGroupEntToGroupInfo(groupEnt)
+
+	memberEnt, err := m.entClient.Member.Query().
+		Where(member.UserIDEQ(userId), member.HasGroupzWith(groupz.IDEQ(groupEnt.ID))).
+		First(ctx)
+
+	groupInfo.MemberStatus = grouppb.Member_Status(memberEnt.Status)
+
+	return groupInfo, nil
 }

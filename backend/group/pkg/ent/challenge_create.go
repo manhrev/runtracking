@@ -58,14 +58,6 @@ func (cc *ChallengeCreate) SetStartTime(t time.Time) *ChallengeCreate {
 	return cc
 }
 
-// SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (cc *ChallengeCreate) SetNillableStartTime(t *time.Time) *ChallengeCreate {
-	if t != nil {
-		cc.SetStartTime(*t)
-	}
-	return cc
-}
-
 // SetPicture sets the "picture" field.
 func (cc *ChallengeCreate) SetPicture(s string) *ChallengeCreate {
 	cc.mutation.SetPicture(s)
@@ -83,14 +75,6 @@ func (cc *ChallengeCreate) SetNillablePicture(s *string) *ChallengeCreate {
 // SetEndTime sets the "end_time" field.
 func (cc *ChallengeCreate) SetEndTime(t time.Time) *ChallengeCreate {
 	cc.mutation.SetEndTime(t)
-	return cc
-}
-
-// SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (cc *ChallengeCreate) SetNillableEndTime(t *time.Time) *ChallengeCreate {
-	if t != nil {
-		cc.SetEndTime(*t)
-	}
 	return cc
 }
 
@@ -124,6 +108,20 @@ func (cc *ChallengeCreate) SetStatus(i int64) *ChallengeCreate {
 func (cc *ChallengeCreate) SetNillableStatus(i *int64) *ChallengeCreate {
 	if i != nil {
 		cc.SetStatus(*i)
+	}
+	return cc
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cc *ChallengeCreate) SetTimeCompleted(t time.Time) *ChallengeCreate {
+	cc.mutation.SetTimeCompleted(t)
+	return cc
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cc *ChallengeCreate) SetNillableTimeCompleted(t *time.Time) *ChallengeCreate {
+	if t != nil {
+		cc.SetTimeCompleted(*t)
 	}
 	return cc
 }
@@ -270,8 +268,14 @@ func (cc *ChallengeCreate) check() error {
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Challenge.created_at"`)}
 	}
+	if _, ok := cc.mutation.StartTime(); !ok {
+		return &ValidationError{Name: "start_time", err: errors.New(`ent: missing required field "Challenge.start_time"`)}
+	}
 	if _, ok := cc.mutation.Picture(); !ok {
 		return &ValidationError{Name: "picture", err: errors.New(`ent: missing required field "Challenge.picture"`)}
+	}
+	if _, ok := cc.mutation.EndTime(); !ok {
+		return &ValidationError{Name: "end_time", err: errors.New(`ent: missing required field "Challenge.end_time"`)}
 	}
 	if _, ok := cc.mutation.TypeID(); !ok {
 		return &ValidationError{Name: "type_id", err: errors.New(`ent: missing required field "Challenge.type_id"`)}
@@ -348,6 +352,10 @@ func (cc *ChallengeCreate) createSpec() (*Challenge, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Status(); ok {
 		_spec.SetField(challenge.FieldStatus, field.TypeInt64, value)
 		_node.Status = value
+	}
+	if value, ok := cc.mutation.TimeCompleted(); ok {
+		_spec.SetField(challenge.FieldTimeCompleted, field.TypeTime, value)
+		_node.TimeCompleted = value
 	}
 	if nodes := cc.mutation.ChallengeMembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -29,7 +29,7 @@ func (m *groupImpl) ListMember(ctx context.Context,
 		authSortBy = auth.ListUserRequest_USER_SORT_BY_NAME
 	}
 
-	groupz, err := m.repository.Group.Get(ctx, groupId)
+	groupz, err := m.repository.Group.Get(ctx, groupId, false, false)
 	if err != nil {
 		return nil, err
 	}

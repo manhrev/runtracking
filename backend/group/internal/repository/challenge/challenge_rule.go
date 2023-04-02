@@ -51,13 +51,13 @@ func (c *challengeImpl) CreateBulkChallengeRules(
 	ctx context.Context,
 	userId int64,
 	groupId int64,
-	challengeId int64,
+	challengeEnt *ent.Challenge,
 	challengeInfo *group.ChallengeInfo,
 ) ([]*ent.ChallengeRule, error) {
 	bulk := make([]*ent.ChallengeRuleCreate, len(challengeInfo.ChallengeRules))
 	for i, rule := range challengeInfo.ChallengeRules {
 		bulk[i] = c.entClient.ChallengeRule.Create().
-			SetChallengeID(challengeId).
+			SetChallengeID(challengeEnt.ID).
 			SetRuleID(int64(rule.GetRule())).
 			SetGoal(rule.Goal)
 	}

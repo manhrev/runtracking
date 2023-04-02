@@ -25,6 +25,10 @@ func GetReceiver(sourceType noti.SOURCE_TYPE, authClient auth.AuthIClient) Recei
 		return &receiverAdmin{
 			authClient: authClient,
 		}
+	case noti.SOURCE_TYPE_GROUP:
+		return &receiverGroup{
+			authClient: authClient,
+		}
 	default:
 		return &receiverPersonal{
 			authClient: authClient,

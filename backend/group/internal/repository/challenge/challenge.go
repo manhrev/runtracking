@@ -3,14 +3,20 @@ package challenge
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
 
 	"github.com/manhrev/runtracking/backend/group/internal/status"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/code"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challenge"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengememberrule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengerule"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent/groupz"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -52,7 +58,7 @@ type Challenge interface {
 		ctx context.Context,
 		userId int64,
 		groupId int64,
-		challengeId int64,
+		challengeEnt *ent.Challenge,
 		challengeInfo *group.ChallengeInfo,
 	) ([]*ent.ChallengeRule, error)
 
@@ -66,6 +72,7 @@ type Challenge interface {
 		ctx context.Context,
 		challengeMemberEnts []*ent.ChallengeMember,
 		challengeRuleEnts []*ent.ChallengeRule,
+		challengeEnt *ent.Challenge,
 	) ([]*ent.ChallengeMemberRule, error)
 
 	Delete(
@@ -82,14 +89,26 @@ type Challenge interface {
 		ctx context.Context,
 		challengeId int64,
 	) (*ent.Challenge, error)
+
+	UpdateChallengeProgress(
+		ctx context.Context,
+		challengeId int64,
+		userId int64,
+		timestamp *timestamppb.Timestamp,
+		activityRecord *group.ActivityRecord,
+	) (string, error)
+
+	CheckDailyProgressChallenge(ctx context.Context, timeCheck time.Time) error
 }
 type challengeImpl struct {
-	entClient *ent.Client
+	entClient          *ent.Client
+	notificaitonClient notification.NotificationIClient
 }
 
-func New(entClient *ent.Client) Challenge {
+func New(entClient *ent.Client, notificationClient notification.NotificationIClient) Challenge {
 	return &challengeImpl{
-		entClient: entClient,
+		entClient:          entClient,
+		notificaitonClient: notificationClient,
 	}
 }
 
@@ -103,15 +122,22 @@ func (c *challengeImpl) Create(
 		SetDescription(challengeInfo.Description).
 		SetPicture(challengeInfo.Picture).
 		SetTypeID(int64(challengeInfo.GetType())).
-		SetStatus(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)).
-		SetName(challengeInfo.Name)
+		SetName(challengeInfo.Name).SetStartTime(challengeInfo.From.AsTime()).
+		SetEndTime(challengeInfo.To.AsTime())
 
-	if challengeInfo.From != nil {
-		query.SetStartTime(challengeInfo.From.AsTime())
+	if challengeInfo.GetFrom().AsTime().Before(time.Now()) {
+		query.SetStatus(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))
+	} else {
+		query.SetStatus(int64(group.RuleStatus_RULE_STATUS_COMING_SOON))
 	}
 
-	if challengeInfo.To != nil {
-		query.SetEndTime(challengeInfo.To.AsTime())
+	// check Start time and End time of challenge
+	isValidDay, err := checkValidPeriodChallenge(ctx, c.entClient, groupId, challengeInfo.From, challengeInfo.To)
+	if err != nil {
+		return nil, err
+	}
+	if !isValidDay {
+		return nil, err
 	}
 
 	newChallenge, err := query.Save(ctx)
@@ -134,15 +160,31 @@ func (c *challengeImpl) Update(
 		SetName(challengeInfo.Name).
 		SetPicture(challengeInfo.Picture).
 		SetDescription(challengeInfo.Description).
-		SetTypeID(int64(challengeInfo.Type)).
-		SetStatus(int64(challengeInfo.GetStatus()))
+		SetTypeID(int64(challengeInfo.Type))
 
-	if challengeInfo.From != nil {
-		challengeQuery.SetStartTime(challengeInfo.From.AsTime())
+	_, err := checkValidPeriodChallenge(ctx, c.entClient, groupId, challengeInfo.From, challengeInfo.To)
+	if err != nil {
+		return err
 	}
 
-	if challengeInfo.To != nil {
-		challengeQuery.SetEndTime(challengeInfo.To.AsTime())
+	challengeQuery.SetStartTime(challengeInfo.From.AsTime()).
+		SetEndTime(challengeInfo.To.AsTime())
+
+	//If do not have any inprogress challenge and time updated before time now => update status to inprogress
+	if challengeInfo.From.AsTime().Before(time.Now()) {
+		challengeQuery.SetStatus(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))
+		//Update challege member rules
+		err = c.entClient.ChallengeMemberRule.Update().
+			Where(challengememberrule.HasChallengeMemberWith(challengemember.ChallengeIDEQ(challengeInfo.Id))).
+			SetStatus(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)).
+			Exec(ctx)
+
+		if err != nil {
+			log.Println("Fail when save challenge member rules: %v", err.Error())
+			return status.Internal(fmt.Sprintf("Fail when save challenge member rules: %v", err.Error()))
+		}
+	} else {
+		challengeQuery.SetStatus(int64(group.RuleStatus_RULE_STATUS_COMING_SOON))
 	}
 
 	if challengeInfo.CompletedFirstMember != nil {
@@ -167,7 +209,7 @@ func (c *challengeImpl) Update(
 		return status.Internal(fmt.Sprintf("At least one rule must be required for challenge"))
 	}
 
-	err := challengeQuery.Exec(ctx)
+	err = challengeQuery.Exec(ctx)
 	if err != nil {
 		return status.Internal(err.Error())
 	}
@@ -211,6 +253,22 @@ func (m *challengeImpl) GetChallengeWithGroup(
 	challengeEnt, err := m.entClient.Challenge.Query().
 		Where(challenge.IDEQ(challengeId)).
 		WithGroupz().
+		First(ctx)
+
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
+	return challengeEnt, nil
+}
+
+func (m *challengeImpl) GetChallengeWithChallengeRules(
+	ctx context.Context,
+	challengeId int64,
+) (*ent.Challenge, error) {
+	challengeEnt, err := m.entClient.Challenge.Query().
+		Where(challenge.IDEQ(challengeId)).
+		WithChallengeRules().
 		First(ctx)
 
 	if err != nil {
@@ -337,6 +395,169 @@ func (c *challengeImpl) List(
 
 	return challenges, int64(total), nil
 
+}
+
+func (c *challengeImpl) UpdateChallengeProgress(
+	ctx context.Context,
+	challengeId int64,
+	userId int64,
+	timestamp *timestamppb.Timestamp,
+	activityRecord *group.ActivityRecord,
+) (string, error) {
+	pushNotifyMessage := ""
+
+	challengeEnt, err := c.GetChallengeWithChallengeRules(ctx, challengeId)
+	if err != nil {
+		return "", err
+	}
+
+	if time.Now().Before(challengeEnt.StartTime) {
+		log.Printf("Error update challenge progress: challenge not started")
+		return "", status.Internal("challenge not started")
+	}
+
+	// if challenge status is failed, reject
+	if challengeEnt.Status == int64(group.RuleStatus_RULE_STATUS_FAILED) {
+		log.Printf("Error update challenge progress: challenge failed")
+		return "", status.Internal("challenge failed")
+	}
+
+	// check plan ended but not completed -> change to failed
+	// NOTIFY?
+	if challengeEnt.Status == int64(group.RuleStatus_RULE_STATUS_INPROGRESS) && time.Now().After(challengeEnt.EndTime) {
+		err := c.entClient.Challenge.UpdateOne(challengeEnt).SetStatus(int64(group.RuleStatus_RULE_STATUS_FAILED)).Exec(ctx)
+		if err != nil {
+			log.Printf("Error update challenge progress: cannot update challenge status: %v", err)
+			return "", status.Internal(err.Error())
+		}
+		pushNotifyMessage = fmt.Sprintf("challenge '%v' failed!", challengeEnt.Name)
+		log.Printf("Error update challenge progress: challenge failed")
+		return pushNotifyMessage, status.Internal("challenge failed")
+	}
+
+	// check plan ended but not completed -> change to failed
+
+	// check if new progress day is in planned time range and /*before now*/
+	newProgessTime := timestamp.AsTime()
+	if newProgessTime.Before(challengeEnt.StartTime) || newProgessTime.After(challengeEnt.EndTime) /*|| newProgessTime.After(time.Now())*/ {
+		log.Printf("Error update plan progress: new progress time is not in planned time range")
+		return "", status.Internal("New progress time is not in planned time range")
+	}
+
+	challengeMember, err := c.entClient.ChallengeMember.Query().
+		Where(challengemember.ChallengeIDEQ(challengeId),
+			challengemember.HasMemberWith(member.UserIDEQ(userId))).
+		WithChallengeMemberRules(func(q *ent.ChallengeMemberRuleQuery) {
+			q.WithChallengeRule()
+		}).
+		First(ctx)
+	if err != nil {
+		return "", status.Internal(fmt.Sprintf("Error when fetch challenge of member: %s", err.Error()))
+	}
+
+	numRuleCompleted := 0
+	for _, challengeMemberRule := range challengeMember.Edges.ChallengeMemberRules {
+		ruleID := challengeMemberRule.RuleID
+		var value int64
+
+		switch challengeMemberRule.RuleID {
+		case int64(group.Rule_RULE_TOTAL_CALORIES):
+			value = activityRecord.CaloriesValue
+		case int64(group.Rule_RULE_TOTAL_DISTANCE):
+			value = activityRecord.DistanceValue
+		case int64(group.Rule_RULE_TOTAL_TIME):
+			value = activityRecord.TimeSpendValue
+		}
+
+		query := c.entClient.ChallengeMemberRule.Update().
+			Where(challengememberrule.RuleIDEQ(int64(ruleID)),
+				challengememberrule.HasChallengeMemberWith(challengemember.IDEQ(challengeMember.ID))).
+			AddTotal(value)
+
+			// if finished or not
+		if (challengeMemberRule.Total + value) >= challengeMemberRule.Edges.ChallengeRule.Goal {
+			// NOTIFY?
+			pushNotifyMessage = fmt.Sprintf("Challenge rule '%v' of %s has been completed!",
+				group.RuleStatus(challengeMemberRule.Edges.ChallengeRule.RuleID).String(),
+				challengeEnt.Name)
+			query.SetStatus(int64(group.RuleStatus_RULE_STATUS_COMPLETED))
+			query.SetTimeCompleted(timestamp.AsTime())
+			numRuleCompleted++
+		}
+
+		err = query.Exec(ctx)
+
+		if err != nil {
+			return "", status.Internal(fmt.Sprintf("Update progress challenge has failed: %s", err.Error()))
+		}
+	}
+
+	if numRuleCompleted == len(challengeMember.Edges.ChallengeMemberRules) {
+		//Update challenge completed when all rules completed at all
+		err := c.entClient.Challenge.UpdateOneID(challengeId).
+			SetStatus(int64(group.RuleStatus_RULE_STATUS_COMPLETED)).
+			SetTimeCompleted(timestamp.AsTime()).
+			Exec(ctx)
+
+		if err != nil {
+			return "", status.Internal(fmt.Sprintf("Update status of challenge failed: %v", err.Error()))
+		}
+
+		//Add count challenge completed to member
+		err = c.entClient.Member.Update().
+			Where(member.UserIDEQ(userId), member.HasChallengeWith(challenge.IDEQ(challengeId))).
+			AddCompletedChallengeCount(1).
+			Exec(ctx)
+
+		if err != nil {
+			return "", status.Internal(fmt.Sprintf("Update count challenge completed status to member has failed: %v", err.Error()))
+		}
+
+		pushNotifyMessage = fmt.Sprintf("Challenge %s has been completed", challengeEnt.Name)
+	} else if numRuleCompleted >= 2 {
+		pushNotifyMessage = fmt.Sprintf("%d of %d rules of challenge has been completed", numRuleCompleted, len(challengeMember.Edges.ChallengeMemberRules))
+	}
+
+	return pushNotifyMessage, nil
+}
+
+func (c *challengeImpl) CheckDailyProgressChallenge(ctx context.Context, timeCheck time.Time) error {
+	// check inprogress challenge
+	inprogressChallengeEntList, err := c.entClient.Challenge.Query().
+		Where(challenge.Status(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))).
+		WithGroupz().
+		All(ctx)
+
+	if err != nil {
+		log.Printf("Error while query challenge to check challenge in progress daily: %v", err)
+		return status.Internal(err.Error())
+	}
+
+	for _, challengeEnt := range inprogressChallengeEntList {
+		log.Printf("Begin checking challenge id: %v - name: %v", challengeEnt.ID, challengeEnt.Name)
+		_ = checkIfChallengeExpired(ctx, c.entClient, challengeEnt, c.notificaitonClient, timeCheck)
+		log.Printf("Begin checking challenge id: %v - name: %v", challengeEnt.ID, challengeEnt.Name)
+
+	}
+
+	// check coming challenge if time coming change status to inprogress
+	comingChallengeEntList, err := c.entClient.Challenge.Query().
+		Where(challenge.Status(int64(group.RuleStatus_RULE_STATUS_COMING_SOON))).
+		WithGroupz().
+		All(ctx)
+
+	if err != nil {
+		log.Printf("Error while query challenge to check challenge in progress daily: %v", err)
+		return status.Internal(err.Error())
+	}
+
+	for _, challengeEnt := range comingChallengeEntList {
+		log.Printf("Begin checking challenge coming id: %v - name: %v", challengeEnt.ID, challengeEnt.Name)
+		_ = checkIfChallengeComing(ctx, c.entClient, challengeEnt, c.notificaitonClient, timeCheck)
+		log.Printf("Begin checking challenge coming id: %v - name: %v", challengeEnt.ID, challengeEnt.Name)
+	}
+
+	return nil
 }
 
 // func (c *challengeImpl) UpdateChallengeRules(

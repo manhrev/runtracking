@@ -12,7 +12,7 @@ func NewServer(entClient *ent.Client,
 	authClient auth.AuthIClient,
 	notificationClient notification.NotificationIClient) group.GroupServer {
 	return &groupServer{
-		service:            service.New(entClient, authClient),
+		service:            service.New(entClient, authClient, notificationClient),
 		notificationClient: notificationClient,
 		authClient:         authClient,
 	}
