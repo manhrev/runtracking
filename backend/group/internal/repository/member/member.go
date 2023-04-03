@@ -45,6 +45,9 @@ type Member interface {
 		ctx context.Context,
 		userId int64,
 	) ([]*ent.Member, error)
+
+	ListMember(ctx context.Context,
+		statusMember group.Member_Status) ([]*ent.Member, error)
 }
 type memberImpl struct {
 	entClient *ent.Client
@@ -155,6 +158,22 @@ func (m *memberImpl) ListMemberByUserId(
 		WithGroupz().
 		All(ctx)
 
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
+	return members, nil
+}
+
+func (m *memberImpl) ListMember(ctx context.Context,
+	statusMember group.Member_Status) ([]*ent.Member, error) {
+	query := m.entClient.Member.Query()
+
+	if statusMember != group.Member_MEMBER_STATUS_UNSPECIFIED {
+		query.Where(member.StatusEQ(uint32(statusMember)))
+	}
+
+	members, err := query.All(ctx)
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}

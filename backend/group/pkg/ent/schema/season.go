@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
 //Season Entity will be set by system's admin
@@ -30,13 +31,13 @@ func (Season) Fields() []ent.Field {
 		field.Time("updated_at").
 			Default(time.Now).
 			UpdateDefault(time.Now),
-		field.Time("start_date").
+		field.Time("start_time").
 			Optional(),
-		field.Time("end_date").
+		field.Time("end_time").
 			Optional(),
 		// Used to determine current season
-		field.Bool("is_active").
-			Default(false),
+		field.Int64("status").
+			Default(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
 	}
 }
 

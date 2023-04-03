@@ -34,12 +34,16 @@ type GroupClient interface {
 	LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opts ...grpc.CallOption) (*LeaveGroupReply, error)
 	// API for challenge
 	CreateChallenge(ctx context.Context, in *CreateChallengeRequest, opts ...grpc.CallOption) (*CreateChallengeReply, error)
-	// rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
 	ListChallenge(ctx context.Context, in *ListChallengeRequest, opts ...grpc.CallOption) (*ListChallengeReply, error)
 	UpdateChallenge(ctx context.Context, in *UpdateChallengeRequest, opts ...grpc.CallOption) (*UpdateChallengeReply, error)
 	DeleteChallenge(ctx context.Context, in *DeleteChallengeRequest, opts ...grpc.CallOption) (*DeleteChallengeReply, error)
 	ListUserRanking(ctx context.Context, in *ListUserRankingRequest, opts ...grpc.CallOption) (*ListUserRankingReply, error)
 	GetChallenge(ctx context.Context, in *GetChallengeRequest, opts ...grpc.CallOption) (*GetChallengeReply, error)
+	CreateSeason(ctx context.Context, in *CreateSeasonRequest, opts ...grpc.CallOption) (*CreateSeasonReply, error)
+	ListSeason(ctx context.Context, in *ListSeasonRequest, opts ...grpc.CallOption) (*ListSeasonReply, error)
+	UpdateSeason(ctx context.Context, in *UpdateSeasonRequest, opts ...grpc.CallOption) (*UpdateSeasonReply, error)
+	DeleteSeason(ctx context.Context, in *DeleteSeasonRequest, opts ...grpc.CallOption) (*DeleteSeasonReply, error)
+	GetSeason(ctx context.Context, in *GetSeasonRequest, opts ...grpc.CallOption) (*GetSeasonReply, error)
 }
 
 type groupClient struct {
@@ -194,6 +198,51 @@ func (c *groupClient) GetChallenge(ctx context.Context, in *GetChallengeRequest,
 	return out, nil
 }
 
+func (c *groupClient) CreateSeason(ctx context.Context, in *CreateSeasonRequest, opts ...grpc.CallOption) (*CreateSeasonReply, error) {
+	out := new(CreateSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.Group/CreateSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) ListSeason(ctx context.Context, in *ListSeasonRequest, opts ...grpc.CallOption) (*ListSeasonReply, error) {
+	out := new(ListSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.Group/ListSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) UpdateSeason(ctx context.Context, in *UpdateSeasonRequest, opts ...grpc.CallOption) (*UpdateSeasonReply, error) {
+	out := new(UpdateSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.Group/UpdateSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) DeleteSeason(ctx context.Context, in *DeleteSeasonRequest, opts ...grpc.CallOption) (*DeleteSeasonReply, error) {
+	out := new(DeleteSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.Group/DeleteSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) GetSeason(ctx context.Context, in *GetSeasonRequest, opts ...grpc.CallOption) (*GetSeasonReply, error) {
+	out := new(GetSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.Group/GetSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupServer is the server API for Group service.
 // All implementations must embed UnimplementedGroupServer
 // for forward compatibility
@@ -210,12 +259,16 @@ type GroupServer interface {
 	LeaveGroup(context.Context, *LeaveGroupRequest) (*LeaveGroupReply, error)
 	// API for challenge
 	CreateChallenge(context.Context, *CreateChallengeRequest) (*CreateChallengeReply, error)
-	// rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
 	ListChallenge(context.Context, *ListChallengeRequest) (*ListChallengeReply, error)
 	UpdateChallenge(context.Context, *UpdateChallengeRequest) (*UpdateChallengeReply, error)
 	DeleteChallenge(context.Context, *DeleteChallengeRequest) (*DeleteChallengeReply, error)
 	ListUserRanking(context.Context, *ListUserRankingRequest) (*ListUserRankingReply, error)
 	GetChallenge(context.Context, *GetChallengeRequest) (*GetChallengeReply, error)
+	CreateSeason(context.Context, *CreateSeasonRequest) (*CreateSeasonReply, error)
+	ListSeason(context.Context, *ListSeasonRequest) (*ListSeasonReply, error)
+	UpdateSeason(context.Context, *UpdateSeasonRequest) (*UpdateSeasonReply, error)
+	DeleteSeason(context.Context, *DeleteSeasonRequest) (*DeleteSeasonReply, error)
+	GetSeason(context.Context, *GetSeasonRequest) (*GetSeasonReply, error)
 	mustEmbedUnimplementedGroupServer()
 }
 
@@ -270,6 +323,21 @@ func (UnimplementedGroupServer) ListUserRanking(context.Context, *ListUserRankin
 }
 func (UnimplementedGroupServer) GetChallenge(context.Context, *GetChallengeRequest) (*GetChallengeReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetChallenge not implemented")
+}
+func (UnimplementedGroupServer) CreateSeason(context.Context, *CreateSeasonRequest) (*CreateSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSeason not implemented")
+}
+func (UnimplementedGroupServer) ListSeason(context.Context, *ListSeasonRequest) (*ListSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSeason not implemented")
+}
+func (UnimplementedGroupServer) UpdateSeason(context.Context, *UpdateSeasonRequest) (*UpdateSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSeason not implemented")
+}
+func (UnimplementedGroupServer) DeleteSeason(context.Context, *DeleteSeasonRequest) (*DeleteSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSeason not implemented")
+}
+func (UnimplementedGroupServer) GetSeason(context.Context, *GetSeasonRequest) (*GetSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSeason not implemented")
 }
 func (UnimplementedGroupServer) mustEmbedUnimplementedGroupServer() {}
 
@@ -572,6 +640,96 @@ func _Group_GetChallenge_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Group_CreateSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).CreateSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/CreateSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).CreateSeason(ctx, req.(*CreateSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_ListSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).ListSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/ListSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).ListSeason(ctx, req.(*ListSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_UpdateSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).UpdateSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/UpdateSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).UpdateSeason(ctx, req.(*UpdateSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_DeleteSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).DeleteSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/DeleteSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).DeleteSeason(ctx, req.(*DeleteSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_GetSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).GetSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/GetSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).GetSeason(ctx, req.(*GetSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Group_ServiceDesc is the grpc.ServiceDesc for Group service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -642,6 +800,26 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetChallenge",
 			Handler:    _Group_GetChallenge_Handler,
+		},
+		{
+			MethodName: "CreateSeason",
+			Handler:    _Group_CreateSeason_Handler,
+		},
+		{
+			MethodName: "ListSeason",
+			Handler:    _Group_ListSeason_Handler,
+		},
+		{
+			MethodName: "UpdateSeason",
+			Handler:    _Group_UpdateSeason_Handler,
+		},
+		{
+			MethodName: "DeleteSeason",
+			Handler:    _Group_DeleteSeason_Handler,
+		},
+		{
+			MethodName: "GetSeason",
+			Handler:    _Group_GetSeason_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

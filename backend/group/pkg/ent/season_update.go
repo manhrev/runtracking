@@ -104,57 +104,64 @@ func (su *SeasonUpdate) SetUpdatedAt(t time.Time) *SeasonUpdate {
 	return su
 }
 
-// SetStartDate sets the "start_date" field.
-func (su *SeasonUpdate) SetStartDate(t time.Time) *SeasonUpdate {
-	su.mutation.SetStartDate(t)
+// SetStartTime sets the "start_time" field.
+func (su *SeasonUpdate) SetStartTime(t time.Time) *SeasonUpdate {
+	su.mutation.SetStartTime(t)
 	return su
 }
 
-// SetNillableStartDate sets the "start_date" field if the given value is not nil.
-func (su *SeasonUpdate) SetNillableStartDate(t *time.Time) *SeasonUpdate {
+// SetNillableStartTime sets the "start_time" field if the given value is not nil.
+func (su *SeasonUpdate) SetNillableStartTime(t *time.Time) *SeasonUpdate {
 	if t != nil {
-		su.SetStartDate(*t)
+		su.SetStartTime(*t)
 	}
 	return su
 }
 
-// ClearStartDate clears the value of the "start_date" field.
-func (su *SeasonUpdate) ClearStartDate() *SeasonUpdate {
-	su.mutation.ClearStartDate()
+// ClearStartTime clears the value of the "start_time" field.
+func (su *SeasonUpdate) ClearStartTime() *SeasonUpdate {
+	su.mutation.ClearStartTime()
 	return su
 }
 
-// SetEndDate sets the "end_date" field.
-func (su *SeasonUpdate) SetEndDate(t time.Time) *SeasonUpdate {
-	su.mutation.SetEndDate(t)
+// SetEndTime sets the "end_time" field.
+func (su *SeasonUpdate) SetEndTime(t time.Time) *SeasonUpdate {
+	su.mutation.SetEndTime(t)
 	return su
 }
 
-// SetNillableEndDate sets the "end_date" field if the given value is not nil.
-func (su *SeasonUpdate) SetNillableEndDate(t *time.Time) *SeasonUpdate {
+// SetNillableEndTime sets the "end_time" field if the given value is not nil.
+func (su *SeasonUpdate) SetNillableEndTime(t *time.Time) *SeasonUpdate {
 	if t != nil {
-		su.SetEndDate(*t)
+		su.SetEndTime(*t)
 	}
 	return su
 }
 
-// ClearEndDate clears the value of the "end_date" field.
-func (su *SeasonUpdate) ClearEndDate() *SeasonUpdate {
-	su.mutation.ClearEndDate()
+// ClearEndTime clears the value of the "end_time" field.
+func (su *SeasonUpdate) ClearEndTime() *SeasonUpdate {
+	su.mutation.ClearEndTime()
 	return su
 }
 
-// SetIsActive sets the "is_active" field.
-func (su *SeasonUpdate) SetIsActive(b bool) *SeasonUpdate {
-	su.mutation.SetIsActive(b)
+// SetStatus sets the "status" field.
+func (su *SeasonUpdate) SetStatus(i int64) *SeasonUpdate {
+	su.mutation.ResetStatus()
+	su.mutation.SetStatus(i)
 	return su
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (su *SeasonUpdate) SetNillableIsActive(b *bool) *SeasonUpdate {
-	if b != nil {
-		su.SetIsActive(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (su *SeasonUpdate) SetNillableStatus(i *int64) *SeasonUpdate {
+	if i != nil {
+		su.SetStatus(*i)
 	}
+	return su
+}
+
+// AddStatus adds i to the "status" field.
+func (su *SeasonUpdate) AddStatus(i int64) *SeasonUpdate {
+	su.mutation.AddStatus(i)
 	return su
 }
 
@@ -280,20 +287,23 @@ func (su *SeasonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.UpdatedAt(); ok {
 		_spec.SetField(season.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := su.mutation.StartDate(); ok {
-		_spec.SetField(season.FieldStartDate, field.TypeTime, value)
+	if value, ok := su.mutation.StartTime(); ok {
+		_spec.SetField(season.FieldStartTime, field.TypeTime, value)
 	}
-	if su.mutation.StartDateCleared() {
-		_spec.ClearField(season.FieldStartDate, field.TypeTime)
+	if su.mutation.StartTimeCleared() {
+		_spec.ClearField(season.FieldStartTime, field.TypeTime)
 	}
-	if value, ok := su.mutation.EndDate(); ok {
-		_spec.SetField(season.FieldEndDate, field.TypeTime, value)
+	if value, ok := su.mutation.EndTime(); ok {
+		_spec.SetField(season.FieldEndTime, field.TypeTime, value)
 	}
-	if su.mutation.EndDateCleared() {
-		_spec.ClearField(season.FieldEndDate, field.TypeTime)
+	if su.mutation.EndTimeCleared() {
+		_spec.ClearField(season.FieldEndTime, field.TypeTime)
 	}
-	if value, ok := su.mutation.IsActive(); ok {
-		_spec.SetField(season.FieldIsActive, field.TypeBool, value)
+	if value, ok := su.mutation.Status(); ok {
+		_spec.SetField(season.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := su.mutation.AddedStatus(); ok {
+		_spec.AddField(season.FieldStatus, field.TypeInt64, value)
 	}
 	if su.mutation.SeasonMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -445,57 +455,64 @@ func (suo *SeasonUpdateOne) SetUpdatedAt(t time.Time) *SeasonUpdateOne {
 	return suo
 }
 
-// SetStartDate sets the "start_date" field.
-func (suo *SeasonUpdateOne) SetStartDate(t time.Time) *SeasonUpdateOne {
-	suo.mutation.SetStartDate(t)
+// SetStartTime sets the "start_time" field.
+func (suo *SeasonUpdateOne) SetStartTime(t time.Time) *SeasonUpdateOne {
+	suo.mutation.SetStartTime(t)
 	return suo
 }
 
-// SetNillableStartDate sets the "start_date" field if the given value is not nil.
-func (suo *SeasonUpdateOne) SetNillableStartDate(t *time.Time) *SeasonUpdateOne {
+// SetNillableStartTime sets the "start_time" field if the given value is not nil.
+func (suo *SeasonUpdateOne) SetNillableStartTime(t *time.Time) *SeasonUpdateOne {
 	if t != nil {
-		suo.SetStartDate(*t)
+		suo.SetStartTime(*t)
 	}
 	return suo
 }
 
-// ClearStartDate clears the value of the "start_date" field.
-func (suo *SeasonUpdateOne) ClearStartDate() *SeasonUpdateOne {
-	suo.mutation.ClearStartDate()
+// ClearStartTime clears the value of the "start_time" field.
+func (suo *SeasonUpdateOne) ClearStartTime() *SeasonUpdateOne {
+	suo.mutation.ClearStartTime()
 	return suo
 }
 
-// SetEndDate sets the "end_date" field.
-func (suo *SeasonUpdateOne) SetEndDate(t time.Time) *SeasonUpdateOne {
-	suo.mutation.SetEndDate(t)
+// SetEndTime sets the "end_time" field.
+func (suo *SeasonUpdateOne) SetEndTime(t time.Time) *SeasonUpdateOne {
+	suo.mutation.SetEndTime(t)
 	return suo
 }
 
-// SetNillableEndDate sets the "end_date" field if the given value is not nil.
-func (suo *SeasonUpdateOne) SetNillableEndDate(t *time.Time) *SeasonUpdateOne {
+// SetNillableEndTime sets the "end_time" field if the given value is not nil.
+func (suo *SeasonUpdateOne) SetNillableEndTime(t *time.Time) *SeasonUpdateOne {
 	if t != nil {
-		suo.SetEndDate(*t)
+		suo.SetEndTime(*t)
 	}
 	return suo
 }
 
-// ClearEndDate clears the value of the "end_date" field.
-func (suo *SeasonUpdateOne) ClearEndDate() *SeasonUpdateOne {
-	suo.mutation.ClearEndDate()
+// ClearEndTime clears the value of the "end_time" field.
+func (suo *SeasonUpdateOne) ClearEndTime() *SeasonUpdateOne {
+	suo.mutation.ClearEndTime()
 	return suo
 }
 
-// SetIsActive sets the "is_active" field.
-func (suo *SeasonUpdateOne) SetIsActive(b bool) *SeasonUpdateOne {
-	suo.mutation.SetIsActive(b)
+// SetStatus sets the "status" field.
+func (suo *SeasonUpdateOne) SetStatus(i int64) *SeasonUpdateOne {
+	suo.mutation.ResetStatus()
+	suo.mutation.SetStatus(i)
 	return suo
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (suo *SeasonUpdateOne) SetNillableIsActive(b *bool) *SeasonUpdateOne {
-	if b != nil {
-		suo.SetIsActive(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (suo *SeasonUpdateOne) SetNillableStatus(i *int64) *SeasonUpdateOne {
+	if i != nil {
+		suo.SetStatus(*i)
 	}
+	return suo
+}
+
+// AddStatus adds i to the "status" field.
+func (suo *SeasonUpdateOne) AddStatus(i int64) *SeasonUpdateOne {
+	suo.mutation.AddStatus(i)
 	return suo
 }
 
@@ -645,20 +662,23 @@ func (suo *SeasonUpdateOne) sqlSave(ctx context.Context) (_node *Season, err err
 	if value, ok := suo.mutation.UpdatedAt(); ok {
 		_spec.SetField(season.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := suo.mutation.StartDate(); ok {
-		_spec.SetField(season.FieldStartDate, field.TypeTime, value)
+	if value, ok := suo.mutation.StartTime(); ok {
+		_spec.SetField(season.FieldStartTime, field.TypeTime, value)
 	}
-	if suo.mutation.StartDateCleared() {
-		_spec.ClearField(season.FieldStartDate, field.TypeTime)
+	if suo.mutation.StartTimeCleared() {
+		_spec.ClearField(season.FieldStartTime, field.TypeTime)
 	}
-	if value, ok := suo.mutation.EndDate(); ok {
-		_spec.SetField(season.FieldEndDate, field.TypeTime, value)
+	if value, ok := suo.mutation.EndTime(); ok {
+		_spec.SetField(season.FieldEndTime, field.TypeTime, value)
 	}
-	if suo.mutation.EndDateCleared() {
-		_spec.ClearField(season.FieldEndDate, field.TypeTime)
+	if suo.mutation.EndTimeCleared() {
+		_spec.ClearField(season.FieldEndTime, field.TypeTime)
 	}
-	if value, ok := suo.mutation.IsActive(); ok {
-		_spec.SetField(season.FieldIsActive, field.TypeBool, value)
+	if value, ok := suo.mutation.Status(); ok {
+		_spec.SetField(season.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := suo.mutation.AddedStatus(); ok {
+		_spec.AddField(season.FieldStatus, field.TypeInt64, value)
 	}
 	if suo.mutation.SeasonMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{

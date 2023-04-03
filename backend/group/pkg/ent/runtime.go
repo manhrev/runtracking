@@ -140,10 +140,10 @@ func init() {
 	season.DefaultUpdatedAt = seasonDescUpdatedAt.Default.(func() time.Time)
 	// season.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	season.UpdateDefaultUpdatedAt = seasonDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// seasonDescIsActive is the schema descriptor for is_active field.
-	seasonDescIsActive := seasonFields[8].Descriptor()
-	// season.DefaultIsActive holds the default value on creation for the is_active field.
-	season.DefaultIsActive = seasonDescIsActive.Default.(bool)
+	// seasonDescStatus is the schema descriptor for status field.
+	seasonDescStatus := seasonFields[8].Descriptor()
+	// season.DefaultStatus holds the default value on creation for the status field.
+	season.DefaultStatus = seasonDescStatus.Default.(int64)
 	seasonmemberFields := schema.SeasonMember{}.Fields()
 	_ = seasonmemberFields
 	// seasonmemberDescPoint is the schema descriptor for point field.

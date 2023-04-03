@@ -20,13 +20,80 @@ service Group {
     
     // API for challenge
     rpc CreateChallenge(CreateChallengeRequest) returns(CreateChallengeReply){};
-    // rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
     rpc ListChallenge(ListChallengeRequest) returns(ListChallengeReply) {};
     rpc UpdateChallenge(UpdateChallengeRequest) returns(UpdateChallengeReply) {};
     rpc DeleteChallenge(DeleteChallengeRequest) returns(DeleteChallengeReply) {};
     rpc ListUserRanking(ListUserRankingRequest) returns(ListUserRankingReply){};
     rpc GetChallenge(GetChallengeRequest) returns(GetChallengeReply) {};
+
+    rpc CreateSeason(CreateSeasonRequest) returns(CreateSeasonReply){};
+    rpc ListSeason(ListSeasonRequest) returns(ListSeasonReply) {};
+    rpc UpdateSeason(UpdateSeasonRequest) returns(UpdateSeasonReply) {};
+    rpc DeleteSeason(DeleteSeasonRequest) returns(DeleteSeasonReply) {};
+    rpc GetSeason(GetSeasonRequest) returns(GetSeasonReply) {};
 }
+
+message SeasonInfo{
+    // just appear when list
+    int64 id = 1;
+
+    //used both list and CRUD
+    string name = 2;
+    string description = 3;
+    string picture = 12;
+    RuleStatus status = 15;
+    google.protobuf.Timestamp from = 6;
+    google.protobuf.Timestamp to = 7;
+
+}
+
+message GetSeasonRequest{
+    int64 id = 1;
+}
+
+message GetSeasonReply{
+    SeasonInfo seasonInfo = 1;
+}
+
+message CreateSeasonRequest{
+    SeasonInfo seasonInfo = 1;
+    int64 group_id = 2;
+}
+message CreateSeasonReply {}
+
+message ListSeasonRequest{
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    SeasonSortBy sort_by = 4;
+    string search_by_name = 5;
+    RuleStatus status = 12;
+
+    google.protobuf.Timestamp from = 8;
+    google.protobuf.Timestamp to = 9;
+
+    enum SeasonSortBy{
+        SEASON_SORT_BY_UNSPECIFIED = 0;
+        SEASON_SORT_BY_START_TIME = 1; 
+        SEASON_SORT_BY_END_TIME = 2; 
+        SEASON_SORT_BY_NAME = 3;
+    }
+}
+message ListSeasonReply {
+    repeated SeasonInfo seasonInfoList = 1;
+    int64 total = 2;
+}
+
+message UpdateSeasonRequest{
+    SeasonInfo seasonInfo = 1;
+}
+message UpdateSeasonReply{}
+
+message DeleteSeasonRequest{
+    int64 id = 1;
+}
+message DeleteSeasonReply{}
+
 
 message GetChallengeRequest{
     int64 id = 1;

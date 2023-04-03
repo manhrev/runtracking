@@ -91,44 +91,44 @@ func (sc *SeasonCreate) SetNillableUpdatedAt(t *time.Time) *SeasonCreate {
 	return sc
 }
 
-// SetStartDate sets the "start_date" field.
-func (sc *SeasonCreate) SetStartDate(t time.Time) *SeasonCreate {
-	sc.mutation.SetStartDate(t)
+// SetStartTime sets the "start_time" field.
+func (sc *SeasonCreate) SetStartTime(t time.Time) *SeasonCreate {
+	sc.mutation.SetStartTime(t)
 	return sc
 }
 
-// SetNillableStartDate sets the "start_date" field if the given value is not nil.
-func (sc *SeasonCreate) SetNillableStartDate(t *time.Time) *SeasonCreate {
+// SetNillableStartTime sets the "start_time" field if the given value is not nil.
+func (sc *SeasonCreate) SetNillableStartTime(t *time.Time) *SeasonCreate {
 	if t != nil {
-		sc.SetStartDate(*t)
+		sc.SetStartTime(*t)
 	}
 	return sc
 }
 
-// SetEndDate sets the "end_date" field.
-func (sc *SeasonCreate) SetEndDate(t time.Time) *SeasonCreate {
-	sc.mutation.SetEndDate(t)
+// SetEndTime sets the "end_time" field.
+func (sc *SeasonCreate) SetEndTime(t time.Time) *SeasonCreate {
+	sc.mutation.SetEndTime(t)
 	return sc
 }
 
-// SetNillableEndDate sets the "end_date" field if the given value is not nil.
-func (sc *SeasonCreate) SetNillableEndDate(t *time.Time) *SeasonCreate {
+// SetNillableEndTime sets the "end_time" field if the given value is not nil.
+func (sc *SeasonCreate) SetNillableEndTime(t *time.Time) *SeasonCreate {
 	if t != nil {
-		sc.SetEndDate(*t)
+		sc.SetEndTime(*t)
 	}
 	return sc
 }
 
-// SetIsActive sets the "is_active" field.
-func (sc *SeasonCreate) SetIsActive(b bool) *SeasonCreate {
-	sc.mutation.SetIsActive(b)
+// SetStatus sets the "status" field.
+func (sc *SeasonCreate) SetStatus(i int64) *SeasonCreate {
+	sc.mutation.SetStatus(i)
 	return sc
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (sc *SeasonCreate) SetNillableIsActive(b *bool) *SeasonCreate {
-	if b != nil {
-		sc.SetIsActive(*b)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (sc *SeasonCreate) SetNillableStatus(i *int64) *SeasonCreate {
+	if i != nil {
+		sc.SetStatus(*i)
 	}
 	return sc
 }
@@ -201,9 +201,9 @@ func (sc *SeasonCreate) defaults() {
 		v := season.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := sc.mutation.IsActive(); !ok {
-		v := season.DefaultIsActive
-		sc.mutation.SetIsActive(v)
+	if _, ok := sc.mutation.Status(); !ok {
+		v := season.DefaultStatus
+		sc.mutation.SetStatus(v)
 	}
 }
 
@@ -218,8 +218,8 @@ func (sc *SeasonCreate) check() error {
 	if _, ok := sc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Season.updated_at"`)}
 	}
-	if _, ok := sc.mutation.IsActive(); !ok {
-		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "Season.is_active"`)}
+	if _, ok := sc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Season.status"`)}
 	}
 	return nil
 }
@@ -279,17 +279,17 @@ func (sc *SeasonCreate) createSpec() (*Season, *sqlgraph.CreateSpec) {
 		_spec.SetField(season.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := sc.mutation.StartDate(); ok {
-		_spec.SetField(season.FieldStartDate, field.TypeTime, value)
-		_node.StartDate = value
+	if value, ok := sc.mutation.StartTime(); ok {
+		_spec.SetField(season.FieldStartTime, field.TypeTime, value)
+		_node.StartTime = value
 	}
-	if value, ok := sc.mutation.EndDate(); ok {
-		_spec.SetField(season.FieldEndDate, field.TypeTime, value)
-		_node.EndDate = value
+	if value, ok := sc.mutation.EndTime(); ok {
+		_spec.SetField(season.FieldEndTime, field.TypeTime, value)
+		_node.EndTime = value
 	}
-	if value, ok := sc.mutation.IsActive(); ok {
-		_spec.SetField(season.FieldIsActive, field.TypeBool, value)
-		_node.IsActive = value
+	if value, ok := sc.mutation.Status(); ok {
+		_spec.SetField(season.FieldStatus, field.TypeInt64, value)
+		_node.Status = value
 	}
 	if nodes := sc.mutation.SeasonMembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

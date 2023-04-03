@@ -206,9 +206,9 @@ var (
 		{Name: "picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "start_date", Type: field.TypeTime, Nullable: true},
-		{Name: "end_date", Type: field.TypeTime, Nullable: true},
-		{Name: "is_active", Type: field.TypeBool, Default: false},
+		{Name: "start_time", Type: field.TypeTime, Nullable: true},
+		{Name: "end_time", Type: field.TypeTime, Nullable: true},
+		{Name: "status", Type: field.TypeInt64, Default: 3},
 	}
 	// SeasonsTable holds the schema information for the "seasons" table.
 	SeasonsTable = &schema.Table{

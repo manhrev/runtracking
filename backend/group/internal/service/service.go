@@ -6,6 +6,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/internal/service/challenge"
 	"github.com/manhrev/runtracking/backend/group/internal/service/group"
 	"github.com/manhrev/runtracking/backend/group/internal/service/member"
+	"github.com/manhrev/runtracking/backend/group/internal/service/season"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 )
@@ -16,6 +17,7 @@ type Service struct {
 	Group      group.Group
 	Member     member.Member
 	Challenge  challenge.Challenge
+	Season     season.Season
 }
 
 func New(entClient *ent.Client, authClient auth.AuthIClient, notificationClient notification.NotificationIClient) *Service {
@@ -27,5 +29,6 @@ func New(entClient *ent.Client, authClient auth.AuthIClient, notificationClient 
 		authClient: authClient,
 		Member:     member.New(entClient, repo, authClient),
 		Challenge:  challenge.New(entClient, repo, authClient),
+		Season:     season.New(entClient, repo, authClient),
 	}
 }

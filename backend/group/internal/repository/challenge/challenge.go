@@ -173,6 +173,17 @@ func (c *challengeImpl) Update(
 	//If do not have any inprogress challenge and time updated before time now => update status to inprogress
 	if challengeInfo.From.AsTime().Before(time.Now()) {
 		challengeQuery.SetStatus(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))
+
+		err = c.entClient.ChallengeMember.Update().
+			Where(challengemember.ChallengeIDEQ(challengeInfo.Id)).
+			SetStatus(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)).
+			Exec(ctx)
+
+		if err != nil {
+			log.Println("Fail when save challenge members: %v", err.Error())
+			return status.Internal(fmt.Sprintf("Fail when save challenge member : %v", err.Error()))
+		}
+
 		//Update challege member rules
 		err = c.entClient.ChallengeMemberRule.Update().
 			Where(challengememberrule.HasChallengeMemberWith(challengemember.ChallengeIDEQ(challengeInfo.Id))).

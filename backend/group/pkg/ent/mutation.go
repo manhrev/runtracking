@@ -5717,9 +5717,10 @@ type SeasonMutation struct {
 	picture               *string
 	created_at            *time.Time
 	updated_at            *time.Time
-	start_date            *time.Time
-	end_date              *time.Time
-	is_active             *bool
+	start_time            *time.Time
+	end_time              *time.Time
+	status                *int64
+	addstatus             *int64
 	clearedFields         map[string]struct{}
 	season_members        map[int64]struct{}
 	removedseason_members map[int64]struct{}
@@ -6039,138 +6040,158 @@ func (m *SeasonMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetStartDate sets the "start_date" field.
-func (m *SeasonMutation) SetStartDate(t time.Time) {
-	m.start_date = &t
+// SetStartTime sets the "start_time" field.
+func (m *SeasonMutation) SetStartTime(t time.Time) {
+	m.start_time = &t
 }
 
-// StartDate returns the value of the "start_date" field in the mutation.
-func (m *SeasonMutation) StartDate() (r time.Time, exists bool) {
-	v := m.start_date
+// StartTime returns the value of the "start_time" field in the mutation.
+func (m *SeasonMutation) StartTime() (r time.Time, exists bool) {
+	v := m.start_time
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStartDate returns the old "start_date" field's value of the Season entity.
+// OldStartTime returns the old "start_time" field's value of the Season entity.
 // If the Season object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeasonMutation) OldStartDate(ctx context.Context) (v time.Time, err error) {
+func (m *SeasonMutation) OldStartTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStartDate is only allowed on UpdateOne operations")
+		return v, errors.New("OldStartTime is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStartDate requires an ID field in the mutation")
+		return v, errors.New("OldStartTime requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStartDate: %w", err)
+		return v, fmt.Errorf("querying old value for OldStartTime: %w", err)
 	}
-	return oldValue.StartDate, nil
+	return oldValue.StartTime, nil
 }
 
-// ClearStartDate clears the value of the "start_date" field.
-func (m *SeasonMutation) ClearStartDate() {
-	m.start_date = nil
-	m.clearedFields[season.FieldStartDate] = struct{}{}
+// ClearStartTime clears the value of the "start_time" field.
+func (m *SeasonMutation) ClearStartTime() {
+	m.start_time = nil
+	m.clearedFields[season.FieldStartTime] = struct{}{}
 }
 
-// StartDateCleared returns if the "start_date" field was cleared in this mutation.
-func (m *SeasonMutation) StartDateCleared() bool {
-	_, ok := m.clearedFields[season.FieldStartDate]
+// StartTimeCleared returns if the "start_time" field was cleared in this mutation.
+func (m *SeasonMutation) StartTimeCleared() bool {
+	_, ok := m.clearedFields[season.FieldStartTime]
 	return ok
 }
 
-// ResetStartDate resets all changes to the "start_date" field.
-func (m *SeasonMutation) ResetStartDate() {
-	m.start_date = nil
-	delete(m.clearedFields, season.FieldStartDate)
+// ResetStartTime resets all changes to the "start_time" field.
+func (m *SeasonMutation) ResetStartTime() {
+	m.start_time = nil
+	delete(m.clearedFields, season.FieldStartTime)
 }
 
-// SetEndDate sets the "end_date" field.
-func (m *SeasonMutation) SetEndDate(t time.Time) {
-	m.end_date = &t
+// SetEndTime sets the "end_time" field.
+func (m *SeasonMutation) SetEndTime(t time.Time) {
+	m.end_time = &t
 }
 
-// EndDate returns the value of the "end_date" field in the mutation.
-func (m *SeasonMutation) EndDate() (r time.Time, exists bool) {
-	v := m.end_date
+// EndTime returns the value of the "end_time" field in the mutation.
+func (m *SeasonMutation) EndTime() (r time.Time, exists bool) {
+	v := m.end_time
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldEndDate returns the old "end_date" field's value of the Season entity.
+// OldEndTime returns the old "end_time" field's value of the Season entity.
 // If the Season object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeasonMutation) OldEndDate(ctx context.Context) (v time.Time, err error) {
+func (m *SeasonMutation) OldEndTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEndDate is only allowed on UpdateOne operations")
+		return v, errors.New("OldEndTime is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEndDate requires an ID field in the mutation")
+		return v, errors.New("OldEndTime requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEndDate: %w", err)
+		return v, fmt.Errorf("querying old value for OldEndTime: %w", err)
 	}
-	return oldValue.EndDate, nil
+	return oldValue.EndTime, nil
 }
 
-// ClearEndDate clears the value of the "end_date" field.
-func (m *SeasonMutation) ClearEndDate() {
-	m.end_date = nil
-	m.clearedFields[season.FieldEndDate] = struct{}{}
+// ClearEndTime clears the value of the "end_time" field.
+func (m *SeasonMutation) ClearEndTime() {
+	m.end_time = nil
+	m.clearedFields[season.FieldEndTime] = struct{}{}
 }
 
-// EndDateCleared returns if the "end_date" field was cleared in this mutation.
-func (m *SeasonMutation) EndDateCleared() bool {
-	_, ok := m.clearedFields[season.FieldEndDate]
+// EndTimeCleared returns if the "end_time" field was cleared in this mutation.
+func (m *SeasonMutation) EndTimeCleared() bool {
+	_, ok := m.clearedFields[season.FieldEndTime]
 	return ok
 }
 
-// ResetEndDate resets all changes to the "end_date" field.
-func (m *SeasonMutation) ResetEndDate() {
-	m.end_date = nil
-	delete(m.clearedFields, season.FieldEndDate)
+// ResetEndTime resets all changes to the "end_time" field.
+func (m *SeasonMutation) ResetEndTime() {
+	m.end_time = nil
+	delete(m.clearedFields, season.FieldEndTime)
 }
 
-// SetIsActive sets the "is_active" field.
-func (m *SeasonMutation) SetIsActive(b bool) {
-	m.is_active = &b
+// SetStatus sets the "status" field.
+func (m *SeasonMutation) SetStatus(i int64) {
+	m.status = &i
+	m.addstatus = nil
 }
 
-// IsActive returns the value of the "is_active" field in the mutation.
-func (m *SeasonMutation) IsActive() (r bool, exists bool) {
-	v := m.is_active
+// Status returns the value of the "status" field in the mutation.
+func (m *SeasonMutation) Status() (r int64, exists bool) {
+	v := m.status
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIsActive returns the old "is_active" field's value of the Season entity.
+// OldStatus returns the old "status" field's value of the Season entity.
 // If the Season object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SeasonMutation) OldIsActive(ctx context.Context) (v bool, err error) {
+func (m *SeasonMutation) OldStatus(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsActive requires an ID field in the mutation")
+		return v, errors.New("OldStatus requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
 	}
-	return oldValue.IsActive, nil
+	return oldValue.Status, nil
 }
 
-// ResetIsActive resets all changes to the "is_active" field.
-func (m *SeasonMutation) ResetIsActive() {
-	m.is_active = nil
+// AddStatus adds i to the "status" field.
+func (m *SeasonMutation) AddStatus(i int64) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *SeasonMutation) AddedStatus() (r int64, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *SeasonMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
 }
 
 // AddSeasonMemberIDs adds the "season_members" edge to the SeasonMember entity by ids.
@@ -6277,14 +6298,14 @@ func (m *SeasonMutation) Fields() []string {
 	if m.updated_at != nil {
 		fields = append(fields, season.FieldUpdatedAt)
 	}
-	if m.start_date != nil {
-		fields = append(fields, season.FieldStartDate)
+	if m.start_time != nil {
+		fields = append(fields, season.FieldStartTime)
 	}
-	if m.end_date != nil {
-		fields = append(fields, season.FieldEndDate)
+	if m.end_time != nil {
+		fields = append(fields, season.FieldEndTime)
 	}
-	if m.is_active != nil {
-		fields = append(fields, season.FieldIsActive)
+	if m.status != nil {
+		fields = append(fields, season.FieldStatus)
 	}
 	return fields
 }
@@ -6304,12 +6325,12 @@ func (m *SeasonMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case season.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case season.FieldStartDate:
-		return m.StartDate()
-	case season.FieldEndDate:
-		return m.EndDate()
-	case season.FieldIsActive:
-		return m.IsActive()
+	case season.FieldStartTime:
+		return m.StartTime()
+	case season.FieldEndTime:
+		return m.EndTime()
+	case season.FieldStatus:
+		return m.Status()
 	}
 	return nil, false
 }
@@ -6329,12 +6350,12 @@ func (m *SeasonMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldCreatedAt(ctx)
 	case season.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case season.FieldStartDate:
-		return m.OldStartDate(ctx)
-	case season.FieldEndDate:
-		return m.OldEndDate(ctx)
-	case season.FieldIsActive:
-		return m.OldIsActive(ctx)
+	case season.FieldStartTime:
+		return m.OldStartTime(ctx)
+	case season.FieldEndTime:
+		return m.OldEndTime(ctx)
+	case season.FieldStatus:
+		return m.OldStatus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Season field %s", name)
 }
@@ -6379,26 +6400,26 @@ func (m *SeasonMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case season.FieldStartDate:
+	case season.FieldStartTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStartDate(v)
+		m.SetStartTime(v)
 		return nil
-	case season.FieldEndDate:
+	case season.FieldEndTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetEndDate(v)
+		m.SetEndTime(v)
 		return nil
-	case season.FieldIsActive:
-		v, ok := value.(bool)
+	case season.FieldStatus:
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsActive(v)
+		m.SetStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Season field %s", name)
@@ -6407,13 +6428,21 @@ func (m *SeasonMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *SeasonMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addstatus != nil {
+		fields = append(fields, season.FieldStatus)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *SeasonMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case season.FieldStatus:
+		return m.AddedStatus()
+	}
 	return nil, false
 }
 
@@ -6422,6 +6451,13 @@ func (m *SeasonMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *SeasonMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case season.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Season numeric field %s", name)
 }
@@ -6436,11 +6472,11 @@ func (m *SeasonMutation) ClearedFields() []string {
 	if m.FieldCleared(season.FieldDescription) {
 		fields = append(fields, season.FieldDescription)
 	}
-	if m.FieldCleared(season.FieldStartDate) {
-		fields = append(fields, season.FieldStartDate)
+	if m.FieldCleared(season.FieldStartTime) {
+		fields = append(fields, season.FieldStartTime)
 	}
-	if m.FieldCleared(season.FieldEndDate) {
-		fields = append(fields, season.FieldEndDate)
+	if m.FieldCleared(season.FieldEndTime) {
+		fields = append(fields, season.FieldEndTime)
 	}
 	return fields
 }
@@ -6462,11 +6498,11 @@ func (m *SeasonMutation) ClearField(name string) error {
 	case season.FieldDescription:
 		m.ClearDescription()
 		return nil
-	case season.FieldStartDate:
-		m.ClearStartDate()
+	case season.FieldStartTime:
+		m.ClearStartTime()
 		return nil
-	case season.FieldEndDate:
-		m.ClearEndDate()
+	case season.FieldEndTime:
+		m.ClearEndTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Season nullable field %s", name)
@@ -6491,14 +6527,14 @@ func (m *SeasonMutation) ResetField(name string) error {
 	case season.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case season.FieldStartDate:
-		m.ResetStartDate()
+	case season.FieldStartTime:
+		m.ResetStartTime()
 		return nil
-	case season.FieldEndDate:
-		m.ResetEndDate()
+	case season.FieldEndTime:
+		m.ResetEndTime()
 		return nil
-	case season.FieldIsActive:
-		m.ResetIsActive()
+	case season.FieldStatus:
+		m.ResetStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Season field %s", name)
