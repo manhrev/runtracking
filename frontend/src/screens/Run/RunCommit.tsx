@@ -45,6 +45,7 @@ export default function RunCommit({
           limit: 100,
           offset: 0,
           sortBy: 1,
+          idsList: [],
         })
       ).unwrap()
 
@@ -85,7 +86,7 @@ export default function RunCommit({
 
   const backToHome = () => {
     route.params.resetRunInfo()
-    navigation.popToTop()
+    navigation.goBack()
   }
 
   const filteredPlanList = planList.filter(

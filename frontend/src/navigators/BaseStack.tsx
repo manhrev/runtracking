@@ -96,7 +96,8 @@ export type RootBaseStackParamList = {
     reloadListFunc: () => void
   }
   GroupEdit: {
-    groupInfo: GroupInfo.AsObject
+    groupInfo: GroupInfo.AsObject | undefined
+    reloadDetailFunc: () => void
   }
   GroupMembers: {
     groupId: number

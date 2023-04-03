@@ -9,6 +9,7 @@ import notificationList from './features/notification/slice'
 import groupList from './features/groupList/slice'
 import yourGroupList from './features/yourGroupList/slice'
 import memberList from './features/memberList/slice'
+import groupDetail from './features/groupDetail/slice'
 
 const rootReducer = combineReducers({
   common,
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   groupList,
   yourGroupList,
   memberList,
+  groupDetail,
 })
 
 export type RootState = ReturnType<typeof rootReducer>

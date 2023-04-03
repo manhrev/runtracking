@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, View } from 'react-native'
 import {
   Button,
   Divider,
@@ -48,6 +48,8 @@ export default function RunTracking({
     },
   ])
 
+  const [hasUnsavedData, setHasUnsavedData] = useState(false)
+
   const [location, setLocation] = useState<TrackPoint.AsObject>({
     latitude: 0,
     longtitude: 0,
@@ -83,28 +85,13 @@ export default function RunTracking({
   // console.log(kcalBurned)
   // dialog
   const [visible, setVisible] = useState(false)
-  const [goBackVisible, setGoBackVisible] = useState(false)
 
   const showDialog = () => {
     setVisible(true)
   }
 
-  const showGoBackDialog = () => {
-    if(userState == 'running' || userState == 'paused') {
-      setUserState('paused')
-      setGoBackVisible(true)
-    }
-    else {
-      navigation.goBack()
-    }
-  }
-
   const hideDialog = () => {
     setVisible(false)
-  }
-
-  const hideGoBackDialog = () => {
-    setGoBackVisible(false)
   }
 
   useEffect(() => {
@@ -221,6 +208,7 @@ export default function RunTracking({
   // state control
   const startOrPause = () => {
     if (userState == 'ready') {
+      setHasUnsavedData(true)
       setUserState('running')
 
       // save start time
@@ -341,6 +329,7 @@ export default function RunTracking({
     })
     setFocusMode(false)
     setVisible(false)
+    setHasUnsavedData(false)
   }
 
   const switchActivityType = () => {
@@ -352,6 +341,29 @@ export default function RunTracking({
       setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)
     }
   }
+
+  useEffect(() => {
+    // prevent go back
+    navigation.addListener('beforeRemove', (e) => {
+      if(!hasUnsavedData) return
+
+      e.preventDefault()
+      
+      Alert.alert(
+        'Alert',
+        'Are you sure you want to leave this screen?',
+        [
+          {
+            text: 'Leave',
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+          { text: "Stay", style: 'cancel', onPress: () => {} }
+        ]
+      );
+      
+    })
+  }, [navigation, hasUnsavedData])
 
   return (
     <View style={styles(theme).container}>
@@ -367,19 +379,6 @@ export default function RunTracking({
           </Dialog.Actions>
         </Dialog>
       </Portal>
-
-      <Portal>
-        <Dialog visible={goBackVisible} onDismiss={hideGoBackDialog}>
-          <Dialog.Title>Alert</Dialog.Title>
-          <Dialog.Content>
-            <Text>Your activity will be deleted. Do you want to continue ?</Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => navigation.goBack()}> Yes </Button>
-            <Button onPress={hideGoBackDialog}> No </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
       <Monitor
         userState={
           userState == 'ready'
@@ -392,7 +391,7 @@ export default function RunTracking({
         displayDistance={(totalDistance / 1000).toFixed(2)}
         displayPace={formatForDisplay('pace', pace)}
         displayKcal={isNaN(kcalBurned) ? 0 : kcalBurned.toFixed(3)}
-        showGoBackDialog={showGoBackDialog}
+        goBackFunc={() => navigation.goBack()}
       />
       <Divider style={{ height: 1 }} />
       <MapView
