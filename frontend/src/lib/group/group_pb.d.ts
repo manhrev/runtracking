@@ -3,6 +3,281 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 
+export class GetChallengeRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): GetChallengeRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetChallengeRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetChallengeRequest): GetChallengeRequest.AsObject;
+  static serializeBinaryToWriter(message: GetChallengeRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetChallengeRequest;
+  static deserializeBinaryFromReader(message: GetChallengeRequest, reader: jspb.BinaryReader): GetChallengeRequest;
+}
+
+export namespace GetChallengeRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
+export class GetChallengeReply extends jspb.Message {
+  getChallengeinfo(): ChallengeInfo | undefined;
+  setChallengeinfo(value?: ChallengeInfo): GetChallengeReply;
+  hasChallengeinfo(): boolean;
+  clearChallengeinfo(): GetChallengeReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetChallengeReply.AsObject;
+  static toObject(includeInstance: boolean, msg: GetChallengeReply): GetChallengeReply.AsObject;
+  static serializeBinaryToWriter(message: GetChallengeReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetChallengeReply;
+  static deserializeBinaryFromReader(message: GetChallengeReply, reader: jspb.BinaryReader): GetChallengeReply;
+}
+
+export namespace GetChallengeReply {
+  export type AsObject = {
+    challengeinfo?: ChallengeInfo.AsObject,
+  }
+}
+
+export class CreateChallengeRequest extends jspb.Message {
+  getChallengeinfo(): ChallengeInfo | undefined;
+  setChallengeinfo(value?: ChallengeInfo): CreateChallengeRequest;
+  hasChallengeinfo(): boolean;
+  clearChallengeinfo(): CreateChallengeRequest;
+
+  getGroupId(): number;
+  setGroupId(value: number): CreateChallengeRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateChallengeRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateChallengeRequest): CreateChallengeRequest.AsObject;
+  static serializeBinaryToWriter(message: CreateChallengeRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateChallengeRequest;
+  static deserializeBinaryFromReader(message: CreateChallengeRequest, reader: jspb.BinaryReader): CreateChallengeRequest;
+}
+
+export namespace CreateChallengeRequest {
+  export type AsObject = {
+    challengeinfo?: ChallengeInfo.AsObject,
+    groupId: number,
+  }
+}
+
+export class CreateChallengeReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateChallengeReply.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateChallengeReply): CreateChallengeReply.AsObject;
+  static serializeBinaryToWriter(message: CreateChallengeReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateChallengeReply;
+  static deserializeBinaryFromReader(message: CreateChallengeReply, reader: jspb.BinaryReader): CreateChallengeReply;
+}
+
+export namespace CreateChallengeReply {
+  export type AsObject = {
+  }
+}
+
+export class ListChallengeRequest extends jspb.Message {
+  getLimit(): number;
+  setLimit(value: number): ListChallengeRequest;
+
+  getOffset(): number;
+  setOffset(value: number): ListChallengeRequest;
+
+  getAscending(): boolean;
+  setAscending(value: boolean): ListChallengeRequest;
+
+  getGroupId(): number;
+  setGroupId(value: number): ListChallengeRequest;
+
+  getSortBy(): ListChallengeRequest.ChallengeSortBy;
+  setSortBy(value: ListChallengeRequest.ChallengeSortBy): ListChallengeRequest;
+
+  getSearchByName(): string;
+  setSearchByName(value: string): ListChallengeRequest;
+
+  getFilterByRulesList(): Array<Rule>;
+  setFilterByRulesList(value: Array<Rule>): ListChallengeRequest;
+  clearFilterByRulesList(): ListChallengeRequest;
+  addFilterByRules(value: Rule, index?: number): ListChallengeRequest;
+
+  getFilterByType(): ActivityType;
+  setFilterByType(value: ActivityType): ListChallengeRequest;
+
+  getStatus(): RuleStatus;
+  setStatus(value: RuleStatus): ListChallengeRequest;
+
+  getFrom(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setFrom(value?: google_protobuf_timestamp_pb.Timestamp): ListChallengeRequest;
+  hasFrom(): boolean;
+  clearFrom(): ListChallengeRequest;
+
+  getTo(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setTo(value?: google_protobuf_timestamp_pb.Timestamp): ListChallengeRequest;
+  hasTo(): boolean;
+  clearTo(): ListChallengeRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListChallengeRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListChallengeRequest): ListChallengeRequest.AsObject;
+  static serializeBinaryToWriter(message: ListChallengeRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListChallengeRequest;
+  static deserializeBinaryFromReader(message: ListChallengeRequest, reader: jspb.BinaryReader): ListChallengeRequest;
+}
+
+export namespace ListChallengeRequest {
+  export type AsObject = {
+    limit: number,
+    offset: number,
+    ascending: boolean,
+    groupId: number,
+    sortBy: ListChallengeRequest.ChallengeSortBy,
+    searchByName: string,
+    filterByRulesList: Array<Rule>,
+    filterByType: ActivityType,
+    status: RuleStatus,
+    from?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    to?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+
+  export enum ChallengeSortBy { 
+    CHALLENGE_SORT_BY_UNSPECIFIED = 0,
+    CHALLENGE_SORT_BY_START_TIME = 1,
+    CHALLENGE_SORT_BY_END_TIME = 2,
+    CHALLENGE_SORT_BY_NAME = 3,
+  }
+}
+
+export class ListChallengeReply extends jspb.Message {
+  getChallengeinfolistList(): Array<ChallengeInfo>;
+  setChallengeinfolistList(value: Array<ChallengeInfo>): ListChallengeReply;
+  clearChallengeinfolistList(): ListChallengeReply;
+  addChallengeinfolist(value?: ChallengeInfo, index?: number): ChallengeInfo;
+
+  getTotal(): number;
+  setTotal(value: number): ListChallengeReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListChallengeReply.AsObject;
+  static toObject(includeInstance: boolean, msg: ListChallengeReply): ListChallengeReply.AsObject;
+  static serializeBinaryToWriter(message: ListChallengeReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListChallengeReply;
+  static deserializeBinaryFromReader(message: ListChallengeReply, reader: jspb.BinaryReader): ListChallengeReply;
+}
+
+export namespace ListChallengeReply {
+  export type AsObject = {
+    challengeinfolistList: Array<ChallengeInfo.AsObject>,
+    total: number,
+  }
+}
+
+export class UpdateChallengeRequest extends jspb.Message {
+  getChallengeinfo(): ChallengeInfo | undefined;
+  setChallengeinfo(value?: ChallengeInfo): UpdateChallengeRequest;
+  hasChallengeinfo(): boolean;
+  clearChallengeinfo(): UpdateChallengeRequest;
+
+  getGroupId(): number;
+  setGroupId(value: number): UpdateChallengeRequest;
+
+  getIdsRuleToDeleteList(): Array<number>;
+  setIdsRuleToDeleteList(value: Array<number>): UpdateChallengeRequest;
+  clearIdsRuleToDeleteList(): UpdateChallengeRequest;
+  addIdsRuleToDelete(value: number, index?: number): UpdateChallengeRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateChallengeRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateChallengeRequest): UpdateChallengeRequest.AsObject;
+  static serializeBinaryToWriter(message: UpdateChallengeRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateChallengeRequest;
+  static deserializeBinaryFromReader(message: UpdateChallengeRequest, reader: jspb.BinaryReader): UpdateChallengeRequest;
+}
+
+export namespace UpdateChallengeRequest {
+  export type AsObject = {
+    challengeinfo?: ChallengeInfo.AsObject,
+    groupId: number,
+    idsRuleToDeleteList: Array<number>,
+  }
+}
+
+export class UpdateChallengeReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateChallengeReply.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateChallengeReply): UpdateChallengeReply.AsObject;
+  static serializeBinaryToWriter(message: UpdateChallengeReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateChallengeReply;
+  static deserializeBinaryFromReader(message: UpdateChallengeReply, reader: jspb.BinaryReader): UpdateChallengeReply;
+}
+
+export namespace UpdateChallengeReply {
+  export type AsObject = {
+  }
+}
+
+export class DeleteChallengeRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): DeleteChallengeRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteChallengeRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteChallengeRequest): DeleteChallengeRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteChallengeRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteChallengeRequest;
+  static deserializeBinaryFromReader(message: DeleteChallengeRequest, reader: jspb.BinaryReader): DeleteChallengeRequest;
+}
+
+export namespace DeleteChallengeRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
+export class DeleteChallengeReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteChallengeReply.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteChallengeReply): DeleteChallengeReply.AsObject;
+  static serializeBinaryToWriter(message: DeleteChallengeReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteChallengeReply;
+  static deserializeBinaryFromReader(message: DeleteChallengeReply, reader: jspb.BinaryReader): DeleteChallengeReply;
+}
+
+export namespace DeleteChallengeReply {
+  export type AsObject = {
+  }
+}
+
+export class ListUserRankingRequest extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListUserRankingRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListUserRankingRequest): ListUserRankingRequest.AsObject;
+  static serializeBinaryToWriter(message: ListUserRankingRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListUserRankingRequest;
+  static deserializeBinaryFromReader(message: ListUserRankingRequest, reader: jspb.BinaryReader): ListUserRankingRequest;
+}
+
+export namespace ListUserRankingRequest {
+  export type AsObject = {
+  }
+}
+
+export class ListUserRankingReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListUserRankingReply.AsObject;
+  static toObject(includeInstance: boolean, msg: ListUserRankingReply): ListUserRankingReply.AsObject;
+  static serializeBinaryToWriter(message: ListUserRankingReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListUserRankingReply;
+  static deserializeBinaryFromReader(message: ListUserRankingReply, reader: jspb.BinaryReader): ListUserRankingReply;
+}
+
+export namespace ListUserRankingReply {
+  export type AsObject = {
+  }
+}
+
 export class LeaveGroupRequest extends jspb.Message {
   getGroupId(): number;
   setGroupId(value: number): LeaveGroupRequest;
@@ -522,6 +797,9 @@ export class Member extends jspb.Message {
   getStatus(): Member.Status;
   setStatus(value: Member.Status): Member;
 
+  getIsAdmin(): boolean;
+  setIsAdmin(value: boolean): Member;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Member.AsObject;
   static toObject(includeInstance: boolean, msg: Member): Member.AsObject;
@@ -539,6 +817,7 @@ export namespace Member {
     email: string,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     status: Member.Status,
+    isAdmin: boolean,
   }
 
   export enum Status { 
@@ -554,25 +833,38 @@ export class ChallengeInfo extends jspb.Message {
   getId(): number;
   setId(value: number): ChallengeInfo;
 
+  getGroupId(): number;
+  setGroupId(value: number): ChallengeInfo;
+
+  getCompletedFirstMember(): Member | undefined;
+  setCompletedFirstMember(value?: Member): ChallengeInfo;
+  hasCompletedFirstMember(): boolean;
+  clearCompletedFirstMember(): ChallengeInfo;
+
+  getMemberProgressListList(): Array<MemberProgress>;
+  setMemberProgressListList(value: Array<MemberProgress>): ChallengeInfo;
+  clearMemberProgressListList(): ChallengeInfo;
+  addMemberProgressList(value?: MemberProgress, index?: number): MemberProgress;
+
   getName(): string;
   setName(value: string): ChallengeInfo;
 
   getDescription(): string;
   setDescription(value: string): ChallengeInfo;
 
-  getRulesList(): Array<Rule>;
-  setRulesList(value: Array<Rule>): ChallengeInfo;
-  clearRulesList(): ChallengeInfo;
-  addRules(value: Rule, index?: number): ChallengeInfo;
+  getPicture(): string;
+  setPicture(value: string): ChallengeInfo;
+
+  getChallengerulesList(): Array<ChallengeRuleInfo>;
+  setChallengerulesList(value: Array<ChallengeRuleInfo>): ChallengeInfo;
+  clearChallengerulesList(): ChallengeInfo;
+  addChallengerules(value?: ChallengeRuleInfo, index?: number): ChallengeRuleInfo;
 
   getType(): ActivityType;
   setType(value: ActivityType): ChallengeInfo;
 
-  getGoal(): number;
-  setGoal(value: number): ChallengeInfo;
-
-  getTotal(): number;
-  setTotal(value: number): ChallengeInfo;
+  getStatus(): RuleStatus;
+  setStatus(value: RuleStatus): ChallengeInfo;
 
   getFrom(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setFrom(value?: google_protobuf_timestamp_pb.Timestamp): ChallengeInfo;
@@ -595,14 +887,122 @@ export class ChallengeInfo extends jspb.Message {
 export namespace ChallengeInfo {
   export type AsObject = {
     id: number,
+    groupId: number,
+    completedFirstMember?: Member.AsObject,
+    memberProgressListList: Array<MemberProgress.AsObject>,
     name: string,
     description: string,
-    rulesList: Array<Rule>,
+    picture: string,
+    challengerulesList: Array<ChallengeRuleInfo.AsObject>,
     type: ActivityType,
-    goal: number,
-    total: number,
+    status: RuleStatus,
     from?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     to?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class MemberProgress extends jspb.Message {
+  getIsCompletedFirst(): boolean;
+  setIsCompletedFirst(value: boolean): MemberProgress;
+
+  getChallengeProgress(): RuleStatus;
+  setChallengeProgress(value: RuleStatus): MemberProgress;
+
+  getMemberInfo(): Member | undefined;
+  setMemberInfo(value?: Member): MemberProgress;
+  hasMemberInfo(): boolean;
+  clearMemberInfo(): MemberProgress;
+
+  getRuleProgressListList(): Array<MemberProgress.RuleProgress>;
+  setRuleProgressListList(value: Array<MemberProgress.RuleProgress>): MemberProgress;
+  clearRuleProgressListList(): MemberProgress;
+  addRuleProgressList(value?: MemberProgress.RuleProgress, index?: number): MemberProgress.RuleProgress;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): MemberProgress.AsObject;
+  static toObject(includeInstance: boolean, msg: MemberProgress): MemberProgress.AsObject;
+  static serializeBinaryToWriter(message: MemberProgress, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): MemberProgress;
+  static deserializeBinaryFromReader(message: MemberProgress, reader: jspb.BinaryReader): MemberProgress;
+}
+
+export namespace MemberProgress {
+  export type AsObject = {
+    isCompletedFirst: boolean,
+    challengeProgress: RuleStatus,
+    memberInfo?: Member.AsObject,
+    ruleProgressListList: Array<MemberProgress.RuleProgress.AsObject>,
+  }
+
+  export class RuleProgress extends jspb.Message {
+    getRule(): Rule;
+    setRule(value: Rule): RuleProgress;
+
+    getStatus(): RuleStatus;
+    setStatus(value: RuleStatus): RuleProgress;
+
+    getTotal(): number;
+    setTotal(value: number): RuleProgress;
+
+    getTimeCompleted(): google_protobuf_timestamp_pb.Timestamp | undefined;
+    setTimeCompleted(value?: google_protobuf_timestamp_pb.Timestamp): RuleProgress;
+    hasTimeCompleted(): boolean;
+    clearTimeCompleted(): RuleProgress;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): RuleProgress.AsObject;
+    static toObject(includeInstance: boolean, msg: RuleProgress): RuleProgress.AsObject;
+    static serializeBinaryToWriter(message: RuleProgress, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): RuleProgress;
+    static deserializeBinaryFromReader(message: RuleProgress, reader: jspb.BinaryReader): RuleProgress;
+  }
+
+  export namespace RuleProgress {
+    export type AsObject = {
+      rule: Rule,
+      status: RuleStatus,
+      total: number,
+      timeCompleted?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    }
+  }
+
+}
+
+export class ChallengeRuleInfo extends jspb.Message {
+  getId(): number;
+  setId(value: number): ChallengeRuleInfo;
+
+  getGoal(): number;
+  setGoal(value: number): ChallengeRuleInfo;
+
+  getRule(): Rule;
+  setRule(value: Rule): ChallengeRuleInfo;
+
+  getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): ChallengeRuleInfo;
+  hasCreatedAt(): boolean;
+  clearCreatedAt(): ChallengeRuleInfo;
+
+  getUpdatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setUpdatedAt(value?: google_protobuf_timestamp_pb.Timestamp): ChallengeRuleInfo;
+  hasUpdatedAt(): boolean;
+  clearUpdatedAt(): ChallengeRuleInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ChallengeRuleInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: ChallengeRuleInfo): ChallengeRuleInfo.AsObject;
+  static serializeBinaryToWriter(message: ChallengeRuleInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ChallengeRuleInfo;
+  static deserializeBinaryFromReader(message: ChallengeRuleInfo, reader: jspb.BinaryReader): ChallengeRuleInfo;
+}
+
+export namespace ChallengeRuleInfo {
+  export type AsObject = {
+    id: number,
+    goal: number,
+    rule: Rule,
+    createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
   }
 }
 
@@ -667,6 +1067,12 @@ export enum Rule {
   RULE_TOTAL_DISTANCE = 1,
   RULE_TOTAL_TIME = 2,
   RULE_TOTAL_CALORIES = 3,
+}
+export enum RuleStatus { 
+  RULE_STATUS_UNSPECIFIED = 0,
+  RULE_STATUS_FAILED = 1,
+  RULE_STATUS_COMPLETED = 2,
+  RULE_STATUS_INPROGRESS = 3,
 }
 export enum ActivityType { 
   ACTIVITY_TYPE_UNSPECIFIED = 0,

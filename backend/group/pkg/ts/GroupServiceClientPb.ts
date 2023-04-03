@@ -465,5 +465,263 @@ export class GroupClient {
     this.methodDescriptorLeaveGroup);
   }
 
+  methodDescriptorCreateChallenge = new grpcWeb.MethodDescriptor(
+    '/group.Group/CreateChallenge',
+    grpcWeb.MethodType.UNARY,
+    group_pb.CreateChallengeRequest,
+    group_pb.CreateChallengeReply,
+    (request: group_pb.CreateChallengeRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.CreateChallengeReply.deserializeBinary
+  );
+
+  createChallenge(
+    request: group_pb.CreateChallengeRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.CreateChallengeReply>;
+
+  createChallenge(
+    request: group_pb.CreateChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.CreateChallengeReply) => void): grpcWeb.ClientReadableStream<group_pb.CreateChallengeReply>;
+
+  createChallenge(
+    request: group_pb.CreateChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.CreateChallengeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/CreateChallenge',
+        request,
+        metadata || {},
+        this.methodDescriptorCreateChallenge,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/CreateChallenge',
+    request,
+    metadata || {},
+    this.methodDescriptorCreateChallenge);
+  }
+
+  methodDescriptorListChallenge = new grpcWeb.MethodDescriptor(
+    '/group.Group/ListChallenge',
+    grpcWeb.MethodType.UNARY,
+    group_pb.ListChallengeRequest,
+    group_pb.ListChallengeReply,
+    (request: group_pb.ListChallengeRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.ListChallengeReply.deserializeBinary
+  );
+
+  listChallenge(
+    request: group_pb.ListChallengeRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.ListChallengeReply>;
+
+  listChallenge(
+    request: group_pb.ListChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.ListChallengeReply) => void): grpcWeb.ClientReadableStream<group_pb.ListChallengeReply>;
+
+  listChallenge(
+    request: group_pb.ListChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.ListChallengeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/ListChallenge',
+        request,
+        metadata || {},
+        this.methodDescriptorListChallenge,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/ListChallenge',
+    request,
+    metadata || {},
+    this.methodDescriptorListChallenge);
+  }
+
+  methodDescriptorUpdateChallenge = new grpcWeb.MethodDescriptor(
+    '/group.Group/UpdateChallenge',
+    grpcWeb.MethodType.UNARY,
+    group_pb.UpdateChallengeRequest,
+    group_pb.UpdateChallengeReply,
+    (request: group_pb.UpdateChallengeRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.UpdateChallengeReply.deserializeBinary
+  );
+
+  updateChallenge(
+    request: group_pb.UpdateChallengeRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.UpdateChallengeReply>;
+
+  updateChallenge(
+    request: group_pb.UpdateChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.UpdateChallengeReply) => void): grpcWeb.ClientReadableStream<group_pb.UpdateChallengeReply>;
+
+  updateChallenge(
+    request: group_pb.UpdateChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.UpdateChallengeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/UpdateChallenge',
+        request,
+        metadata || {},
+        this.methodDescriptorUpdateChallenge,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/UpdateChallenge',
+    request,
+    metadata || {},
+    this.methodDescriptorUpdateChallenge);
+  }
+
+  methodDescriptorDeleteChallenge = new grpcWeb.MethodDescriptor(
+    '/group.Group/DeleteChallenge',
+    grpcWeb.MethodType.UNARY,
+    group_pb.DeleteChallengeRequest,
+    group_pb.DeleteChallengeReply,
+    (request: group_pb.DeleteChallengeRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.DeleteChallengeReply.deserializeBinary
+  );
+
+  deleteChallenge(
+    request: group_pb.DeleteChallengeRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.DeleteChallengeReply>;
+
+  deleteChallenge(
+    request: group_pb.DeleteChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.DeleteChallengeReply) => void): grpcWeb.ClientReadableStream<group_pb.DeleteChallengeReply>;
+
+  deleteChallenge(
+    request: group_pb.DeleteChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.DeleteChallengeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/DeleteChallenge',
+        request,
+        metadata || {},
+        this.methodDescriptorDeleteChallenge,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/DeleteChallenge',
+    request,
+    metadata || {},
+    this.methodDescriptorDeleteChallenge);
+  }
+
+  methodDescriptorListUserRanking = new grpcWeb.MethodDescriptor(
+    '/group.Group/ListUserRanking',
+    grpcWeb.MethodType.UNARY,
+    group_pb.ListUserRankingRequest,
+    group_pb.ListUserRankingReply,
+    (request: group_pb.ListUserRankingRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.ListUserRankingReply.deserializeBinary
+  );
+
+  listUserRanking(
+    request: group_pb.ListUserRankingRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.ListUserRankingReply>;
+
+  listUserRanking(
+    request: group_pb.ListUserRankingRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.ListUserRankingReply) => void): grpcWeb.ClientReadableStream<group_pb.ListUserRankingReply>;
+
+  listUserRanking(
+    request: group_pb.ListUserRankingRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.ListUserRankingReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/ListUserRanking',
+        request,
+        metadata || {},
+        this.methodDescriptorListUserRanking,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/ListUserRanking',
+    request,
+    metadata || {},
+    this.methodDescriptorListUserRanking);
+  }
+
+  methodDescriptorGetChallenge = new grpcWeb.MethodDescriptor(
+    '/group.Group/GetChallenge',
+    grpcWeb.MethodType.UNARY,
+    group_pb.GetChallengeRequest,
+    group_pb.GetChallengeReply,
+    (request: group_pb.GetChallengeRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.GetChallengeReply.deserializeBinary
+  );
+
+  getChallenge(
+    request: group_pb.GetChallengeRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.GetChallengeReply>;
+
+  getChallenge(
+    request: group_pb.GetChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.GetChallengeReply) => void): grpcWeb.ClientReadableStream<group_pb.GetChallengeReply>;
+
+  getChallenge(
+    request: group_pb.GetChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.GetChallengeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/GetChallenge',
+        request,
+        metadata || {},
+        this.methodDescriptorGetChallenge,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/GetChallenge',
+    request,
+    metadata || {},
+    this.methodDescriptorGetChallenge);
+  }
+
 }
 

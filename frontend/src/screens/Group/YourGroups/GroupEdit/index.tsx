@@ -24,10 +24,10 @@ export default function GroupEdit({
   const dispatch = useAppDispatch()
 
   const [groupInfo, setGroupInfo] = useState<GroupInfo.AsObject>({
-    id: route.params.groupInfo.id,
-    name: route.params.groupInfo.name,
-    description: route.params.groupInfo.description,
-    backgroundPicture: route.params.groupInfo.backgroundPicture,
+    id: route.params.groupInfo?.id || 0,
+    name: route.params.groupInfo?.name || "",
+    description: route.params.groupInfo?.description || "",
+    backgroundPicture: route.params.groupInfo?.backgroundPicture || "",
     leaderId: 0,
     memberStatus: 0,
     numOfMembers: 0,

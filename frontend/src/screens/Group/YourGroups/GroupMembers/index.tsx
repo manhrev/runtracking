@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { RefreshControl } from 'react-native-gesture-handler'
-import { Button, Divider, Searchbar, Text } from 'react-native-paper'
+import { ActivityIndicator, Button, Divider, Searchbar, Text } from 'react-native-paper'
 import { useDialog } from '../../../../hooks/useDialog'
 import {
   Member,
@@ -126,7 +126,7 @@ export default function GroupMembers({
               No data
             </Text>
           )}
-          {memberList.map((member: Member.AsObject, idx) => {
+          {!memberListLoading && memberList.map((member: Member.AsObject, idx) => {
             return (
               <MemberItem
                 key={idx}
@@ -138,6 +138,16 @@ export default function GroupMembers({
               />
             )
           })}
+
+          {memberListLoading &&
+            <ActivityIndicator
+                animating={true}
+                size='small'
+                style={{
+                    paddingVertical: 30,
+                }}
+            />
+          }
         </ScrollView>
       </View>
     </View>
