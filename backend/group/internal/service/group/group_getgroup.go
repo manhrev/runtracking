@@ -18,11 +18,17 @@ func (m *groupImpl) Get(ctx context.Context, userId int64, request *grouppb.GetG
 
 	groupInfo := transformer.TransformGroupEntToGroupInfo(groupEnt)
 
-	memberEnt, err := m.entClient.Member.Query().
+	memberEntList, err := m.entClient.Member.Query().
 		Where(member.UserIDEQ(userId), member.HasGroupzWith(groupz.IDEQ(groupEnt.ID))).
-		First(ctx)
+		All(ctx)
 
-	groupInfo.MemberStatus = grouppb.Member_Status(memberEnt.Status)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(memberEntList) == 1 {
+		groupInfo.MemberStatus = grouppb.Member_Status(memberEntList[0].Status)
+	}
 
 	return groupInfo, nil
 }
