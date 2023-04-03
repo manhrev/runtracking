@@ -41,11 +41,12 @@ static_resources:
                             timeout: 0s
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
-
+                            auto_host_rewrite: true
                           typed_per_filter_config:
                             envoy.filters.http.ext_authz:
                               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                               disabled: true
+
                         - match:
                             prefix: /auth.Auth/SignUp
                           route:
@@ -53,6 +54,7 @@ static_resources:
                             timeout: 0s
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
+                            auto_host_rewrite: true
                           typed_per_filter_config:
                             envoy.filters.http.ext_authz:
                               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
@@ -65,6 +67,7 @@ static_resources:
                             timeout: 0s
                             max_stream_duration:
                               grpc_timeout_header_max: 0s
+                            auto_host_rewrite: true
 
                         - match:
                             prefix: /group.Group
@@ -124,6 +127,7 @@ static_resources:
                       grpc_service:
                         envoy_grpc:
                           cluster_name: auth_cluster
+                          authority: auth-jzg35jprna-as.a.run.app
                         timeout: 5s
                       transport_api_version: V3
                       failure_mode_allow: false
@@ -147,7 +151,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: 35.213.159.197
+                      address: auth-jzg35jprna-as.a.run.app
                       port_value: 443
 
     - name: group_cluster
