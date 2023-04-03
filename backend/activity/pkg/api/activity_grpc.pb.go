@@ -22,11 +22,13 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ActivityClient interface {
+	// for each user
 	CreateActivityInfo(ctx context.Context, in *CreateActivityInfoRequest, opts ...grpc.CallOption) (*CreateActivityInfoReply, error)
 	ListActivityInfo(ctx context.Context, in *ListActivityInfoRequest, opts ...grpc.CallOption) (*ListActivityInfoReply, error)
 	DeleteActivityInfo(ctx context.Context, in *DeleteActivityInfoRequest, opts ...grpc.CallOption) (*DeleteActivityInfoReply, error)
 	GetActivityStatistic(ctx context.Context, in *GetActivityStatisticRequest, opts ...grpc.CallOption) (*GetActivityStatisticReply, error)
 	CommitActivity(ctx context.Context, in *CommitActivityRequest, opts ...grpc.CallOption) (*CommitActivityReply, error)
+	GetUsersAchievement(ctx context.Context, in *GetUsersAchievementRequest, opts ...grpc.CallOption) (*GetUsersAchievementReply, error)
 }
 
 type activityClient struct {
@@ -82,15 +84,26 @@ func (c *activityClient) CommitActivity(ctx context.Context, in *CommitActivityR
 	return out, nil
 }
 
+func (c *activityClient) GetUsersAchievement(ctx context.Context, in *GetUsersAchievementRequest, opts ...grpc.CallOption) (*GetUsersAchievementReply, error) {
+	out := new(GetUsersAchievementReply)
+	err := c.cc.Invoke(ctx, "/activity.Activity/GetUsersAchievement", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ActivityServer is the server API for Activity service.
 // All implementations must embed UnimplementedActivityServer
 // for forward compatibility
 type ActivityServer interface {
+	// for each user
 	CreateActivityInfo(context.Context, *CreateActivityInfoRequest) (*CreateActivityInfoReply, error)
 	ListActivityInfo(context.Context, *ListActivityInfoRequest) (*ListActivityInfoReply, error)
 	DeleteActivityInfo(context.Context, *DeleteActivityInfoRequest) (*DeleteActivityInfoReply, error)
 	GetActivityStatistic(context.Context, *GetActivityStatisticRequest) (*GetActivityStatisticReply, error)
 	CommitActivity(context.Context, *CommitActivityRequest) (*CommitActivityReply, error)
+	GetUsersAchievement(context.Context, *GetUsersAchievementRequest) (*GetUsersAchievementReply, error)
 	mustEmbedUnimplementedActivityServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedActivityServer) GetActivityStatistic(context.Context, *GetAct
 }
 func (UnimplementedActivityServer) CommitActivity(context.Context, *CommitActivityRequest) (*CommitActivityReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CommitActivity not implemented")
+}
+func (UnimplementedActivityServer) GetUsersAchievement(context.Context, *GetUsersAchievementRequest) (*GetUsersAchievementReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsersAchievement not implemented")
 }
 func (UnimplementedActivityServer) mustEmbedUnimplementedActivityServer() {}
 
@@ -216,6 +232,24 @@ func _Activity_CommitActivity_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Activity_GetUsersAchievement_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUsersAchievementRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActivityServer).GetUsersAchievement(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/activity.Activity/GetUsersAchievement",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActivityServer).GetUsersAchievement(ctx, req.(*GetUsersAchievementRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Activity_ServiceDesc is the grpc.ServiceDesc for Activity service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +276,10 @@ var Activity_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CommitActivity",
 			Handler:    _Activity_CommitActivity_Handler,
+		},
+		{
+			MethodName: "GetUsersAchievement",
+			Handler:    _Activity_GetUsersAchievement_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

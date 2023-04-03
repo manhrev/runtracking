@@ -26,6 +26,7 @@ type AuthIClient interface {
 	GetAllUsers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllUsersReply, error)
 	GetUsersByIds(ctx context.Context, in *GetByIdsRequest, opts ...grpc.CallOption) (*GetAllUsersReply, error)
 	ListUser(ctx context.Context, in *ListUserRequest, opts ...grpc.CallOption) (*ListUserReply, error)
+	GetUserById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetUserReply, error)
 }
 
 type authIClient struct {
@@ -63,6 +64,15 @@ func (c *authIClient) ListUser(ctx context.Context, in *ListUserRequest, opts ..
 	return out, nil
 }
 
+func (c *authIClient) GetUserById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetUserReply, error) {
+	out := new(GetUserReply)
+	err := c.cc.Invoke(ctx, "/auth.AuthI/GetUserById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthIServer is the server API for AuthI service.
 // All implementations must embed UnimplementedAuthIServer
 // for forward compatibility
@@ -70,6 +80,7 @@ type AuthIServer interface {
 	GetAllUsers(context.Context, *emptypb.Empty) (*GetAllUsersReply, error)
 	GetUsersByIds(context.Context, *GetByIdsRequest) (*GetAllUsersReply, error)
 	ListUser(context.Context, *ListUserRequest) (*ListUserReply, error)
+	GetUserById(context.Context, *GetByIdRequest) (*GetUserReply, error)
 	mustEmbedUnimplementedAuthIServer()
 }
 
@@ -85,6 +96,9 @@ func (UnimplementedAuthIServer) GetUsersByIds(context.Context, *GetByIdsRequest)
 }
 func (UnimplementedAuthIServer) ListUser(context.Context, *ListUserRequest) (*ListUserReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListUser not implemented")
+}
+func (UnimplementedAuthIServer) GetUserById(context.Context, *GetByIdRequest) (*GetUserReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
 }
 func (UnimplementedAuthIServer) mustEmbedUnimplementedAuthIServer() {}
 
@@ -153,6 +167,24 @@ func _AuthI_ListUser_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthI_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthIServer).GetUserById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthI/GetUserById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthIServer).GetUserById(ctx, req.(*GetByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthI_ServiceDesc is the grpc.ServiceDesc for AuthI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -171,6 +203,10 @@ var AuthI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListUser",
 			Handler:    _AuthI_ListUser_Handler,
+		},
+		{
+			MethodName: "GetUserById",
+			Handler:    _AuthI_GetUserById_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

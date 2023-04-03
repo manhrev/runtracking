@@ -7,6 +7,7 @@ import (
 	"github.com/manhrev/runtracking/backend/group/internal/service/group"
 	"github.com/manhrev/runtracking/backend/group/internal/service/member"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 )
 
 type Service struct {
@@ -17,8 +18,8 @@ type Service struct {
 	Challenge  challenge.Challenge
 }
 
-func New(entClient *ent.Client, authClient auth.AuthIClient) *Service {
-	repo := repository.New(entClient)
+func New(entClient *ent.Client, authClient auth.AuthIClient, notificationClient notification.NotificationIClient) *Service {
+	repo := repository.New(entClient, notificationClient)
 
 	return &Service{
 		repository: repo,

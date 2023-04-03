@@ -73,20 +73,6 @@ func (cu *ChallengeUpdate) SetStartTime(t time.Time) *ChallengeUpdate {
 	return cu
 }
 
-// SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (cu *ChallengeUpdate) SetNillableStartTime(t *time.Time) *ChallengeUpdate {
-	if t != nil {
-		cu.SetStartTime(*t)
-	}
-	return cu
-}
-
-// ClearStartTime clears the value of the "start_time" field.
-func (cu *ChallengeUpdate) ClearStartTime() *ChallengeUpdate {
-	cu.mutation.ClearStartTime()
-	return cu
-}
-
 // SetPicture sets the "picture" field.
 func (cu *ChallengeUpdate) SetPicture(s string) *ChallengeUpdate {
 	cu.mutation.SetPicture(s)
@@ -104,20 +90,6 @@ func (cu *ChallengeUpdate) SetNillablePicture(s *string) *ChallengeUpdate {
 // SetEndTime sets the "end_time" field.
 func (cu *ChallengeUpdate) SetEndTime(t time.Time) *ChallengeUpdate {
 	cu.mutation.SetEndTime(t)
-	return cu
-}
-
-// SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (cu *ChallengeUpdate) SetNillableEndTime(t *time.Time) *ChallengeUpdate {
-	if t != nil {
-		cu.SetEndTime(*t)
-	}
-	return cu
-}
-
-// ClearEndTime clears the value of the "end_time" field.
-func (cu *ChallengeUpdate) ClearEndTime() *ChallengeUpdate {
-	cu.mutation.ClearEndTime()
 	return cu
 }
 
@@ -172,6 +144,26 @@ func (cu *ChallengeUpdate) SetNillableStatus(i *int64) *ChallengeUpdate {
 // AddStatus adds i to the "status" field.
 func (cu *ChallengeUpdate) AddStatus(i int64) *ChallengeUpdate {
 	cu.mutation.AddStatus(i)
+	return cu
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cu *ChallengeUpdate) SetTimeCompleted(t time.Time) *ChallengeUpdate {
+	cu.mutation.SetTimeCompleted(t)
+	return cu
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cu *ChallengeUpdate) SetNillableTimeCompleted(t *time.Time) *ChallengeUpdate {
+	if t != nil {
+		cu.SetTimeCompleted(*t)
+	}
+	return cu
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (cu *ChallengeUpdate) ClearTimeCompleted() *ChallengeUpdate {
+	cu.mutation.ClearTimeCompleted()
 	return cu
 }
 
@@ -385,17 +377,11 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.StartTime(); ok {
 		_spec.SetField(challenge.FieldStartTime, field.TypeTime, value)
 	}
-	if cu.mutation.StartTimeCleared() {
-		_spec.ClearField(challenge.FieldStartTime, field.TypeTime)
-	}
 	if value, ok := cu.mutation.Picture(); ok {
 		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)
-	}
-	if cu.mutation.EndTimeCleared() {
-		_spec.ClearField(challenge.FieldEndTime, field.TypeTime)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(challenge.FieldDescription, field.TypeString, value)
@@ -414,6 +400,12 @@ func (cu *ChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.AddedStatus(); ok {
 		_spec.AddField(challenge.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cu.mutation.TimeCompleted(); ok {
+		_spec.SetField(challenge.FieldTimeCompleted, field.TypeTime, value)
+	}
+	if cu.mutation.TimeCompletedCleared() {
+		_spec.ClearField(challenge.FieldTimeCompleted, field.TypeTime)
 	}
 	if cu.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -655,20 +647,6 @@ func (cuo *ChallengeUpdateOne) SetStartTime(t time.Time) *ChallengeUpdateOne {
 	return cuo
 }
 
-// SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (cuo *ChallengeUpdateOne) SetNillableStartTime(t *time.Time) *ChallengeUpdateOne {
-	if t != nil {
-		cuo.SetStartTime(*t)
-	}
-	return cuo
-}
-
-// ClearStartTime clears the value of the "start_time" field.
-func (cuo *ChallengeUpdateOne) ClearStartTime() *ChallengeUpdateOne {
-	cuo.mutation.ClearStartTime()
-	return cuo
-}
-
 // SetPicture sets the "picture" field.
 func (cuo *ChallengeUpdateOne) SetPicture(s string) *ChallengeUpdateOne {
 	cuo.mutation.SetPicture(s)
@@ -686,20 +664,6 @@ func (cuo *ChallengeUpdateOne) SetNillablePicture(s *string) *ChallengeUpdateOne
 // SetEndTime sets the "end_time" field.
 func (cuo *ChallengeUpdateOne) SetEndTime(t time.Time) *ChallengeUpdateOne {
 	cuo.mutation.SetEndTime(t)
-	return cuo
-}
-
-// SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (cuo *ChallengeUpdateOne) SetNillableEndTime(t *time.Time) *ChallengeUpdateOne {
-	if t != nil {
-		cuo.SetEndTime(*t)
-	}
-	return cuo
-}
-
-// ClearEndTime clears the value of the "end_time" field.
-func (cuo *ChallengeUpdateOne) ClearEndTime() *ChallengeUpdateOne {
-	cuo.mutation.ClearEndTime()
 	return cuo
 }
 
@@ -754,6 +718,26 @@ func (cuo *ChallengeUpdateOne) SetNillableStatus(i *int64) *ChallengeUpdateOne {
 // AddStatus adds i to the "status" field.
 func (cuo *ChallengeUpdateOne) AddStatus(i int64) *ChallengeUpdateOne {
 	cuo.mutation.AddStatus(i)
+	return cuo
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (cuo *ChallengeUpdateOne) SetTimeCompleted(t time.Time) *ChallengeUpdateOne {
+	cuo.mutation.SetTimeCompleted(t)
+	return cuo
+}
+
+// SetNillableTimeCompleted sets the "time_completed" field if the given value is not nil.
+func (cuo *ChallengeUpdateOne) SetNillableTimeCompleted(t *time.Time) *ChallengeUpdateOne {
+	if t != nil {
+		cuo.SetTimeCompleted(*t)
+	}
+	return cuo
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (cuo *ChallengeUpdateOne) ClearTimeCompleted() *ChallengeUpdateOne {
+	cuo.mutation.ClearTimeCompleted()
 	return cuo
 }
 
@@ -991,17 +975,11 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	if value, ok := cuo.mutation.StartTime(); ok {
 		_spec.SetField(challenge.FieldStartTime, field.TypeTime, value)
 	}
-	if cuo.mutation.StartTimeCleared() {
-		_spec.ClearField(challenge.FieldStartTime, field.TypeTime)
-	}
 	if value, ok := cuo.mutation.Picture(); ok {
 		_spec.SetField(challenge.FieldPicture, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.EndTime(); ok {
 		_spec.SetField(challenge.FieldEndTime, field.TypeTime, value)
-	}
-	if cuo.mutation.EndTimeCleared() {
-		_spec.ClearField(challenge.FieldEndTime, field.TypeTime)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(challenge.FieldDescription, field.TypeString, value)
@@ -1020,6 +998,12 @@ func (cuo *ChallengeUpdateOne) sqlSave(ctx context.Context) (_node *Challenge, e
 	}
 	if value, ok := cuo.mutation.AddedStatus(); ok {
 		_spec.AddField(challenge.FieldStatus, field.TypeInt64, value)
+	}
+	if value, ok := cuo.mutation.TimeCompleted(); ok {
+		_spec.SetField(challenge.FieldTimeCompleted, field.TypeTime, value)
+	}
+	if cuo.mutation.TimeCompletedCleared() {
+		_spec.ClearField(challenge.FieldTimeCompleted, field.TypeTime)
 	}
 	if cuo.mutation.ChallengeMembersCleared() {
 		edge := &sqlgraph.EdgeSpec{

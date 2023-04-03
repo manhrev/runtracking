@@ -4,6 +4,7 @@ import (
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TransformChallengeEntToChallengeInfo(challengeEnt *ent.Challenge, userInfoMap map[int64]*auth.UserInfo) *group.ChallengeInfo {
@@ -15,6 +16,8 @@ func TransformChallengeEntToChallengeInfo(challengeEnt *ent.Challenge, userInfoM
 		Picture:     challengeEnt.Picture,
 		Type:        group.ActivityType(challengeEnt.TypeID),
 		Status:      group.RuleStatus(challengeEnt.Status),
+		From:        timestamppb.New(challengeEnt.StartTime),
+		To:          timestamppb.New(challengeEnt.EndTime),
 	}
 
 	if challengeEnt.Edges.ChallengeRules != nil {

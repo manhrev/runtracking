@@ -5,7 +5,7 @@ generate-proto:
 		--go_opt=paths=source_relative \
 		--go-grpc_out=./pkg \
 		--go-grpc_opt=paths=source_relative \
-		./api/group.proto
+		./api/group.proto ./api/groupi.proto
 
 generate-code:
 	mkdir -p ./pkg/code
