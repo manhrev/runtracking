@@ -104,6 +104,7 @@ export default function GroupEdit({
     }
     else {
       toast.success({ message: 'Group info updated!' })
+      route.params.reloadDetailFunc()
       navigation.goBack()
     }
   }

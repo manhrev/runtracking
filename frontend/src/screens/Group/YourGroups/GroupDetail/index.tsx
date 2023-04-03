@@ -170,7 +170,10 @@ export default function GroupDetail({
                 }}
                 icon="pencil"
                 size={30}
-                onPress={() => navigation.navigate('GroupEdit', { groupInfo: groupDetail.groupinfo? groupDetail.groupinfo : undefined})}
+                onPress={() => navigation.navigate('GroupEdit', {
+                    groupInfo: groupDetail.groupinfo? groupDetail.groupinfo : undefined,
+                    reloadDetailFunc: fetchGroupDetail,
+                })}
             />}
             <Image
                 style={styles(theme).profilePicture}
