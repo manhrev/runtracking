@@ -25,13 +25,12 @@ import { useAppSelector } from '../../redux/store'
 import { selectUserSlice } from '../../redux/features/user/slice'
 import { selectToggleSlice } from '../../redux/features/toggle/slice'
 
-const windowWidth = Dimensions.get('window').width
-
 export default function RunTracking({
   navigation,
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, 'RunTracking'>) {
   const theme = useAppTheme()
+  const [navEvent, setNavEvent] = useState<any>(undefined)
   const { weight } = useAppSelector(selectUserSlice)
   const { isNightMode } = useAppSelector(selectToggleSlice)
   const [isClosedBottomMenu, setIsClosedBottomMenu] = useState(false)
@@ -203,6 +202,21 @@ export default function RunTracking({
       )
     })()
   }, [])
+
+  useEffect(
+    () =>
+      navigation.addListener('beforeRemove', (e) => {
+        // Prevent default behavior of leaving the screen
+        if (!(userState == 'running' || userState == 'paused')) return
+        else {
+          if (goBackVisible) return
+          e.preventDefault()
+          setNavEvent(e.data.action)
+          showGoBackDialog()
+        }
+      }),
+    [navigation, userState]
+  )
 
   // center map to current location
   const mapRef = useRef<MapView>(null)
@@ -378,7 +392,20 @@ export default function RunTracking({
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => navigation.goBack()}> Yes </Button>
+            <Button
+              onPress={() => {
+                console.log(navEvent)
+                if (navEvent === undefined) {
+                  navigation.goBack()
+                } else {
+                  navigation.dispatch(navEvent)
+                  setNavEvent(undefined)
+                }
+              }}
+            >
+              {' '}
+              Yes{' '}
+            </Button>
             <Button onPress={hideGoBackDialog}> No </Button>
           </Dialog.Actions>
         </Dialog>
