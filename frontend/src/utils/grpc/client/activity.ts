@@ -11,6 +11,8 @@ import {
   GetActivityStatisticReply,
   CommitActivityRequest,
   CommitActivityReply,
+  GetUsersAchievementRequest,
+  GetUsersAchievementReply,
 } from '../../../lib/activity/activity_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -117,6 +119,16 @@ class rpcActivityClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<CommitActivityReply.AsObject>(
       'commitActivity',
+      req
+    )
+  }
+
+  async getUserAchievement(param: GetUsersAchievementRequest.AsObject) {
+    const req = new GetUsersAchievementRequest()
+    req.setUserIdsList(param.userIdsList)
+
+    return await this.gRPCClientRequest<GetUsersAchievementReply.AsObject>(
+      'getUsersAchievement',
       req
     )
   }

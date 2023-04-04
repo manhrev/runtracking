@@ -1,14 +1,5 @@
-import { autoBatchEnhancer } from '@reduxjs/toolkit'
-import { timeConversion } from 'geolib'
-import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import {
-  Button,
-  Divider,
-  IconButton,
-  SegmentedButtons,
-  Text,
-} from 'react-native-paper'
+import { IconButton, Text } from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../theme'
 
 export default function Monitor(props: any) {
@@ -18,14 +9,16 @@ export default function Monitor(props: any) {
     <View style={styles(theme).container}>
       <IconButton
         style={{
-          position: 'absolute',
-          top: 30,
           left: 0,
+          marginBottom: -30,
+          zIndex: 10,
         }}
         size={30}
         iconColor={theme.colors.tertiary}
         icon="close"
-        onPress={() => props.goBackFunc()}
+        onPress={() => {
+          props.showGoBackDialog()
+        }}
       />
       <View style={styles(theme).firstCtn}>
         <Text style={styles(theme).timer}>{props.displayTime}</Text>

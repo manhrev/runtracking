@@ -25,13 +25,12 @@ import { useAppSelector } from '../../redux/store'
 import { selectUserSlice } from '../../redux/features/user/slice'
 import { selectToggleSlice } from '../../redux/features/toggle/slice'
 
-const windowWidth = Dimensions.get('window').width
-
 export default function RunTracking({
   navigation,
   route,
 }: NativeStackScreenProps<RootHomeTabsParamList, 'RunTracking'>) {
   const theme = useAppTheme()
+  const [navEvent, setNavEvent] = useState<any>(undefined)
   const { weight } = useAppSelector(selectUserSlice)
   const { isNightMode } = useAppSelector(selectToggleSlice)
   const [isClosedBottomMenu, setIsClosedBottomMenu] = useState(false)
@@ -47,6 +46,10 @@ export default function RunTracking({
       },
     },
   ])
+  const [goBackVisible, setGoBackVisible] = useState(false)
+  const hideGoBackDialog = () => {
+    setGoBackVisible(false)
+  }
 
   const [hasUnsavedData, setHasUnsavedData] = useState(false)
 
@@ -65,7 +68,9 @@ export default function RunTracking({
   const [focusMode, setFocusMode] = useState(false)
 
   // some info
-  const [activityType, setActivityType] = useState(ActivityType.ACTIVITY_TYPE_RUNNING)
+  const [activityType, setActivityType] = useState(
+    ActivityType.ACTIVITY_TYPE_RUNNING
+  )
   const [totalDistance, setTotalDistance] = useState(0)
   const [totalTime, setTotalTime] = useState(0) // seconds
   const [userState, setUserState] = useState('ready') // ready, running, paused, stopped
@@ -88,6 +93,15 @@ export default function RunTracking({
 
   const showDialog = () => {
     setVisible(true)
+  }
+
+  const showGoBackDialog = () => {
+    if (userState == 'running' || userState == 'paused') {
+      setUserState('paused')
+      setGoBackVisible(true)
+    } else {
+      navigation.goBack()
+    }
   }
 
   const hideDialog = () => {
@@ -190,6 +204,21 @@ export default function RunTracking({
     })()
   }, [])
 
+  useEffect(
+    () =>
+      navigation.addListener('beforeRemove', (e) => {
+        // Prevent default behavior of leaving the screen
+        if (!(userState == 'running' || userState == 'paused')) return
+        else {
+          if (goBackVisible) return
+          e.preventDefault()
+          setNavEvent(e.data.action)
+          showGoBackDialog()
+        }
+      }),
+    [navigation, userState]
+  )
+
   // center map to current location
   const mapRef = useRef<MapView>(null)
 
@@ -252,7 +281,7 @@ export default function RunTracking({
       },
       savingInfo: {
         duration: totalTime,
-        kcal: 0,
+        kcal: kcalBurned,
         totalDistance: totalDistance,
         routeList: coordinates,
         startTime: {
@@ -335,35 +364,12 @@ export default function RunTracking({
   const switchActivityType = () => {
     if (activityType == ActivityType.ACTIVITY_TYPE_RUNNING) {
       setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)
-    } else if(activityType == ActivityType.ACTIVITY_TYPE_WALKING) {
+    } else if (activityType == ActivityType.ACTIVITY_TYPE_WALKING) {
       setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)
     } else {
       setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)
     }
   }
-
-  useEffect(() => {
-    // prevent go back
-    navigation.addListener('beforeRemove', (e) => {
-      if(!hasUnsavedData) return
-
-      e.preventDefault()
-      
-      Alert.alert(
-        'Alert',
-        'Are you sure you want to leave this screen?',
-        [
-          {
-            text: 'Leave',
-            style: 'destructive',
-            onPress: () => navigation.dispatch(e.data.action),
-          },
-          { text: "Stay", style: 'cancel', onPress: () => {} }
-        ]
-      );
-      
-    })
-  }, [navigation, hasUnsavedData])
 
   return (
     <View style={styles(theme).container}>
@@ -379,6 +385,33 @@ export default function RunTracking({
           </Dialog.Actions>
         </Dialog>
       </Portal>
+
+      <Portal>
+        <Dialog visible={goBackVisible} onDismiss={hideGoBackDialog}>
+          <Dialog.Title>Alert</Dialog.Title>
+          <Dialog.Content>
+            <Text>
+              Your activity will be deleted. Do you want to continue ?
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => {
+                if (navEvent === undefined) {
+                  navigation.goBack()
+                } else {
+                  navigation.dispatch(navEvent)
+                  setNavEvent(undefined)
+                }
+              }}
+            >
+              {' '}
+              Yes{' '}
+            </Button>
+            <Button onPress={hideGoBackDialog}> No </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
       <Monitor
         userState={
           userState == 'ready'
@@ -391,7 +424,7 @@ export default function RunTracking({
         displayDistance={(totalDistance / 1000).toFixed(2)}
         displayPace={formatForDisplay('pace', pace)}
         displayKcal={isNaN(kcalBurned) ? 0 : kcalBurned.toFixed(3)}
-        goBackFunc={() => navigation.goBack()}
+        showGoBackDialog={showGoBackDialog}
       />
       <Divider style={{ height: 1 }} />
       <MapView
@@ -437,42 +470,60 @@ export default function RunTracking({
         ))}
       </MapView>
 
-
       <Divider style={{ height: 1 }} />
-      {!isClosedBottomMenu && <View style={{
-        height: 100,
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection: 'row',
-      }}>
+      {!isClosedBottomMenu && (
+        <View
+          style={{
+            height: 100,
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
           <View
             style={{
               justifyContent: 'center',
               alignItems: 'flex-start',
               flex: 1,
-              marginLeft: 10
+              marginLeft: 10,
             }}
           >
-            <View style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
               <IconButton
-                icon={activityType == ActivityType.ACTIVITY_TYPE_RUNNING ? 'run-fast' : (activityType == ActivityType.ACTIVITY_TYPE_WALKING ? 'walk' : 'bike')}
+                icon={
+                  activityType == ActivityType.ACTIVITY_TYPE_RUNNING
+                    ? 'run-fast'
+                    : activityType == ActivityType.ACTIVITY_TYPE_WALKING
+                    ? 'walk'
+                    : 'bike'
+                }
                 iconColor={theme.colors.tertiary}
                 mode="outlined"
                 size={30}
                 onPress={() => switchActivityType()}
               />
-              <Text style={styles(theme).underText}>{activityType == ActivityType.ACTIVITY_TYPE_RUNNING ? 'Running' : (activityType == ActivityType.ACTIVITY_TYPE_WALKING ? 'Walking' : 'Cycling')}</Text>
+              <Text style={styles(theme).underText}>
+                {activityType == ActivityType.ACTIVITY_TYPE_RUNNING
+                  ? 'Running'
+                  : activityType == ActivityType.ACTIVITY_TYPE_WALKING
+                  ? 'Walking'
+                  : 'Cycling'}
+              </Text>
             </View>
           </View>
 
-          <View style={{
-            display: 'flex',
-            flexDirection: 'row',
-          }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+          >
             <IconButton // start button
               icon={
                 userState == 'ready' || userState == 'paused'
@@ -483,14 +534,14 @@ export default function RunTracking({
               iconColor={theme.colors.primary}
               onPress={() => startOrPause()}
             />
-            {userState == 'paused' &&
+            {userState == 'paused' && (
               <IconButton // paused button
                 icon="stop-circle"
                 size={75}
                 iconColor={theme.colors.error}
                 onPress={() => stopRun()}
               />
-            }
+            )}
           </View>
 
           <View
@@ -500,14 +551,16 @@ export default function RunTracking({
               flex: 1,
             }}
           >
-            <View style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              marginRight: 10
-            }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                marginRight: 10,
+              }}
+            >
               <IconButton
-                icon='chevron-double-down'
+                icon="chevron-double-down"
                 mode="outlined"
                 size={26}
                 iconColor={theme.colors.tertiary}
@@ -517,22 +570,25 @@ export default function RunTracking({
               <Text style={styles(theme).underText}>Hide</Text>
             </View>
           </View>
-      </View>}
-      
-      {isClosedBottomMenu && <IconButton // show bottom menu button
-        style={{
-          position: 'absolute',
-          bottom: 10,
-          right: 0,
-          margin: 10,
-        }}
-        icon='chevron-double-up'
-        mode="outlined"
-        size={26}
-        iconColor={theme.colors.tertiary}
-        containerColor="white"
-        onPress={() => setIsClosedBottomMenu(!isClosedBottomMenu)}
-      />}
+        </View>
+      )}
+
+      {isClosedBottomMenu && (
+        <IconButton // show bottom menu button
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 0,
+            margin: 10,
+          }}
+          icon="chevron-double-up"
+          mode="outlined"
+          size={26}
+          iconColor={theme.colors.tertiary}
+          containerColor="white"
+          onPress={() => setIsClosedBottomMenu(!isClosedBottomMenu)}
+        />
+      )}
 
       <IconButton // reset button
         style={styles(theme).resetBtn}

@@ -1,10 +1,12 @@
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import Activity from '../screens/Activity/ActivityHome'
 import ProfileHome from '../screens/Profile/ProfileHome/index'
 import RunHome from '../screens/Run/RunHome'
 import { RootBaseStackParamList } from './BaseStack'
 import PlanHome from '../screens/Plan/PlanHome'
 import GroupTopTabs from './GroupTopTab'
+import { useAppTheme } from '../theme'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import TabBar from '../comp/TabBar'
 
 export type RootHomeTabsParamList = {
   ActivityHome: undefined
@@ -14,29 +16,22 @@ export type RootHomeTabsParamList = {
   PlanHome: undefined
 } & RootBaseStackParamList
 
-const Tab = createMaterialBottomTabNavigator<RootHomeTabsParamList>()
+const Tab = createBottomTabNavigator<RootHomeTabsParamList>()
 
 export default function HomeTabs() {
+  const theme = useAppTheme()
   return (
     <Tab.Navigator
       initialRouteName="GroupHome"
       backBehavior="initialRoute"
-      shifting
+      screenOptions={{ headerShown: false }}
+      tabBar={(props) => <TabBar {...props} theme={theme} />}
     >
-      <Tab.Screen
-        name="GroupHome"
-        component={GroupTopTabs}
-        options={{ tabBarIcon: 'account-group' }}
-      />
-      <Tab.Screen
-        name="ActivityHome"
-        component={Activity}
-        options={{ tabBarIcon: 'text-box-check' }}
-      />
+      <Tab.Screen name="GroupHome" component={GroupTopTabs} />
+      <Tab.Screen name="ActivityHome" component={Activity} />
       <Tab.Screen
         name="RunHome"
         component={RunHome}
-        options={{ tabBarIcon: 'run' }}
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault()
@@ -44,16 +39,8 @@ export default function HomeTabs() {
           },
         })}
       />
-      <Tab.Screen
-        name="PlanHome"
-        component={PlanHome}
-        options={{ tabBarIcon: 'file-document-edit' }}
-      />
-      <Tab.Screen
-        name="ProfileHome"
-        component={ProfileHome}
-        options={{ tabBarIcon: 'account' }}
-      />
+      <Tab.Screen name="PlanHome" component={PlanHome} />
+      <Tab.Screen name="ProfileHome" component={ProfileHome} />
     </Tab.Navigator>
   )
 }

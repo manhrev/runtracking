@@ -1,128 +1,84 @@
 import { StyleSheet, View } from 'react-native'
 import { Divider, Text } from 'react-native-paper'
+import { selectUserSlice } from '../../../redux/features/user/slice'
+import { useAppSelector } from '../../../redux/store'
 import { AppTheme, useAppTheme } from '../../../theme'
+import { mToKm } from '../../../utils/helpers'
+import { getActivitySubjectWithActivityType } from '../../../utils/helpers/enumStr'
 import { baseStyles } from '../../baseStyle'
 
 export default function ProfileAchievement() {
   const theme = useAppTheme()
+  const { achievement } = useAppSelector(selectUserSlice)
+
   return (
     <View style={styles(theme).extendedBaseContainer}>
       <View style={baseStyles(theme).innerWrapper}>
-        <View style={styles(theme).achievementSection}>
-          <Text
-            variant="titleMedium"
-            style={{
-              fontWeight: 'bold',
-              color: theme.colors.primary,
-              marginVertical: 12,
-            }}
-          >
-            Beginer level runner
-          </Text>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-          >
-            <View style={styles(theme).achievementBoxLeft}>
+        {achievement.map(
+          ([acitivityType, { level, totalDistance, totalKcal }], idx) => (
+            <View style={styles(theme).achievementSection} key={idx}>
               <Text
-                variant="displayMedium"
-                style={{ fontStyle: 'italic', fontWeight: 'bold' }}
+                variant="titleMedium"
+                style={{
+                  fontWeight: 'bold',
+                  color: theme.colors.primary,
+                  marginVertical: 12,
+                }}
               >
-                0
+                {getLevelStr(level, acitivityType)}
               </Text>
-              <Text variant="bodyLarge">Total kilometers</Text>
-            </View>
-            <View style={styles(theme).achievementBoxRight}>
-              <Text
-                variant="displayMedium"
-                style={{ fontStyle: 'italic', fontWeight: 'bold' }}
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                }}
               >
-                0
-              </Text>
-              <Text variant="bodyLarge">Total calories burned</Text>
+                <View style={styles(theme).achievementBoxLeft}>
+                  <Text
+                    variant="displaySmall"
+                    style={{ fontStyle: 'italic', fontWeight: 'bold' }}
+                  >
+                    {mToKm(totalDistance)}
+                  </Text>
+                  <Text variant="bodyLarge">Total kilometers</Text>
+                </View>
+                <View style={styles(theme).achievementBoxRight}>
+                  <Text
+                    variant="displaySmall"
+                    style={{ fontStyle: 'italic', fontWeight: 'bold' }}
+                  >
+                    {Number(totalKcal.toFixed(3))}
+                  </Text>
+                  <Text variant="bodyLarge">Total kcal burned</Text>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-        {/* <Divider />
-        <View style={styles(theme).achievementSection}>
-          <Text
-            variant="titleMedium"
-            style={{
-              fontWeight: "bold",
-              color: theme.colors.primary,
-              marginVertical: 12,
-            }}
-          >
-            Platinum level cyclist
-          </Text>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <View style={styles(theme).achievementBoxLeft}>
-              <Text
-                variant="displayMedium"
-                style={{ fontStyle: "italic", fontWeight: "bold" }}
-              >
-                1034
-              </Text>
-              <Text variant="bodyLarge">Total kilometers</Text>
-            </View>
-            <View style={styles(theme).achievementBoxRight}>
-              <Text
-                variant="displayMedium"
-                style={{ fontStyle: "italic", fontWeight: "bold" }}
-              >
-                1920k
-              </Text>
-              <Text variant="bodyLarge">Total calories burned</Text>
-            </View>
-          </View>
-        </View>
-        <View style={styles(theme).achievementSection}>
-          <Text
-            variant="titleMedium"
-            style={{
-              fontWeight: "bold",
-              color: theme.colors.primary,
-              marginVertical: 12,
-            }}
-          >
-            Platinum level cyclist
-          </Text>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <View style={styles(theme).achievementBoxLeft}>
-              <Text
-                variant="displayMedium"
-                style={{ fontStyle: "italic", fontWeight: "bold" }}
-              >
-                1034
-              </Text>
-              <Text variant="bodyLarge">Total kilometers</Text>
-            </View>
-            <View style={styles(theme).achievementBoxRight}>
-              <Text
-                variant="displayMedium"
-                style={{ fontStyle: "italic", fontWeight: "bold" }}
-              >
-                1920k
-              </Text>
-              <Text variant="bodyLarge">Total calories burned</Text>
-            </View>
-          </View>
-        </View>*/}
+          )
+        )}
       </View>
     </View>
   )
+}
+
+function getLevelStr(level: number, acitivityType: number) {
+  switch (level) {
+    case 1:
+      return `Beginner level ${getActivitySubjectWithActivityType(
+        acitivityType
+      )}`
+    case 2:
+      return `Intermediate level ${getActivitySubjectWithActivityType(
+        acitivityType
+      )}`
+    case 3:
+      return `Advanced level ${getActivitySubjectWithActivityType(
+        acitivityType
+      )}`
+    default:
+      return `Beginner level ${getActivitySubjectWithActivityType(
+        acitivityType
+      )}`
+  }
 }
 
 const styles = (theme: AppTheme) =>

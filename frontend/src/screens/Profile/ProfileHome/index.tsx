@@ -22,7 +22,10 @@ import {
   isUserSliceLoading,
   selectUserSlice,
 } from '../../../redux/features/user/slice'
-import { getMeThunk } from '../../../redux/features/user/thunk'
+import {
+  getMeThunk,
+  getUserAchievementThunk,
+} from '../../../redux/features/user/thunk'
 import { useAppDispatch, useAppSelector } from '../../../redux/store'
 import { AppTheme, useAppTheme } from '../../../theme'
 import { baseStyles } from '../../baseStyle'
@@ -36,7 +39,7 @@ export default function ProfileHome({
 }: NativeStackScreenProps<RootHomeTabsParamList, 'ProfileHome'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-  const { displayName, profiePicture } = useAppSelector(selectUserSlice)
+  const { displayName, profiePicture, userId } = useAppSelector(selectUserSlice)
 
   const loading = useAppSelector(isUserSliceLoading)
   const [isInfoSelected, setIsInfoSelected] = useState(true)
@@ -52,12 +55,13 @@ export default function ProfileHome({
 
   const { closeModal, modalVisible, openModal } = useModal()
 
-  const getMe = () => {
-    dispatch(getMeThunk())
+  const fetchUserData = async () => {
+    await dispatch(getMeThunk())
+    dispatch(getUserAchievementThunk({ userIdsList: [userId] }))
   }
 
   useEffect(() => {
-    getMe()
+    fetchUserData()
   }, [])
 
   return (
@@ -73,7 +77,7 @@ export default function ProfileHome({
         showsVerticalScrollIndicator={false}
         style={{ marginTop: StatusBar.currentHeight }}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={getMe} />
+          <RefreshControl refreshing={loading} onRefresh={fetchUserData} />
         }
       >
         <TouchableRipple
