@@ -21,7 +21,7 @@ import { ActivityType, TrackPoint } from '../../lib/activity/activity_pb'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
 import { minimalStyle, minimalStyleDark } from '../../constants/mapstyles'
 import { kCaloriesBurned } from '../../utils/calories'
-import { useAppSelector } from '../../redux/store'
+import { useAppSelector } from '../../redux/store'sd
 import { selectUserSlice } from '../../redux/features/user/slice'
 import { selectToggleSlice } from '../../redux/features/toggle/slice'
 
