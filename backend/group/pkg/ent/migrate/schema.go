@@ -13,12 +13,13 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "start_time", Type: field.TypeTime, Nullable: true},
+		{Name: "start_time", Type: field.TypeTime},
 		{Name: "picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
-		{Name: "end_time", Type: field.TypeTime, Nullable: true},
+		{Name: "end_time", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "type_id", Type: field.TypeInt64},
 		{Name: "status", Type: field.TypeInt64, Default: 3},
+		{Name: "time_completed", Type: field.TypeTime, Nullable: true},
 		{Name: "groupz_challenges", Type: field.TypeInt64, Nullable: true},
 		{Name: "completed_first_member_id", Type: field.TypeInt64, Unique: true, Nullable: true},
 	}
@@ -30,13 +31,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "challenges_groupzs_challenges",
-				Columns:    []*schema.Column{ChallengesColumns[9]},
+				Columns:    []*schema.Column{ChallengesColumns[10]},
 				RefColumns: []*schema.Column{GroupzsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "challenges_members_challenge",
-				Columns:    []*schema.Column{ChallengesColumns[10]},
+				Columns:    []*schema.Column{ChallengesColumns[11]},
 				RefColumns: []*schema.Column{MembersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

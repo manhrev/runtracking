@@ -9,8 +9,6 @@ require (
 	google.golang.org/protobuf v1.28.1
 )
 
-require github.com/rogpeppe/go-internal v1.9.0 // indirect
-
 require (
 	ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect

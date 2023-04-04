@@ -34,6 +34,8 @@ type Challenge struct {
 	TypeID int64 `json:"type_id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status int64 `json:"status,omitempty"`
+	// TimeCompleted holds the value of the "time_completed" field.
+	TimeCompleted time.Time `json:"time_completed,omitempty"`
 	// CompletedFirstMemberID holds the value of the "completed_first_member_id" field.
 	CompletedFirstMemberID int64 `json:"completed_first_member_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -110,7 +112,7 @@ func (*Challenge) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case challenge.FieldName, challenge.FieldPicture, challenge.FieldDescription:
 			values[i] = new(sql.NullString)
-		case challenge.FieldCreatedAt, challenge.FieldStartTime, challenge.FieldEndTime:
+		case challenge.FieldCreatedAt, challenge.FieldStartTime, challenge.FieldEndTime, challenge.FieldTimeCompleted:
 			values[i] = new(sql.NullTime)
 		case challenge.ForeignKeys[0]: // groupz_challenges
 			values[i] = new(sql.NullInt64)
@@ -182,6 +184,12 @@ func (c *Challenge) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				c.Status = value.Int64
+			}
+		case challenge.FieldTimeCompleted:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field time_completed", values[i])
+			} else if value.Valid {
+				c.TimeCompleted = value.Time
 			}
 		case challenge.FieldCompletedFirstMemberID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -267,6 +275,9 @@ func (c *Challenge) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", c.Status))
+	builder.WriteString(", ")
+	builder.WriteString("time_completed=")
+	builder.WriteString(c.TimeCompleted.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("completed_first_member_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.CompletedFirstMemberID))

@@ -2,6 +2,7 @@ package challenge
 
 import (
 	"context"
+	"time"
 
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/internal/repository"
@@ -37,6 +38,17 @@ type Challenge interface {
 		ctx context.Context,
 		request *group.GetChallengeRequest,
 	) (*group.GetChallengeReply, error)
+
+	UpdateChallengeProgress(
+		ctx context.Context,
+		userId int64,
+		request *group.UpdateChallengeProgressRequest,
+	) (string, error)
+
+	CheckDailyProgress(
+		ctx context.Context,
+		timeCheck time.Time,
+	) (*group.CheckDailyProgressChallengeReply, error)
 }
 
 type challengeImpl struct {

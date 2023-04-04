@@ -5,6 +5,18 @@
 		},
 		{
 			"path": "backend/group"
+		},
+		{
+			"path": "backend/auth"
+		},
+		{
+			"path": "backend/plan"
+		},
+		{
+			"path": "backend/intermediary"
+		},
+		{
+			"path": "backend/notification"
 		}
 	],
 	"settings": {}

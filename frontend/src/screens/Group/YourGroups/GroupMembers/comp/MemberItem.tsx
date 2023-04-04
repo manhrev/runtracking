@@ -3,6 +3,7 @@ import {
   Avatar,
   Button,
   Divider,
+  IconButton,
   Text,
   TouchableRipple,
 } from 'react-native-paper'
@@ -38,7 +39,7 @@ export default function GroupItem({
             <Avatar.Icon
               size={55}
               icon="account-outline"
-              style={{ borderRadius: 10 }}
+              style={{ borderRadius: 50 }}
             />
             <View
               style={{
@@ -47,7 +48,7 @@ export default function GroupItem({
                 flex: 1,
               }}
             >
-              <View style={{ marginLeft: 12 }}>
+              <View style={{ marginLeft: 12, justifyContent: 'center' }}>
                 <Text variant="titleMedium" style={{ fontWeight: '700' }}>
                   {member.displayName}
                 </Text>
@@ -62,6 +63,13 @@ export default function GroupItem({
                   flex: 1,
                 }}
               >
+                {member.isAdmin && (
+                  <IconButton
+                    icon="account-star"
+                    iconColor={theme.colors.secondary}
+                    size={35}
+                  />
+                )}
                 {member.status === Member.Status.MEMBER_STATUS_WAITING && isLeader && (
                   <Button
                     mode="contained-tonal"

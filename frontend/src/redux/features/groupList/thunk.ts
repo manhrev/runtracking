@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { CreateGroupRequest, UpdateGroupRequest, DeleteGroupRequest, ListGroupRequest } from '../../../lib/group/group_pb'
+import { ListGroupRequest } from '../../../lib/group/group_pb'
 import { groupClient } from '../../../utils/grpc'
 
 export const listGroupExploreThunk = createAsyncThunk(

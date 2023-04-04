@@ -1,19 +1,17 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { View, Image, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native'
-import { Text, IconButton, Button, TextInput, Divider, List } from 'react-native-paper'
+import { Text, IconButton, Button, TextInput, Divider, List, ActivityIndicator } from 'react-native-paper'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
 import { useAppDispatch, useAppSelector } from '../../../../redux/store'
-import {
-    selectYourGroupList,
-} from '../../../../redux/features/yourGroupList/slice'
 
 import {
-    selectGroupList,
-} from '../../../../redux/features/groupList/slice'
+    selectGroupDetail,
+    isGroupDetailLoading,
+} from '../../../../redux/features/groupDetail/slice'
 
-import { Member, GroupInfo } from '../../../../lib/group/group_pb'
+import { Member, GetGroupReply } from '../../../../lib/group/group_pb'
 import { useEffect, useState } from 'react'
 import { FabGroup } from '../../../../comp/FabGroup'
 import { groupClient } from '../../../../utils/grpc'
@@ -21,6 +19,8 @@ import { toast } from '../../../../utils/toast/toast'
 
 import { useDialog } from '../../../../hooks/useDialog'
 import { ConfirmDialog } from '../../../../comp/ConfirmDialog'
+import { getGroupThunk } from '../../../../redux/features/groupDetail/thunk'
+import { RefreshControl } from 'react-native-gesture-handler'
 
 export default function GroupDetail({
   navigation,
@@ -58,18 +58,9 @@ export default function GroupDetail({
         },
     ]
 
-    const [selectedGroup, setSelectedGroup] = useState(({} as GroupInfo.AsObject))
-    const yourGroups = useAppSelector(selectYourGroupList).yourGroupList.find(group => group.id === route.params.groupId)
-    const exploreGroups = useAppSelector(selectGroupList).groupList.find(group => group.id === route.params.groupId)
-
-    useEffect(() => {
-        if(route.params.detailFrom == "YourGroups") {
-            setSelectedGroup(yourGroups as GroupInfo.AsObject)
-        }
-        else if(route.params.detailFrom == "Explore") {
-            setSelectedGroup(exploreGroups as GroupInfo.AsObject)
-        }
-    }, [yourGroups, exploreGroups])
+    const { groupDetail } = useAppSelector(selectGroupDetail)
+    const groupDetailLoading = useAppSelector(isGroupDetailLoading)
+    // const noData = groupDetail.length === 0 && !groupDetailLoading
 
     const handleAction = (action: string) => {
         setCurrentAction(action)
@@ -106,20 +97,39 @@ export default function GroupDetail({
             route.params.reloadListFunc()
         }
 
-        toggleDialog()
+        toggleDialog() // close dialog
+        fetchGroupDetail() // reload group detail
     }
 
+    const fetchGroupDetail = async () => {
+        await dispatch(getGroupThunk({ groupId: route.params.groupId })).unwrap()
+        console.log(groupDetail)
+    }
+
+    useEffect(() => {
+        fetchGroupDetail()
+    }, [])
 
   return (
     <View style={baseStyles(theme).container}>
-      {selectedGroup != undefined && <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
+      {!groupDetailLoading && <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={baseStyles(theme).innerWrapper}
+            refreshControl={
+                <RefreshControl
+                    refreshing={groupDetailLoading}
+                    onRefresh={fetchGroupDetail}
+                />
+            }
+        >
+        
         <ConfirmDialog
           toogleDialog={toggleDialog}
           visible={open}
           onSubmit={currentAction == "leave" ? leaveGroup : joinGroup}
           message={currentAction == "leave" ? "Are you sure you want to leave this group?" : "Are you sure you want to join this group?"}
         />
-        {selectedGroup.memberStatus == Member.Status.MEMBER_STATUS_ACTIVE && <FabGroup
+        {groupDetail.groupinfo?.memberStatus == Member.Status.MEMBER_STATUS_ACTIVE && <FabGroup
             actions={
                 [{
                     icon: 'exit-to-app',
@@ -135,7 +145,7 @@ export default function GroupDetail({
             icon="cog"
         />}
 
-        {selectedGroup.memberStatus == Member.Status.MEMBER_STATUS_UNSPECIFIED && <FabGroup
+        {groupDetail.groupinfo?.memberStatus == Member.Status.MEMBER_STATUS_UNSPECIFIED && <FabGroup
             actions={
                 [{
                     icon: 'plus',
@@ -152,7 +162,7 @@ export default function GroupDetail({
         />}
 
         <View style={styles(theme).imgContainer}>
-            {userState.userId == selectedGroup.leaderId && <IconButton
+            {userState.userId == groupDetail.groupinfo?.leaderId && <IconButton
                 style={{
                     position: 'absolute',
                     top: 0,
@@ -160,21 +170,24 @@ export default function GroupDetail({
                 }}
                 icon="pencil"
                 size={30}
-                onPress={() => navigation.navigate('GroupEdit', { groupInfo: selectedGroup })}
+                onPress={() => navigation.navigate('GroupEdit', {
+                    groupInfo: groupDetail.groupinfo? groupDetail.groupinfo : undefined,
+                    reloadDetailFunc: fetchGroupDetail,
+                })}
             />}
             <Image
                 style={styles(theme).profilePicture}
                 source={
-                    selectedGroup.backgroundPicture == "" ?
+                    groupDetail.groupinfo?.backgroundPicture == "" ?
                     require('../../../../../assets/group-img.png') :
-                    { uri: selectedGroup.backgroundPicture }
+                    { uri: groupDetail.groupinfo?.backgroundPicture }
                 }
             />
         </View>
 
-        <Text style={styles(theme).groupTitle}>{selectedGroup.name}</Text>
+        <Text style={styles(theme).groupTitle}>{groupDetail.groupinfo?.name}</Text>
 
-        {selectedGroup.memberStatus === Member.Status.MEMBER_STATUS_ACTIVE && (
+        {groupDetail.groupinfo?.memberStatus === Member.Status.MEMBER_STATUS_ACTIVE && (
             <Button
                 style={styles(theme).joinButton}
                 mode="contained"
@@ -186,7 +199,7 @@ export default function GroupDetail({
                 Joined &#10003;
             </Button>
         )}
-        {selectedGroup.memberStatus === Member.Status.MEMBER_STATUS_WAITING && (
+        {groupDetail.groupinfo?.memberStatus === Member.Status.MEMBER_STATUS_WAITING && (
             <Button
                 style={styles(theme).joinButton}
                 buttonColor="#e68a00"
@@ -199,7 +212,7 @@ export default function GroupDetail({
                 Requested
             </Button>
         )}
-        {selectedGroup.memberStatus === (Member.Status.MEMBER_STATUS_BANNED || Member.Status.MEMBER_STATUS_REJECTED) && (
+        {groupDetail.groupinfo?.memberStatus === (Member.Status.MEMBER_STATUS_BANNED || Member.Status.MEMBER_STATUS_REJECTED) && (
             <Button
                 style={styles(theme).joinButton}
                 buttonColor="#e82525"
@@ -209,11 +222,11 @@ export default function GroupDetail({
                     fontSize: 15
                 }}
             >
-                {selectedGroup.memberStatus === Member.Status.MEMBER_STATUS_BANNED ? 'Banned' : 'Rejected'}
+                {groupDetail.groupinfo?.memberStatus === Member.Status.MEMBER_STATUS_BANNED ? 'Banned' : 'Rejected'}
             </Button>
         )}
 
-        <Text style={styles(theme).desTitle}>{selectedGroup.description}</Text>
+        <Text style={styles(theme).desTitle}>{groupDetail.groupinfo?.description}</Text>
 
         <Divider bold style={{ width: '100%', marginTop: 20 }} />
         <Button
@@ -223,14 +236,14 @@ export default function GroupDetail({
             }}
             mode="text"
             onPress={() => navigation.navigate('GroupMembers', { 
-                groupId: selectedGroup.id || 0,
-                isLeader: userState.userId == selectedGroup.leaderId,
+                groupId: groupDetail.groupinfo?.id || 0,
+                isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
             })}
             labelStyle={{
                 fontSize: 15
             }}
         >
-            Members of group ({selectedGroup.numOfMembers})
+            Members of group ({groupDetail.groupinfo?.numOfMembers})
         </Button>
         
         <View style={{
@@ -392,6 +405,15 @@ export default function GroupDetail({
             keyExtractor={item => item.id.toString()}
         />
       </ScrollView>}
+      {groupDetailLoading &&
+        <ActivityIndicator
+            animating={true}
+            size='large'
+            style={{
+                paddingVertical: 120,
+            }}
+        />
+      }
     </View>
   )
 }

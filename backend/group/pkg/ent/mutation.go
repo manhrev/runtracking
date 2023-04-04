@@ -58,6 +58,7 @@ type ChallengeMutation struct {
 	addtype_id               *int64
 	status                   *int64
 	addstatus                *int64
+	time_completed           *time.Time
 	clearedFields            map[string]struct{}
 	challenge_members        map[int64]struct{}
 	removedchallenge_members map[int64]struct{}
@@ -294,22 +295,9 @@ func (m *ChallengeMutation) OldStartTime(ctx context.Context) (v time.Time, err 
 	return oldValue.StartTime, nil
 }
 
-// ClearStartTime clears the value of the "start_time" field.
-func (m *ChallengeMutation) ClearStartTime() {
-	m.start_time = nil
-	m.clearedFields[challenge.FieldStartTime] = struct{}{}
-}
-
-// StartTimeCleared returns if the "start_time" field was cleared in this mutation.
-func (m *ChallengeMutation) StartTimeCleared() bool {
-	_, ok := m.clearedFields[challenge.FieldStartTime]
-	return ok
-}
-
 // ResetStartTime resets all changes to the "start_time" field.
 func (m *ChallengeMutation) ResetStartTime() {
 	m.start_time = nil
-	delete(m.clearedFields, challenge.FieldStartTime)
 }
 
 // SetPicture sets the "picture" field.
@@ -379,22 +367,9 @@ func (m *ChallengeMutation) OldEndTime(ctx context.Context) (v time.Time, err er
 	return oldValue.EndTime, nil
 }
 
-// ClearEndTime clears the value of the "end_time" field.
-func (m *ChallengeMutation) ClearEndTime() {
-	m.end_time = nil
-	m.clearedFields[challenge.FieldEndTime] = struct{}{}
-}
-
-// EndTimeCleared returns if the "end_time" field was cleared in this mutation.
-func (m *ChallengeMutation) EndTimeCleared() bool {
-	_, ok := m.clearedFields[challenge.FieldEndTime]
-	return ok
-}
-
 // ResetEndTime resets all changes to the "end_time" field.
 func (m *ChallengeMutation) ResetEndTime() {
 	m.end_time = nil
-	delete(m.clearedFields, challenge.FieldEndTime)
 }
 
 // SetDescription sets the "description" field.
@@ -556,6 +531,55 @@ func (m *ChallengeMutation) AddedStatus() (r int64, exists bool) {
 func (m *ChallengeMutation) ResetStatus() {
 	m.status = nil
 	m.addstatus = nil
+}
+
+// SetTimeCompleted sets the "time_completed" field.
+func (m *ChallengeMutation) SetTimeCompleted(t time.Time) {
+	m.time_completed = &t
+}
+
+// TimeCompleted returns the value of the "time_completed" field in the mutation.
+func (m *ChallengeMutation) TimeCompleted() (r time.Time, exists bool) {
+	v := m.time_completed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimeCompleted returns the old "time_completed" field's value of the Challenge entity.
+// If the Challenge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChallengeMutation) OldTimeCompleted(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimeCompleted is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimeCompleted requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimeCompleted: %w", err)
+	}
+	return oldValue.TimeCompleted, nil
+}
+
+// ClearTimeCompleted clears the value of the "time_completed" field.
+func (m *ChallengeMutation) ClearTimeCompleted() {
+	m.time_completed = nil
+	m.clearedFields[challenge.FieldTimeCompleted] = struct{}{}
+}
+
+// TimeCompletedCleared returns if the "time_completed" field was cleared in this mutation.
+func (m *ChallengeMutation) TimeCompletedCleared() bool {
+	_, ok := m.clearedFields[challenge.FieldTimeCompleted]
+	return ok
+}
+
+// ResetTimeCompleted resets all changes to the "time_completed" field.
+func (m *ChallengeMutation) ResetTimeCompleted() {
+	m.time_completed = nil
+	delete(m.clearedFields, challenge.FieldTimeCompleted)
 }
 
 // SetCompletedFirstMemberID sets the "completed_first_member_id" field.
@@ -827,7 +851,7 @@ func (m *ChallengeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChallengeMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.name != nil {
 		fields = append(fields, challenge.FieldName)
 	}
@@ -851,6 +875,9 @@ func (m *ChallengeMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, challenge.FieldStatus)
+	}
+	if m.time_completed != nil {
+		fields = append(fields, challenge.FieldTimeCompleted)
 	}
 	if m.first_member != nil {
 		fields = append(fields, challenge.FieldCompletedFirstMemberID)
@@ -879,6 +906,8 @@ func (m *ChallengeMutation) Field(name string) (ent.Value, bool) {
 		return m.TypeID()
 	case challenge.FieldStatus:
 		return m.Status()
+	case challenge.FieldTimeCompleted:
+		return m.TimeCompleted()
 	case challenge.FieldCompletedFirstMemberID:
 		return m.CompletedFirstMemberID()
 	}
@@ -906,6 +935,8 @@ func (m *ChallengeMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldTypeID(ctx)
 	case challenge.FieldStatus:
 		return m.OldStatus(ctx)
+	case challenge.FieldTimeCompleted:
+		return m.OldTimeCompleted(ctx)
 	case challenge.FieldCompletedFirstMemberID:
 		return m.OldCompletedFirstMemberID(ctx)
 	}
@@ -972,6 +1003,13 @@ func (m *ChallengeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case challenge.FieldTimeCompleted:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimeCompleted(v)
 		return nil
 	case challenge.FieldCompletedFirstMemberID:
 		v, ok := value.(int64)
@@ -1040,14 +1078,11 @@ func (m *ChallengeMutation) ClearedFields() []string {
 	if m.FieldCleared(challenge.FieldName) {
 		fields = append(fields, challenge.FieldName)
 	}
-	if m.FieldCleared(challenge.FieldStartTime) {
-		fields = append(fields, challenge.FieldStartTime)
-	}
-	if m.FieldCleared(challenge.FieldEndTime) {
-		fields = append(fields, challenge.FieldEndTime)
-	}
 	if m.FieldCleared(challenge.FieldDescription) {
 		fields = append(fields, challenge.FieldDescription)
+	}
+	if m.FieldCleared(challenge.FieldTimeCompleted) {
+		fields = append(fields, challenge.FieldTimeCompleted)
 	}
 	if m.FieldCleared(challenge.FieldCompletedFirstMemberID) {
 		fields = append(fields, challenge.FieldCompletedFirstMemberID)
@@ -1069,14 +1104,11 @@ func (m *ChallengeMutation) ClearField(name string) error {
 	case challenge.FieldName:
 		m.ClearName()
 		return nil
-	case challenge.FieldStartTime:
-		m.ClearStartTime()
-		return nil
-	case challenge.FieldEndTime:
-		m.ClearEndTime()
-		return nil
 	case challenge.FieldDescription:
 		m.ClearDescription()
+		return nil
+	case challenge.FieldTimeCompleted:
+		m.ClearTimeCompleted()
 		return nil
 	case challenge.FieldCompletedFirstMemberID:
 		m.ClearCompletedFirstMemberID()
@@ -1112,6 +1144,9 @@ func (m *ChallengeMutation) ResetField(name string) error {
 		return nil
 	case challenge.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case challenge.FieldTimeCompleted:
+		m.ResetTimeCompleted()
 		return nil
 	case challenge.FieldCompletedFirstMemberID:
 		m.ResetCompletedFirstMemberID()

@@ -12,7 +12,7 @@ func (m *memberImpl) AcceptMember(
 	userId int64,
 	request *group.AcceptMemberRequest,
 ) (*group.AcceptMemberReply, error) {
-	groupEntity, err := m.repository.Group.Get(ctx, request.GetGroupId())
+	groupEntity, err := m.repository.Group.Get(ctx, request.GetGroupId(), false, false)
 	if err != nil {
 		return nil, err
 	}

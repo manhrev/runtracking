@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, View } from 'react-native'
 import {
   Button,
   Divider,
@@ -46,6 +46,12 @@ export default function RunTracking({
       },
     },
   ])
+  const [goBackVisible, setGoBackVisible] = useState(false)
+  const hideGoBackDialog = () => {
+    setGoBackVisible(false)
+  }
+
+  const [hasUnsavedData, setHasUnsavedData] = useState(false)
 
   const [location, setLocation] = useState<TrackPoint.AsObject>({
     latitude: 0,
@@ -84,7 +90,6 @@ export default function RunTracking({
   // console.log(kcalBurned)
   // dialog
   const [visible, setVisible] = useState(false)
-  const [goBackVisible, setGoBackVisible] = useState(false)
 
   const showDialog = () => {
     setVisible(true)
@@ -101,10 +106,6 @@ export default function RunTracking({
 
   const hideDialog = () => {
     setVisible(false)
-  }
-
-  const hideGoBackDialog = () => {
-    setGoBackVisible(false)
   }
 
   useEffect(() => {
@@ -236,6 +237,7 @@ export default function RunTracking({
   // state control
   const startOrPause = () => {
     if (userState == 'ready') {
+      setHasUnsavedData(true)
       setUserState('running')
 
       // save start time
@@ -356,6 +358,7 @@ export default function RunTracking({
     })
     setFocusMode(false)
     setVisible(false)
+    setHasUnsavedData(false)
   }
 
   const switchActivityType = () => {

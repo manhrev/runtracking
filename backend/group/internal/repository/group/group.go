@@ -28,7 +28,12 @@ type Group interface {
 		limit uint32,
 		offset uint64,
 	) ([]*ent.Groupz, int64, error)
-	Get(ctx context.Context, groupId int64) (*ent.Groupz, error)
+	Get(ctx context.Context,
+		groupId int64,
+		withMembers bool,
+		withChallenges bool) (*ent.Groupz, error)
+	GetGroupWithMemberActive(ctx context.Context,
+		groupId int64) (*ent.Groupz, error)
 	Delete(ctx context.Context, userId int64, groupId int64) error
 	Update(ctx context.Context, userId int64, groupInfo *grouppb.GroupInfo) error
 	ListMember(ctx context.Context,
@@ -201,10 +206,44 @@ func (m *groupImpl) Delete(ctx context.Context, userId int64, groupId int64) err
 	return nil
 }
 
-func (m *groupImpl) Get(ctx context.Context, groupId int64) (*ent.Groupz, error) {
-	groupEntity, err := m.entClient.Groupz.
+func (m *groupImpl) Get(ctx context.Context,
+	groupId int64,
+	withMembers bool,
+	withChallenges bool) (*ent.Groupz, error) {
+	query := m.entClient.Groupz.
+		Query().Where(group.IDEQ(groupId))
+
+	if withChallenges {
+		query.WithChallenges()
+	}
+
+	if withMembers {
+		query.WithMembers()
+	}
+
+	groupEntity, err := query.First(ctx)
+
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
+	if groupEntity == nil {
+		return nil, status.Internal("no records were found")
+	}
+
+	return groupEntity, nil
+}
+
+func (m *groupImpl) GetGroupWithMemberActive(ctx context.Context,
+	groupId int64) (*ent.Groupz, error) {
+	query := m.entClient.Groupz.
 		Query().Where(group.IDEQ(groupId)).
-		First(ctx)
+		WithMembers(func(mq *ent.MemberQuery) {
+			mq.Where(member.StatusEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE)))
+		}).
+		WithChallenges()
+
+	groupEntity, err := query.First(ctx)
 
 	if err != nil {
 		return nil, status.Internal(err.Error())

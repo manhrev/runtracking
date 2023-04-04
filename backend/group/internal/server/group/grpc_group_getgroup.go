@@ -3,7 +3,8 @@ package group
 import (
 	"context"
 
-	"github.com/manhrev/runtracking/backend/group/internal/transformer"
+	extractor "github.com/manhrev/runtracking/backend/auth/pkg/extractor"
+	"github.com/manhrev/runtracking/backend/group/internal/status"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
@@ -11,8 +12,12 @@ func (s *groupServer) GetGroup(
 	ctx context.Context,
 	request *group.GetGroupRequest,
 ) (*group.GetGroupReply, error) {
+	userId, err := extractor.New().GetUserID(ctx)
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
 
-	groupz, err := s.service.Group.Get(ctx, request)
+	groupInfo, err := s.service.Group.Get(ctx, userId, request)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +40,7 @@ func (s *groupServer) GetGroup(
 	// event will be listed soon
 
 	return &group.GetGroupReply{
-		GroupInfo:  transformer.TransformGroupEntToGroupInfo(groupz),
+		GroupInfo:  groupInfo,
 		Members:    members.Members,
 		Challenges: challenges.ChallengeInfoList,
 	}, nil

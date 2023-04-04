@@ -12,7 +12,7 @@ func (m *memberImpl) BanMember(
 	userId int64,
 	request *group.BanMemberRequest,
 ) (*group.BanMemberReply, error) {
-	groupEntity, err := m.repository.Group.Get(ctx, request.GetGroupId())
+	groupEntity, err := m.repository.Group.Get(ctx, request.GetGroupId(), false, false)
 	if err != nil {
 		return nil, err
 	}

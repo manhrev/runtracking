@@ -19,7 +19,8 @@ func (c *challengeImpl) CreateBulkChallengeMember(
 		bulk[i] = c.entClient.ChallengeMember.Create().
 			SetChallenge(challengeEnt).
 			SetCreatedAt(challengeEnt.StartTime).
-			SetMember(memberEnt)
+			SetMember(memberEnt).
+			SetStatus(challengeEnt.Status)
 	}
 
 	challengeMembers, err := c.entClient.ChallengeMember.CreateBulk(bulk...).Save(ctx)

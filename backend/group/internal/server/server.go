@@ -11,6 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/internal/server/group"
+	"github.com/manhrev/runtracking/backend/group/internal/server/groupi"
 	pb "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
@@ -81,7 +82,7 @@ func Serve(server *grpc.Server) {
 	notificationClient := notification.NewNotificationIClient(notiConn)
 	// register main and other server servers
 	pb.RegisterGroupServer(server, group.NewServer(entClient, authClient, notificationClient))
-
+	pb.RegisterGroupIServer(server, groupi.NewServer(entClient, authClient, notificationClient))
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {
 		log.Fatalf("error while create listen: %v", err)

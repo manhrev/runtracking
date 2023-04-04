@@ -1,6 +1,8 @@
 import {
   ListGroupReply,
   ListGroupRequest,
+  GetGroupRequest,
+  GetGroupReply,
   CreateGroupRequest,
   CreateGroupReply,
   GroupInfo,
@@ -39,6 +41,16 @@ class rpcGroupClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<ListGroupReply.AsObject>(
       'listGroup',
+      req
+    )
+  }
+
+  async getGroup(param: GetGroupRequest.AsObject) {
+    const req = new GetGroupRequest()
+    req.setGroupId(param.groupId)
+
+    return await this.gRPCClientRequest<GetGroupReply.AsObject>(
+      'getGroup',
       req
     )
   }
