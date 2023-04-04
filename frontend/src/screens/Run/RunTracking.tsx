@@ -51,8 +51,6 @@ export default function RunTracking({
     setGoBackVisible(false)
   }
 
-  const [hasUnsavedData, setHasUnsavedData] = useState(false)
-
   const [location, setLocation] = useState<TrackPoint.AsObject>({
     latitude: 0,
     longtitude: 0,
@@ -237,7 +235,6 @@ export default function RunTracking({
   // state control
   const startOrPause = () => {
     if (userState == 'ready') {
-      setHasUnsavedData(true)
       setUserState('running')
 
       // save start time
@@ -358,7 +355,6 @@ export default function RunTracking({
     })
     setFocusMode(false)
     setVisible(false)
-    setHasUnsavedData(false)
   }
 
   const switchActivityType = () => {
