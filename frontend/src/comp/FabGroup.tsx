@@ -51,7 +51,7 @@ export const FabGroup = ({
       <FAB.Group
         style={{
           position: 'absolute',
-          bottom: bottom || 80,
+          paddingBottom: bottom || 80,
           right: right || 0,
         }}
         fabStyle={{ backgroundColor: color }}
