@@ -394,7 +394,6 @@ export default function RunTracking({
           <Dialog.Actions>
             <Button
               onPress={() => {
-                console.log(navEvent)
                 if (navEvent === undefined) {
                   navigation.goBack()
                 } else {
