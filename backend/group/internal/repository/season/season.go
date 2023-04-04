@@ -63,6 +63,11 @@ type Season interface {
 		inProgressSeasonEnt *ent.Season,
 		memberEnt *ent.Member,
 	) error
+
+	InitialSeasonRecordForMember(
+		ctx context.Context,
+		memberId int64,
+	) error
 }
 type seasonImpl struct {
 	entClient *ent.Client

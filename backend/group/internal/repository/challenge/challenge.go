@@ -106,6 +106,18 @@ type Challenge interface {
 		inProgressChallengeEnt *ent.Challenge,
 		memberEnt *ent.Member,
 	) error
+
+	CreateChallengeMemberRule(
+		ctx context.Context,
+		challengeMemberEnt *ent.ChallengeMember,
+		challengeEnt *ent.Challenge,
+	) ([]*ent.ChallengeMemberRule, error)
+
+	CreateChallengeMember(
+		ctx context.Context,
+		memberId int64,
+		challengeEnt *ent.Challenge,
+	) (*ent.ChallengeMember, error)
 }
 type challengeImpl struct {
 	entClient          *ent.Client
@@ -187,7 +199,7 @@ func (c *challengeImpl) Update(
 			Exec(ctx)
 
 		if err != nil {
-			log.Println("Fail when save challenge members: %v", err.Error())
+			log.Println("Fail when save challenge members: %v", err)
 			return status.Internal(fmt.Sprintf("Fail when save challenge member : %v", err.Error()))
 		}
 
@@ -252,7 +264,8 @@ func (m *challengeImpl) GetActiveChallenge(
 	groupId int64,
 ) (*ent.Challenge, error) {
 	challengeEntList, err := m.entClient.Challenge.Query().
-		Where(challenge.StatusEQ(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))).
+		Where(challenge.StatusEQ(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
+			challenge.HasGroupzWith(groupz.IDEQ(groupId))).
 		All(ctx)
 
 	if err != nil {

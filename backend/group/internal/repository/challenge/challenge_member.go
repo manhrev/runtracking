@@ -33,6 +33,26 @@ func (c *challengeImpl) CreateBulkChallengeMember(
 	return challengeMembers, nil
 }
 
+func (c *challengeImpl) CreateChallengeMember(
+	ctx context.Context,
+	memberId int64,
+	challengeEnt *ent.Challenge,
+) (*ent.ChallengeMember, error) {
+
+	challengeMemberEnt, err := c.entClient.ChallengeMember.Create().
+		SetChallenge(challengeEnt).
+		SetCreatedAt(challengeEnt.StartTime).
+		SetMemberID(memberId).
+		SetStatus(challengeEnt.Status).
+		Save(ctx)
+
+	if err != nil {
+		return nil, status.Internal(fmt.Sprintf("Creating challenge member for challenge has failed %s\n", err.Error()))
+	}
+
+	return challengeMemberEnt, nil
+}
+
 func (m *challengeImpl) UpdateMemberPoint(
 	ctx context.Context,
 	point int,

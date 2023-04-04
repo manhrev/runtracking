@@ -31,6 +31,11 @@ type Member interface {
 		userId int64,
 		request *group.LeaveGroupRequest,
 	) (*group.LeaveGroupReply, error)
+
+	GetMember(
+		ctx context.Context,
+		memberId int64,
+	) (*ent.Member, error)
 }
 
 type memberImpl struct {
