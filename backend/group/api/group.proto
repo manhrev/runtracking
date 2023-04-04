@@ -57,7 +57,6 @@ message GetSeasonReply{
 
 message CreateSeasonRequest{
     SeasonInfo seasonInfo = 1;
-    int64 group_id = 2;
 }
 message CreateSeasonReply {}
 

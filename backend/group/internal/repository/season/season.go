@@ -52,6 +52,17 @@ type Season interface {
 		memberEnts []*ent.Member,
 		seasonEnt *ent.Season,
 	) ([]*ent.SeasonMember, error)
+
+	GetInProgressSeason(
+		ctx context.Context,
+	) (*ent.Season, error)
+
+	UpdateMemberPoint(
+		ctx context.Context,
+		point int,
+		inProgressSeasonEnt *ent.Season,
+		memberEnt *ent.Member,
+	) error
 }
 type seasonImpl struct {
 	entClient *ent.Client
@@ -233,6 +244,20 @@ func (m *seasonImpl) Get(
 
 	if err != nil {
 		return nil, status.Internal(err.Error())
+	}
+
+	return seasonEnt, nil
+}
+
+func (m *seasonImpl) GetInProgressSeason(
+	ctx context.Context,
+) (*ent.Season, error) {
+	seasonEnt, err := m.entClient.Season.Query().
+		Where(season.StatusEQ(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))).
+		First(ctx)
+
+	if err != nil {
+		return nil, status.Internal(fmt.Sprintf("InProgress Season not found: %v", err))
 	}
 
 	return seasonEnt, nil

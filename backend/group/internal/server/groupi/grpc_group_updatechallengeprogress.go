@@ -29,7 +29,7 @@ func (s *groupIServer) UpdateChallengeProgress(
 		_, err = s.notificationIClient.PushNotification(ctx,
 			&notification.PushNotiRequest{
 				Messeage:      message,
-				SourceType:    notification.SOURCE_TYPE_PERSONAL,
+				SourceType:    notification.SOURCE_TYPE_GROUP,
 				ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 10)),
 				ReceiveIds:    []int64{userId},
 			})

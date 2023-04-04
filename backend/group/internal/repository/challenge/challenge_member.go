@@ -6,6 +6,8 @@ import (
 
 	"github.com/manhrev/runtracking/backend/group/internal/status"
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/challengemember"
+	"github.com/manhrev/runtracking/backend/group/pkg/ent/member"
 )
 
 func (c *challengeImpl) CreateBulkChallengeMember(
@@ -29,4 +31,24 @@ func (c *challengeImpl) CreateBulkChallengeMember(
 	}
 
 	return challengeMembers, nil
+}
+
+func (m *challengeImpl) UpdateMemberPoint(
+	ctx context.Context,
+	point int,
+	inProgressChallengeEnt *ent.Challenge,
+	memberEnt *ent.Member,
+) error {
+
+	err := m.entClient.ChallengeMember.Update().
+		Where(challengemember.HasMemberWith(member.IDEQ(memberEnt.ID)),
+			challengemember.ChallengeIDEQ(inProgressChallengeEnt.ID)).
+		AddPoint(int64(point)).
+		Exec(ctx)
+
+	if err != nil {
+		return status.Internal(fmt.Sprintf("Error when add point for member season: %v", err))
+	}
+
+	return nil
 }
