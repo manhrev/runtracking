@@ -51,11 +51,27 @@ func TransformUserInfoListToMemberList(userInfoList []*auth.UserInfo, memberMap 
 			Email:       userInfo.GetEmail(),
 			CreatedAt:   timestamppb.New(memberMap[userInfo.GetUserId()].CreatedAt),
 			Status:      group.Member_Status(memberMap[userInfo.GetUserId()].Status),
-			IsAdmin:     (userInfo.GetUserId() == groupz.LeaderID),
+		}
+
+		if groupz != nil {
+			member.IsAdmin = (userInfo.GetUserId() == groupz.LeaderID)
 		}
 		memberList = append(memberList, member)
 	}
 	return memberList
+}
+
+func TransformMemberSeasonListToUserRankingInfoList(seasonMemberList []*ent.SeasonMember, memberInfoMap map[int64]*group.Member) []*group.UserRanking {
+	userRankingList := []*group.UserRanking{}
+	for _, seasonMember := range seasonMemberList {
+		userRanking := &group.UserRanking{
+			Member:                  memberInfoMap[seasonMember.MemberID],
+			Point:                   seasonMember.Point,
+			CountChallengeCompleted: seasonMember.CompletedChallengeCount,
+		}
+		userRankingList = append(userRankingList, userRanking)
+	}
+	return userRankingList
 }
 
 func TransformChallengeRuleEntListToChallengeRuleInfoList(challengeRuleEntList []*ent.ChallengeRule) []*group.ChallengeRuleInfo {

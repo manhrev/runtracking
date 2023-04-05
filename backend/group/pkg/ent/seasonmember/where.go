@@ -80,6 +80,11 @@ func UpdatedAt(v time.Time) predicate.SeasonMember {
 	return predicate.SeasonMember(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// CompletedChallengeCount applies equality check predicate on the "completed_challenge_count" field. It's identical to CompletedChallengeCountEQ.
+func CompletedChallengeCount(v int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldEQ(FieldCompletedChallengeCount, v))
+}
+
 // PointEQ applies the EQ predicate on the "point" field.
 func PointEQ(v int64) predicate.SeasonMember {
 	return predicate.SeasonMember(sql.FieldEQ(FieldPoint, v))
@@ -238,6 +243,46 @@ func UpdatedAtLT(v time.Time) predicate.SeasonMember {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.SeasonMember {
 	return predicate.SeasonMember(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// CompletedChallengeCountEQ applies the EQ predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountEQ(v int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldEQ(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountNEQ applies the NEQ predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountNEQ(v int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldNEQ(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountIn applies the In predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountIn(vs ...int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldIn(FieldCompletedChallengeCount, vs...))
+}
+
+// CompletedChallengeCountNotIn applies the NotIn predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountNotIn(vs ...int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldNotIn(FieldCompletedChallengeCount, vs...))
+}
+
+// CompletedChallengeCountGT applies the GT predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountGT(v int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldGT(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountGTE applies the GTE predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountGTE(v int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldGTE(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountLT applies the LT predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountLT(v int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldLT(FieldCompletedChallengeCount, v))
+}
+
+// CompletedChallengeCountLTE applies the LTE predicate on the "completed_challenge_count" field.
+func CompletedChallengeCountLTE(v int64) predicate.SeasonMember {
+	return predicate.SeasonMember(sql.FieldLTE(FieldCompletedChallengeCount, v))
 }
 
 // HasSeason applies the HasEdge predicate on the "season" edge.

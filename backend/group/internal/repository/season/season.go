@@ -60,6 +60,7 @@ type Season interface {
 	UpdateMemberPoint(
 		ctx context.Context,
 		point int,
+		isCompletedChallenge bool,
 		inProgressSeasonEnt *ent.Season,
 		memberEnt *ent.Member,
 	) error
@@ -68,6 +69,16 @@ type Season interface {
 		ctx context.Context,
 		memberId int64,
 	) error
+
+	ListSeasonMemberOfGroup(
+		ctx context.Context,
+		groupId int64,
+		seasonId int64,
+		sortBy group.ListUserRankingRequest_SortBy,
+		ascending bool,
+		limit uint32,
+		offset uint64,
+	) ([]*ent.SeasonMember, int64, error)
 }
 type seasonImpl struct {
 	entClient *ent.Client

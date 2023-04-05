@@ -40,6 +40,9 @@ type Group interface {
 		ascending bool,
 		limit uint32,
 		offset uint64) (*group.ListMembersOfGroupReply, error)
+
+	ListUserRanking(ctx context.Context,
+		request *group.ListUserRankingRequest) (*group.ListUserRankingReply, error)
 }
 
 type MemberSlice []*grouppb.Member

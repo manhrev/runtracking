@@ -101,48 +101,6 @@ func (mu *MemberUpdate) ClearJoiningAt() *MemberUpdate {
 	return mu
 }
 
-// SetPoint sets the "point" field.
-func (mu *MemberUpdate) SetPoint(i int64) *MemberUpdate {
-	mu.mutation.ResetPoint()
-	mu.mutation.SetPoint(i)
-	return mu
-}
-
-// SetNillablePoint sets the "point" field if the given value is not nil.
-func (mu *MemberUpdate) SetNillablePoint(i *int64) *MemberUpdate {
-	if i != nil {
-		mu.SetPoint(*i)
-	}
-	return mu
-}
-
-// AddPoint adds i to the "point" field.
-func (mu *MemberUpdate) AddPoint(i int64) *MemberUpdate {
-	mu.mutation.AddPoint(i)
-	return mu
-}
-
-// SetCompletedChallengeCount sets the "completed_challenge_count" field.
-func (mu *MemberUpdate) SetCompletedChallengeCount(i int64) *MemberUpdate {
-	mu.mutation.ResetCompletedChallengeCount()
-	mu.mutation.SetCompletedChallengeCount(i)
-	return mu
-}
-
-// SetNillableCompletedChallengeCount sets the "completed_challenge_count" field if the given value is not nil.
-func (mu *MemberUpdate) SetNillableCompletedChallengeCount(i *int64) *MemberUpdate {
-	if i != nil {
-		mu.SetCompletedChallengeCount(*i)
-	}
-	return mu
-}
-
-// AddCompletedChallengeCount adds i to the "completed_challenge_count" field.
-func (mu *MemberUpdate) AddCompletedChallengeCount(i int64) *MemberUpdate {
-	mu.mutation.AddCompletedChallengeCount(i)
-	return mu
-}
-
 // SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
 func (mu *MemberUpdate) SetGroupzID(id int64) *MemberUpdate {
 	mu.mutation.SetGroupzID(id)
@@ -341,18 +299,6 @@ func (mu *MemberUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if mu.mutation.JoiningAtCleared() {
 		_spec.ClearField(member.FieldJoiningAt, field.TypeTime)
-	}
-	if value, ok := mu.mutation.Point(); ok {
-		_spec.SetField(member.FieldPoint, field.TypeInt64, value)
-	}
-	if value, ok := mu.mutation.AddedPoint(); ok {
-		_spec.AddField(member.FieldPoint, field.TypeInt64, value)
-	}
-	if value, ok := mu.mutation.CompletedChallengeCount(); ok {
-		_spec.SetField(member.FieldCompletedChallengeCount, field.TypeInt64, value)
-	}
-	if value, ok := mu.mutation.AddedCompletedChallengeCount(); ok {
-		_spec.AddField(member.FieldCompletedChallengeCount, field.TypeInt64, value)
 	}
 	if mu.mutation.GroupzCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -622,48 +568,6 @@ func (muo *MemberUpdateOne) ClearJoiningAt() *MemberUpdateOne {
 	return muo
 }
 
-// SetPoint sets the "point" field.
-func (muo *MemberUpdateOne) SetPoint(i int64) *MemberUpdateOne {
-	muo.mutation.ResetPoint()
-	muo.mutation.SetPoint(i)
-	return muo
-}
-
-// SetNillablePoint sets the "point" field if the given value is not nil.
-func (muo *MemberUpdateOne) SetNillablePoint(i *int64) *MemberUpdateOne {
-	if i != nil {
-		muo.SetPoint(*i)
-	}
-	return muo
-}
-
-// AddPoint adds i to the "point" field.
-func (muo *MemberUpdateOne) AddPoint(i int64) *MemberUpdateOne {
-	muo.mutation.AddPoint(i)
-	return muo
-}
-
-// SetCompletedChallengeCount sets the "completed_challenge_count" field.
-func (muo *MemberUpdateOne) SetCompletedChallengeCount(i int64) *MemberUpdateOne {
-	muo.mutation.ResetCompletedChallengeCount()
-	muo.mutation.SetCompletedChallengeCount(i)
-	return muo
-}
-
-// SetNillableCompletedChallengeCount sets the "completed_challenge_count" field if the given value is not nil.
-func (muo *MemberUpdateOne) SetNillableCompletedChallengeCount(i *int64) *MemberUpdateOne {
-	if i != nil {
-		muo.SetCompletedChallengeCount(*i)
-	}
-	return muo
-}
-
-// AddCompletedChallengeCount adds i to the "completed_challenge_count" field.
-func (muo *MemberUpdateOne) AddCompletedChallengeCount(i int64) *MemberUpdateOne {
-	muo.mutation.AddCompletedChallengeCount(i)
-	return muo
-}
-
 // SetGroupzID sets the "groupz" edge to the Groupz entity by ID.
 func (muo *MemberUpdateOne) SetGroupzID(id int64) *MemberUpdateOne {
 	muo.mutation.SetGroupzID(id)
@@ -886,18 +790,6 @@ func (muo *MemberUpdateOne) sqlSave(ctx context.Context) (_node *Member, err err
 	}
 	if muo.mutation.JoiningAtCleared() {
 		_spec.ClearField(member.FieldJoiningAt, field.TypeTime)
-	}
-	if value, ok := muo.mutation.Point(); ok {
-		_spec.SetField(member.FieldPoint, field.TypeInt64, value)
-	}
-	if value, ok := muo.mutation.AddedPoint(); ok {
-		_spec.AddField(member.FieldPoint, field.TypeInt64, value)
-	}
-	if value, ok := muo.mutation.CompletedChallengeCount(); ok {
-		_spec.SetField(member.FieldCompletedChallengeCount, field.TypeInt64, value)
-	}
-	if value, ok := muo.mutation.AddedCompletedChallengeCount(); ok {
-		_spec.AddField(member.FieldCompletedChallengeCount, field.TypeInt64, value)
 	}
 	if muo.mutation.GroupzCleared() {
 		edge := &sqlgraph.EdgeSpec{

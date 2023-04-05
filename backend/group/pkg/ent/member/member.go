@@ -19,10 +19,6 @@ const (
 	FieldStatus = "status"
 	// FieldJoiningAt holds the string denoting the joining_at field in the database.
 	FieldJoiningAt = "joining_at"
-	// FieldPoint holds the string denoting the point field in the database.
-	FieldPoint = "point"
-	// FieldCompletedChallengeCount holds the string denoting the completed_challenge_count field in the database.
-	FieldCompletedChallengeCount = "completed_challenge_count"
 	// EdgeGroupz holds the string denoting the groupz edge name in mutations.
 	EdgeGroupz = "groupz"
 	// EdgeChallengeMembers holds the string denoting the challenge_members edge name in mutations.
@@ -70,8 +66,6 @@ var Columns = []string{
 	FieldUserID,
 	FieldStatus,
 	FieldJoiningAt,
-	FieldPoint,
-	FieldCompletedChallengeCount,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "members"
@@ -100,8 +94,4 @@ var (
 	DefaultCreatedAt func() time.Time
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus uint32
-	// DefaultPoint holds the default value on creation for the "point" field.
-	DefaultPoint int64
-	// DefaultCompletedChallengeCount holds the default value on creation for the "completed_challenge_count" field.
-	DefaultCompletedChallengeCount int64
 )

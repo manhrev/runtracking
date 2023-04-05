@@ -96,7 +96,7 @@ type Challenge interface {
 		userId int64,
 		timestamp *timestamppb.Timestamp,
 		activityRecord *group.ActivityRecord,
-	) (string, bool, error)
+	) (string, bool, bool, error)
 
 	CheckDailyProgressChallenge(ctx context.Context, timeCheck time.Time) error
 
@@ -435,24 +435,25 @@ func (c *challengeImpl) UpdateChallengeProgress(
 	userId int64,
 	timestamp *timestamppb.Timestamp,
 	activityRecord *group.ActivityRecord,
-) (string, bool, error) {
+) (string, bool, bool, error) {
 	pushNotifyMessage := ""
+	isCompletedChallenge := false
 	isCompletedFirst := false
 
 	challengeEnt, err := c.GetChallengeWithChallengeRules(ctx, challengeId)
 	if err != nil {
-		return "", isCompletedFirst, err
+		return "", isCompletedFirst, isCompletedChallenge, err
 	}
 
 	if time.Now().Before(challengeEnt.StartTime) {
 		log.Printf("Error update challenge progress: challenge not started")
-		return "", isCompletedFirst, status.Internal("challenge not started")
+		return "", isCompletedFirst, isCompletedChallenge, status.Internal("challenge not started")
 	}
 
 	// if challenge status is failed, reject
 	if challengeEnt.Status == int64(group.RuleStatus_RULE_STATUS_FAILED) {
 		log.Printf("Error update challenge progress: challenge failed")
-		return "", isCompletedFirst, status.Internal("challenge failed")
+		return "", isCompletedFirst, isCompletedChallenge, status.Internal("challenge failed")
 	}
 
 	// check plan ended but not completed -> change to failed
@@ -461,11 +462,11 @@ func (c *challengeImpl) UpdateChallengeProgress(
 		err := c.entClient.Challenge.UpdateOne(challengeEnt).SetStatus(int64(group.RuleStatus_RULE_STATUS_FAILED)).Exec(ctx)
 		if err != nil {
 			log.Printf("Error update challenge progress: cannot update challenge status: %v", err)
-			return "", isCompletedFirst, status.Internal(err.Error())
+			return "", isCompletedFirst, isCompletedChallenge, status.Internal(err.Error())
 		}
 		pushNotifyMessage = fmt.Sprintf("challenge '%v' failed!", challengeEnt.Name)
 		log.Printf("Error update challenge progress: challenge failed")
-		return pushNotifyMessage, isCompletedFirst, status.Internal("challenge failed")
+		return pushNotifyMessage, isCompletedFirst, isCompletedChallenge, status.Internal("challenge failed")
 	}
 
 	// check plan ended but not completed -> change to failed
@@ -474,8 +475,10 @@ func (c *challengeImpl) UpdateChallengeProgress(
 	newProgessTime := timestamp.AsTime()
 	if newProgessTime.Before(challengeEnt.StartTime) || newProgessTime.After(challengeEnt.EndTime) /*|| newProgessTime.After(time.Now())*/ {
 		log.Printf("Error update plan progress: new progress time is not in planned time range")
-		return "", isCompletedFirst, status.Internal("New progress time is not in planned time range")
+		return "", isCompletedFirst, isCompletedChallenge, status.Internal("New progress time is not in planned time range")
 	}
+
+	log.Println(fmt.Sprintf("UserID: %d ChallengeID: %d", userId, challengeId))
 
 	challengeMember, err := c.entClient.ChallengeMember.Query().
 		Where(challengemember.ChallengeIDEQ(challengeId),
@@ -485,8 +488,10 @@ func (c *challengeImpl) UpdateChallengeProgress(
 		}).
 		First(ctx)
 	if err != nil {
-		return "", isCompletedFirst, status.Internal(fmt.Sprintf("Error when fetch challenge of member: %s", err.Error()))
+		return "", isCompletedFirst, isCompletedChallenge, status.Internal(fmt.Sprintf("Error when fetch challenge of member: %s", err.Error()))
 	}
+
+	log.Println("Here")
 
 	numRuleCompleted := 0
 	for _, challengeMemberRule := range challengeMember.Edges.ChallengeMemberRules {
@@ -523,7 +528,7 @@ func (c *challengeImpl) UpdateChallengeProgress(
 		err = query.Exec(ctx)
 
 		if err != nil {
-			return "", isCompletedFirst, status.Internal(fmt.Sprintf("Update progress challenge has failed: %s", err.Error()))
+			return "", isCompletedFirst, isCompletedChallenge, status.Internal(fmt.Sprintf("Update progress challenge has failed: %s", err.Error()))
 		}
 	}
 
@@ -537,18 +542,11 @@ func (c *challengeImpl) UpdateChallengeProgress(
 				Exec(ctx)
 
 			if err != nil {
-				return "", isCompletedFirst, status.Internal(fmt.Sprintf("Update status of challenge failed: %v", err.Error()))
+				return "", isCompletedFirst, isCompletedChallenge, status.Internal(fmt.Sprintf("Update status of challenge failed: %v", err.Error()))
 			}
 
-			//Add count challenge completed to member
-			err = c.entClient.Member.Update().
-				Where(member.UserIDEQ(userId), member.HasChallengeMembersWith(challengemember.ChallengeIDEQ(challengeId))).
-				AddCompletedChallengeCount(1).
-				Exec(ctx)
-
-			if err != nil {
-				return "", isCompletedFirst, status.Internal(fmt.Sprintf("Update count challenge completed status to member has failed: %v", err.Error()))
-			}
+			// Set isCompletedChallenge = true to update season member count challenge completed
+			isCompletedChallenge = true
 
 			// Update fist challenge member if don't have any completed first member
 			if challengeEnt.Edges.FirstMember == nil {
@@ -557,7 +555,7 @@ func (c *challengeImpl) UpdateChallengeProgress(
 					First(ctx)
 
 				if err != nil {
-					return "", isCompletedFirst, status.Internal(fmt.Sprintf("Error when fetch member Ent : %v", err))
+					return "", isCompletedFirst, isCompletedChallenge, status.Internal(fmt.Sprintf("Error when fetch member Ent : %v", err))
 				}
 
 				err = c.entClient.Challenge.UpdateOne(challengeEnt).
@@ -566,7 +564,7 @@ func (c *challengeImpl) UpdateChallengeProgress(
 
 				isCompletedFirst = true
 				if err != nil {
-					return "", isCompletedFirst, status.Internal(fmt.Sprintf("Error when update first member of challenge : %v", err))
+					return "", isCompletedFirst, isCompletedChallenge, status.Internal(fmt.Sprintf("Error when update first member of challenge : %v", err))
 				}
 			}
 
@@ -576,7 +574,7 @@ func (c *challengeImpl) UpdateChallengeProgress(
 		}
 	}
 
-	return pushNotifyMessage, isCompletedFirst, nil
+	return pushNotifyMessage, isCompletedFirst, isCompletedChallenge, nil
 }
 
 func (c *challengeImpl) CheckDailyProgressChallenge(ctx context.Context, timeCheck time.Time) error {

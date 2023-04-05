@@ -28,6 +28,9 @@ func (SeasonMember) Fields() []ent.Field {
 		field.Time("updated_at").
 			Default(time.Now).
 			UpdateDefault(time.Now),
+		// how many challenge completed by this member will be set into this field
+		field.Int64("completed_challenge_count").
+			Default(0),
 	}
 }
 

@@ -4656,33 +4656,29 @@ func (m *GroupzMutation) ResetEdge(name string) error {
 // MemberMutation represents an operation that mutates the Member nodes in the graph.
 type MemberMutation struct {
 	config
-	op                           Op
-	typ                          string
-	id                           *int64
-	created_at                   *time.Time
-	user_id                      *int64
-	adduser_id                   *int64
-	status                       *uint32
-	addstatus                    *int32
-	joining_at                   *time.Time
-	point                        *int64
-	addpoint                     *int64
-	completed_challenge_count    *int64
-	addcompleted_challenge_count *int64
-	clearedFields                map[string]struct{}
-	groupz                       *int64
-	clearedgroupz                bool
-	challenge_members            map[int64]struct{}
-	removedchallenge_members     map[int64]struct{}
-	clearedchallenge_members     bool
-	season_members               map[int64]struct{}
-	removedseason_members        map[int64]struct{}
-	clearedseason_members        bool
-	challenge                    *int64
-	clearedchallenge             bool
-	done                         bool
-	oldValue                     func(context.Context) (*Member, error)
-	predicates                   []predicate.Member
+	op                       Op
+	typ                      string
+	id                       *int64
+	created_at               *time.Time
+	user_id                  *int64
+	adduser_id               *int64
+	status                   *uint32
+	addstatus                *int32
+	joining_at               *time.Time
+	clearedFields            map[string]struct{}
+	groupz                   *int64
+	clearedgroupz            bool
+	challenge_members        map[int64]struct{}
+	removedchallenge_members map[int64]struct{}
+	clearedchallenge_members bool
+	season_members           map[int64]struct{}
+	removedseason_members    map[int64]struct{}
+	clearedseason_members    bool
+	challenge                *int64
+	clearedchallenge         bool
+	done                     bool
+	oldValue                 func(context.Context) (*Member, error)
+	predicates               []predicate.Member
 }
 
 var _ ent.Mutation = (*MemberMutation)(nil)
@@ -4986,118 +4982,6 @@ func (m *MemberMutation) ResetJoiningAt() {
 	delete(m.clearedFields, member.FieldJoiningAt)
 }
 
-// SetPoint sets the "point" field.
-func (m *MemberMutation) SetPoint(i int64) {
-	m.point = &i
-	m.addpoint = nil
-}
-
-// Point returns the value of the "point" field in the mutation.
-func (m *MemberMutation) Point() (r int64, exists bool) {
-	v := m.point
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPoint returns the old "point" field's value of the Member entity.
-// If the Member object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MemberMutation) OldPoint(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPoint is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPoint requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPoint: %w", err)
-	}
-	return oldValue.Point, nil
-}
-
-// AddPoint adds i to the "point" field.
-func (m *MemberMutation) AddPoint(i int64) {
-	if m.addpoint != nil {
-		*m.addpoint += i
-	} else {
-		m.addpoint = &i
-	}
-}
-
-// AddedPoint returns the value that was added to the "point" field in this mutation.
-func (m *MemberMutation) AddedPoint() (r int64, exists bool) {
-	v := m.addpoint
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetPoint resets all changes to the "point" field.
-func (m *MemberMutation) ResetPoint() {
-	m.point = nil
-	m.addpoint = nil
-}
-
-// SetCompletedChallengeCount sets the "completed_challenge_count" field.
-func (m *MemberMutation) SetCompletedChallengeCount(i int64) {
-	m.completed_challenge_count = &i
-	m.addcompleted_challenge_count = nil
-}
-
-// CompletedChallengeCount returns the value of the "completed_challenge_count" field in the mutation.
-func (m *MemberMutation) CompletedChallengeCount() (r int64, exists bool) {
-	v := m.completed_challenge_count
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCompletedChallengeCount returns the old "completed_challenge_count" field's value of the Member entity.
-// If the Member object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MemberMutation) OldCompletedChallengeCount(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCompletedChallengeCount is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCompletedChallengeCount requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCompletedChallengeCount: %w", err)
-	}
-	return oldValue.CompletedChallengeCount, nil
-}
-
-// AddCompletedChallengeCount adds i to the "completed_challenge_count" field.
-func (m *MemberMutation) AddCompletedChallengeCount(i int64) {
-	if m.addcompleted_challenge_count != nil {
-		*m.addcompleted_challenge_count += i
-	} else {
-		m.addcompleted_challenge_count = &i
-	}
-}
-
-// AddedCompletedChallengeCount returns the value that was added to the "completed_challenge_count" field in this mutation.
-func (m *MemberMutation) AddedCompletedChallengeCount() (r int64, exists bool) {
-	v := m.addcompleted_challenge_count
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCompletedChallengeCount resets all changes to the "completed_challenge_count" field.
-func (m *MemberMutation) ResetCompletedChallengeCount() {
-	m.completed_challenge_count = nil
-	m.addcompleted_challenge_count = nil
-}
-
 // SetGroupzID sets the "groupz" edge to the Groupz entity by id.
 func (m *MemberMutation) SetGroupzID(id int64) {
 	m.groupz = &id
@@ -5318,7 +5202,7 @@ func (m *MemberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MemberMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 4)
 	if m.created_at != nil {
 		fields = append(fields, member.FieldCreatedAt)
 	}
@@ -5330,12 +5214,6 @@ func (m *MemberMutation) Fields() []string {
 	}
 	if m.joining_at != nil {
 		fields = append(fields, member.FieldJoiningAt)
-	}
-	if m.point != nil {
-		fields = append(fields, member.FieldPoint)
-	}
-	if m.completed_challenge_count != nil {
-		fields = append(fields, member.FieldCompletedChallengeCount)
 	}
 	return fields
 }
@@ -5353,10 +5231,6 @@ func (m *MemberMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case member.FieldJoiningAt:
 		return m.JoiningAt()
-	case member.FieldPoint:
-		return m.Point()
-	case member.FieldCompletedChallengeCount:
-		return m.CompletedChallengeCount()
 	}
 	return nil, false
 }
@@ -5374,10 +5248,6 @@ func (m *MemberMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldStatus(ctx)
 	case member.FieldJoiningAt:
 		return m.OldJoiningAt(ctx)
-	case member.FieldPoint:
-		return m.OldPoint(ctx)
-	case member.FieldCompletedChallengeCount:
-		return m.OldCompletedChallengeCount(ctx)
 	}
 	return nil, fmt.Errorf("unknown Member field %s", name)
 }
@@ -5415,20 +5285,6 @@ func (m *MemberMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetJoiningAt(v)
 		return nil
-	case member.FieldPoint:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPoint(v)
-		return nil
-	case member.FieldCompletedChallengeCount:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCompletedChallengeCount(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Member field %s", name)
 }
@@ -5443,12 +5299,6 @@ func (m *MemberMutation) AddedFields() []string {
 	if m.addstatus != nil {
 		fields = append(fields, member.FieldStatus)
 	}
-	if m.addpoint != nil {
-		fields = append(fields, member.FieldPoint)
-	}
-	if m.addcompleted_challenge_count != nil {
-		fields = append(fields, member.FieldCompletedChallengeCount)
-	}
 	return fields
 }
 
@@ -5461,10 +5311,6 @@ func (m *MemberMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUserID()
 	case member.FieldStatus:
 		return m.AddedStatus()
-	case member.FieldPoint:
-		return m.AddedPoint()
-	case member.FieldCompletedChallengeCount:
-		return m.AddedCompletedChallengeCount()
 	}
 	return nil, false
 }
@@ -5487,20 +5333,6 @@ func (m *MemberMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStatus(v)
-		return nil
-	case member.FieldPoint:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddPoint(v)
-		return nil
-	case member.FieldCompletedChallengeCount:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCompletedChallengeCount(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Member numeric field %s", name)
@@ -5549,12 +5381,6 @@ func (m *MemberMutation) ResetField(name string) error {
 		return nil
 	case member.FieldJoiningAt:
 		m.ResetJoiningAt()
-		return nil
-	case member.FieldPoint:
-		m.ResetPoint()
-		return nil
-	case member.FieldCompletedChallengeCount:
-		m.ResetCompletedChallengeCount()
 		return nil
 	}
 	return fmt.Errorf("unknown Member field %s", name)
@@ -6627,21 +6453,23 @@ func (m *SeasonMutation) ResetEdge(name string) error {
 // SeasonMemberMutation represents an operation that mutates the SeasonMember nodes in the graph.
 type SeasonMemberMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	point         *int64
-	addpoint      *int64
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	season        *int64
-	clearedseason bool
-	member        *int64
-	clearedmember bool
-	done          bool
-	oldValue      func(context.Context) (*SeasonMember, error)
-	predicates    []predicate.SeasonMember
+	op                           Op
+	typ                          string
+	id                           *int64
+	point                        *int64
+	addpoint                     *int64
+	created_at                   *time.Time
+	updated_at                   *time.Time
+	completed_challenge_count    *int64
+	addcompleted_challenge_count *int64
+	clearedFields                map[string]struct{}
+	season                       *int64
+	clearedseason                bool
+	member                       *int64
+	clearedmember                bool
+	done                         bool
+	oldValue                     func(context.Context) (*SeasonMember, error)
+	predicates                   []predicate.SeasonMember
 }
 
 var _ ent.Mutation = (*SeasonMemberMutation)(nil)
@@ -6948,6 +6776,62 @@ func (m *SeasonMemberMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetCompletedChallengeCount sets the "completed_challenge_count" field.
+func (m *SeasonMemberMutation) SetCompletedChallengeCount(i int64) {
+	m.completed_challenge_count = &i
+	m.addcompleted_challenge_count = nil
+}
+
+// CompletedChallengeCount returns the value of the "completed_challenge_count" field in the mutation.
+func (m *SeasonMemberMutation) CompletedChallengeCount() (r int64, exists bool) {
+	v := m.completed_challenge_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCompletedChallengeCount returns the old "completed_challenge_count" field's value of the SeasonMember entity.
+// If the SeasonMember object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SeasonMemberMutation) OldCompletedChallengeCount(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCompletedChallengeCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCompletedChallengeCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCompletedChallengeCount: %w", err)
+	}
+	return oldValue.CompletedChallengeCount, nil
+}
+
+// AddCompletedChallengeCount adds i to the "completed_challenge_count" field.
+func (m *SeasonMemberMutation) AddCompletedChallengeCount(i int64) {
+	if m.addcompleted_challenge_count != nil {
+		*m.addcompleted_challenge_count += i
+	} else {
+		m.addcompleted_challenge_count = &i
+	}
+}
+
+// AddedCompletedChallengeCount returns the value that was added to the "completed_challenge_count" field in this mutation.
+func (m *SeasonMemberMutation) AddedCompletedChallengeCount() (r int64, exists bool) {
+	v := m.addcompleted_challenge_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCompletedChallengeCount resets all changes to the "completed_challenge_count" field.
+func (m *SeasonMemberMutation) ResetCompletedChallengeCount() {
+	m.completed_challenge_count = nil
+	m.addcompleted_challenge_count = nil
+}
+
 // ClearSeason clears the "season" edge to the Season entity.
 func (m *SeasonMemberMutation) ClearSeason() {
 	m.clearedseason = true
@@ -7034,7 +6918,7 @@ func (m *SeasonMemberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SeasonMemberMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.point != nil {
 		fields = append(fields, seasonmember.FieldPoint)
 	}
@@ -7049,6 +6933,9 @@ func (m *SeasonMemberMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, seasonmember.FieldUpdatedAt)
+	}
+	if m.completed_challenge_count != nil {
+		fields = append(fields, seasonmember.FieldCompletedChallengeCount)
 	}
 	return fields
 }
@@ -7068,6 +6955,8 @@ func (m *SeasonMemberMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case seasonmember.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case seasonmember.FieldCompletedChallengeCount:
+		return m.CompletedChallengeCount()
 	}
 	return nil, false
 }
@@ -7087,6 +6976,8 @@ func (m *SeasonMemberMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldCreatedAt(ctx)
 	case seasonmember.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case seasonmember.FieldCompletedChallengeCount:
+		return m.OldCompletedChallengeCount(ctx)
 	}
 	return nil, fmt.Errorf("unknown SeasonMember field %s", name)
 }
@@ -7131,6 +7022,13 @@ func (m *SeasonMemberMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case seasonmember.FieldCompletedChallengeCount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCompletedChallengeCount(v)
+		return nil
 	}
 	return fmt.Errorf("unknown SeasonMember field %s", name)
 }
@@ -7142,6 +7040,9 @@ func (m *SeasonMemberMutation) AddedFields() []string {
 	if m.addpoint != nil {
 		fields = append(fields, seasonmember.FieldPoint)
 	}
+	if m.addcompleted_challenge_count != nil {
+		fields = append(fields, seasonmember.FieldCompletedChallengeCount)
+	}
 	return fields
 }
 
@@ -7152,6 +7053,8 @@ func (m *SeasonMemberMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case seasonmember.FieldPoint:
 		return m.AddedPoint()
+	case seasonmember.FieldCompletedChallengeCount:
+		return m.AddedCompletedChallengeCount()
 	}
 	return nil, false
 }
@@ -7167,6 +7070,13 @@ func (m *SeasonMemberMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddPoint(v)
+		return nil
+	case seasonmember.FieldCompletedChallengeCount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCompletedChallengeCount(v)
 		return nil
 	}
 	return fmt.Errorf("unknown SeasonMember numeric field %s", name)
@@ -7209,6 +7119,9 @@ func (m *SeasonMemberMutation) ResetField(name string) error {
 		return nil
 	case seasonmember.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case seasonmember.FieldCompletedChallengeCount:
+		m.ResetCompletedChallengeCount()
 		return nil
 	}
 	return fmt.Errorf("unknown SeasonMember field %s", name)

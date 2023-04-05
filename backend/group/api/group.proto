@@ -146,8 +146,32 @@ message DeleteChallengeRequest{
 }
 message DeleteChallengeReply{}
 
-message ListUserRankingRequest{}
-message ListUserRankingReply{}
+message ListUserRankingRequest{
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    int64 group_id = 4;
+    int64 season_id = 5;
+    SortBy sortBy = 6;
+
+    enum SortBy{
+        SORT_BY_UNSPECIFIED = 0;
+        SORT_BY_POINT = 1;
+        SORT_BY_COUNT_CHALLENGE_COMPLETED = 2;
+    }
+}
+
+message ListUserRankingReply{
+    SeasonInfo seasonInfo = 1;
+    repeated UserRanking userRankingList = 2;
+    int64 total = 3;
+}
+
+message UserRanking{
+    Member member = 1;
+    int64 point = 2;
+    int64 count_challenge_completed = 3;        
+}
 
 message LeaveGroupRequest{
     int64 group_id = 1;

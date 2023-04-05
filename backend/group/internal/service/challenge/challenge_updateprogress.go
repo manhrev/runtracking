@@ -26,7 +26,7 @@ func (c *challengeImpl) UpdateChallengeProgress(
 	userId int64,
 	request *group.UpdateChallengeProgressRequest,
 ) (string, error) {
-	pushMessage, isCompletedFirst, err := c.repository.Challenge.UpdateChallengeProgress(ctx,
+	pushMessage, isCompletedFirst, isCompletedChallenge, err := c.repository.Challenge.UpdateChallengeProgress(ctx,
 		request.ChallengeId,
 		userId, request.Time,
 		request.GetActivityRecord())
@@ -71,7 +71,7 @@ func (c *challengeImpl) UpdateChallengeProgress(
 	}
 
 	err = c.repository.Season.UpdateMemberPoint(ctx,
-		point,
+		point, isCompletedChallenge,
 		seasonEnt, memberEnt)
 
 	if err != nil {

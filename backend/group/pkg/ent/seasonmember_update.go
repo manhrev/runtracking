@@ -84,6 +84,27 @@ func (smu *SeasonMemberUpdate) SetUpdatedAt(t time.Time) *SeasonMemberUpdate {
 	return smu
 }
 
+// SetCompletedChallengeCount sets the "completed_challenge_count" field.
+func (smu *SeasonMemberUpdate) SetCompletedChallengeCount(i int64) *SeasonMemberUpdate {
+	smu.mutation.ResetCompletedChallengeCount()
+	smu.mutation.SetCompletedChallengeCount(i)
+	return smu
+}
+
+// SetNillableCompletedChallengeCount sets the "completed_challenge_count" field if the given value is not nil.
+func (smu *SeasonMemberUpdate) SetNillableCompletedChallengeCount(i *int64) *SeasonMemberUpdate {
+	if i != nil {
+		smu.SetCompletedChallengeCount(*i)
+	}
+	return smu
+}
+
+// AddCompletedChallengeCount adds i to the "completed_challenge_count" field.
+func (smu *SeasonMemberUpdate) AddCompletedChallengeCount(i int64) *SeasonMemberUpdate {
+	smu.mutation.AddCompletedChallengeCount(i)
+	return smu
+}
+
 // SetSeason sets the "season" edge to the Season entity.
 func (smu *SeasonMemberUpdate) SetSeason(s *Season) *SeasonMemberUpdate {
 	return smu.SetSeasonID(s.ID)
@@ -196,6 +217,12 @@ func (smu *SeasonMemberUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := smu.mutation.UpdatedAt(); ok {
 		_spec.SetField(seasonmember.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := smu.mutation.CompletedChallengeCount(); ok {
+		_spec.SetField(seasonmember.FieldCompletedChallengeCount, field.TypeInt64, value)
+	}
+	if value, ok := smu.mutation.AddedCompletedChallengeCount(); ok {
+		_spec.AddField(seasonmember.FieldCompletedChallengeCount, field.TypeInt64, value)
 	}
 	if smu.mutation.SeasonCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -342,6 +369,27 @@ func (smuo *SeasonMemberUpdateOne) SetUpdatedAt(t time.Time) *SeasonMemberUpdate
 	return smuo
 }
 
+// SetCompletedChallengeCount sets the "completed_challenge_count" field.
+func (smuo *SeasonMemberUpdateOne) SetCompletedChallengeCount(i int64) *SeasonMemberUpdateOne {
+	smuo.mutation.ResetCompletedChallengeCount()
+	smuo.mutation.SetCompletedChallengeCount(i)
+	return smuo
+}
+
+// SetNillableCompletedChallengeCount sets the "completed_challenge_count" field if the given value is not nil.
+func (smuo *SeasonMemberUpdateOne) SetNillableCompletedChallengeCount(i *int64) *SeasonMemberUpdateOne {
+	if i != nil {
+		smuo.SetCompletedChallengeCount(*i)
+	}
+	return smuo
+}
+
+// AddCompletedChallengeCount adds i to the "completed_challenge_count" field.
+func (smuo *SeasonMemberUpdateOne) AddCompletedChallengeCount(i int64) *SeasonMemberUpdateOne {
+	smuo.mutation.AddCompletedChallengeCount(i)
+	return smuo
+}
+
 // SetSeason sets the "season" edge to the Season entity.
 func (smuo *SeasonMemberUpdateOne) SetSeason(s *Season) *SeasonMemberUpdateOne {
 	return smuo.SetSeasonID(s.ID)
@@ -478,6 +526,12 @@ func (smuo *SeasonMemberUpdateOne) sqlSave(ctx context.Context) (_node *SeasonMe
 	}
 	if value, ok := smuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(seasonmember.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := smuo.mutation.CompletedChallengeCount(); ok {
+		_spec.SetField(seasonmember.FieldCompletedChallengeCount, field.TypeInt64, value)
+	}
+	if value, ok := smuo.mutation.AddedCompletedChallengeCount(); ok {
+		_spec.AddField(seasonmember.FieldCompletedChallengeCount, field.TypeInt64, value)
 	}
 	if smuo.mutation.SeasonCleared() {
 		edge := &sqlgraph.EdgeSpec{

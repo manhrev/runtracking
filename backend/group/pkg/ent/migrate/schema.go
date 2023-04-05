@@ -173,8 +173,6 @@ var (
 		{Name: "user_id", Type: field.TypeInt64},
 		{Name: "status", Type: field.TypeUint32, Default: 0},
 		{Name: "joining_at", Type: field.TypeTime, Nullable: true},
-		{Name: "point", Type: field.TypeInt64, Default: 0},
-		{Name: "completed_challenge_count", Type: field.TypeInt64, Default: 0},
 		{Name: "groupz_members", Type: field.TypeInt64, Nullable: true},
 	}
 	// MembersTable holds the schema information for the "members" table.
@@ -185,7 +183,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "members_groupzs_members",
-				Columns:    []*schema.Column{MembersColumns[7]},
+				Columns:    []*schema.Column{MembersColumns[5]},
 				RefColumns: []*schema.Column{GroupzsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -194,7 +192,7 @@ var (
 			{
 				Name:    "member_user_id_groupz_members",
 				Unique:  true,
-				Columns: []*schema.Column{MembersColumns[2], MembersColumns[7]},
+				Columns: []*schema.Column{MembersColumns[2], MembersColumns[5]},
 			},
 		},
 	}
@@ -222,6 +220,7 @@ var (
 		{Name: "point", Type: field.TypeInt64, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "completed_challenge_count", Type: field.TypeInt64, Default: 0},
 		{Name: "member_id", Type: field.TypeInt64},
 		{Name: "season_id", Type: field.TypeInt64},
 	}
@@ -233,13 +232,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "season_members_members_season_members",
-				Columns:    []*schema.Column{SeasonMembersColumns[4]},
+				Columns:    []*schema.Column{SeasonMembersColumns[5]},
 				RefColumns: []*schema.Column{MembersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "season_members_seasons_season_members",
-				Columns:    []*schema.Column{SeasonMembersColumns[5]},
+				Columns:    []*schema.Column{SeasonMembersColumns[6]},
 				RefColumns: []*schema.Column{SeasonsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -248,7 +247,7 @@ var (
 			{
 				Name:    "seasonmember_member_id_season_id",
 				Unique:  true,
-				Columns: []*schema.Column{SeasonMembersColumns[4], SeasonMembersColumns[5]},
+				Columns: []*schema.Column{SeasonMembersColumns[5], SeasonMembersColumns[6]},
 			},
 		},
 	}
