@@ -38,17 +38,20 @@ func (s *groupServer) AcceptMember(
 		return nil, err
 	}
 
-	//Push notification to user
-	_, err = s.notificationClient.PushNotification(ctx, &notification.PushNotiRequest{
-		Messeage:      fmt.Sprintf("Your request to %s has been accepted", groupEnt.Name),
-		SourceType:    notification.SOURCE_TYPE_GROUP,
-		ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
-		ReceiveIds:    []int64{memberEnt.UserID},
-	})
-
-	if err != nil {
-		log.Println("There are something mistaken when push notification ", err)
-	}
+	go func() {
+		//Push notification to user
+		ctxNoti, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*80))
+		defer cancel()
+		_, err = s.notificationClient.PushNotification(ctxNoti, &notification.PushNotiRequest{
+			Messeage:      fmt.Sprintf("Your request to %s has been accepted", groupEnt.Name),
+			SourceType:    notification.SOURCE_TYPE_GROUP,
+			ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
+			ReceiveIds:    []int64{memberEnt.UserID},
+		})
+		if err != nil {
+			log.Println("There are something mistaken when push notification ", err)
+		}
+	}()
 
 	return reply, nil
 }
