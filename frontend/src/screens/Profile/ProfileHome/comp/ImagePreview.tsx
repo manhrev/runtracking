@@ -106,6 +106,7 @@ const ImagePreview = ({
                   label={displayName}
                   style={{
                     borderRadius: 0,
+                    alignSelf: 'center',
                   }}
                 />
               )}

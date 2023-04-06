@@ -9,6 +9,8 @@ import {
   UpdateUserInfoRequest,
   UpdateUserInfoReply,
   UserInfo,
+  GetUsersPublicInfoRequest,
+  GetUsersPublicInfoReply,
 } from '../../../lib/auth/auth_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -70,6 +72,16 @@ class rpcAuthClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<UpdateUserInfoReply.AsObject>(
       'updateUserInfo',
+      req
+    )
+  }
+
+  async getUsersPublicInfo(param: GetUsersPublicInfoRequest.AsObject) {
+    const req = new GetUsersPublicInfoRequest()
+    req.setUserIdsList(param.userIdsList || [])
+
+    return await this.gRPCClientRequest<GetUsersPublicInfoReply.AsObject>(
+      'getUsersPublicInfo',
       req
     )
   }
