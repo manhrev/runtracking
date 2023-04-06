@@ -29,6 +29,7 @@ import GroupMembers from '../screens/Group/YourGroups/GroupMembers'
 import ChallengeList from '../screens/Group/Challenge/ChallengeList'
 import ChallengeAdd from '../screens/Group/Challenge/ChallengeAdd'
 import { toast } from '../utils/toast/toast'
+import OtherUser from '../screens/OtherUser'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -113,6 +114,11 @@ export type RootBaseStackParamList = {
   }
   ChallengeAdd: {
     groupId: number
+  }
+
+  // user
+  OtherUser: {
+    userId: number
   }
 }
 
@@ -270,6 +276,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={ChallengeAdd}
+          />
+          <Stack.Screen
+            name="OtherUser"
+            options={{
+              title: 'Other user detail',
+              headerBackVisible: true,
+            }}
+            component={OtherUser}
           />
         </>
       ) : (
