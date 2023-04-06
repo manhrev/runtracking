@@ -80,19 +80,19 @@ func UpdatedAt(v time.Time) predicate.Season {
 	return predicate.Season(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// StartDate applies equality check predicate on the "start_date" field. It's identical to StartDateEQ.
-func StartDate(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldStartDate, v))
+// StartTime applies equality check predicate on the "start_time" field. It's identical to StartTimeEQ.
+func StartTime(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldStartTime, v))
 }
 
-// EndDate applies equality check predicate on the "end_date" field. It's identical to EndDateEQ.
-func EndDate(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldEndDate, v))
+// EndTime applies equality check predicate on the "end_time" field. It's identical to EndTimeEQ.
+func EndTime(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldEndTime, v))
 }
 
-// IsActive applies equality check predicate on the "is_active" field. It's identical to IsActiveEQ.
-func IsActive(v bool) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldIsActive, v))
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int64) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldStatus, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -390,114 +390,144 @@ func UpdatedAtLTE(v time.Time) predicate.Season {
 	return predicate.Season(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// StartDateEQ applies the EQ predicate on the "start_date" field.
-func StartDateEQ(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldStartDate, v))
+// StartTimeEQ applies the EQ predicate on the "start_time" field.
+func StartTimeEQ(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldStartTime, v))
 }
 
-// StartDateNEQ applies the NEQ predicate on the "start_date" field.
-func StartDateNEQ(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldNEQ(FieldStartDate, v))
+// StartTimeNEQ applies the NEQ predicate on the "start_time" field.
+func StartTimeNEQ(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldNEQ(FieldStartTime, v))
 }
 
-// StartDateIn applies the In predicate on the "start_date" field.
-func StartDateIn(vs ...time.Time) predicate.Season {
-	return predicate.Season(sql.FieldIn(FieldStartDate, vs...))
+// StartTimeIn applies the In predicate on the "start_time" field.
+func StartTimeIn(vs ...time.Time) predicate.Season {
+	return predicate.Season(sql.FieldIn(FieldStartTime, vs...))
 }
 
-// StartDateNotIn applies the NotIn predicate on the "start_date" field.
-func StartDateNotIn(vs ...time.Time) predicate.Season {
-	return predicate.Season(sql.FieldNotIn(FieldStartDate, vs...))
+// StartTimeNotIn applies the NotIn predicate on the "start_time" field.
+func StartTimeNotIn(vs ...time.Time) predicate.Season {
+	return predicate.Season(sql.FieldNotIn(FieldStartTime, vs...))
 }
 
-// StartDateGT applies the GT predicate on the "start_date" field.
-func StartDateGT(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldGT(FieldStartDate, v))
+// StartTimeGT applies the GT predicate on the "start_time" field.
+func StartTimeGT(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldGT(FieldStartTime, v))
 }
 
-// StartDateGTE applies the GTE predicate on the "start_date" field.
-func StartDateGTE(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldGTE(FieldStartDate, v))
+// StartTimeGTE applies the GTE predicate on the "start_time" field.
+func StartTimeGTE(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldGTE(FieldStartTime, v))
 }
 
-// StartDateLT applies the LT predicate on the "start_date" field.
-func StartDateLT(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldLT(FieldStartDate, v))
+// StartTimeLT applies the LT predicate on the "start_time" field.
+func StartTimeLT(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldLT(FieldStartTime, v))
 }
 
-// StartDateLTE applies the LTE predicate on the "start_date" field.
-func StartDateLTE(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldLTE(FieldStartDate, v))
+// StartTimeLTE applies the LTE predicate on the "start_time" field.
+func StartTimeLTE(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldLTE(FieldStartTime, v))
 }
 
-// StartDateIsNil applies the IsNil predicate on the "start_date" field.
-func StartDateIsNil() predicate.Season {
-	return predicate.Season(sql.FieldIsNull(FieldStartDate))
+// StartTimeIsNil applies the IsNil predicate on the "start_time" field.
+func StartTimeIsNil() predicate.Season {
+	return predicate.Season(sql.FieldIsNull(FieldStartTime))
 }
 
-// StartDateNotNil applies the NotNil predicate on the "start_date" field.
-func StartDateNotNil() predicate.Season {
-	return predicate.Season(sql.FieldNotNull(FieldStartDate))
+// StartTimeNotNil applies the NotNil predicate on the "start_time" field.
+func StartTimeNotNil() predicate.Season {
+	return predicate.Season(sql.FieldNotNull(FieldStartTime))
 }
 
-// EndDateEQ applies the EQ predicate on the "end_date" field.
-func EndDateEQ(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldEndDate, v))
+// EndTimeEQ applies the EQ predicate on the "end_time" field.
+func EndTimeEQ(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldEndTime, v))
 }
 
-// EndDateNEQ applies the NEQ predicate on the "end_date" field.
-func EndDateNEQ(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldNEQ(FieldEndDate, v))
+// EndTimeNEQ applies the NEQ predicate on the "end_time" field.
+func EndTimeNEQ(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldNEQ(FieldEndTime, v))
 }
 
-// EndDateIn applies the In predicate on the "end_date" field.
-func EndDateIn(vs ...time.Time) predicate.Season {
-	return predicate.Season(sql.FieldIn(FieldEndDate, vs...))
+// EndTimeIn applies the In predicate on the "end_time" field.
+func EndTimeIn(vs ...time.Time) predicate.Season {
+	return predicate.Season(sql.FieldIn(FieldEndTime, vs...))
 }
 
-// EndDateNotIn applies the NotIn predicate on the "end_date" field.
-func EndDateNotIn(vs ...time.Time) predicate.Season {
-	return predicate.Season(sql.FieldNotIn(FieldEndDate, vs...))
+// EndTimeNotIn applies the NotIn predicate on the "end_time" field.
+func EndTimeNotIn(vs ...time.Time) predicate.Season {
+	return predicate.Season(sql.FieldNotIn(FieldEndTime, vs...))
 }
 
-// EndDateGT applies the GT predicate on the "end_date" field.
-func EndDateGT(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldGT(FieldEndDate, v))
+// EndTimeGT applies the GT predicate on the "end_time" field.
+func EndTimeGT(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldGT(FieldEndTime, v))
 }
 
-// EndDateGTE applies the GTE predicate on the "end_date" field.
-func EndDateGTE(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldGTE(FieldEndDate, v))
+// EndTimeGTE applies the GTE predicate on the "end_time" field.
+func EndTimeGTE(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldGTE(FieldEndTime, v))
 }
 
-// EndDateLT applies the LT predicate on the "end_date" field.
-func EndDateLT(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldLT(FieldEndDate, v))
+// EndTimeLT applies the LT predicate on the "end_time" field.
+func EndTimeLT(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldLT(FieldEndTime, v))
 }
 
-// EndDateLTE applies the LTE predicate on the "end_date" field.
-func EndDateLTE(v time.Time) predicate.Season {
-	return predicate.Season(sql.FieldLTE(FieldEndDate, v))
+// EndTimeLTE applies the LTE predicate on the "end_time" field.
+func EndTimeLTE(v time.Time) predicate.Season {
+	return predicate.Season(sql.FieldLTE(FieldEndTime, v))
 }
 
-// EndDateIsNil applies the IsNil predicate on the "end_date" field.
-func EndDateIsNil() predicate.Season {
-	return predicate.Season(sql.FieldIsNull(FieldEndDate))
+// EndTimeIsNil applies the IsNil predicate on the "end_time" field.
+func EndTimeIsNil() predicate.Season {
+	return predicate.Season(sql.FieldIsNull(FieldEndTime))
 }
 
-// EndDateNotNil applies the NotNil predicate on the "end_date" field.
-func EndDateNotNil() predicate.Season {
-	return predicate.Season(sql.FieldNotNull(FieldEndDate))
+// EndTimeNotNil applies the NotNil predicate on the "end_time" field.
+func EndTimeNotNil() predicate.Season {
+	return predicate.Season(sql.FieldNotNull(FieldEndTime))
 }
 
-// IsActiveEQ applies the EQ predicate on the "is_active" field.
-func IsActiveEQ(v bool) predicate.Season {
-	return predicate.Season(sql.FieldEQ(FieldIsActive, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v int64) predicate.Season {
+	return predicate.Season(sql.FieldEQ(FieldStatus, v))
 }
 
-// IsActiveNEQ applies the NEQ predicate on the "is_active" field.
-func IsActiveNEQ(v bool) predicate.Season {
-	return predicate.Season(sql.FieldNEQ(FieldIsActive, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v int64) predicate.Season {
+	return predicate.Season(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...int64) predicate.Season {
+	return predicate.Season(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...int64) predicate.Season {
+	return predicate.Season(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int64) predicate.Season {
+	return predicate.Season(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int64) predicate.Season {
+	return predicate.Season(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int64) predicate.Season {
+	return predicate.Season(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int64) predicate.Season {
+	return predicate.Season(sql.FieldLTE(FieldStatus, v))
 }
 
 // HasSeasonMembers applies the HasEdge predicate on the "season_members" edge.

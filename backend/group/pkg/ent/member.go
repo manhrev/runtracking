@@ -26,10 +26,6 @@ type Member struct {
 	Status uint32 `json:"status,omitempty"`
 	// JoiningAt holds the value of the "joining_at" field.
 	JoiningAt time.Time `json:"joining_at,omitempty"`
-	// Point holds the value of the "point" field.
-	Point int64 `json:"point,omitempty"`
-	// CompletedChallengeCount holds the value of the "completed_challenge_count" field.
-	CompletedChallengeCount int64 `json:"completed_challenge_count,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MemberQuery when eager-loading is set.
 	Edges          MemberEdges `json:"edges"`
@@ -100,7 +96,7 @@ func (*Member) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case member.FieldID, member.FieldUserID, member.FieldStatus, member.FieldPoint, member.FieldCompletedChallengeCount:
+		case member.FieldID, member.FieldUserID, member.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case member.FieldCreatedAt, member.FieldJoiningAt:
 			values[i] = new(sql.NullTime)
@@ -150,18 +146,6 @@ func (m *Member) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field joining_at", values[i])
 			} else if value.Valid {
 				m.JoiningAt = value.Time
-			}
-		case member.FieldPoint:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field point", values[i])
-			} else if value.Valid {
-				m.Point = value.Int64
-			}
-		case member.FieldCompletedChallengeCount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field completed_challenge_count", values[i])
-			} else if value.Valid {
-				m.CompletedChallengeCount = value.Int64
 			}
 		case member.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -229,12 +213,6 @@ func (m *Member) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("joining_at=")
 	builder.WriteString(m.JoiningAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("point=")
-	builder.WriteString(fmt.Sprintf("%v", m.Point))
-	builder.WriteString(", ")
-	builder.WriteString("completed_challenge_count=")
-	builder.WriteString(fmt.Sprintf("%v", m.CompletedChallengeCount))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -37,9 +37,17 @@ func (c *challengeImpl) CreateChallenge(
 	members, err := c.repository.Group.ListMember(ctx, groupEntity.ID,
 		group.Member_MEMBER_STATUS_ACTIVE)
 
+	if err != nil {
+		return nil, err
+	}
+
 	// Create Challenge Member
 	challengeMembers, err := c.repository.Challenge.CreateBulkChallengeMember(ctx,
 		members, challengeEnt)
+
+	if err != nil {
+		return nil, err
+	}
 
 	// Create challenge Member rules
 	_, err = c.repository.Challenge.CreateBulkChallengeMemberRule(ctx,

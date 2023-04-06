@@ -116,14 +116,6 @@ func init() {
 	memberDescStatus := memberFields[3].Descriptor()
 	// member.DefaultStatus holds the default value on creation for the status field.
 	member.DefaultStatus = memberDescStatus.Default.(uint32)
-	// memberDescPoint is the schema descriptor for point field.
-	memberDescPoint := memberFields[5].Descriptor()
-	// member.DefaultPoint holds the default value on creation for the point field.
-	member.DefaultPoint = memberDescPoint.Default.(int64)
-	// memberDescCompletedChallengeCount is the schema descriptor for completed_challenge_count field.
-	memberDescCompletedChallengeCount := memberFields[6].Descriptor()
-	// member.DefaultCompletedChallengeCount holds the default value on creation for the completed_challenge_count field.
-	member.DefaultCompletedChallengeCount = memberDescCompletedChallengeCount.Default.(int64)
 	seasonFields := schema.Season{}.Fields()
 	_ = seasonFields
 	// seasonDescPicture is the schema descriptor for picture field.
@@ -140,10 +132,10 @@ func init() {
 	season.DefaultUpdatedAt = seasonDescUpdatedAt.Default.(func() time.Time)
 	// season.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	season.UpdateDefaultUpdatedAt = seasonDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// seasonDescIsActive is the schema descriptor for is_active field.
-	seasonDescIsActive := seasonFields[8].Descriptor()
-	// season.DefaultIsActive holds the default value on creation for the is_active field.
-	season.DefaultIsActive = seasonDescIsActive.Default.(bool)
+	// seasonDescStatus is the schema descriptor for status field.
+	seasonDescStatus := seasonFields[8].Descriptor()
+	// season.DefaultStatus holds the default value on creation for the status field.
+	season.DefaultStatus = seasonDescStatus.Default.(int64)
 	seasonmemberFields := schema.SeasonMember{}.Fields()
 	_ = seasonmemberFields
 	// seasonmemberDescPoint is the schema descriptor for point field.
@@ -160,4 +152,8 @@ func init() {
 	seasonmember.DefaultUpdatedAt = seasonmemberDescUpdatedAt.Default.(func() time.Time)
 	// seasonmember.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	seasonmember.UpdateDefaultUpdatedAt = seasonmemberDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// seasonmemberDescCompletedChallengeCount is the schema descriptor for completed_challenge_count field.
+	seasonmemberDescCompletedChallengeCount := seasonmemberFields[6].Descriptor()
+	// seasonmember.DefaultCompletedChallengeCount holds the default value on creation for the completed_challenge_count field.
+	seasonmember.DefaultCompletedChallengeCount = seasonmemberDescCompletedChallengeCount.Default.(int64)
 }

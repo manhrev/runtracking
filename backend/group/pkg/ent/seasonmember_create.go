@@ -76,6 +76,20 @@ func (smc *SeasonMemberCreate) SetNillableUpdatedAt(t *time.Time) *SeasonMemberC
 	return smc
 }
 
+// SetCompletedChallengeCount sets the "completed_challenge_count" field.
+func (smc *SeasonMemberCreate) SetCompletedChallengeCount(i int64) *SeasonMemberCreate {
+	smc.mutation.SetCompletedChallengeCount(i)
+	return smc
+}
+
+// SetNillableCompletedChallengeCount sets the "completed_challenge_count" field if the given value is not nil.
+func (smc *SeasonMemberCreate) SetNillableCompletedChallengeCount(i *int64) *SeasonMemberCreate {
+	if i != nil {
+		smc.SetCompletedChallengeCount(*i)
+	}
+	return smc
+}
+
 // SetID sets the "id" field.
 func (smc *SeasonMemberCreate) SetID(i int64) *SeasonMemberCreate {
 	smc.mutation.SetID(i)
@@ -139,6 +153,10 @@ func (smc *SeasonMemberCreate) defaults() {
 		v := seasonmember.DefaultUpdatedAt()
 		smc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := smc.mutation.CompletedChallengeCount(); !ok {
+		v := seasonmember.DefaultCompletedChallengeCount
+		smc.mutation.SetCompletedChallengeCount(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -157,6 +175,9 @@ func (smc *SeasonMemberCreate) check() error {
 	}
 	if _, ok := smc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "SeasonMember.updated_at"`)}
+	}
+	if _, ok := smc.mutation.CompletedChallengeCount(); !ok {
+		return &ValidationError{Name: "completed_challenge_count", err: errors.New(`ent: missing required field "SeasonMember.completed_challenge_count"`)}
 	}
 	if _, ok := smc.mutation.SeasonID(); !ok {
 		return &ValidationError{Name: "season", err: errors.New(`ent: missing required edge "SeasonMember.season"`)}
@@ -213,6 +234,10 @@ func (smc *SeasonMemberCreate) createSpec() (*SeasonMember, *sqlgraph.CreateSpec
 	if value, ok := smc.mutation.UpdatedAt(); ok {
 		_spec.SetField(seasonmember.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := smc.mutation.CompletedChallengeCount(); ok {
+		_spec.SetField(seasonmember.FieldCompletedChallengeCount, field.TypeInt64, value)
+		_node.CompletedChallengeCount = value
 	}
 	if nodes := smc.mutation.SeasonIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -39,6 +39,8 @@ type Group interface {
 	ListMember(ctx context.Context,
 		groupId int64,
 		status api.Member_Status) ([]*ent.Member, error)
+
+	
 	// GetStatistic(
 	// 	ctx context.Context,
 	// 	userId int64,

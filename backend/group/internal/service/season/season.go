@@ -1,4 +1,4 @@
-package member
+package season
 
 import (
 	"context"
@@ -9,36 +9,37 @@ import (
 	"github.com/manhrev/runtracking/backend/group/pkg/ent"
 )
 
-type Member interface {
-	JoinGroup(
+type Season interface {
+	CreateSeason(
 		ctx context.Context,
 		userId int64,
-		groupId int64,
-	) (*group.JoinGroupReply, error)
-	AcceptMember(
-		ctx context.Context,
-		userId int64,
-		request *group.AcceptMemberRequest,
-	) (*group.AcceptMemberReply, error)
+		request *group.CreateSeasonRequest,
+	) (*group.CreateSeasonReply, error)
 
-	BanMember(
+	DeleteSeason(
 		ctx context.Context,
 		userId int64,
-		request *group.BanMemberRequest,
-	) (*group.BanMemberReply, error)
-	LeaveGroup(
-		ctx context.Context,
-		userId int64,
-		request *group.LeaveGroupRequest,
-	) (*group.LeaveGroupReply, error)
+		request *group.DeleteSeasonRequest,
+	) (*group.DeleteSeasonReply, error)
 
-	GetMember(
+	GetSeason(
 		ctx context.Context,
-		memberId int64,
-	) (*ent.Member, error)
+		request *group.GetSeasonRequest,
+	) (*group.GetSeasonReply, error)
+
+	ListSeason(
+		ctx context.Context,
+		request *group.ListSeasonRequest,
+	) (*group.ListSeasonReply, error)
+
+	UpdateSeason(
+		ctx context.Context,
+		userId int64,
+		request *group.UpdateSeasonRequest,
+	) (*group.UpdateSeasonReply, error)
 }
 
-type memberImpl struct {
+type seasonImpl struct {
 	entClient  *ent.Client
 	authClient auth.AuthIClient
 	repository *repository.Repository
@@ -46,8 +47,8 @@ type memberImpl struct {
 
 func New(entClient *ent.Client,
 	repository *repository.Repository,
-	authClient auth.AuthIClient) Member {
-	return &memberImpl{
+	authClient auth.AuthIClient) Season {
+	return &seasonImpl{
 		entClient:  entClient,
 		repository: repository,
 		authClient: authClient,

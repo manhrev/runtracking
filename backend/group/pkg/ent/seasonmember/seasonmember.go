@@ -21,6 +21,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldCompletedChallengeCount holds the string denoting the completed_challenge_count field in the database.
+	FieldCompletedChallengeCount = "completed_challenge_count"
 	// EdgeSeason holds the string denoting the season edge name in mutations.
 	EdgeSeason = "season"
 	// EdgeMember holds the string denoting the member edge name in mutations.
@@ -51,6 +53,7 @@ var Columns = []string{
 	FieldSeasonID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldCompletedChallengeCount,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -72,4 +75,6 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultCompletedChallengeCount holds the default value on creation for the "completed_challenge_count" field.
+	DefaultCompletedChallengeCount int64
 )

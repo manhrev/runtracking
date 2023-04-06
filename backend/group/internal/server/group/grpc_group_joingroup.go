@@ -40,19 +40,24 @@ func (s *groupServer) JoinGroup(
 	}
 
 	if len(userInfos.GetUsers()) < 1 {
-		return nil, status.Internal(fmt.Sprintf("UserId: %s not found", userId))
+		return nil, status.Internal(fmt.Sprintf("UserId: %d not found", userId))
 	}
-	//Push notification to user
-	_, err = s.notificationClient.PushNotification(ctx, &notification.PushNotiRequest{
-		Messeage:      fmt.Sprintf("%s has recently sent a join group request to you group", userInfos.GetUsers()[0].DisplayName),
-		SourceType:    notification.SOURCE_TYPE_PERSONAL,
-		ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
-		ReceiveIds:    []int64{groupInfo.LeaderId},
-	})
 
-	if err != nil {
-		log.Println("There are something mistaken when push notification ", err)
-	}
+	go func() {
+		//Push notification to user
+		ctxNoti, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*80))
+		defer cancel()
+		_, err = s.notificationClient.PushNotification(ctxNoti, &notification.PushNotiRequest{
+			Messeage:      fmt.Sprintf("%s has recently sent a join group request to your group", userInfos.GetUsers()[0].DisplayName),
+			SourceType:    notification.SOURCE_TYPE_PERSONAL,
+			ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
+			ReceiveIds:    []int64{groupInfo.LeaderId},
+		})
+
+		if err != nil {
+			log.Println("There are something mistaken when push notification ", err)
+		}
+	}()
 
 	return res, nil
 }

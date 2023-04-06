@@ -26,12 +26,12 @@ type Season struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// StartDate holds the value of the "start_date" field.
-	StartDate time.Time `json:"start_date,omitempty"`
-	// EndDate holds the value of the "end_date" field.
-	EndDate time.Time `json:"end_date,omitempty"`
-	// IsActive holds the value of the "is_active" field.
-	IsActive bool `json:"is_active,omitempty"`
+	// StartTime holds the value of the "start_time" field.
+	StartTime time.Time `json:"start_time,omitempty"`
+	// EndTime holds the value of the "end_time" field.
+	EndTime time.Time `json:"end_time,omitempty"`
+	// Status holds the value of the "status" field.
+	Status int64 `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SeasonQuery when eager-loading is set.
 	Edges SeasonEdges `json:"edges"`
@@ -60,13 +60,11 @@ func (*Season) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case season.FieldIsActive:
-			values[i] = new(sql.NullBool)
-		case season.FieldID:
+		case season.FieldID, season.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case season.FieldName, season.FieldDescription, season.FieldPicture:
 			values[i] = new(sql.NullString)
-		case season.FieldCreatedAt, season.FieldUpdatedAt, season.FieldStartDate, season.FieldEndDate:
+		case season.FieldCreatedAt, season.FieldUpdatedAt, season.FieldStartTime, season.FieldEndTime:
 			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Season", columns[i])
@@ -119,23 +117,23 @@ func (s *Season) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.UpdatedAt = value.Time
 			}
-		case season.FieldStartDate:
+		case season.FieldStartTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field start_date", values[i])
+				return fmt.Errorf("unexpected type %T for field start_time", values[i])
 			} else if value.Valid {
-				s.StartDate = value.Time
+				s.StartTime = value.Time
 			}
-		case season.FieldEndDate:
+		case season.FieldEndTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field end_date", values[i])
+				return fmt.Errorf("unexpected type %T for field end_time", values[i])
 			} else if value.Valid {
-				s.EndDate = value.Time
+				s.EndTime = value.Time
 			}
-		case season.FieldIsActive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_active", values[i])
+		case season.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				s.IsActive = value.Bool
+				s.Status = value.Int64
 			}
 		}
 	}
@@ -185,14 +183,14 @@ func (s *Season) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(s.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("start_date=")
-	builder.WriteString(s.StartDate.Format(time.ANSIC))
+	builder.WriteString("start_time=")
+	builder.WriteString(s.StartTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("end_date=")
-	builder.WriteString(s.EndDate.Format(time.ANSIC))
+	builder.WriteString("end_time=")
+	builder.WriteString(s.EndTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("is_active=")
-	builder.WriteString(fmt.Sprintf("%v", s.IsActive))
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", s.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

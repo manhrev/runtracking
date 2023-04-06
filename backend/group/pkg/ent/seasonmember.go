@@ -28,6 +28,8 @@ type SeasonMember struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// CompletedChallengeCount holds the value of the "completed_challenge_count" field.
+	CompletedChallengeCount int64 `json:"completed_challenge_count,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SeasonMemberQuery when eager-loading is set.
 	Edges SeasonMemberEdges `json:"edges"`
@@ -75,7 +77,7 @@ func (*SeasonMember) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case seasonmember.FieldID, seasonmember.FieldPoint, seasonmember.FieldMemberID, seasonmember.FieldSeasonID:
+		case seasonmember.FieldID, seasonmember.FieldPoint, seasonmember.FieldMemberID, seasonmember.FieldSeasonID, seasonmember.FieldCompletedChallengeCount:
 			values[i] = new(sql.NullInt64)
 		case seasonmember.FieldCreatedAt, seasonmember.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -130,6 +132,12 @@ func (sm *SeasonMember) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				sm.UpdatedAt = value.Time
 			}
+		case seasonmember.FieldCompletedChallengeCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field completed_challenge_count", values[i])
+			} else if value.Valid {
+				sm.CompletedChallengeCount = value.Int64
+			}
 		}
 	}
 	return nil
@@ -182,6 +190,9 @@ func (sm *SeasonMember) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(sm.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("completed_challenge_count=")
+	builder.WriteString(fmt.Sprintf("%v", sm.CompletedChallengeCount))
 	builder.WriteByte(')')
 	return builder.String()
 }

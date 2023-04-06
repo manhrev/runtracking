@@ -72,34 +72,6 @@ func (mc *MemberCreate) SetNillableJoiningAt(t *time.Time) *MemberCreate {
 	return mc
 }
 
-// SetPoint sets the "point" field.
-func (mc *MemberCreate) SetPoint(i int64) *MemberCreate {
-	mc.mutation.SetPoint(i)
-	return mc
-}
-
-// SetNillablePoint sets the "point" field if the given value is not nil.
-func (mc *MemberCreate) SetNillablePoint(i *int64) *MemberCreate {
-	if i != nil {
-		mc.SetPoint(*i)
-	}
-	return mc
-}
-
-// SetCompletedChallengeCount sets the "completed_challenge_count" field.
-func (mc *MemberCreate) SetCompletedChallengeCount(i int64) *MemberCreate {
-	mc.mutation.SetCompletedChallengeCount(i)
-	return mc
-}
-
-// SetNillableCompletedChallengeCount sets the "completed_challenge_count" field if the given value is not nil.
-func (mc *MemberCreate) SetNillableCompletedChallengeCount(i *int64) *MemberCreate {
-	if i != nil {
-		mc.SetCompletedChallengeCount(*i)
-	}
-	return mc
-}
-
 // SetID sets the "id" field.
 func (mc *MemberCreate) SetID(i int64) *MemberCreate {
 	mc.mutation.SetID(i)
@@ -217,14 +189,6 @@ func (mc *MemberCreate) defaults() {
 		v := member.DefaultStatus
 		mc.mutation.SetStatus(v)
 	}
-	if _, ok := mc.mutation.Point(); !ok {
-		v := member.DefaultPoint
-		mc.mutation.SetPoint(v)
-	}
-	if _, ok := mc.mutation.CompletedChallengeCount(); !ok {
-		v := member.DefaultCompletedChallengeCount
-		mc.mutation.SetCompletedChallengeCount(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -237,12 +201,6 @@ func (mc *MemberCreate) check() error {
 	}
 	if _, ok := mc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Member.status"`)}
-	}
-	if _, ok := mc.mutation.Point(); !ok {
-		return &ValidationError{Name: "point", err: errors.New(`ent: missing required field "Member.point"`)}
-	}
-	if _, ok := mc.mutation.CompletedChallengeCount(); !ok {
-		return &ValidationError{Name: "completed_challenge_count", err: errors.New(`ent: missing required field "Member.completed_challenge_count"`)}
 	}
 	return nil
 }
@@ -297,14 +255,6 @@ func (mc *MemberCreate) createSpec() (*Member, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.JoiningAt(); ok {
 		_spec.SetField(member.FieldJoiningAt, field.TypeTime, value)
 		_node.JoiningAt = value
-	}
-	if value, ok := mc.mutation.Point(); ok {
-		_spec.SetField(member.FieldPoint, field.TypeInt64, value)
-		_node.Point = value
-	}
-	if value, ok := mc.mutation.CompletedChallengeCount(); ok {
-		_spec.SetField(member.FieldCompletedChallengeCount, field.TypeInt64, value)
-		_node.CompletedChallengeCount = value
 	}
 	if nodes := mc.mutation.GroupzIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
