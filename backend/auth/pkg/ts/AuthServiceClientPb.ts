@@ -380,6 +380,49 @@ export class AuthClient {
     this.methodDescriptorUpdateUserInfo);
   }
 
+  methodDescriptorGetUsersPublicInfo = new grpcWeb.MethodDescriptor(
+    '/auth.Auth/GetUsersPublicInfo',
+    grpcWeb.MethodType.UNARY,
+    auth_pb.GetUsersPublicInfoRequest,
+    auth_pb.GetUsersPublicInfoReply,
+    (request: auth_pb.GetUsersPublicInfoRequest) => {
+      return request.serializeBinary();
+    },
+    auth_pb.GetUsersPublicInfoReply.deserializeBinary
+  );
+
+  getUsersPublicInfo(
+    request: auth_pb.GetUsersPublicInfoRequest,
+    metadata: grpcWeb.Metadata | null): Promise<auth_pb.GetUsersPublicInfoReply>;
+
+  getUsersPublicInfo(
+    request: auth_pb.GetUsersPublicInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: auth_pb.GetUsersPublicInfoReply) => void): grpcWeb.ClientReadableStream<auth_pb.GetUsersPublicInfoReply>;
+
+  getUsersPublicInfo(
+    request: auth_pb.GetUsersPublicInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: auth_pb.GetUsersPublicInfoReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.Auth/GetUsersPublicInfo',
+        request,
+        metadata || {},
+        this.methodDescriptorGetUsersPublicInfo,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.Auth/GetUsersPublicInfo',
+    request,
+    metadata || {},
+    this.methodDescriptorGetUsersPublicInfo);
+  }
+
 }
 
 export class UserClient {

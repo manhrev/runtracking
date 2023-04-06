@@ -12,24 +12,30 @@ import { AppTheme, useAppTheme } from '../../../../../theme'
 import { formatDateWithoutTime } from '../../../../../utils/helpers'
 
 interface GroupItemProps {
-    hideTopDivider?: boolean
-    showBottomDivider?: boolean
-    member: Member.AsObject
-    acceptMemberFunc: () => void
-    isLeader: boolean
+  hideTopDivider?: boolean
+  showBottomDivider?: boolean
+  member: Member.AsObject
+  acceptMemberFunc: () => void
+  isLeader: boolean
+  viewProfile: () => void
 }
 
 export default function GroupItem({
-    hideTopDivider,
-    showBottomDivider,
-    member,
-    acceptMemberFunc,
-    isLeader,
+  hideTopDivider,
+  showBottomDivider,
+  member,
+  acceptMemberFunc,
+  isLeader,
+  viewProfile,
 }: GroupItemProps) {
   const theme = useAppTheme()
 
   return (
-    <TouchableRipple onPress={() => {}}>
+    <TouchableRipple
+      onPress={() => {
+        viewProfile()
+      }}
+    >
       <>
         {!hideTopDivider && (
           <Divider bold style={{ width: '80%', alignSelf: 'flex-end' }} />
@@ -70,14 +76,15 @@ export default function GroupItem({
                     size={35}
                   />
                 )}
-                {member.status === Member.Status.MEMBER_STATUS_WAITING && isLeader && (
-                  <Button
-                    mode="contained-tonal"
-                    onPress={() => acceptMemberFunc()}
-                  >
-                    Accept
-                  </Button>
-                )}
+                {member.status === Member.Status.MEMBER_STATUS_WAITING &&
+                  isLeader && (
+                    <Button
+                      mode="contained-tonal"
+                      onPress={() => acceptMemberFunc()}
+                    >
+                      Accept
+                    </Button>
+                  )}
                 {member.status === Member.Status.MEMBER_STATUS_REJECTED && (
                   <Button mode="contained-tonal" disabled>
                     Rejected

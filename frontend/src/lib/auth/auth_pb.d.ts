@@ -295,3 +295,73 @@ export namespace UpdateUserInfoReply {
   }
 }
 
+export class UserPublicInfo extends jspb.Message {
+  getUserId(): number;
+  setUserId(value: number): UserPublicInfo;
+
+  getDisplayName(): string;
+  setDisplayName(value: string): UserPublicInfo;
+
+  getProfilePicture(): string;
+  setProfilePicture(value: string): UserPublicInfo;
+
+  getUsername(): string;
+  setUsername(value: string): UserPublicInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserPublicInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: UserPublicInfo): UserPublicInfo.AsObject;
+  static serializeBinaryToWriter(message: UserPublicInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserPublicInfo;
+  static deserializeBinaryFromReader(message: UserPublicInfo, reader: jspb.BinaryReader): UserPublicInfo;
+}
+
+export namespace UserPublicInfo {
+  export type AsObject = {
+    userId: number,
+    displayName: string,
+    profilePicture: string,
+    username: string,
+  }
+}
+
+export class GetUsersPublicInfoRequest extends jspb.Message {
+  getUserIdsList(): Array<number>;
+  setUserIdsList(value: Array<number>): GetUsersPublicInfoRequest;
+  clearUserIdsList(): GetUsersPublicInfoRequest;
+  addUserIds(value: number, index?: number): GetUsersPublicInfoRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetUsersPublicInfoRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetUsersPublicInfoRequest): GetUsersPublicInfoRequest.AsObject;
+  static serializeBinaryToWriter(message: GetUsersPublicInfoRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetUsersPublicInfoRequest;
+  static deserializeBinaryFromReader(message: GetUsersPublicInfoRequest, reader: jspb.BinaryReader): GetUsersPublicInfoRequest;
+}
+
+export namespace GetUsersPublicInfoRequest {
+  export type AsObject = {
+    userIdsList: Array<number>,
+  }
+}
+
+export class GetUsersPublicInfoReply extends jspb.Message {
+  getUsersList(): Array<UserPublicInfo>;
+  setUsersList(value: Array<UserPublicInfo>): GetUsersPublicInfoReply;
+  clearUsersList(): GetUsersPublicInfoReply;
+  addUsers(value?: UserPublicInfo, index?: number): UserPublicInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetUsersPublicInfoReply.AsObject;
+  static toObject(includeInstance: boolean, msg: GetUsersPublicInfoReply): GetUsersPublicInfoReply.AsObject;
+  static serializeBinaryToWriter(message: GetUsersPublicInfoReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetUsersPublicInfoReply;
+  static deserializeBinaryFromReader(message: GetUsersPublicInfoReply, reader: jspb.BinaryReader): GetUsersPublicInfoReply;
+}
+
+export namespace GetUsersPublicInfoReply {
+  export type AsObject = {
+    usersList: Array<UserPublicInfo.AsObject>,
+  }
+}
+

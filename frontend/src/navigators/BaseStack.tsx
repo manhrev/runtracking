@@ -27,6 +27,7 @@ import GroupDetail from '../screens/Group/YourGroups/GroupDetail'
 import GroupEdit from '../screens/Group/YourGroups/GroupEdit'
 import GroupMembers from '../screens/Group/YourGroups/GroupMembers'
 import { toast } from '../utils/toast/toast'
+import OtherUser from '../screens/OtherUser'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -102,6 +103,9 @@ export type RootBaseStackParamList = {
   GroupMembers: {
     groupId: number
     isLeader: boolean
+  }
+  OtherUser: {
+    userId: number
   }
 }
 
@@ -243,6 +247,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={GroupMembers}
+          />
+          <Stack.Screen
+            name="OtherUser"
+            options={{
+              title: 'Other user detail',
+              headerBackVisible: true,
+            }}
+            component={OtherUser}
           />
         </>
       ) : (
