@@ -10,6 +10,7 @@ import groupList from './features/groupList/slice'
 import yourGroupList from './features/yourGroupList/slice'
 import memberList from './features/memberList/slice'
 import groupDetail from './features/groupDetail/slice'
+import challengeList from './features/challengeList/slice'
 import otherUser from './features/otherUser/slice'
 
 const rootReducer = combineReducers({
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   yourGroupList,
   memberList,
   groupDetail,
+  challengeList,
   otherUser,
 })
 
