@@ -14,6 +14,8 @@ service Auth {
     rpc GetAllUsers(google.protobuf.Empty) returns (GetAllUsersReply) {};
     rpc GetUserById(GetByIdRequest) returns (UserInfo) {};
     rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoReply) {};
+
+    rpc GetUsersPublicInfo(GetUsersPublicInfoRequest) returns (GetUsersPublicInfoReply) {};
 }
 
 
@@ -86,3 +88,19 @@ message UpdateUserInfoRequest{
 }
 
 message UpdateUserInfoReply{}
+
+message UserPublicInfo {
+    int64 user_id = 1;
+    string display_name = 2;
+    string profile_picture = 3;
+    string username = 4;
+
+}
+
+message GetUsersPublicInfoRequest{
+    repeated int64 user_ids = 1;
+}
+
+message GetUsersPublicInfoReply{
+    repeated UserPublicInfo users = 1;
+}
