@@ -723,5 +723,220 @@ export class GroupClient {
     this.methodDescriptorGetChallenge);
   }
 
+  methodDescriptorCreateSeason = new grpcWeb.MethodDescriptor(
+    '/group.Group/CreateSeason',
+    grpcWeb.MethodType.UNARY,
+    group_pb.CreateSeasonRequest,
+    group_pb.CreateSeasonReply,
+    (request: group_pb.CreateSeasonRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.CreateSeasonReply.deserializeBinary
+  );
+
+  createSeason(
+    request: group_pb.CreateSeasonRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.CreateSeasonReply>;
+
+  createSeason(
+    request: group_pb.CreateSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.CreateSeasonReply) => void): grpcWeb.ClientReadableStream<group_pb.CreateSeasonReply>;
+
+  createSeason(
+    request: group_pb.CreateSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.CreateSeasonReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/CreateSeason',
+        request,
+        metadata || {},
+        this.methodDescriptorCreateSeason,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/CreateSeason',
+    request,
+    metadata || {},
+    this.methodDescriptorCreateSeason);
+  }
+
+  methodDescriptorListSeason = new grpcWeb.MethodDescriptor(
+    '/group.Group/ListSeason',
+    grpcWeb.MethodType.UNARY,
+    group_pb.ListSeasonRequest,
+    group_pb.ListSeasonReply,
+    (request: group_pb.ListSeasonRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.ListSeasonReply.deserializeBinary
+  );
+
+  listSeason(
+    request: group_pb.ListSeasonRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.ListSeasonReply>;
+
+  listSeason(
+    request: group_pb.ListSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.ListSeasonReply) => void): grpcWeb.ClientReadableStream<group_pb.ListSeasonReply>;
+
+  listSeason(
+    request: group_pb.ListSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.ListSeasonReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/ListSeason',
+        request,
+        metadata || {},
+        this.methodDescriptorListSeason,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/ListSeason',
+    request,
+    metadata || {},
+    this.methodDescriptorListSeason);
+  }
+
+  methodDescriptorUpdateSeason = new grpcWeb.MethodDescriptor(
+    '/group.Group/UpdateSeason',
+    grpcWeb.MethodType.UNARY,
+    group_pb.UpdateSeasonRequest,
+    group_pb.UpdateSeasonReply,
+    (request: group_pb.UpdateSeasonRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.UpdateSeasonReply.deserializeBinary
+  );
+
+  updateSeason(
+    request: group_pb.UpdateSeasonRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.UpdateSeasonReply>;
+
+  updateSeason(
+    request: group_pb.UpdateSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.UpdateSeasonReply) => void): grpcWeb.ClientReadableStream<group_pb.UpdateSeasonReply>;
+
+  updateSeason(
+    request: group_pb.UpdateSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.UpdateSeasonReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/UpdateSeason',
+        request,
+        metadata || {},
+        this.methodDescriptorUpdateSeason,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/UpdateSeason',
+    request,
+    metadata || {},
+    this.methodDescriptorUpdateSeason);
+  }
+
+  methodDescriptorDeleteSeason = new grpcWeb.MethodDescriptor(
+    '/group.Group/DeleteSeason',
+    grpcWeb.MethodType.UNARY,
+    group_pb.DeleteSeasonRequest,
+    group_pb.DeleteSeasonReply,
+    (request: group_pb.DeleteSeasonRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.DeleteSeasonReply.deserializeBinary
+  );
+
+  deleteSeason(
+    request: group_pb.DeleteSeasonRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.DeleteSeasonReply>;
+
+  deleteSeason(
+    request: group_pb.DeleteSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.DeleteSeasonReply) => void): grpcWeb.ClientReadableStream<group_pb.DeleteSeasonReply>;
+
+  deleteSeason(
+    request: group_pb.DeleteSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.DeleteSeasonReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/DeleteSeason',
+        request,
+        metadata || {},
+        this.methodDescriptorDeleteSeason,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/DeleteSeason',
+    request,
+    metadata || {},
+    this.methodDescriptorDeleteSeason);
+  }
+
+  methodDescriptorGetSeason = new grpcWeb.MethodDescriptor(
+    '/group.Group/GetSeason',
+    grpcWeb.MethodType.UNARY,
+    group_pb.GetSeasonRequest,
+    group_pb.GetSeasonReply,
+    (request: group_pb.GetSeasonRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.GetSeasonReply.deserializeBinary
+  );
+
+  getSeason(
+    request: group_pb.GetSeasonRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.GetSeasonReply>;
+
+  getSeason(
+    request: group_pb.GetSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.GetSeasonReply) => void): grpcWeb.ClientReadableStream<group_pb.GetSeasonReply>;
+
+  getSeason(
+    request: group_pb.GetSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.GetSeasonReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/GetSeason',
+        request,
+        metadata || {},
+        this.methodDescriptorGetSeason,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/GetSeason',
+    request,
+    metadata || {},
+    this.methodDescriptorGetSeason);
+  }
+
 }
 

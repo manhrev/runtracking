@@ -1,24 +1,18 @@
 import {
-  ListGroupReply,
-  ListGroupRequest,
-  GetGroupRequest,
-  GetGroupReply,
-  CreateGroupRequest,
-  CreateGroupReply,
-  GroupInfo,
-  UpdateGroupRequest,
-  UpdateGroupReply,
-  JoinGroupReply,
-  JoinGroupRequest,
-  DeleteGroupRequest,
-  DeleteGroupReply,
-  ListMembersOfGroupRequest,
-  ListMembersOfGroupReply,
-  AcceptMemberRequest,
-  AcceptMemberReply,
-  LeaveGroupRequest,
-  LeaveGroupReply,
+  GroupInfo, ChallengeInfo, ChallengeRuleInfo,
+  ListGroupReply, ListGroupRequest,
+  GetGroupRequest, GetGroupReply,
+  CreateGroupRequest, CreateGroupReply,
+  UpdateGroupRequest, UpdateGroupReply,
+  JoinGroupRequest, JoinGroupReply,
+  DeleteGroupRequest, DeleteGroupReply,
+  ListMembersOfGroupRequest, ListMembersOfGroupReply,
+  AcceptMemberRequest, AcceptMemberReply,
+  LeaveGroupRequest, LeaveGroupReply,
+  ListChallengeRequest, ListChallengeReply,
+  CreateChallengeRequest, CreateChallengeReply,
 } from '../../../lib/group/group_pb'
+
 import { GRPCClientConfig } from '../abstract/types'
 import gRPCClientAbstract from '../abstract/gRPCClient'
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb'
@@ -137,6 +131,73 @@ class rpcGroupClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<LeaveGroupReply.AsObject>(
       'leaveGroup',
+      req
+    )
+  }
+
+  // challenge
+  async listChallenge(param: ListChallengeRequest.AsObject) {
+    const req = new ListChallengeRequest()
+    req.setGroupId(param.groupId)
+    req.setAscending(param.ascending)
+    req.setLimit(param.limit)
+    req.setOffset(param.offset)
+    req.setSortBy(param.sortBy)
+    req.setSearchByName(param.searchByName)
+    req.setFilterByRulesList(param.filterByRulesList)
+    req.setFilterByType(param.filterByType)
+    req.setStatus(param.status)
+
+    // // dont need
+    // req.setFrom(new Timestamp().setSeconds(param.from?.seconds || 0))
+    // req.setTo(new Timestamp().setSeconds(param.to?.seconds || 0))
+
+    return await this.gRPCClientRequest<ListChallengeReply.AsObject>(
+      'listChallenge',
+      req
+    )
+  }
+  
+  async createChallenge(param: CreateChallengeRequest.AsObject) {
+    const challengeRuleInfo = new ChallengeRuleInfo()
+    challengeRuleInfo.setRule(param.challengeinfo?.challengerulesList[0]?.rule || 0)
+    challengeRuleInfo.setId(param.challengeinfo?.challengerulesList[0]?.id || 0)
+    challengeRuleInfo.setGoal(param.challengeinfo?.challengerulesList[0]?.goal || 0)
+    challengeRuleInfo.setCreatedAt(
+      new Timestamp().setSeconds(param.challengeinfo?.challengerulesList[0]?.createdAt?.seconds || 0)
+    )
+    challengeRuleInfo.setUpdatedAt(
+      new Timestamp().setSeconds(param.challengeinfo?.challengerulesList[0]?.updatedAt?.seconds || 0)
+    )
+
+
+    const challengeInfo = new ChallengeInfo()
+    challengeInfo.setName(param.challengeinfo?.name || '')
+    challengeInfo.setDescription(param.challengeinfo?.description || '')
+    challengeInfo.setPicture(param.challengeinfo?.picture || '')
+    challengeInfo.setType(param.challengeinfo?.type || 0)
+    challengeInfo.setStatus(param.challengeinfo?.status || 0)
+    challengeInfo.setFrom(
+      new Timestamp().setSeconds(param.challengeinfo?.from?.seconds || 0)
+    )
+    challengeInfo.setTo(
+      new Timestamp().setSeconds(param.challengeinfo?.to?.seconds || 0)
+    )
+    challengeInfo.setChallengerulesList([challengeRuleInfo])
+    
+    // dont need
+    challengeInfo.setId(param.challengeinfo?.id || 0)
+    challengeInfo.setGroupId(param.challengeinfo?.groupId || 0)
+    challengeInfo.setMemberProgressListList([])
+    challengeInfo.setCompletedFirstMember(undefined)
+
+    // main req
+    const req = new CreateChallengeRequest()
+    req.setGroupId(param.groupId)
+    req.setChallengeinfo(challengeInfo)
+
+    return await this.gRPCClientRequest<CreateChallengeReply.AsObject>(
+      'createChallenge',
       req
     )
   }

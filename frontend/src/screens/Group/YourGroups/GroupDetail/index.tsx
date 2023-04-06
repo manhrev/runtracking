@@ -311,7 +311,10 @@ export default function GroupDetail({
                     marginRight: 10,
                 }}
                 mode="text"
-                onPress={() => {}}
+                onPress={() => navigation.navigate('ChallengeList', {
+                    groupId: groupDetail.groupinfo?.id || 0,
+                    isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
+                })}
                 labelStyle={{
                     fontSize: 15
                 }}

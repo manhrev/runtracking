@@ -3,6 +3,271 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 
+export class SeasonInfo extends jspb.Message {
+  getId(): number;
+  setId(value: number): SeasonInfo;
+
+  getName(): string;
+  setName(value: string): SeasonInfo;
+
+  getDescription(): string;
+  setDescription(value: string): SeasonInfo;
+
+  getPicture(): string;
+  setPicture(value: string): SeasonInfo;
+
+  getStatus(): RuleStatus;
+  setStatus(value: RuleStatus): SeasonInfo;
+
+  getFrom(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setFrom(value?: google_protobuf_timestamp_pb.Timestamp): SeasonInfo;
+  hasFrom(): boolean;
+  clearFrom(): SeasonInfo;
+
+  getTo(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setTo(value?: google_protobuf_timestamp_pb.Timestamp): SeasonInfo;
+  hasTo(): boolean;
+  clearTo(): SeasonInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SeasonInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: SeasonInfo): SeasonInfo.AsObject;
+  static serializeBinaryToWriter(message: SeasonInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SeasonInfo;
+  static deserializeBinaryFromReader(message: SeasonInfo, reader: jspb.BinaryReader): SeasonInfo;
+}
+
+export namespace SeasonInfo {
+  export type AsObject = {
+    id: number,
+    name: string,
+    description: string,
+    picture: string,
+    status: RuleStatus,
+    from?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    to?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class GetSeasonRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): GetSeasonRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetSeasonRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetSeasonRequest): GetSeasonRequest.AsObject;
+  static serializeBinaryToWriter(message: GetSeasonRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetSeasonRequest;
+  static deserializeBinaryFromReader(message: GetSeasonRequest, reader: jspb.BinaryReader): GetSeasonRequest;
+}
+
+export namespace GetSeasonRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
+export class GetSeasonReply extends jspb.Message {
+  getSeasoninfo(): SeasonInfo | undefined;
+  setSeasoninfo(value?: SeasonInfo): GetSeasonReply;
+  hasSeasoninfo(): boolean;
+  clearSeasoninfo(): GetSeasonReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetSeasonReply.AsObject;
+  static toObject(includeInstance: boolean, msg: GetSeasonReply): GetSeasonReply.AsObject;
+  static serializeBinaryToWriter(message: GetSeasonReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetSeasonReply;
+  static deserializeBinaryFromReader(message: GetSeasonReply, reader: jspb.BinaryReader): GetSeasonReply;
+}
+
+export namespace GetSeasonReply {
+  export type AsObject = {
+    seasoninfo?: SeasonInfo.AsObject,
+  }
+}
+
+export class CreateSeasonRequest extends jspb.Message {
+  getSeasoninfo(): SeasonInfo | undefined;
+  setSeasoninfo(value?: SeasonInfo): CreateSeasonRequest;
+  hasSeasoninfo(): boolean;
+  clearSeasoninfo(): CreateSeasonRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateSeasonRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateSeasonRequest): CreateSeasonRequest.AsObject;
+  static serializeBinaryToWriter(message: CreateSeasonRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateSeasonRequest;
+  static deserializeBinaryFromReader(message: CreateSeasonRequest, reader: jspb.BinaryReader): CreateSeasonRequest;
+}
+
+export namespace CreateSeasonRequest {
+  export type AsObject = {
+    seasoninfo?: SeasonInfo.AsObject,
+  }
+}
+
+export class CreateSeasonReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateSeasonReply.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateSeasonReply): CreateSeasonReply.AsObject;
+  static serializeBinaryToWriter(message: CreateSeasonReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateSeasonReply;
+  static deserializeBinaryFromReader(message: CreateSeasonReply, reader: jspb.BinaryReader): CreateSeasonReply;
+}
+
+export namespace CreateSeasonReply {
+  export type AsObject = {
+  }
+}
+
+export class ListSeasonRequest extends jspb.Message {
+  getLimit(): number;
+  setLimit(value: number): ListSeasonRequest;
+
+  getOffset(): number;
+  setOffset(value: number): ListSeasonRequest;
+
+  getAscending(): boolean;
+  setAscending(value: boolean): ListSeasonRequest;
+
+  getSortBy(): ListSeasonRequest.SeasonSortBy;
+  setSortBy(value: ListSeasonRequest.SeasonSortBy): ListSeasonRequest;
+
+  getSearchByName(): string;
+  setSearchByName(value: string): ListSeasonRequest;
+
+  getStatus(): RuleStatus;
+  setStatus(value: RuleStatus): ListSeasonRequest;
+
+  getFrom(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setFrom(value?: google_protobuf_timestamp_pb.Timestamp): ListSeasonRequest;
+  hasFrom(): boolean;
+  clearFrom(): ListSeasonRequest;
+
+  getTo(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setTo(value?: google_protobuf_timestamp_pb.Timestamp): ListSeasonRequest;
+  hasTo(): boolean;
+  clearTo(): ListSeasonRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListSeasonRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListSeasonRequest): ListSeasonRequest.AsObject;
+  static serializeBinaryToWriter(message: ListSeasonRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListSeasonRequest;
+  static deserializeBinaryFromReader(message: ListSeasonRequest, reader: jspb.BinaryReader): ListSeasonRequest;
+}
+
+export namespace ListSeasonRequest {
+  export type AsObject = {
+    limit: number,
+    offset: number,
+    ascending: boolean,
+    sortBy: ListSeasonRequest.SeasonSortBy,
+    searchByName: string,
+    status: RuleStatus,
+    from?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    to?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+
+  export enum SeasonSortBy { 
+    SEASON_SORT_BY_UNSPECIFIED = 0,
+    SEASON_SORT_BY_START_TIME = 1,
+    SEASON_SORT_BY_END_TIME = 2,
+    SEASON_SORT_BY_NAME = 3,
+  }
+}
+
+export class ListSeasonReply extends jspb.Message {
+  getSeasoninfolistList(): Array<SeasonInfo>;
+  setSeasoninfolistList(value: Array<SeasonInfo>): ListSeasonReply;
+  clearSeasoninfolistList(): ListSeasonReply;
+  addSeasoninfolist(value?: SeasonInfo, index?: number): SeasonInfo;
+
+  getTotal(): number;
+  setTotal(value: number): ListSeasonReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListSeasonReply.AsObject;
+  static toObject(includeInstance: boolean, msg: ListSeasonReply): ListSeasonReply.AsObject;
+  static serializeBinaryToWriter(message: ListSeasonReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListSeasonReply;
+  static deserializeBinaryFromReader(message: ListSeasonReply, reader: jspb.BinaryReader): ListSeasonReply;
+}
+
+export namespace ListSeasonReply {
+  export type AsObject = {
+    seasoninfolistList: Array<SeasonInfo.AsObject>,
+    total: number,
+  }
+}
+
+export class UpdateSeasonRequest extends jspb.Message {
+  getSeasoninfo(): SeasonInfo | undefined;
+  setSeasoninfo(value?: SeasonInfo): UpdateSeasonRequest;
+  hasSeasoninfo(): boolean;
+  clearSeasoninfo(): UpdateSeasonRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateSeasonRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateSeasonRequest): UpdateSeasonRequest.AsObject;
+  static serializeBinaryToWriter(message: UpdateSeasonRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateSeasonRequest;
+  static deserializeBinaryFromReader(message: UpdateSeasonRequest, reader: jspb.BinaryReader): UpdateSeasonRequest;
+}
+
+export namespace UpdateSeasonRequest {
+  export type AsObject = {
+    seasoninfo?: SeasonInfo.AsObject,
+  }
+}
+
+export class UpdateSeasonReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateSeasonReply.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateSeasonReply): UpdateSeasonReply.AsObject;
+  static serializeBinaryToWriter(message: UpdateSeasonReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateSeasonReply;
+  static deserializeBinaryFromReader(message: UpdateSeasonReply, reader: jspb.BinaryReader): UpdateSeasonReply;
+}
+
+export namespace UpdateSeasonReply {
+  export type AsObject = {
+  }
+}
+
+export class DeleteSeasonRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): DeleteSeasonRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteSeasonRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteSeasonRequest): DeleteSeasonRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteSeasonRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteSeasonRequest;
+  static deserializeBinaryFromReader(message: DeleteSeasonRequest, reader: jspb.BinaryReader): DeleteSeasonRequest;
+}
+
+export namespace DeleteSeasonRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
+export class DeleteSeasonReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteSeasonReply.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteSeasonReply): DeleteSeasonReply.AsObject;
+  static serializeBinaryToWriter(message: DeleteSeasonReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteSeasonReply;
+  static deserializeBinaryFromReader(message: DeleteSeasonReply, reader: jspb.BinaryReader): DeleteSeasonReply;
+}
+
+export namespace DeleteSeasonReply {
+  export type AsObject = {
+  }
+}
+
 export class GetChallengeRequest extends jspb.Message {
   getId(): number;
   setId(value: number): GetChallengeRequest;
@@ -251,6 +516,24 @@ export namespace DeleteChallengeReply {
 }
 
 export class ListUserRankingRequest extends jspb.Message {
+  getLimit(): number;
+  setLimit(value: number): ListUserRankingRequest;
+
+  getOffset(): number;
+  setOffset(value: number): ListUserRankingRequest;
+
+  getAscending(): boolean;
+  setAscending(value: boolean): ListUserRankingRequest;
+
+  getGroupId(): number;
+  setGroupId(value: number): ListUserRankingRequest;
+
+  getSeasonId(): number;
+  setSeasonId(value: number): ListUserRankingRequest;
+
+  getSortby(): ListUserRankingRequest.SortBy;
+  setSortby(value: ListUserRankingRequest.SortBy): ListUserRankingRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListUserRankingRequest.AsObject;
   static toObject(includeInstance: boolean, msg: ListUserRankingRequest): ListUserRankingRequest.AsObject;
@@ -261,10 +544,35 @@ export class ListUserRankingRequest extends jspb.Message {
 
 export namespace ListUserRankingRequest {
   export type AsObject = {
+    limit: number,
+    offset: number,
+    ascending: boolean,
+    groupId: number,
+    seasonId: number,
+    sortby: ListUserRankingRequest.SortBy,
+  }
+
+  export enum SortBy { 
+    SORT_BY_UNSPECIFIED = 0,
+    SORT_BY_POINT = 1,
+    SORT_BY_COUNT_CHALLENGE_COMPLETED = 2,
   }
 }
 
 export class ListUserRankingReply extends jspb.Message {
+  getSeasoninfo(): SeasonInfo | undefined;
+  setSeasoninfo(value?: SeasonInfo): ListUserRankingReply;
+  hasSeasoninfo(): boolean;
+  clearSeasoninfo(): ListUserRankingReply;
+
+  getUserrankinglistList(): Array<UserRanking>;
+  setUserrankinglistList(value: Array<UserRanking>): ListUserRankingReply;
+  clearUserrankinglistList(): ListUserRankingReply;
+  addUserrankinglist(value?: UserRanking, index?: number): UserRanking;
+
+  getTotal(): number;
+  setTotal(value: number): ListUserRankingReply;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListUserRankingReply.AsObject;
   static toObject(includeInstance: boolean, msg: ListUserRankingReply): ListUserRankingReply.AsObject;
@@ -275,6 +583,37 @@ export class ListUserRankingReply extends jspb.Message {
 
 export namespace ListUserRankingReply {
   export type AsObject = {
+    seasoninfo?: SeasonInfo.AsObject,
+    userrankinglistList: Array<UserRanking.AsObject>,
+    total: number,
+  }
+}
+
+export class UserRanking extends jspb.Message {
+  getMember(): Member | undefined;
+  setMember(value?: Member): UserRanking;
+  hasMember(): boolean;
+  clearMember(): UserRanking;
+
+  getPoint(): number;
+  setPoint(value: number): UserRanking;
+
+  getCountChallengeCompleted(): number;
+  setCountChallengeCompleted(value: number): UserRanking;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserRanking.AsObject;
+  static toObject(includeInstance: boolean, msg: UserRanking): UserRanking.AsObject;
+  static serializeBinaryToWriter(message: UserRanking, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserRanking;
+  static deserializeBinaryFromReader(message: UserRanking, reader: jspb.BinaryReader): UserRanking;
+}
+
+export namespace UserRanking {
+  export type AsObject = {
+    member?: Member.AsObject,
+    point: number,
+    countChallengeCompleted: number,
   }
 }
 
@@ -1062,6 +1401,30 @@ export namespace EventInfo {
   }
 }
 
+export class ChallengeProgress extends jspb.Message {
+  getTimestamp(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setTimestamp(value?: google_protobuf_timestamp_pb.Timestamp): ChallengeProgress;
+  hasTimestamp(): boolean;
+  clearTimestamp(): ChallengeProgress;
+
+  getValue(): number;
+  setValue(value: number): ChallengeProgress;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ChallengeProgress.AsObject;
+  static toObject(includeInstance: boolean, msg: ChallengeProgress): ChallengeProgress.AsObject;
+  static serializeBinaryToWriter(message: ChallengeProgress, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ChallengeProgress;
+  static deserializeBinaryFromReader(message: ChallengeProgress, reader: jspb.BinaryReader): ChallengeProgress;
+}
+
+export namespace ChallengeProgress {
+  export type AsObject = {
+    timestamp?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    value: number,
+  }
+}
+
 export enum Rule { 
   RULE_UNSPECIFIED = 0,
   RULE_TOTAL_DISTANCE = 1,
@@ -1070,9 +1433,10 @@ export enum Rule {
 }
 export enum RuleStatus { 
   RULE_STATUS_UNSPECIFIED = 0,
-  RULE_STATUS_FAILED = 1,
   RULE_STATUS_COMPLETED = 2,
   RULE_STATUS_INPROGRESS = 3,
+  RULE_STATUS_COMING_SOON = 4,
+  RULE_STATUS_FAILED = 1,
 }
 export enum ActivityType { 
   ACTIVITY_TYPE_UNSPECIFIED = 0,
