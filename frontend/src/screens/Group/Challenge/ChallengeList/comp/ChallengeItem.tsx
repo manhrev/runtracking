@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, View } from 'react-native'
+import { Dimensions, StyleSheet, View, Image } from 'react-native'
 import {
   Avatar,
   Button,
@@ -34,10 +34,17 @@ export default function GroupItem({
         )}
         <View style={styles(theme).listItemContainer}>
           <View style={styles(theme).listItemTilte}>
-            <Avatar.Icon
-              size={55}
-              icon={challenge.type == ActivityType.ACTIVITY_TYPE_RUNNING ? 'run-fast' : challenge.type == ActivityType.ACTIVITY_TYPE_WALKING ? 'walk' : 'bike'}
-              style={{ borderRadius: 5 }}
+            <Image
+                style={{
+                    width: 55,
+                    height: 55,
+                    borderRadius: 5,
+                }}
+                source={
+                    challenge.picture == "" ?
+                    require('../../../../../../assets/group-img.png') :
+                    { uri: challenge.picture }
+                }
             />
             <View
               style={{
