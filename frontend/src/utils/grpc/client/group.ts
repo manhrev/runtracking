@@ -11,6 +11,7 @@ import {
   LeaveGroupRequest, LeaveGroupReply,
   ListChallengeRequest, ListChallengeReply,
   CreateChallengeRequest, CreateChallengeReply,
+  DeleteChallengeRequest, DeleteChallengeReply,
 } from '../../../lib/group/group_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -198,6 +199,16 @@ class rpcGroupClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<CreateChallengeReply.AsObject>(
       'createChallenge',
+      req
+    )
+  }
+
+  async deleteChallenge(param: DeleteChallengeRequest.AsObject) {
+    const req = new DeleteChallengeRequest()
+    req.setId(param.id)
+
+    return await this.gRPCClientRequest<DeleteChallengeReply.AsObject>(
+      'deleteChallenge',
       req
     )
   }

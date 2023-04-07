@@ -16,12 +16,18 @@ interface GroupItemProps {
     hideTopDivider?: boolean
     showBottomDivider?: boolean
     challenge: ChallengeInfo.AsObject
+    deleteListId: number[]
+    addOrRemoveFromDeleteList: (id: number) => void
+    isLeader: boolean
 }
 
 export default function GroupItem({
     hideTopDivider,
     showBottomDivider,
     challenge,
+    deleteListId,
+    addOrRemoveFromDeleteList,
+    isLeader,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const windowWidth = Dimensions.get('window').width;
@@ -78,6 +84,26 @@ export default function GroupItem({
                     />
                 </View>
             </View>
+            {isLeader && <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flex: 1,
+                }}
+              >
+                <IconButton
+                  icon={
+                    deleteListId.includes(challenge.id)
+                      ? 'checkbox-marked'
+                      : 'checkbox-blank-outline'
+                  }
+                  iconColor={
+                    deleteListId.includes(challenge.id) ? '#e82525' : '#969696'
+                  }
+                  size={27}
+                  onPress={() => addOrRemoveFromDeleteList(challenge.id)}
+                />
+            </View>}
           </View>
         </View>
         {showBottomDivider && (

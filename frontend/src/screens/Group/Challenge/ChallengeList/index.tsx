@@ -6,8 +6,9 @@ import { ActivityIndicator, Button, Divider, Searchbar, Text } from 'react-nativ
 import { useDialog } from '../../../../hooks/useDialog'
 import {
   RuleStatus,
-  ListChallengeRequest,
   ChallengeInfo,
+  ListChallengeRequest,
+  DeleteChallengeRequest,
 } from '../../../../lib/group/group_pb'
 
 import {
@@ -23,6 +24,7 @@ import {
 
 import {
     listChallengeThunk,
+    deleteChallengeThunk,
 } from '../../../../redux/features/challengeList/thunk'
 import { useAppDispatch, useAppSelector } from '../../../../redux/store'
 import { useAppTheme } from '../../../../theme'
@@ -46,15 +48,11 @@ export default function ChallengeList({
     const { challengeList } = useAppSelector(getChallengesList)
     const challengeListLoading = useAppSelector(isChallengeListLoading)
     const noData = challengeList.length === 0 && !challengeListLoading
-    //   const [canLoadmore, setCanLoadmore] = useState(false)
 
     const [searchQuery, setSearchQuery] = useState('')
-
     const [asc, setAsc] = useState(false)
-    //   const [currentOffset, setCurrentOffset] = useState(0)
     const [searchByName, setSearchByName] = useState('')
     const [sortBy, setSortBy] = useState(ListChallengeRequest.ChallengeSortBy.CHALLENGE_SORT_BY_START_TIME)
-    //   const filterBy = ListGroupRequest.FilterBy.FILTER_BY_IS_NOT_MEMBER
     const [status, setStatus] = useState(RuleStatus.RULE_STATUS_UNSPECIFIED)
 
     useEffect(() => {
@@ -82,8 +80,97 @@ export default function ChallengeList({
         if (query === '') setSearchByName(query)
     }
 
+  
+  // for delete
+  const [deleteListId, setDeleteListId] = useState<number[]>([])
+  const [selectedAll, setSelectedAll] = useState(false)
+  const { toggleDialog, open } = useDialog()
+
+  const addOrRemoveFromDeleteList = (id: number) => {
+    if (deleteListId.includes(id)) {
+      // remove from delete list
+      setDeleteListId(deleteListId.filter((item) => item !== id))
+      setSelectedAll(false)
+    } else {
+      setDeleteListId([...deleteListId, id])
+      if (deleteListId.length + 1 === challengeList.length)
+        setSelectedAll(true) // if all selected
+    }
+  }
+
+  const deleteOrNot = () => {
+    if (deleteListId.length === 0) {
+      toast.error({ message: 'No challenge selected' })
+      return
+    }
+
+    toggleDialog()
+  }
+
+  const deleteConfirmed = () => {
+    let failedCount = 0
+
+    deleteListId.forEach(async (id) => {
+      const deleteInfo: DeleteChallengeRequest.AsObject = {
+        id: id,
+      }
+
+      const { error } = await dispatch(deleteChallengeThunk(deleteInfo)).unwrap()
+      if (error) {
+        failedCount++
+      }
+    })
+
+    if (failedCount == deleteListId.length) {
+      toast.error({
+        message: 'Failed to delete challenge(s)',
+      })
+    }
+    else if (failedCount > 0) {
+      toast.error({
+        message: 'Failed to delete ' + failedCount + ' challenge(s)',
+      })
+    }
+    else {
+      toast.success({ message: 'Deleted challenge(s) successfully' })
+    }
+
+    setDeleteListId([])
+    setSelectedAll(false)
+    toggleDialog()
+  }
+  
+  const selectOrUnselectAll = () => {
+    if (selectedAll) {
+      setSelectedAll(false)
+      setDeleteListId([])
+    } else {
+      setSelectedAll(true)
+      const listId: number[] = []
+      challengeList.map((item) => {
+        listId.push(item.id)
+      })
+      setDeleteListId(listId)
+    }
+  }
+
+  // if loading change, reset selected all and delete list
+  useEffect(() => {
+    setSelectedAll(false)
+    setDeleteListId([])
+  }, [challengeListLoading])
+
   return (
     <View style={baseStyles(theme).container}>
+      <ConfirmDialog
+        message={
+          'Are you sure you want to delete ' + deleteListId.length + ' challenge(s)?'
+        }
+        title="Delete Challenge"
+        visible={open}
+        onSubmit={() => deleteConfirmed()}
+        toogleDialog={toggleDialog}
+      />
       <View style={baseStyles(theme).innerWrapper}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -94,18 +181,53 @@ export default function ChallengeList({
             />
           }
         >
-          {route.params.isLeader && <FabGroup
-            actions={[
-              {
-                icon: 'plus',
-                label: 'Create new challenge',
-                labelTextColor: theme.colors.onPrimary,
-                color: theme.colors.onPrimary,
-                style: { backgroundColor: theme.colors.primary },
-                onPress: () => navigation.navigate('ChallengeAdd', { groupId: route.params.groupId }),
-              },
-            ]}
-          />}
+          {(deleteListId.length > 0) ? route.params.isLeader && (
+            <FabGroup
+              actions={[
+                {
+                  icon: 'delete',
+                  label:
+                    'Remove ' + deleteListId.length + ' selected challenge(s)',
+                  labelTextColor: theme.colors.onError,
+                  onPress: () => deleteOrNot(),
+                  color: theme.colors.onError,
+                  style: { backgroundColor: theme.colors.error },
+                },
+                {
+                  // select or unselect all
+                  icon: selectedAll ? 'checkbox-multiple-blank' : 'checkbox-multiple-marked',
+                  label: selectedAll ? 'Unselect all' : 'Select all',
+                  labelTextColor: theme.colors.onTertiary,
+                  color: theme.colors.onTertiary,
+                  style: { backgroundColor: theme.colors.tertiary },
+                  onPress: () => selectOrUnselectAll()
+                },
+              ]}
+              type="error"
+            />
+          ) : route.params.isLeader && (
+            <FabGroup
+              actions={[
+                {
+                  icon: 'plus',
+                  label: 'Create new challenge',
+                  labelTextColor: theme.colors.onPrimary,
+                  color: theme.colors.onPrimary,
+                  style: { backgroundColor: theme.colors.primary },
+                  onPress: () => navigation.navigate('ChallengeAdd', { groupId: route.params.groupId }),
+                },
+                {
+                  // select or unselect all
+                  icon: selectedAll ? 'checkbox-multiple-blank' : 'checkbox-multiple-marked',
+                  label: selectedAll ? 'Unselect all' : 'Select all',
+                  labelTextColor: theme.colors.onTertiary,
+                  color: theme.colors.onTertiary,
+                  style: { backgroundColor: theme.colors.tertiary },
+                  onPress: () => selectOrUnselectAll()
+                },
+              ]}
+            />
+          )}
 
           <Searchbar
             style={{ marginTop: 20, height: 45 }}
@@ -141,6 +263,9 @@ export default function ChallengeList({
                 challenge={challenge}
                 hideTopDivider={idx === 0}
                 showBottomDivider={idx === challengeList.length - 1}
+                deleteListId={deleteListId}
+                addOrRemoveFromDeleteList={addOrRemoveFromDeleteList}
+                isLeader={route.params.isLeader}
               />
             )
           })}
