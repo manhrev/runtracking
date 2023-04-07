@@ -6,6 +6,7 @@ import { RootState } from '../../reducers'
 import {
   listChallengeThunk,
   createChallengeThunk,
+  deleteChallengeThunk,
 } from './thunk'
 
 type PlanListState = {
@@ -45,6 +46,21 @@ const slice = createSlice({
       }
       state.status = StatusEnum.SUCCEEDED
       // state.challengeList.push(response?.challengeinfo || {})
+    })
+    builder.addCase(deleteChallengeThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING
+    })
+    builder.addCase(deleteChallengeThunk.fulfilled, (state, { payload }) => {
+      const { response, error, deletedId } = payload
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
+      state.status = StatusEnum.SUCCEEDED
+      
+      state.challengeList = state.challengeList.filter((item: any) => {
+        return item.id !== deletedId
+      })
     })
   },
 })
