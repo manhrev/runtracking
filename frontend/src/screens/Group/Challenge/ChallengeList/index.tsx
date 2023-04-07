@@ -181,7 +181,7 @@ export default function ChallengeList({
             />
           }
         >
-          {(route.params.isLeader && deleteListId.length > 0) ? (
+          {(deleteListId.length > 0) ? route.params.isLeader && (
             <FabGroup
               actions={[
                 {
@@ -205,7 +205,7 @@ export default function ChallengeList({
               ]}
               type="error"
             />
-          ) : (
+          ) : route.params.isLeader && (
             <FabGroup
               actions={[
                 {
@@ -265,6 +265,7 @@ export default function ChallengeList({
                 showBottomDivider={idx === challengeList.length - 1}
                 deleteListId={deleteListId}
                 addOrRemoveFromDeleteList={addOrRemoveFromDeleteList}
+                isLeader={route.params.isLeader}
               />
             )
           })}

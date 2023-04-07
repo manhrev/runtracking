@@ -18,6 +18,7 @@ interface GroupItemProps {
     challenge: ChallengeInfo.AsObject
     deleteListId: number[]
     addOrRemoveFromDeleteList: (id: number) => void
+    isLeader: boolean
 }
 
 export default function GroupItem({
@@ -26,6 +27,7 @@ export default function GroupItem({
     challenge,
     deleteListId,
     addOrRemoveFromDeleteList,
+    isLeader,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const windowWidth = Dimensions.get('window').width;
@@ -82,7 +84,7 @@ export default function GroupItem({
                     />
                 </View>
             </View>
-            <View
+            {isLeader && <View
                 style={{
                   justifyContent: 'center',
                   alignItems: 'flex-end',
@@ -101,7 +103,7 @@ export default function GroupItem({
                   size={27}
                   onPress={() => addOrRemoveFromDeleteList(challenge.id)}
                 />
-            </View>
+            </View>}
           </View>
         </View>
         {showBottomDivider && (
