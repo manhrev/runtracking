@@ -11,7 +11,7 @@ import {
     isGroupDetailLoading,
 } from '../../../../redux/features/groupDetail/slice'
 
-import { Member, GetGroupReply } from '../../../../lib/group/group_pb'
+import { Member, GetGroupReply, RuleStatus, ListChallengeRequest } from '../../../../lib/group/group_pb'
 import { useEffect, useState } from 'react'
 import { FabGroup } from '../../../../comp/FabGroup'
 import { groupClient } from '../../../../utils/grpc'
@@ -21,6 +21,9 @@ import { useDialog } from '../../../../hooks/useDialog'
 import { ConfirmDialog } from '../../../../comp/ConfirmDialog'
 import { getGroupThunk } from '../../../../redux/features/groupDetail/thunk'
 import { RefreshControl } from 'react-native-gesture-handler'
+import { getChallengesList, isChallengeListLoading } from '../../../../redux/features/challengeList/slice'
+import { listChallengeThunk } from '../../../../redux/features/challengeList/thunk'
+import { ActivityType } from '../../../../lib/activity/activity_pb'
 
 export default function GroupDetail({
   navigation,
@@ -58,9 +61,15 @@ export default function GroupDetail({
         },
     ]
 
+    // group detail
     const { groupDetail } = useAppSelector(selectGroupDetail)
     const groupDetailLoading = useAppSelector(isGroupDetailLoading)
     // const noData = groupDetail.length === 0 && !groupDetailLoading
+
+    // challenge list
+    const { challengeList } = useAppSelector(getChallengesList)
+    const challengeListLoading = useAppSelector(isChallengeListLoading)
+    const noChallengeData = challengeList.length === 0 && !challengeListLoading
 
     const handleAction = (action: string) => {
         setCurrentAction(action)
@@ -101,6 +110,22 @@ export default function GroupDetail({
         fetchGroupDetail() // reload group detail
     }
 
+    const fetchChallengeList = async () => {
+        const { response } = await dispatch(
+            listChallengeThunk({
+                limit: 5,
+                offset: 0,
+                ascending: true,
+                groupId: route.params.groupId,
+                sortBy: ListChallengeRequest.ChallengeSortBy.CHALLENGE_SORT_BY_START_TIME,
+                searchByName: '',
+                status: RuleStatus.RULE_STATUS_UNSPECIFIED,
+                filterByRulesList: [],
+                filterByType: ActivityType.ACTIVITY_TYPE_UNSPECIFIED,
+            })
+        ).unwrap()
+    }
+
     const fetchGroupDetail = async () => {
         await dispatch(getGroupThunk({ groupId: route.params.groupId })).unwrap()
         console.log(groupDetail)
@@ -108,6 +133,7 @@ export default function GroupDetail({
 
     useEffect(() => {
         fetchGroupDetail()
+        fetchChallengeList()
     }, [])
 
   return (
@@ -324,9 +350,9 @@ export default function GroupDetail({
         </View>
 
         {/* // Horizontal FlatList of challenges */}
-        <FlatList
+        {!challengeListLoading && <FlatList
             horizontal
-            data={testData}
+            data={challengeList}
             renderItem={({ item }) => (
                 <TouchableOpacity
                 style={{
@@ -335,26 +361,37 @@ export default function GroupDetail({
                 }}
                 onPress={() => console.log("Challenge pressed")}
                 >
-                    <View style={{
-                        width: 150,
-                        height: 130,
-                        backgroundColor: theme.colors.tertiary,
-                        borderRadius: 5,
-                        margin: 10,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                        <Text style={{color: "white"}}>Image</Text>
-                    </View>
+                    <Image
+                        style={{
+                            width: 150,
+                            height: 130,
+                            borderRadius: 5,
+                            margin: 10,
+                        }}
+                        source={
+                            item.picture == "" ?
+                            require('../../../../../assets/group-img.png') :
+                            { uri: item.picture }
+                        }
+                    />
                     <Text style={{
                         marginLeft: 10,
                         fontWeight: 'bold',
                         fontSize: 15,
-                    }}>{item.title}</Text>
+                    }}>{item.name}</Text>
                 </TouchableOpacity>
             )}
             keyExtractor={item => item.id.toString()}
-        />
+        />}
+
+        {challengeListLoading && <ActivityIndicator size="small" style={{ paddingVertical: 20, alignItems: 'center'}} />}
+
+        {noChallengeData && <Text
+            variant="bodyLarge"
+            style={{ paddingVertical: 10, color: theme.colors.tertiary, textAlign: 'center', fontWeight: 'bold' }}
+        >
+            No challenge yet
+        </Text>}
 
         <View style={{
             flexDirection: 'row',

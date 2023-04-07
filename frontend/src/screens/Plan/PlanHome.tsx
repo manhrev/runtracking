@@ -51,7 +51,6 @@ export default function Plan({
   const dispatch = useAppDispatch()
   const { planList } = useAppSelector(getPlanList)
   const isLoading = useAppSelector(isPlanListLoading)
-  const noData = planList.length === 0 && !isLoading
   const [tabState, setTabState] = useState('current')
   const [deleteListId, setDeleteListId] = useState<number[]>([])
   const [selectedAll, setSelectedAll] = useState(false)
@@ -247,12 +246,12 @@ export default function Plan({
                 addOrRemoveFromDeleteList={addOrRemoveFromDeleteList}
               />
             ))}
-            {noData && (
+            {!isLoading && filteredPlanList.length == 0 && (
               <Text
                 variant="bodyLarge"
-                style={{ color: theme.colors.tertiary, textAlign: 'center' }}
+                style={{ color: theme.colors.tertiary, textAlign: 'center', marginTop: 10, fontWeight: 'bold' }}
               >
-                No data
+                {tabState === 'current' ? 'No current plan' : 'No history plan'}
               </Text>
             )}
           </ScrollView>
