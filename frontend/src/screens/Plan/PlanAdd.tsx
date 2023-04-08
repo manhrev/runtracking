@@ -244,15 +244,12 @@ export default function PlanAdd({
             style={styles(theme).dropdown}
             placeholderStyle={styles(theme).placeholderStyle}
             selectedTextStyle={styles(theme).selectedTextStyle}
-            inputSearchStyle={styles(theme).inputSearchStyle}
             iconStyle={styles(theme).iconStyle}
             data={data}
-            search
             maxHeight={300}
             labelField="label"
             valueField="value"
             placeholder="Select item"
-            searchPlaceholder="Search..."
             value={rule.toString()}
             onChange={(item) => {
               setRule(item.value)
@@ -386,6 +383,7 @@ const styles = (theme: AppTheme) =>
       borderColor: 'gray',
       borderWidth: 1,
       borderRadius: 5,
+      paddingRight: 15,
     },
     icon: {
       marginRight: 5,
@@ -400,10 +398,6 @@ const styles = (theme: AppTheme) =>
     iconStyle: {
       width: 20,
       height: 20,
-    },
-    inputSearchStyle: {
-      height: 40,
-      fontSize: 16,
     },
     button: {
       flex: 1,

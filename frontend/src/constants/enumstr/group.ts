@@ -15,7 +15,7 @@ export const ChallengeSortByStr = {
 
 export const ChallengeRuleStr = {
   [Rule.RULE_TOTAL_DISTANCE]: 'Total KM',
-  [Rule.RULE_TOTAL_TIME]: 'Total Time',
+  [Rule.RULE_TOTAL_TIME]: 'Total Time (minutes)',
   [Rule.RULE_TOTAL_CALORIES]: 'Total Calories',
   [Rule.RULE_UNSPECIFIED]: '',
 }

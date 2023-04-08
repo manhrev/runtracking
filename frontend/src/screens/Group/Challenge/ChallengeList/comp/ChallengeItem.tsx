@@ -7,7 +7,7 @@ import {
   Text,
   TouchableRipple,
 } from 'react-native-paper'
-import { ActivityType, ChallengeInfo } from '../../../../../lib/group/group_pb'
+import { ActivityType, ChallengeInfo, Rule } from '../../../../../lib/group/group_pb'
 import { AppTheme, useAppTheme } from '../../../../../theme'
 import { formatDateWithoutTime, toDate } from '../../../../../utils/helpers'
 import * as Progress from 'react-native-progress'
@@ -31,6 +31,21 @@ export default function GroupItem({
 }: GroupItemProps) {
   const theme = useAppTheme()
   const windowWidth = Dimensions.get('window').width;
+
+  const getRealDisplayValue = (rule: Rule, value: number) => {
+    if(rule == Rule.RULE_TOTAL_DISTANCE) {
+        return value / 1000
+    }
+    else if(rule == Rule.RULE_TOTAL_TIME) {
+        // to mm:ss
+        const minutes = Math.floor(value / 60)
+        const seconds = value % 60 < 10 ? `0${value % 60}` : value % 60
+
+        return `${minutes}:${seconds}`
+    }
+    else return value
+  }
+
   
   return (
     <TouchableRipple onPress={() => {}}>
@@ -69,8 +84,8 @@ export default function GroupItem({
                     </Text>
 
                     <Text variant="bodyMedium" style={{ marginBottom: 3, fontWeight: "bold", color: theme.colors.tertiary }}>
-                        Progress: {0} /{' '}
-                        {challenge.challengerulesList[0]? challenge.challengerulesList[0].goal : 0}
+                        Progress: {getRealDisplayValue(challenge.challengerulesList[0]?.rule, 0)} /{' '}
+                        {getRealDisplayValue(challenge.challengerulesList[0]?.rule, challenge.challengerulesList[0]?.goal)}
                     </Text>
 
                     <Progress.Bar
