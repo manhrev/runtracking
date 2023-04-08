@@ -5,12 +5,31 @@ package group;
 option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;group";
 
 import "google/protobuf/timestamp.proto";
+import "api/group.proto";
 
 service GroupI {
     rpc UpdateChallengeProgress(UpdateChallengeProgressRequest) returns (UpdateChallengeProgressReply);
 
     // for intermediary, cloud schedule check daily progress -> call intermediary -> call groupi
     rpc CheckDailyProgressChallenge(CheckDailyProgressChallengeRequest) returns (CheckDailyProgressChallengeReply);
+    rpc CheckDailyProgressSeason(CheckDailyProgressSeasonRequest) returns (CheckDailyProgressSeasonReply);
+    rpc ListInProgressChallenge(ListInProgressChallengeRequest) returns (ListInProgressChallengeReply) {};
+}
+
+message ListInProgressChallengeRequest{
+    int64 user_id = 1;
+}
+
+message ListInProgressChallengeReply{
+    repeated ChallengeInfo challenge_info_list = 1;
+}
+
+message CheckDailyProgressSeasonRequest{
+    google.protobuf.Timestamp time_check = 3;
+}
+
+message CheckDailyProgressSeasonReply{
+
 }
 
 message CheckDailyProgressChallengeRequest{

@@ -25,6 +25,8 @@ type GroupIClient interface {
 	UpdateChallengeProgress(ctx context.Context, in *UpdateChallengeProgressRequest, opts ...grpc.CallOption) (*UpdateChallengeProgressReply, error)
 	// for intermediary, cloud schedule check daily progress -> call intermediary -> call groupi
 	CheckDailyProgressChallenge(ctx context.Context, in *CheckDailyProgressChallengeRequest, opts ...grpc.CallOption) (*CheckDailyProgressChallengeReply, error)
+	CheckDailyProgressSeason(ctx context.Context, in *CheckDailyProgressSeasonRequest, opts ...grpc.CallOption) (*CheckDailyProgressSeasonReply, error)
+	ListInProgressChallenge(ctx context.Context, in *ListInProgressChallengeRequest, opts ...grpc.CallOption) (*ListInProgressChallengeReply, error)
 }
 
 type groupIClient struct {
@@ -53,6 +55,24 @@ func (c *groupIClient) CheckDailyProgressChallenge(ctx context.Context, in *Chec
 	return out, nil
 }
 
+func (c *groupIClient) CheckDailyProgressSeason(ctx context.Context, in *CheckDailyProgressSeasonRequest, opts ...grpc.CallOption) (*CheckDailyProgressSeasonReply, error) {
+	out := new(CheckDailyProgressSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.GroupI/CheckDailyProgressSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupIClient) ListInProgressChallenge(ctx context.Context, in *ListInProgressChallengeRequest, opts ...grpc.CallOption) (*ListInProgressChallengeReply, error) {
+	out := new(ListInProgressChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.GroupI/ListInProgressChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupIServer is the server API for GroupI service.
 // All implementations must embed UnimplementedGroupIServer
 // for forward compatibility
@@ -60,6 +80,8 @@ type GroupIServer interface {
 	UpdateChallengeProgress(context.Context, *UpdateChallengeProgressRequest) (*UpdateChallengeProgressReply, error)
 	// for intermediary, cloud schedule check daily progress -> call intermediary -> call groupi
 	CheckDailyProgressChallenge(context.Context, *CheckDailyProgressChallengeRequest) (*CheckDailyProgressChallengeReply, error)
+	CheckDailyProgressSeason(context.Context, *CheckDailyProgressSeasonRequest) (*CheckDailyProgressSeasonReply, error)
+	ListInProgressChallenge(context.Context, *ListInProgressChallengeRequest) (*ListInProgressChallengeReply, error)
 	mustEmbedUnimplementedGroupIServer()
 }
 
@@ -72,6 +94,12 @@ func (UnimplementedGroupIServer) UpdateChallengeProgress(context.Context, *Updat
 }
 func (UnimplementedGroupIServer) CheckDailyProgressChallenge(context.Context, *CheckDailyProgressChallengeRequest) (*CheckDailyProgressChallengeReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckDailyProgressChallenge not implemented")
+}
+func (UnimplementedGroupIServer) CheckDailyProgressSeason(context.Context, *CheckDailyProgressSeasonRequest) (*CheckDailyProgressSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckDailyProgressSeason not implemented")
+}
+func (UnimplementedGroupIServer) ListInProgressChallenge(context.Context, *ListInProgressChallengeRequest) (*ListInProgressChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListInProgressChallenge not implemented")
 }
 func (UnimplementedGroupIServer) mustEmbedUnimplementedGroupIServer() {}
 
@@ -122,6 +150,42 @@ func _GroupI_CheckDailyProgressChallenge_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GroupI_CheckDailyProgressSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckDailyProgressSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupIServer).CheckDailyProgressSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.GroupI/CheckDailyProgressSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupIServer).CheckDailyProgressSeason(ctx, req.(*CheckDailyProgressSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GroupI_ListInProgressChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListInProgressChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupIServer).ListInProgressChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.GroupI/ListInProgressChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupIServer).ListInProgressChallenge(ctx, req.(*ListInProgressChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GroupI_ServiceDesc is the grpc.ServiceDesc for GroupI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -136,6 +200,14 @@ var GroupI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckDailyProgressChallenge",
 			Handler:    _GroupI_CheckDailyProgressChallenge_Handler,
+		},
+		{
+			MethodName: "CheckDailyProgressSeason",
+			Handler:    _GroupI_CheckDailyProgressSeason_Handler,
+		},
+		{
+			MethodName: "ListInProgressChallenge",
+			Handler:    _GroupI_ListInProgressChallenge_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
