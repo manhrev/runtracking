@@ -31,6 +31,24 @@ service Group {
     rpc UpdateSeason(UpdateSeasonRequest) returns(UpdateSeasonReply) {};
     rpc DeleteSeason(DeleteSeasonRequest) returns(DeleteSeasonReply) {};
     rpc GetSeason(GetSeasonRequest) returns(GetSeasonReply) {};
+    rpc ListInProgressChallenge(ListInProgressChallengeRequest) returns (ListInProgressChallengeReply) {};
+    rpc GetInProgressSeason(GetInProgressSeasonRequest) returns (GetInProgressSeasonReply) {};
+}
+
+message GetInProgressSeasonRequest{
+
+}
+
+message GetInProgressSeasonReply{
+    SeasonInfo seasonInfo = 1;
+}
+
+message ListInProgressChallengeRequest{
+    int64 user_id = 1;
+}
+
+message ListInProgressChallengeReply{
+    repeated ChallengeInfo challenge_info_list = 1;
 }
 
 message SeasonInfo{

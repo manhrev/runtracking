@@ -625,6 +625,7 @@ func (c *challengeImpl) ListInProgressChallenge(ctx context.Context, userId int6
 		Where(challenge.Status(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
 			challenge.HasChallengeMembersWith(challengemember.HasMemberWith(member.UserIDEQ(userId)))).
 		WithChallengeRules().
+		WithGroupz().
 		All(ctx)
 
 	if err != nil {

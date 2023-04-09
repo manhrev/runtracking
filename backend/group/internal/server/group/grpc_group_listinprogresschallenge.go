@@ -1,4 +1,4 @@
-package groupi
+package group
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
-func (s *groupIServer) ListInProgressChallenge(
+func (s *groupServer) ListInProgressChallenge(
 	ctx context.Context,
 	request *group.ListInProgressChallengeRequest,
 ) (*group.ListInProgressChallengeReply, error) {
