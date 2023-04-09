@@ -33,5 +33,14 @@ migrate:
 generate:
 	make generate-proto generate-code generate-ent
 
+reset-schema:
+	rm -rf ./pkg/ent
+	make generate-ent
+	sudo rm -rf ../../tmp/db/notification
+	docker rm --force --volumes db-notification
+	docker compose build notification
+	go mod tidy
+	go mod vendor
+
 run:
 	go run ./cmd/.

@@ -47,6 +47,8 @@ func (s *groupServer) AcceptMember(
 			SourceType:    notification.SOURCE_TYPE_GROUP,
 			ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
 			ReceiveIds:    []int64{memberEnt.UserID},
+			SourceId:      groupEnt.Id,
+			SourceImage:   groupEnt.BackgroundPicture,
 		})
 		if err != nil {
 			log.Println("There are something mistaken when push notification ", err)

@@ -21,6 +21,8 @@ func (Notification) Fields() []ent.Field {
 			Optional(),
 		field.Int64("source_id").
 			Optional(),
+		field.String("source_image").
+			Default("https://www.chameleon.io/assets/blog/app-notification-smartphone.png"),
 		field.JSON("receive_ids", []int64{}).
 			Optional(),
 		field.Time("scheduled_time").

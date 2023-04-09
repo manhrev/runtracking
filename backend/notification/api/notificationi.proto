@@ -4,8 +4,19 @@ package notification;
 
 option go_package = "github.com/manhrev/runtracking/backend/group/pkg/api;notification";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 import "api/notification.proto";
 
 service NotificationI{
     rpc PushNotification(PushNotiRequest) returns (google.protobuf.Empty){};
 }
+
+message PushNotiRequest{
+    string messeage = 1;
+    google.protobuf.Timestamp scheduled_time = 2;
+    SOURCE_TYPE source_type = 3;
+    int64 source_id = 4;
+    repeated int64 receive_ids = 5;
+    string source_image = 6;
+}
+

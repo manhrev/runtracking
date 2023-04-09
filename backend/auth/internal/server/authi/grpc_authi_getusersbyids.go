@@ -21,10 +21,11 @@ func (s *authIServer) GetUsersByIds(ctx context.Context, request *auth.GetByIdsR
 	var userInfos []*auth.UserInfo
 	for _, user := range users {
 		userInfos = append(userInfos, &auth.UserInfo{
-			UserId:      user.ID,
-			Username:    user.Username,
-			Email:       user.Email,
-			DisplayName: user.DisplayName,
+			UserId:         user.ID,
+			Username:       user.Username,
+			Email:          user.Email,
+			ProfilePicture: user.ProfilePicture,
+			DisplayName:    user.DisplayName,
 		})
 	}
 

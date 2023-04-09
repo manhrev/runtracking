@@ -105,6 +105,20 @@ func (nu *NotificationUpdate) ClearSourceID() *NotificationUpdate {
 	return nu
 }
 
+// SetSourceImage sets the "source_image" field.
+func (nu *NotificationUpdate) SetSourceImage(s string) *NotificationUpdate {
+	nu.mutation.SetSourceImage(s)
+	return nu
+}
+
+// SetNillableSourceImage sets the "source_image" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableSourceImage(s *string) *NotificationUpdate {
+	if s != nil {
+		nu.SetSourceImage(*s)
+	}
+	return nu
+}
+
 // SetReceiveIds sets the "receive_ids" field.
 func (nu *NotificationUpdate) SetReceiveIds(i []int64) *NotificationUpdate {
 	nu.mutation.SetReceiveIds(i)
@@ -258,6 +272,9 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nu.mutation.SourceIDCleared() {
 		_spec.ClearField(notification.FieldSourceID, field.TypeInt64)
+	}
+	if value, ok := nu.mutation.SourceImage(); ok {
+		_spec.SetField(notification.FieldSourceImage, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.ReceiveIds(); ok {
 		_spec.SetField(notification.FieldReceiveIds, field.TypeJSON, value)
@@ -423,6 +440,20 @@ func (nuo *NotificationUpdateOne) AddSourceID(i int64) *NotificationUpdateOne {
 // ClearSourceID clears the value of the "source_id" field.
 func (nuo *NotificationUpdateOne) ClearSourceID() *NotificationUpdateOne {
 	nuo.mutation.ClearSourceID()
+	return nuo
+}
+
+// SetSourceImage sets the "source_image" field.
+func (nuo *NotificationUpdateOne) SetSourceImage(s string) *NotificationUpdateOne {
+	nuo.mutation.SetSourceImage(s)
+	return nuo
+}
+
+// SetNillableSourceImage sets the "source_image" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableSourceImage(s *string) *NotificationUpdateOne {
+	if s != nil {
+		nuo.SetSourceImage(*s)
+	}
 	return nuo
 }
 
@@ -603,6 +634,9 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 	}
 	if nuo.mutation.SourceIDCleared() {
 		_spec.ClearField(notification.FieldSourceID, field.TypeInt64)
+	}
+	if value, ok := nuo.mutation.SourceImage(); ok {
+		_spec.SetField(notification.FieldSourceImage, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.ReceiveIds(); ok {
 		_spec.SetField(notification.FieldReceiveIds, field.TypeJSON, value)

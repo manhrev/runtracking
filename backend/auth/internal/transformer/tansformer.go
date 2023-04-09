@@ -5,7 +5,7 @@ import (
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent"
 )
 
-func TransformActivityListEntToActivityList(userList []*ent.User) []*auth.UserInfo {
+func TransformUserListEntToUserList(userList []*ent.User) []*auth.UserInfo {
 	userInfoList := []*auth.UserInfo{}
 	for _, userEnt := range userList {
 		userInfo := &auth.UserInfo{
