@@ -14,8 +14,22 @@ export const ChallengeSortByStr = {
 }
 
 export const ChallengeRuleStr = {
-  [Rule.RULE_TOTAL_DISTANCE]: 'Total KM',
-  [Rule.RULE_TOTAL_TIME]: 'Total Time',
+  [Rule.RULE_TOTAL_DISTANCE]: 'Total Distance (km)',
+  [Rule.RULE_TOTAL_TIME]: 'Total Time (minutes)',
   [Rule.RULE_TOTAL_CALORIES]: 'Total Calories',
+  [Rule.RULE_UNSPECIFIED]: '',
+}
+
+export const ChallengeRuleStrShorted = {
+  [Rule.RULE_TOTAL_DISTANCE]: 'Distance',
+  [Rule.RULE_TOTAL_TIME]: 'Time',
+  [Rule.RULE_TOTAL_CALORIES]: 'Calories',
+  [Rule.RULE_UNSPECIFIED]: '',
+}
+
+export const ChallengeRuleIcon = {
+  [Rule.RULE_TOTAL_DISTANCE]: 'map-marker-distance',
+  [Rule.RULE_TOTAL_TIME]: 'timer',
+  [Rule.RULE_TOTAL_CALORIES]: 'lightning-bolt-circle',
   [Rule.RULE_UNSPECIFIED]: '',
 }

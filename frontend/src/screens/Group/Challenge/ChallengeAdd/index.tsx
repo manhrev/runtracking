@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { View, Image, StyleSheet, ScrollView } from 'react-native'
+import { View, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Text, Button, TextInput, RadioButton, IconButton, Menu } from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
@@ -16,6 +16,9 @@ import { ActivityType } from '../../../../lib/activity/activity_pb'
 import moment from 'moment'
 import { ChallengeRuleStr } from '../../../../constants/enumstr/group'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { MultiSelect } from 'react-native-element-dropdown'
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { ChallengeRuleInfo } from '../../../../lib/group/group_pb'
 
 export default function ChallengeAdd({
   navigation,
@@ -24,9 +27,30 @@ export default function ChallengeAdd({
     const theme = useAppTheme()
     const dispatch = useAppDispatch()
 
-    const [visible, setVisible] = useState(false)
-    const openMenu = () => setVisible(true)
-    const closeMenu = () => setVisible(false)
+    // goals object
+    const [goals, setGoals] = useState({
+      distance: 1,
+      time: 5,
+      calories: 500,
+    })
+
+    // dropdown list
+    const dropDownData = [
+      { label: 'Distance', value: Rule.RULE_TOTAL_DISTANCE.toString() },
+      { label: 'Time', value: Rule.RULE_TOTAL_TIME.toString() },
+      { label: 'Calories', value: Rule.RULE_TOTAL_CALORIES.toString() },
+    ]
+    const [dropdownSelected, setDropdownSelected] = useState<string[]>([Rule.RULE_TOTAL_DISTANCE.toString()])
+    const renderItem = (item: any) => {
+      return (
+        <View style={styles(theme).item}>
+          <Text style={styles(theme).selectedTextStyle}>{item.label}</Text>
+          {dropdownSelected.includes(item.value) && (
+            <AntDesign style={styles(theme).icon} color="black" name="Safety" size={20} />
+          )}
+        </View>
+      );
+    };
 
     // time picker
     const [showStartTimePicker, setShowStartTimePicker] = useState(false)
@@ -39,21 +63,7 @@ export default function ChallengeAdd({
         'https://cdn.dribbble.com/users/2984251/screenshots/15487625/media/1501cb8cd7dbdb88127b7402c2692acd.png?compress=1&resize=1000x750&vertical=top',
         type: ActivityType.ACTIVITY_TYPE_RUNNING,
         status: RuleStatus.RULE_STATUS_COMING_SOON,
-        challengerulesList: [
-            {
-                id: 1,
-                goal: 1,
-                rule: Rule.RULE_TOTAL_DISTANCE,
-                createdAt: {
-                  "seconds": 1680755341,
-                  "nanos": 0
-                },
-                updatedAt: {
-                  "seconds": 1680755341,
-                  "nanos": 0
-                },
-            }
-        ],
+        challengerulesList: [],
         from: {
             // today
             seconds: Math.floor(
@@ -79,18 +89,6 @@ export default function ChallengeAdd({
         groupId: 0,
         memberProgressListList: [],
     })
-
-    const challengRulesListChange = (field: string, value: number) => {
-        setChallengeInfo({
-            ...challengeInfo,
-            challengerulesList: [
-                {
-                    ...challengeInfo.challengerulesList[0],
-                    [field]: value,
-                },
-            ],
-        })
-    }
 
     const setStart = (event: any, date: any) => {
         setShowStartTimePicker(false)
@@ -127,18 +125,65 @@ export default function ChallengeAdd({
         setChallengeInfo({ ...challengeInfo, picture: text })
     }
 
+    const getRealGoal = (rule: Rule, goal: number) => {
+        if (rule == Rule.RULE_TOTAL_DISTANCE) {
+            return goal * 1000 // to meters
+        }
+        else if (rule == Rule.RULE_TOTAL_TIME) {
+            return goal * 60 // to seconds
+        }
+        else return goal // calories
+    }
+
+    const getRuleList = () => {
+        const ruleList: ChallengeRuleInfo.AsObject[] = []
+        for (let i = 0; i < dropdownSelected.length; i++) {
+            const rule = parseInt(dropdownSelected[i])
+            const goal = rule == Rule.RULE_TOTAL_DISTANCE ? goals.distance : rule == Rule.RULE_TOTAL_TIME ? goals.time : goals.calories
+            ruleList.push({
+                id: i, // ignore
+                rule: rule,
+                goal: getRealGoal(rule, goal),
+            })
+        }
+        return ruleList
+    }
+
+
     const createNewChallenge = async () => {
         if (challengeInfo.name == '' || challengeInfo.picture == '') {
-        toast.error({ message: 'Challenge name or image link cannot be empty!' })
-        return
+          toast.error({ message: 'Challenge name or image link cannot be empty!' })
+          return
+        }
+        else if (dropdownSelected.length == 0) {
+          toast.error({ message: 'Please select at least 1 rule!' })
+          return
+        }
+        else if (goals.distance <= 0 || goals.time <=  0 || goals.calories <=  0) {
+          toast.error({ message: 'Goals cannot be negative or zero!' })
+          return
+        }
+        else if (challengeInfo.from?.seconds)
+        {
+          if(challengeInfo.to?.seconds)
+          {
+            if(challengeInfo.from.seconds > challengeInfo.to.seconds)
+            {
+              toast.error({ message: 'Start date cannot be later than end date!' })
+              return
+            }
+          }
         }
 
         const req: CreateChallengeRequest.AsObject = {
             groupId: route.params.groupId,
-            challengeinfo: challengeInfo,
+            challengeinfo: {
+                ...challengeInfo,
+                challengerulesList: getRuleList()
+            }
         }
 
-        console.log(req)
+        // console.log(req.challengeinfo?.challengerulesList)
 
         const { error } = await dispatch(createChallengeThunk(req)).unwrap()
         if (error) {
@@ -244,56 +289,60 @@ export default function ChallengeAdd({
             <Text>Cycling</Text>
         </View>
 
-        <Text style={styles(theme).title}>Challenge Rule: </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text
-                variant="bodyLarge"
-                style={{
-                    fontWeight: 'bold',
-                    color: theme.colors.secondary,
-                    marginLeft: 10,
-                }}
-            >
-                {ChallengeRuleStr[challengeInfo.challengerulesList[0].rule]}
-            </Text>
+        <Text style={styles(theme).title}>Challenge Rules</Text>
+        <MultiSelect
+          style={styles(theme).dropdown}
+          placeholderStyle={styles(theme).placeholderStyle}
+          selectedTextStyle={styles(theme).selectedTextStyle}
+          iconStyle={styles(theme).iconStyle}
+          data={dropDownData}
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder="Select item"
+          value={dropdownSelected}
+          onChange={(item) => {
+            // challengRulesListChange('rule', parseInt(item.value))
+            setDropdownSelected(item)
+          }}
+          renderItem={renderItem}
+          renderSelectedItem={(item, unSelect) => (
+            <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
+              <View style={styles(theme).selectedStyle}>
+                <Text style={styles(theme).textSelectedStyle}>{item.label}</Text>
+                <AntDesign color="black" name="close" size={17} />
+              </View>
+            </TouchableOpacity>
+          )}
+        />
 
-            <Menu
-                visible={visible}
-                onDismiss={closeMenu}
-                anchor={
-                    <IconButton
-                        icon="cog"
-                        iconColor={theme.colors.primary}
-                        size={23}
-                        onPress={openMenu}
-                    />
-                }
-            >
-                <Menu.Item
-                    onPress={() => {
-                        challengRulesListChange('rule', Rule.RULE_TOTAL_DISTANCE)
-                        closeMenu()
-                    }}
-                    title={'Total KM'}
-                />
-                <Menu.Item
-                    onPress={() => {
-                        challengRulesListChange('rule', Rule.RULE_TOTAL_TIME)
-                        closeMenu()
-                    }}
-                    title={'Total Time'}
-                />
-                <Menu.Item
-                    onPress={() => {
-                        challengRulesListChange('rule', Rule.RULE_TOTAL_CALORIES)
-                        closeMenu()
-                    }}
-                    title={'Total Calories'}
-            />
-            </Menu>
-        </View>
+        <Text style={styles(theme).title}>Goals</Text>
+        {dropdownSelected.length == 0 && <Text style={{marginLeft: 10}}>Please select at least one rule !</Text>}
 
-        <Text style={styles(theme).title}>Start Date: </Text>
+        {dropdownSelected.includes(Rule.RULE_TOTAL_DISTANCE.toString()) && <TextInput
+          mode="outlined"
+          style={{ marginBottom: 10 }}
+          label={ChallengeRuleStr[Rule.RULE_TOTAL_DISTANCE]}
+          value={goals.distance.toString()}
+          onChangeText={(text) => setGoals({ ...goals, distance: parseInt(text == '' ? '0' : text) })}
+        />}
+
+        {dropdownSelected.includes(Rule.RULE_TOTAL_TIME.toString()) && <TextInput
+          mode="outlined"
+          style={{ marginBottom: 10 }}
+          label={ChallengeRuleStr[Rule.RULE_TOTAL_TIME]}
+          value={goals.time.toString()}
+          onChangeText={(text) => setGoals({ ...goals, time: parseInt(text == '' ? '0' : text) })}
+        />}
+
+        {dropdownSelected.includes(Rule.RULE_TOTAL_CALORIES.toString()) && <TextInput
+          mode="outlined"
+          label={ChallengeRuleStr[Rule.RULE_TOTAL_CALORIES]}
+          value={goals.calories.toString()}
+          onChangeText={(text) => setGoals({ ...goals, calories: parseInt(text == '' ? '0' : text) })}
+        />}
+
+        <Text style={styles(theme).title}>Start Date</Text>
         <TextInput
             mode="outlined"
             value={challengeInfo.from?.seconds ? new Date(challengeInfo.from.seconds * 1000).toDateString() : ''}
@@ -315,7 +364,7 @@ export default function ChallengeAdd({
             />
         )}
 
-        <Text style={styles(theme).title}>End Date: </Text>
+        <Text style={styles(theme).title}>End Date</Text>
         <TextInput
             mode="outlined"
             value={challengeInfo.to?.seconds ? new Date(challengeInfo.to.seconds * 1000).toDateString() : ''}
@@ -337,13 +386,6 @@ export default function ChallengeAdd({
                 onChange={setEnd}
             />
         )}
-
-        <Text style={styles(theme).title}>Goal</Text>
-        <TextInput
-          mode="outlined"
-          value={challengeInfo.challengerulesList[0].goal.toString()}
-          onChangeText={(text) => challengRulesListChange('goal', text === '' ? 0 : parseInt(text))}
-        />
 
         <Text style={styles(theme).title}>Challenge Description</Text>
         <TextInput
@@ -423,5 +465,58 @@ const styles = (theme: AppTheme) =>
       fontSize: 22,
       fontWeight: 'bold',
       alignSelf: 'center',
+    },
+    dropdown: {
+      marginBottom: 7,
+      height: 50,
+      borderColor: 'gray',
+      borderWidth: 1,
+      borderRadius: 5,
+      paddingRight: 15,
+    },
+    icon: {
+      marginRight: 5,
+    },
+    placeholderStyle: {
+      fontSize: 16,
+      marginLeft: 10,
+    },
+    selectedTextStyle: {
+      fontSize: 16,
+      marginLeft: 10,
+    },
+    iconStyle: {
+      width: 20,
+      height: 20,
+    },
+    selectedStyle: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 14,
+      backgroundColor: 'white',
+      shadowColor: '#000',
+      marginTop: 8,
+      marginRight: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.2,
+      shadowRadius: 1.41,
+
+      elevation: 2,
+    },
+    textSelectedStyle: {
+      marginRight: 5,
+      fontSize: 16,
+    },
+    item: {
+      padding: 17,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
   })

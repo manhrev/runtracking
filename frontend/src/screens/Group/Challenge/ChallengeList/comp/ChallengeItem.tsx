@@ -7,10 +7,11 @@ import {
   Text,
   TouchableRipple,
 } from 'react-native-paper'
-import { ActivityType, ChallengeInfo } from '../../../../../lib/group/group_pb'
+import { ActivityType, ChallengeInfo, Rule } from '../../../../../lib/group/group_pb'
 import { AppTheme, useAppTheme } from '../../../../../theme'
 import { formatDateWithoutTime, toDate } from '../../../../../utils/helpers'
 import * as Progress from 'react-native-progress'
+import { ChallengeRuleStrShorted } from '../../../../../constants/enumstr/group'
 
 interface GroupItemProps {
     hideTopDivider?: boolean
@@ -19,6 +20,7 @@ interface GroupItemProps {
     deleteListId: number[]
     addOrRemoveFromDeleteList: (id: number) => void
     isLeader: boolean
+    goToChallengeDetail: () => void
 }
 
 export default function GroupItem({
@@ -28,12 +30,37 @@ export default function GroupItem({
     deleteListId,
     addOrRemoveFromDeleteList,
     isLeader,
+    goToChallengeDetail,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const windowWidth = Dimensions.get('window').width;
+
+  const getRealDisplayValue = (rule: Rule, value: number) => {
+    if(rule == Rule.RULE_TOTAL_DISTANCE) {
+        return value / 1000
+    }
+    else if(rule == Rule.RULE_TOTAL_TIME) {
+        // to mm:ss
+        const minutes = Math.floor(value / 60)
+        const seconds = value % 60 < 10 ? `0${value % 60}` : value % 60
+
+        return `${minutes}:${seconds}`
+    }
+    else return value
+  }
+
+  const getRuleListDisplayStr = () => {
+    let displayStr = ""
+    challenge.challengerulesList.forEach((item, index) => {
+        displayStr += ChallengeRuleStrShorted[item.rule] + ", "
+    })
+    return displayStr.slice(0, -2)
+  }
+
+
   
   return (
-    <TouchableRipple onPress={() => {}}>
+    <TouchableRipple onPress={() => goToChallengeDetail()}>
       <>
         {!hideTopDivider && (
           <Divider bold style={{ width: '80%', alignSelf: 'flex-end' }} />
@@ -60,7 +87,7 @@ export default function GroupItem({
               }}
             >
                 <View style={{ marginLeft: 12 }}>
-                    <Text variant="titleMedium" style={{ fontWeight: '700' }}>
+                    <Text variant="titleMedium" style={{ fontWeight: '700', width: windowWidth * 0.6 }}>
                         {challenge.name}
                     </Text>
                     <Text variant="bodyMedium">
@@ -69,19 +96,8 @@ export default function GroupItem({
                     </Text>
 
                     <Text variant="bodyMedium" style={{ marginBottom: 3, fontWeight: "bold", color: theme.colors.tertiary }}>
-                        Progress: {0} /{' '}
-                        {challenge.challengerulesList[0]? challenge.challengerulesList[0].goal : 0}
+                        Rules: {getRuleListDisplayStr()}
                     </Text>
-
-                    <Progress.Bar
-                        progress={0}
-                        width={windowWidth * 0.6}
-                        color={theme.colors.primary}
-                        borderColor="#e0e0e0"
-                        unfilledColor="#e0e0e0"
-                        borderRadius={5}
-                        animated={true}
-                    />
                 </View>
             </View>
             {isLeader && <View
