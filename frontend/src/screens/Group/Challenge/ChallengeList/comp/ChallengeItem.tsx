@@ -11,6 +11,7 @@ import { ActivityType, ChallengeInfo, Rule } from '../../../../../lib/group/grou
 import { AppTheme, useAppTheme } from '../../../../../theme'
 import { formatDateWithoutTime, toDate } from '../../../../../utils/helpers'
 import * as Progress from 'react-native-progress'
+import { ChallengeRuleStrShorted } from '../../../../../constants/enumstr/group'
 
 interface GroupItemProps {
     hideTopDivider?: boolean
@@ -19,6 +20,7 @@ interface GroupItemProps {
     deleteListId: number[]
     addOrRemoveFromDeleteList: (id: number) => void
     isLeader: boolean
+    goToChallengeDetail: () => void
 }
 
 export default function GroupItem({
@@ -28,6 +30,7 @@ export default function GroupItem({
     deleteListId,
     addOrRemoveFromDeleteList,
     isLeader,
+    goToChallengeDetail,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const windowWidth = Dimensions.get('window').width;
@@ -46,9 +49,18 @@ export default function GroupItem({
     else return value
   }
 
+  const getRuleListDisplayStr = () => {
+    let displayStr = ""
+    challenge.challengerulesList.forEach((item, index) => {
+        displayStr += ChallengeRuleStrShorted[item.rule] + ", "
+    })
+    return displayStr.slice(0, -2)
+  }
+
+
   
   return (
-    <TouchableRipple onPress={() => {}}>
+    <TouchableRipple onPress={() => goToChallengeDetail()}>
       <>
         {!hideTopDivider && (
           <Divider bold style={{ width: '80%', alignSelf: 'flex-end' }} />
@@ -75,7 +87,7 @@ export default function GroupItem({
               }}
             >
                 <View style={{ marginLeft: 12 }}>
-                    <Text variant="titleMedium" style={{ fontWeight: '700' }}>
+                    <Text variant="titleMedium" style={{ fontWeight: '700', width: windowWidth * 0.6 }}>
                         {challenge.name}
                     </Text>
                     <Text variant="bodyMedium">
@@ -84,19 +96,8 @@ export default function GroupItem({
                     </Text>
 
                     <Text variant="bodyMedium" style={{ marginBottom: 3, fontWeight: "bold", color: theme.colors.tertiary }}>
-                        Progress: {getRealDisplayValue(challenge.challengerulesList[0]?.rule, 0)} /{' '}
-                        {getRealDisplayValue(challenge.challengerulesList[0]?.rule, challenge.challengerulesList[0]?.goal)}
+                        Rules: {getRuleListDisplayStr()}
                     </Text>
-
-                    <Progress.Bar
-                        progress={0}
-                        width={windowWidth * 0.6}
-                        color={theme.colors.primary}
-                        borderColor="#e0e0e0"
-                        unfilledColor="#e0e0e0"
-                        borderRadius={5}
-                        animated={true}
-                    />
                 </View>
             </View>
             {isLeader && <View

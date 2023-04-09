@@ -12,6 +12,7 @@ import {
   ListChallengeRequest, ListChallengeReply,
   CreateChallengeRequest, CreateChallengeReply,
   DeleteChallengeRequest, DeleteChallengeReply,
+  GetChallengeRequest, GetChallengeReply,
 } from '../../../lib/group/group_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -160,16 +161,20 @@ class rpcGroupClient extends gRPCClientAbstract {
   }
   
   async createChallenge(param: CreateChallengeRequest.AsObject) {
-    const challengeRuleInfo = new ChallengeRuleInfo()
-    challengeRuleInfo.setRule(param.challengeinfo?.challengerulesList[0]?.rule || 0)
-    challengeRuleInfo.setId(param.challengeinfo?.challengerulesList[0]?.id || 0)
-    challengeRuleInfo.setGoal(param.challengeinfo?.challengerulesList[0]?.goal || 0)
-    challengeRuleInfo.setCreatedAt(
-      new Timestamp().setSeconds(param.challengeinfo?.challengerulesList[0]?.createdAt?.seconds || 0)
-    )
-    challengeRuleInfo.setUpdatedAt(
-      new Timestamp().setSeconds(param.challengeinfo?.challengerulesList[0]?.updatedAt?.seconds || 0)
-    )
+    const challengeRuleList = Array<ChallengeRuleInfo>()
+    param.challengeinfo?.challengerulesList?.forEach((rule) => {
+      const challengeRuleInfo = new ChallengeRuleInfo()
+      challengeRuleInfo.setRule(rule.rule)
+      challengeRuleInfo.setId(rule.id)
+      challengeRuleInfo.setGoal(rule.goal)
+      challengeRuleInfo.setCreatedAt(
+        new Timestamp().setSeconds(rule.createdAt?.seconds || 0)
+      )
+      challengeRuleInfo.setUpdatedAt(
+        new Timestamp().setSeconds(rule.updatedAt?.seconds || 0)
+      )
+      challengeRuleList.push(challengeRuleInfo)
+    })
 
 
     const challengeInfo = new ChallengeInfo()
@@ -184,7 +189,7 @@ class rpcGroupClient extends gRPCClientAbstract {
     challengeInfo.setTo(
       new Timestamp().setSeconds(param.challengeinfo?.to?.seconds || 0)
     )
-    challengeInfo.setChallengerulesList([challengeRuleInfo])
+    challengeInfo.setChallengerulesList(challengeRuleList)
     
     // dont need
     challengeInfo.setId(param.challengeinfo?.id || 0)
@@ -209,6 +214,16 @@ class rpcGroupClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<DeleteChallengeReply.AsObject>(
       'deleteChallenge',
+      req
+    )
+  }
+
+  async getChallenge(param: GetChallengeRequest.AsObject) {
+    const req = new GetChallengeRequest()
+    req.setId(param.id)
+
+    return await this.gRPCClientRequest<GetChallengeReply.AsObject>(
+      'getChallenge',
       req
     )
   }

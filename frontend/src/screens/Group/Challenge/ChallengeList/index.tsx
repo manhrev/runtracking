@@ -266,6 +266,11 @@ export default function ChallengeList({
                 deleteListId={deleteListId}
                 addOrRemoveFromDeleteList={addOrRemoveFromDeleteList}
                 isLeader={route.params.isLeader}
+                goToChallengeDetail={() => navigation.navigate('ChallengeDetail', {
+                  challengeId: challenge.id,
+                  canEdit: route.params.isLeader && challenge.status === RuleStatus.RULE_STATUS_COMING_SOON,
+                  leaderId: route.params.leaderId,
+                })}
               />
             )
           })}

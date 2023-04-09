@@ -340,6 +340,7 @@ export default function GroupDetail({
                 onPress={() => navigation.navigate('ChallengeList', {
                     groupId: groupDetail.groupinfo?.id || 0,
                     isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
+                    leaderId: groupDetail.groupinfo?.leaderId || 0,
                 })}
                 labelStyle={{
                     fontSize: 15
