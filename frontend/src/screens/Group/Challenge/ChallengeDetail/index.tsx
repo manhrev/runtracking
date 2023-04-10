@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { View, Image, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native'
-import { Text, IconButton, Button, TextInput, Divider, List, ActivityIndicator } from 'react-native-paper'
+import { Text, IconButton, Button, TextInput, Divider, List, ActivityIndicator, Avatar } from 'react-native-paper';
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
@@ -24,7 +24,7 @@ import { RefreshControl } from 'react-native-gesture-handler'
 import { listChallengeThunk } from '../../../../redux/features/challengeList/thunk'
 import { ActivityType } from '../../../../lib/activity/activity_pb'
 import { toDate } from '../../../../utils/helpers'
-import { ChallengeRuleStr } from '../../../../constants/enumstr/group'
+import { ChallengeRuleStr, ActivityTypeIcon, ActivityTypeStr, ChallengeRuleIcon } from '../../../../constants/enumstr/group'
 
 export default function ChallengeDetail({
   navigation,
@@ -127,6 +127,18 @@ export default function ChallengeDetail({
             </Button>
         </View>
 
+        <List.Item
+            title="Activity Type"
+            description=""
+            left={props =>
+                <List.Icon
+                    {...props}
+                    icon={ActivityTypeIcon[challengeDetail.challengeinfo?.type || 0]}
+                />
+            }
+            right={props => <Text>{ActivityTypeStr[challengeDetail.challengeinfo?.type || 0]}</Text>}
+        />
+
         {challengeDetail.challengeinfo?.challengerulesList.map((item, index) => {
             return (
                 <List.Item
@@ -136,39 +148,15 @@ export default function ChallengeDetail({
                     left={props =>
                         <List.Icon
                             {...props}
-                            icon={item.rule === Rule.RULE_TOTAL_DISTANCE ? "map-marker-distance" :
-                                item.rule === Rule.RULE_TOTAL_TIME ? "timer" : "lightning-bolt-circle"}
+                            icon={ChallengeRuleIcon[item.rule]}
                         />
                     }
-                    right={props => <Text>{getRealDisplayValue(item.rule, item.goal)}</Text>}
+                    right={props =>
+                        <Text>{getRealDisplayValue(item.rule, item.goal)}</Text>
+                    }
                 />
             )
         })}
-        
-        {/* <List.Item
-            title="Total Distance (km)"
-            description=""
-            left={props =>
-                <List.Icon {...props} icon="map-marker-distance" />
-            }
-            right={props => <Text>30</Text>}
-        />
-        <List.Item
-            title="Total Time (minutes)"
-            description=""
-            left={props =>
-                <List.Icon {...props} icon="timer" />
-            }
-            right={props => <Text>12</Text>}
-        />
-        <List.Item
-            title="Total Calories"
-            description=""
-            left={props =>
-                <List.Icon {...props} icon="lightning-bolt-circle" />
-            }
-            right={props => <Text>500</Text>}
-        /> */}
 
         <Divider bold style={{ width: '100%', marginTop: 10 }} />
 
