@@ -5,7 +5,8 @@ go 1.18
 require (
 	entgo.io/ent v0.11.8
 	github.com/go-sql-driver/mysql v1.7.0
-	github.com/manhrev/runtracking/backend/auth v0.0.0-20221203014235-23c074a45158
+	github.com/manhrev/runtracking/backend/auth v0.0.0-20230410032406-e6a75a418900
+	github.com/manhrev/runtracking/backend/group v0.0.0-20230410091950-223248ceafb9
 	github.com/manhrev/runtracking/backend/plan v0.0.0-20230304110622-ca4cf0ae879f
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
@@ -21,6 +22,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
+	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
