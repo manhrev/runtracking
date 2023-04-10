@@ -13,6 +13,8 @@ const (
 	FieldSourceType = "source_type"
 	// FieldSourceID holds the string denoting the source_id field in the database.
 	FieldSourceID = "source_id"
+	// FieldSourceImage holds the string denoting the source_image field in the database.
+	FieldSourceImage = "source_image"
 	// FieldReceiveIds holds the string denoting the receive_ids field in the database.
 	FieldReceiveIds = "receive_ids"
 	// FieldScheduledTime holds the string denoting the scheduled_time field in the database.
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldMessage,
 	FieldSourceType,
 	FieldSourceID,
+	FieldSourceImage,
 	FieldReceiveIds,
 	FieldScheduledTime,
 }
@@ -49,3 +52,8 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultSourceImage holds the default value on creation for the "source_image" field.
+	DefaultSourceImage string
+)

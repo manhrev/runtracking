@@ -17,9 +17,11 @@ func (s *authIServer) GetUserById(ctx context.Context, request *auth.GetByIdRequ
 
 	return &auth.GetUserReply{
 		UserInfo: &auth.UserInfo{
-			UserId:   user.ID,
-			Username: user.Username,
-			Email:    user.Email,
+			UserId:         user.ID,
+			Username:       user.Username,
+			Email:          user.Email,
+			ProfilePicture: user.ProfilePicture,
+			DisplayName:    user.DisplayName,
 		},
 	}, nil
 }

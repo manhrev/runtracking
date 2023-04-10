@@ -52,6 +52,8 @@ func (s *groupServer) JoinGroup(
 			SourceType:    notification.SOURCE_TYPE_PERSONAL,
 			ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
 			ReceiveIds:    []int64{groupInfo.LeaderId},
+			SourceId:      userId,
+			SourceImage:   userInfos.GetUsers()[0].ProfilePicture,
 		})
 
 		if err != nil {

@@ -23,6 +23,8 @@ type Notification struct {
 	SourceType int64 `json:"source_type,omitempty"`
 	// SourceID holds the value of the "source_id" field.
 	SourceID int64 `json:"source_id,omitempty"`
+	// SourceImage holds the value of the "source_image" field.
+	SourceImage string `json:"source_image,omitempty"`
 	// ReceiveIds holds the value of the "receive_ids" field.
 	ReceiveIds []int64 `json:"receive_ids,omitempty"`
 	// ScheduledTime holds the value of the "scheduled_time" field.
@@ -59,7 +61,7 @@ func (*Notification) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case notification.FieldID, notification.FieldSourceType, notification.FieldSourceID:
 			values[i] = new(sql.NullInt64)
-		case notification.FieldMessage:
+		case notification.FieldMessage, notification.FieldSourceImage:
 			values[i] = new(sql.NullString)
 		case notification.FieldScheduledTime:
 			values[i] = new(sql.NullTime)
@@ -101,6 +103,12 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field source_id", values[i])
 			} else if value.Valid {
 				n.SourceID = value.Int64
+			}
+		case notification.FieldSourceImage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field source_image", values[i])
+			} else if value.Valid {
+				n.SourceImage = value.String
 			}
 		case notification.FieldReceiveIds:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -157,6 +165,9 @@ func (n *Notification) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("source_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.SourceID))
+	builder.WriteString(", ")
+	builder.WriteString("source_image=")
+	builder.WriteString(n.SourceImage)
 	builder.WriteString(", ")
 	builder.WriteString("receive_ids=")
 	builder.WriteString(fmt.Sprintf("%v", n.ReceiveIds))

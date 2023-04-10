@@ -122,44 +122,6 @@ export namespace ListNotificationInfoReply {
   }
 }
 
-export class PushNotiRequest extends jspb.Message {
-  getMesseage(): string;
-  setMesseage(value: string): PushNotiRequest;
-
-  getScheduledTime(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setScheduledTime(value?: google_protobuf_timestamp_pb.Timestamp): PushNotiRequest;
-  hasScheduledTime(): boolean;
-  clearScheduledTime(): PushNotiRequest;
-
-  getSourceType(): SOURCE_TYPE;
-  setSourceType(value: SOURCE_TYPE): PushNotiRequest;
-
-  getSourceId(): number;
-  setSourceId(value: number): PushNotiRequest;
-
-  getReceiveIdsList(): Array<number>;
-  setReceiveIdsList(value: Array<number>): PushNotiRequest;
-  clearReceiveIdsList(): PushNotiRequest;
-  addReceiveIds(value: number, index?: number): PushNotiRequest;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): PushNotiRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: PushNotiRequest): PushNotiRequest.AsObject;
-  static serializeBinaryToWriter(message: PushNotiRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): PushNotiRequest;
-  static deserializeBinaryFromReader(message: PushNotiRequest, reader: jspb.BinaryReader): PushNotiRequest;
-}
-
-export namespace PushNotiRequest {
-  export type AsObject = {
-    messeage: string,
-    scheduledTime?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    sourceType: SOURCE_TYPE,
-    sourceId: number,
-    receiveIdsList: Array<number>,
-  }
-}
-
 export class ListNotificationInfoRequest extends jspb.Message {
   getLimit(): number;
   setLimit(value: number): ListNotificationInfoRequest;
@@ -238,4 +200,5 @@ export enum SOURCE_TYPE {
   EVENT = 2,
   PERSONAL = 3,
   PLAN = 4,
+  CHALLENGE = 5,
 }

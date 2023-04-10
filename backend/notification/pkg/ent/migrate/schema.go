@@ -14,6 +14,7 @@ var (
 		{Name: "message", Type: field.TypeString, Nullable: true},
 		{Name: "source_type", Type: field.TypeInt64, Nullable: true},
 		{Name: "source_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "source_image", Type: field.TypeString, Default: "https://www.chameleon.io/assets/blog/app-notification-smartphone.png"},
 		{Name: "receive_ids", Type: field.TypeJSON, Nullable: true},
 		{Name: "scheduled_time", Type: field.TypeTime, Nullable: true},
 	}
@@ -56,6 +57,13 @@ var (
 		Name:       "user_devices",
 		Columns:    UserDevicesColumns,
 		PrimaryKey: []*schema.Column{UserDevicesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "userdevice_user_id_expo_push_token",
+				Unique:  true,
+				Columns: []*schema.Column{UserDevicesColumns[1], UserDevicesColumns[2]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

@@ -26,6 +26,14 @@ func (s *groupIServer) UpdateChallengeProgress(
 		return nil, err
 	}
 
+	challengeRes, err := s.service.Challenge.GetChallenge(ctx, &group.GetChallengeRequest{
+		Id: request.ChallengeId,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
 	if message != "" {
 		go func() {
 			ctxNoti, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*80))
@@ -36,6 +44,8 @@ func (s *groupIServer) UpdateChallengeProgress(
 					SourceType:    notification.SOURCE_TYPE_GROUP,
 					ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 10)),
 					ReceiveIds:    []int64{userId},
+					SourceId:      request.ChallengeId,
+					SourceImage:   challengeRes.ChallengeInfo.GetPicture(),
 				})
 			if err != nil {
 				log.Println("There are something mistaken when push notification ", err)

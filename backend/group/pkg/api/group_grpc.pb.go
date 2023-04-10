@@ -44,6 +44,8 @@ type GroupClient interface {
 	UpdateSeason(ctx context.Context, in *UpdateSeasonRequest, opts ...grpc.CallOption) (*UpdateSeasonReply, error)
 	DeleteSeason(ctx context.Context, in *DeleteSeasonRequest, opts ...grpc.CallOption) (*DeleteSeasonReply, error)
 	GetSeason(ctx context.Context, in *GetSeasonRequest, opts ...grpc.CallOption) (*GetSeasonReply, error)
+	ListInProgressChallenge(ctx context.Context, in *ListInProgressChallengeRequest, opts ...grpc.CallOption) (*ListInProgressChallengeReply, error)
+	GetInProgressSeason(ctx context.Context, in *GetInProgressSeasonRequest, opts ...grpc.CallOption) (*GetInProgressSeasonReply, error)
 }
 
 type groupClient struct {
@@ -243,6 +245,24 @@ func (c *groupClient) GetSeason(ctx context.Context, in *GetSeasonRequest, opts 
 	return out, nil
 }
 
+func (c *groupClient) ListInProgressChallenge(ctx context.Context, in *ListInProgressChallengeRequest, opts ...grpc.CallOption) (*ListInProgressChallengeReply, error) {
+	out := new(ListInProgressChallengeReply)
+	err := c.cc.Invoke(ctx, "/group.Group/ListInProgressChallenge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) GetInProgressSeason(ctx context.Context, in *GetInProgressSeasonRequest, opts ...grpc.CallOption) (*GetInProgressSeasonReply, error) {
+	out := new(GetInProgressSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.Group/GetInProgressSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupServer is the server API for Group service.
 // All implementations must embed UnimplementedGroupServer
 // for forward compatibility
@@ -269,6 +289,8 @@ type GroupServer interface {
 	UpdateSeason(context.Context, *UpdateSeasonRequest) (*UpdateSeasonReply, error)
 	DeleteSeason(context.Context, *DeleteSeasonRequest) (*DeleteSeasonReply, error)
 	GetSeason(context.Context, *GetSeasonRequest) (*GetSeasonReply, error)
+	ListInProgressChallenge(context.Context, *ListInProgressChallengeRequest) (*ListInProgressChallengeReply, error)
+	GetInProgressSeason(context.Context, *GetInProgressSeasonRequest) (*GetInProgressSeasonReply, error)
 	mustEmbedUnimplementedGroupServer()
 }
 
@@ -338,6 +360,12 @@ func (UnimplementedGroupServer) DeleteSeason(context.Context, *DeleteSeasonReque
 }
 func (UnimplementedGroupServer) GetSeason(context.Context, *GetSeasonRequest) (*GetSeasonReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSeason not implemented")
+}
+func (UnimplementedGroupServer) ListInProgressChallenge(context.Context, *ListInProgressChallengeRequest) (*ListInProgressChallengeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListInProgressChallenge not implemented")
+}
+func (UnimplementedGroupServer) GetInProgressSeason(context.Context, *GetInProgressSeasonRequest) (*GetInProgressSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInProgressSeason not implemented")
 }
 func (UnimplementedGroupServer) mustEmbedUnimplementedGroupServer() {}
 
@@ -730,6 +758,42 @@ func _Group_GetSeason_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Group_ListInProgressChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListInProgressChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).ListInProgressChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/ListInProgressChallenge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).ListInProgressChallenge(ctx, req.(*ListInProgressChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_GetInProgressSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInProgressSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).GetInProgressSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.Group/GetInProgressSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).GetInProgressSeason(ctx, req.(*GetInProgressSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Group_ServiceDesc is the grpc.ServiceDesc for Group service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -820,6 +884,14 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSeason",
 			Handler:    _Group_GetSeason_Handler,
+		},
+		{
+			MethodName: "ListInProgressChallenge",
+			Handler:    _Group_ListInProgressChallenge_Handler,
+		},
+		{
+			MethodName: "GetInProgressSeason",
+			Handler:    _Group_GetInProgressSeason_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

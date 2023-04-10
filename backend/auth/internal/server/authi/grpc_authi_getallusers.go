@@ -19,9 +19,11 @@ func (s *authIServer) GetAllUsers(ctx context.Context, _ *emptypb.Empty) (*auth.
 	var userInfos []*auth.UserInfo
 	for _, user := range users {
 		userInfos = append(userInfos, &auth.UserInfo{
-			UserId:   user.ID,
-			Username: user.Username,
-			Email:    user.Email,
+			UserId:         user.ID,
+			Username:       user.Username,
+			Email:          user.Email,
+			ProfilePicture: user.ProfilePicture,
+			DisplayName:    user.DisplayName,
 		})
 	}
 

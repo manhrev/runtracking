@@ -70,6 +70,11 @@ func SourceID(v int64) predicate.Notification {
 	return predicate.Notification(sql.FieldEQ(FieldSourceID, v))
 }
 
+// SourceImage applies equality check predicate on the "source_image" field. It's identical to SourceImageEQ.
+func SourceImage(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldSourceImage, v))
+}
+
 // ScheduledTime applies equality check predicate on the "scheduled_time" field. It's identical to ScheduledTimeEQ.
 func ScheduledTime(v time.Time) predicate.Notification {
 	return predicate.Notification(sql.FieldEQ(FieldScheduledTime, v))
@@ -248,6 +253,71 @@ func SourceIDIsNil() predicate.Notification {
 // SourceIDNotNil applies the NotNil predicate on the "source_id" field.
 func SourceIDNotNil() predicate.Notification {
 	return predicate.Notification(sql.FieldNotNull(FieldSourceID))
+}
+
+// SourceImageEQ applies the EQ predicate on the "source_image" field.
+func SourceImageEQ(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldSourceImage, v))
+}
+
+// SourceImageNEQ applies the NEQ predicate on the "source_image" field.
+func SourceImageNEQ(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldSourceImage, v))
+}
+
+// SourceImageIn applies the In predicate on the "source_image" field.
+func SourceImageIn(vs ...string) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldSourceImage, vs...))
+}
+
+// SourceImageNotIn applies the NotIn predicate on the "source_image" field.
+func SourceImageNotIn(vs ...string) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldSourceImage, vs...))
+}
+
+// SourceImageGT applies the GT predicate on the "source_image" field.
+func SourceImageGT(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldSourceImage, v))
+}
+
+// SourceImageGTE applies the GTE predicate on the "source_image" field.
+func SourceImageGTE(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldSourceImage, v))
+}
+
+// SourceImageLT applies the LT predicate on the "source_image" field.
+func SourceImageLT(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldSourceImage, v))
+}
+
+// SourceImageLTE applies the LTE predicate on the "source_image" field.
+func SourceImageLTE(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldSourceImage, v))
+}
+
+// SourceImageContains applies the Contains predicate on the "source_image" field.
+func SourceImageContains(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldContains(FieldSourceImage, v))
+}
+
+// SourceImageHasPrefix applies the HasPrefix predicate on the "source_image" field.
+func SourceImageHasPrefix(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldHasPrefix(FieldSourceImage, v))
+}
+
+// SourceImageHasSuffix applies the HasSuffix predicate on the "source_image" field.
+func SourceImageHasSuffix(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldHasSuffix(FieldSourceImage, v))
+}
+
+// SourceImageEqualFold applies the EqualFold predicate on the "source_image" field.
+func SourceImageEqualFold(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEqualFold(FieldSourceImage, v))
+}
+
+// SourceImageContainsFold applies the ContainsFold predicate on the "source_image" field.
+func SourceImageContainsFold(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldContainsFold(FieldSourceImage, v))
 }
 
 // ReceiveIdsIsNil applies the IsNil predicate on the "receive_ids" field.

@@ -49,6 +49,11 @@ type Challenge interface {
 		ctx context.Context,
 		timeCheck time.Time,
 	) (*group.CheckDailyProgressChallengeReply, error)
+
+	ListInProgressChallenge(
+		ctx context.Context,
+		request *group.ListInProgressChallengeRequest,
+	) (*group.ListInProgressChallengeReply, error)
 }
 
 type challengeImpl struct {

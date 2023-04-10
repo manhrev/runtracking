@@ -79,6 +79,8 @@ type Season interface {
 		limit uint32,
 		offset uint64,
 	) ([]*ent.SeasonMember, int64, error)
+
+	// CheckDailyProgressSeason(ctx context.Context, timeCheck time.Time) error
 }
 type seasonImpl struct {
 	entClient *ent.Client
@@ -301,3 +303,21 @@ func (c *seasonImpl) CreateBulkSeasonMember(
 
 	return seasonMembers, nil
 }
+
+// func (c *seasonImpl) CheckDailyProgressSeason(ctx context.Context, timeCheck time.Time) error {
+// 	// check inprogress challenge
+// 	inprogressSeasonEnt, err := c.entClient.Season.Query().
+// 		Where(season.Status(int64(group.RuleStatus_RULE_STATUS_INPROGRESS))).
+// 		First(ctx)
+
+// 	if err != nil {
+// 		log.Printf("Error while query challenge to check challenge in progress daily: %v", err)
+// 		return status.Internal(err.Error())
+// 	}
+
+// 		log.Printf("Begin checking challenge id: %v - name: %v", challengeEnt.ID, challengeEnt.Name)
+// 		_ = checkIfChallengeExpired(ctx, c.entClient, challengeEnt, c.notificaitonClient, timeCheck)
+// 		log.Printf("Begin checking challenge id: %v - name: %v", challengeEnt.ID, challengeEnt.Name)
+
+// 	return nil
+// }

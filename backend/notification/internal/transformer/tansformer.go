@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func TransformActivityListEntToActivityList(notificationList []*ent.NotificationUser) []*notification.NotificationInfo {
+func TransformNotificationListEntToNotificationList(notificationList []*ent.NotificationUser) []*notification.NotificationInfo {
 	notificationInfoList := []*notification.NotificationInfo{}
 	for _, notificationEnt := range notificationList {
 		notificationInfo := &notification.NotificationInfo{
@@ -15,7 +15,7 @@ func TransformActivityListEntToActivityList(notificationList []*ent.Notification
 			SourceType: notification.SOURCE_TYPE(notificationEnt.Edges.Notification.SourceType),
 			ReceiveIds: notificationEnt.Edges.Notification.ReceiveIds,
 			SourceId:   notificationEnt.Edges.Notification.SourceID,
-			Image:      "",
+			Image:      notificationEnt.Edges.Notification.SourceImage,
 			IsSeen:     notificationEnt.IsSeen,
 			Time:       timestamppb.New(notificationEnt.CreatedAt),
 		}

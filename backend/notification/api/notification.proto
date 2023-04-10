@@ -40,14 +40,6 @@ message ListNotificationInfoReply{
     int64 total = 2;
 }
 
-message PushNotiRequest{
-    string messeage = 1;
-    google.protobuf.Timestamp scheduled_time = 2;
-    SOURCE_TYPE source_type = 3;
-    int64 source_id = 4;
-    repeated int64 receive_ids = 5;
-}
-
 message ListNotificationInfoRequest{
     uint32 limit = 1;
     uint64 offset = 2;
@@ -67,12 +59,13 @@ message NotificationInfo{
 }
 
 enum SOURCE_TYPE{
-        ADMIN = 0;
-        GROUP = 1;
-        EVENT = 2;
-        PERSONAL = 3;
-        PLAN = 4;
-    }
+    ADMIN = 0;
+    GROUP = 1;
+    EVENT = 2;
+    PERSONAL = 3;
+    PLAN = 4;
+    CHALLENGE = 5;
+}
 
 
 

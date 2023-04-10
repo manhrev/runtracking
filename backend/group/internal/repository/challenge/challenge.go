@@ -118,6 +118,9 @@ type Challenge interface {
 		memberId int64,
 		challengeEnt *ent.Challenge,
 	) (*ent.ChallengeMember, error)
+
+	ListInProgressChallenge(ctx context.Context, userId int64,
+	) ([]*ent.Challenge, error)
 }
 type challengeImpl struct {
 	entClient          *ent.Client
@@ -614,6 +617,23 @@ func (c *challengeImpl) CheckDailyProgressChallenge(ctx context.Context, timeChe
 	}
 
 	return nil
+}
+
+func (c *challengeImpl) ListInProgressChallenge(ctx context.Context, userId int64) ([]*ent.Challenge, error) {
+	// check inprogress challenge
+	inprogressChallengeEntList, err := c.entClient.Challenge.Query().
+		Where(challenge.Status(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
+			challenge.HasChallengeMembersWith(challengemember.HasMemberWith(member.UserIDEQ(userId)))).
+		WithChallengeRules().
+		WithGroupz().
+		All(ctx)
+
+	if err != nil {
+		log.Printf("Error while query challenge to check challenge in progress daily: %v", err)
+		return nil, status.Internal(err.Error())
+	}
+
+	return inprogressChallengeEntList, nil
 }
 
 // func (c *challengeImpl) UpdateChallengeRules(
