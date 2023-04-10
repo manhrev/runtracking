@@ -19,13 +19,18 @@ var (
 
 func (s *notificationIServer) PushNotification(ctx context.Context, request *noti.PushNotiRequest) (*emptypb.Empty, error) {
 
-	notification, err := s.entClient.Notification.Create().
+	query := s.entClient.Notification.Create().
 		SetMessage(request.GetMesseage()).
 		SetScheduledTime(request.GetScheduledTime().AsTime()).
 		SetSourceType(int64(request.GetSourceType())).
 		SetSourceID(request.GetSourceId()).
-		SetReceiveIds(request.GetReceiveIds()).
-		Save(ctx)
+		SetReceiveIds(request.GetReceiveIds())
+
+	if request.SourceImage != "" {
+		query.SetSourceImage(request.SourceImage)
+	}
+
+	notification, err := query.Save(ctx)
 
 	if err != nil {
 		return nil, errors.New("fail when save data to notification database " + err.Error())

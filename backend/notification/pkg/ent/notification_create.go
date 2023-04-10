@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -62,6 +63,20 @@ func (nc *NotificationCreate) SetNillableSourceID(i *int64) *NotificationCreate 
 	return nc
 }
 
+// SetSourceImage sets the "source_image" field.
+func (nc *NotificationCreate) SetSourceImage(s string) *NotificationCreate {
+	nc.mutation.SetSourceImage(s)
+	return nc
+}
+
+// SetNillableSourceImage sets the "source_image" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableSourceImage(s *string) *NotificationCreate {
+	if s != nil {
+		nc.SetSourceImage(*s)
+	}
+	return nc
+}
+
 // SetReceiveIds sets the "receive_ids" field.
 func (nc *NotificationCreate) SetReceiveIds(i []int64) *NotificationCreate {
 	nc.mutation.SetReceiveIds(i)
@@ -110,6 +125,7 @@ func (nc *NotificationCreate) Mutation() *NotificationMutation {
 
 // Save creates the Notification in the database.
 func (nc *NotificationCreate) Save(ctx context.Context) (*Notification, error) {
+	nc.defaults()
 	return withHooks[*Notification, NotificationMutation](ctx, nc.sqlSave, nc.mutation, nc.hooks)
 }
 
@@ -135,8 +151,19 @@ func (nc *NotificationCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (nc *NotificationCreate) defaults() {
+	if _, ok := nc.mutation.SourceImage(); !ok {
+		v := notification.DefaultSourceImage
+		nc.mutation.SetSourceImage(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (nc *NotificationCreate) check() error {
+	if _, ok := nc.mutation.SourceImage(); !ok {
+		return &ValidationError{Name: "source_image", err: errors.New(`ent: missing required field "Notification.source_image"`)}
+	}
 	return nil
 }
 
@@ -187,6 +214,10 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec.SetField(notification.FieldSourceID, field.TypeInt64, value)
 		_node.SourceID = value
 	}
+	if value, ok := nc.mutation.SourceImage(); ok {
+		_spec.SetField(notification.FieldSourceImage, field.TypeString, value)
+		_node.SourceImage = value
+	}
 	if value, ok := nc.mutation.ReceiveIds(); ok {
 		_spec.SetField(notification.FieldReceiveIds, field.TypeJSON, value)
 		_node.ReceiveIds = value
@@ -231,6 +262,7 @@ func (ncb *NotificationCreateBulk) Save(ctx context.Context) ([]*Notification, e
 	for i := range ncb.builders {
 		func(i int, root context.Context) {
 			builder := ncb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*NotificationMutation)
 				if !ok {

@@ -11,6 +11,15 @@ service GroupI {
 
     // for intermediary, cloud schedule check daily progress -> call intermediary -> call groupi
     rpc CheckDailyProgressChallenge(CheckDailyProgressChallengeRequest) returns (CheckDailyProgressChallengeReply);
+    rpc CheckDailyProgressSeason(CheckDailyProgressSeasonRequest) returns (CheckDailyProgressSeasonReply);
+}
+
+message CheckDailyProgressSeasonRequest{
+    google.protobuf.Timestamp time_check = 3;
+}
+
+message CheckDailyProgressSeasonReply{
+
 }
 
 message CheckDailyProgressChallengeRequest{

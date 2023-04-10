@@ -20,7 +20,7 @@ func (s *authIServer) ListUser(ctx context.Context, request *auth.ListUserReques
 	}
 
 	return &auth.ListUserReply{
-		Users: transformer.TransformActivityListEntToActivityList(userEntList),
+		Users: transformer.TransformUserListEntToUserList(userEntList),
 		Total: total,
 	}, nil
 }

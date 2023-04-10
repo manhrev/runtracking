@@ -27,7 +27,7 @@ func (s *notificationServer) ListNotificationInfo(ctx context.Context, request *
 	}
 
 	return &noti.ListNotificationInfoReply{
-		NotificationList: transformer.TransformActivityListEntToActivityList(notificationList),
+		NotificationList: transformer.TransformNotificationListEntToNotificationList(notificationList),
 		Total:            total,
 	}, nil
 }

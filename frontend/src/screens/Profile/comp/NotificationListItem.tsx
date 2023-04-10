@@ -93,18 +93,21 @@ export default function NotificationListItem({
             <View style={styles(theme).listItemContainer}>
               <Avatar.Image
                 size={60}
-                source={require('../../../../assets/icon.png')}
+                source={{uri: image}}
               />
               <View style={styles(theme).listItemContent}>
-                <Text
-                  variant="bodyMedium"
-                  style={[
-                    styles(theme).listItemValue,
-                    { fontWeight: isSeen ? '500' : 'bold' },
-                  ]}
-                >
-                  {message}
-                </Text>
+                <View style={{flexDirection: 'row', width: '90%' }}>
+                  <Text
+                    variant="bodyMedium"
+                    style={[
+                      styles(theme).listItemValue,
+                      { fontWeight: isSeen ? '500' : 'bold'},
+                      {flex: 1, flexWrap: 'wrap' }
+                    ]}
+                  >
+                    {message}
+                  </Text>
+                </View>
                 <Text
                   variant="labelSmall"
                   style={{
@@ -135,6 +138,9 @@ const styles = (theme: AppTheme) =>
     },
     listItemContent: {
       marginLeft: 20,
+      width: '90%'
+      // width: '90%'
+      // flexDirection: 'row',
     },
     listItemValue: {
       paddingBottom: 10,

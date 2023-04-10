@@ -37,6 +37,11 @@ type Season interface {
 		userId int64,
 		request *group.UpdateSeasonRequest,
 	) (*group.UpdateSeasonReply, error)
+
+	GetInProgressSeason(
+		ctx context.Context,
+		request *group.GetInProgressSeasonRequest,
+	) (*group.GetInProgressSeasonReply, error)
 }
 
 type seasonImpl struct {

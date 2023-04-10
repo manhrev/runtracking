@@ -43,6 +43,7 @@ type NotificationMutation struct {
 	addsource_type            *int64
 	source_id                 *int64
 	addsource_id              *int64
+	source_image              *string
 	receive_ids               *[]int64
 	appendreceive_ids         []int64
 	scheduled_time            *time.Time
@@ -348,6 +349,42 @@ func (m *NotificationMutation) ResetSourceID() {
 	delete(m.clearedFields, notification.FieldSourceID)
 }
 
+// SetSourceImage sets the "source_image" field.
+func (m *NotificationMutation) SetSourceImage(s string) {
+	m.source_image = &s
+}
+
+// SourceImage returns the value of the "source_image" field in the mutation.
+func (m *NotificationMutation) SourceImage() (r string, exists bool) {
+	v := m.source_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSourceImage returns the old "source_image" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldSourceImage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSourceImage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSourceImage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSourceImage: %w", err)
+	}
+	return oldValue.SourceImage, nil
+}
+
+// ResetSourceImage resets all changes to the "source_image" field.
+func (m *NotificationMutation) ResetSourceImage() {
+	m.source_image = nil
+}
+
 // SetReceiveIds sets the "receive_ids" field.
 func (m *NotificationMutation) SetReceiveIds(i []int64) {
 	m.receive_ids = &i
@@ -550,7 +587,7 @@ func (m *NotificationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NotificationMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.message != nil {
 		fields = append(fields, notification.FieldMessage)
 	}
@@ -559,6 +596,9 @@ func (m *NotificationMutation) Fields() []string {
 	}
 	if m.source_id != nil {
 		fields = append(fields, notification.FieldSourceID)
+	}
+	if m.source_image != nil {
+		fields = append(fields, notification.FieldSourceImage)
 	}
 	if m.receive_ids != nil {
 		fields = append(fields, notification.FieldReceiveIds)
@@ -580,6 +620,8 @@ func (m *NotificationMutation) Field(name string) (ent.Value, bool) {
 		return m.SourceType()
 	case notification.FieldSourceID:
 		return m.SourceID()
+	case notification.FieldSourceImage:
+		return m.SourceImage()
 	case notification.FieldReceiveIds:
 		return m.ReceiveIds()
 	case notification.FieldScheduledTime:
@@ -599,6 +641,8 @@ func (m *NotificationMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldSourceType(ctx)
 	case notification.FieldSourceID:
 		return m.OldSourceID(ctx)
+	case notification.FieldSourceImage:
+		return m.OldSourceImage(ctx)
 	case notification.FieldReceiveIds:
 		return m.OldReceiveIds(ctx)
 	case notification.FieldScheduledTime:
@@ -632,6 +676,13 @@ func (m *NotificationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSourceID(v)
+		return nil
+	case notification.FieldSourceImage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSourceImage(v)
 		return nil
 	case notification.FieldReceiveIds:
 		v, ok := value.([]int64)
@@ -764,6 +815,9 @@ func (m *NotificationMutation) ResetField(name string) error {
 		return nil
 	case notification.FieldSourceID:
 		m.ResetSourceID()
+		return nil
+	case notification.FieldSourceImage:
+		m.ResetSourceImage()
 		return nil
 	case notification.FieldReceiveIds:
 		m.ResetReceiveIds()
