@@ -124,7 +124,7 @@ func checkIfChallengeExpired(
 			log.Printf("Error update challenge member rule status if challenge expired %v", err)
 			return err
 		}
-		notifyUsersAboutChallenge(ctx, notificationIClient, fmt.Sprintf("Your %v challenge of group %v has failed!", challengeEnt.Name, challengeEnt.Edges.Groupz.Name), userIds, challengeEnt.Edges.Groupz.ID)
+		notifyUsersAboutChallenge(ctx, notificationIClient, fmt.Sprintf("Your %v challenge of group %v has failed!", challengeEnt.Name, challengeEnt.Edges.Groupz.Name), userIds, challengeEnt)
 		log.Printf("challenge %v:%d has failed 0: Status when check if challenge expired", challengeEnt.Name, challengeEnt.ID)
 		return nil
 	}
@@ -167,7 +167,7 @@ func checkIfChallengeComing(
 			userIds = append(userIds, challengeMember.Edges.Member.UserID)
 		}
 
-		notifyUsersAboutChallenge(ctx, notificationIClient, fmt.Sprintf("Your %v challenge of group %v has coming!", challengeEnt.Name, challengeEnt.Edges.Groupz.Name), userIds, challengeEnt.Edges.Groupz.ID)
+		notifyUsersAboutChallenge(ctx, notificationIClient, fmt.Sprintf("Your %v challenge of group %v has coming!", challengeEnt.Name, challengeEnt.Edges.Groupz.Name), userIds, challengeEnt)
 		log.Printf("challenge %v:%d has started: Status when check if challenge coming", challengeEnt.Name, challengeEnt.ID)
 		return nil
 	}
@@ -215,14 +215,15 @@ func notifyUsersAboutChallenge(
 	notificationIClient notification.NotificationIClient,
 	message string,
 	userIds []int64,
-	groupId int64,
+	challengeEnt *ent.Challenge,
 ) error {
 	_, err := notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
 		Messeage:      message,
 		SourceType:    notification.SOURCE_TYPE_GROUP,
 		ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 10)),
 		ReceiveIds:    userIds,
-		SourceId:      groupId,
+		SourceId:      challengeEnt.ID,
+		SourceImage:   challengeEnt.Picture,
 	})
 	if err != nil {
 		log.Printf("Error when push notification: %v", err)
