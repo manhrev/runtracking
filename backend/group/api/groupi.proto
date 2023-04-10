@@ -32,6 +32,7 @@ message CheckDailyProgressChallengeReply{
 
 message UpdateChallengeProgressRequest {
     int64 challenge_id = 1;
+    int64 user_id = 2;
     google.protobuf.Timestamp time = 3;
     ActivityRecord activityRecord = 4;
 }

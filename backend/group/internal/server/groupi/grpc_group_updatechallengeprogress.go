@@ -5,8 +5,6 @@ import (
 	"log"
 	"time"
 
-	extractor "github.com/manhrev/runtracking/backend/auth/pkg/extractor"
-	"github.com/manhrev/runtracking/backend/group/internal/status"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -16,10 +14,7 @@ func (s *groupIServer) UpdateChallengeProgress(
 	ctx context.Context,
 	request *group.UpdateChallengeProgressRequest,
 ) (*group.UpdateChallengeProgressReply, error) {
-	userId, err := extractor.New().GetUserID(ctx)
-	if err != nil {
-		return nil, status.Internal(err.Error())
-	}
+	userId := request.GetUserId()
 	message, err := s.service.Challenge.UpdateChallengeProgress(ctx, userId, request)
 
 	if err != nil {
