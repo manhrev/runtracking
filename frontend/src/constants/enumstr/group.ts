@@ -1,4 +1,5 @@
 import { GroupSortBy, ListChallengeRequest, Rule } from '../../lib/group/group_pb'
+import { ActivityType } from '../../lib/activity/activity_pb'
 
 export const GroupSortByStr = {
   [GroupSortBy.GROUP_SORT_BY_CREATED_TIME]: 'Created time',
@@ -33,3 +34,18 @@ export const ChallengeRuleIcon = {
   [Rule.RULE_TOTAL_CALORIES]: 'lightning-bolt-circle',
   [Rule.RULE_UNSPECIFIED]: '',
 }
+
+export const ActivityTypeIcon = {
+  [ActivityType.ACTIVITY_TYPE_RUNNING]: 'run-fast',
+  [ActivityType.ACTIVITY_TYPE_WALKING]: 'walk',
+  [ActivityType.ACTIVITY_TYPE_CYCLING]: 'bike',
+  [ActivityType.ACTIVITY_TYPE_UNSPECIFIED]: '',
+}
+
+export const ActivityTypeStr = {
+  [ActivityType.ACTIVITY_TYPE_RUNNING]: 'Running',
+  [ActivityType.ACTIVITY_TYPE_WALKING]: 'Walking',
+  [ActivityType.ACTIVITY_TYPE_CYCLING]: 'Cycling',
+  [ActivityType.ACTIVITY_TYPE_UNSPECIFIED]: '',
+}
+

@@ -360,7 +360,11 @@ export default function GroupDetail({
                     flexDirection: 'column',
                     marginBottom: 10,
                 }}
-                onPress={() => console.log("Challenge pressed")}
+                onPress={() => navigation.navigate("ChallengeDetail", {
+                    canEdit: groupDetail.groupinfo?.leaderId == userState.userId && item.status === RuleStatus.RULE_STATUS_COMING_SOON,
+                    leaderId: groupDetail.groupinfo?.leaderId || 0,
+                    challengeId: item.id
+                })}
                 >
                     <Image
                         style={{
