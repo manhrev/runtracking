@@ -171,6 +171,34 @@ services:
       NOTIFICATIONI_PORT: 8080
       IS_SECURE_CONNECTION: "false"
 
+  chat:
+    build:
+      context: backend/chat
+      dockerfile: Dockerfile
+    container_name: chat
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - chat_db
+    ports:
+      - 8088:8080
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: chat_db
+      DB_PORT: 3306
+      DB_NAME: chat
+      AUTH_SERVICE: auth
+      AUTH_PORT: 8080
+      NOTIFICATION_SERVICE: notification
+      NOTIFICATION_PORT: 8080
+      # GCP_CLOUD_TASK_PROJECT_ID: new-runtracking
+      # GCP_CLOUD_TASK_LOCATION_ID: asia-southeast1
+      # GCP_CLOUD_TASK_QUEUE_ID: notification
+      IS_SECURE_CONNECTION: "false"
+
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest
     command: -host 0.0.0.0 -port 8123 -queue "projects/daring-acumen-370401/locations/asia-southeast2/queues/test-queue1"
@@ -255,3 +283,16 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33310:3306
+
+  chat_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: chat
+    container_name: 'db-chat'
+    volumes:
+      - "./tmp/db/chat:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - 33311:3306
