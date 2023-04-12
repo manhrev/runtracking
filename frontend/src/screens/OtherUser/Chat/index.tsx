@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState , useCallback} from 'react'
 import { ScrollView, View } from 'react-native'
 import { RefreshControl } from 'react-native-gesture-handler'
-import { Button, Divider, Searchbar, Text } from 'react-native-paper'
+import { ActivityIndicator, Button, Divider, Searchbar, Text } from 'react-native-paper'
 import { useDialog } from '../../../hooks/useDialog'
 import {
   GroupInfo,
@@ -18,7 +18,8 @@ import {
  getHistoryChatThunk,
  deleteConversationThunk, 
  sendMessageThunk, 
- getMoreHistoryChatThunk
+ getMoreHistoryChatThunk,
+ getUpToDateHistoryChatThunk
 } from '../../../redux/features/messageList/thunk'
 import { useAppDispatch, useAppSelector } from '../../../redux/store'
 import { useAppTheme } from '../../../theme'
@@ -44,8 +45,9 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb'
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeSyntheticEvent } from 'react-native'
 import { NativeScrollEvent } from 'react-native'
+import { RootBaseStackParamList } from '../../../navigators/BaseStack'
 
-const LIMIT = 1
+const LIMIT = 15
 export interface IMessage {
   _id: string | number
   text: string
@@ -101,15 +103,10 @@ function TransformerMessageInfoListToMessageIList(messageInfoList: MessageInfo.A
 export default function Chat({
   navigation,
   route,
-}: NativeStackScreenProps<RootGroupTopTabsParamList, 'Chat'>) {
+
+}: NativeStackScreenProps<RootBaseStackParamList, 'Chat'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-  const {
-    handleToggleDialog,
-    dataSelected: groupId,
-    open,
-    toggleDialog,
-  } = useDialog<number>()
   const userIdParam = route.params.userId
   const toUserIdParam = route.params.toUserId
   const { user } = useAppSelector(selectOtherUserSlice)
@@ -124,62 +121,61 @@ export default function Chat({
 
   useFocusEffect(
     useCallback(() => {
-       const userInfoMap = new Map<number, UserPublicInfo.AsObject>([
-    [userState.userId, userSender], 
-    [toUserIdParam, user]
-  ])
-      getHistoryChat(LIMIT)
+      getHistoryChat()
       fetchUserData()
-      
-      setMessages(TransformerMessageInfoListToMessageIList(messageList, userInfoMap))
-
-      
-
-
-    }, [dispatch])
+    }, [])
  )
+
+ useEffect(() => {
+  const interval = setInterval(() => {
+    getUpToDateHistoryChat()
+  }, 4000);
+  return () => clearInterval(interval);
+ }, [])
 
  useEffect(() => {
   const userInfoMap = new Map<number, UserPublicInfo.AsObject>([
     [userState.userId, userSender], 
     [toUserIdParam, user]
   ])
-
-  const interval = setInterval(() => {
-    console.log(LIMIT + currentOffset)
-    getHistoryChat(LIMIT + currentOffset)
-    console.log(messageList)
     setMessages(TransformerMessageInfoListToMessageIList(messageList, userInfoMap))
-  }, 5000);
-  return () => clearInterval(interval);
- }, [])
+ }, [dispatch, messageList])
 
   const fetchUserData = async () => {
     dispatch(getUserPublicInfoThunk(userIdParam))
   }
 
-  const getHistoryChat = async (limit : number) => {
+  const getHistoryChat = async () => {
     const { response } = await dispatch(
       getHistoryChatThunk({
         toUserId: toUserIdParam, 
-        limit: limit, 
+        limit: LIMIT, 
         offset: 0
       })
     ).unwrap()
 
     if (response) {
-      setCurrentOffset(0)
       if (response.total > LIMIT) setCanLoadmore(true)
       else setCanLoadmore(false)
     } else setCanLoadmore(false)
   }
 
+  const getUpToDateHistoryChat = async () => {
+    await dispatch(
+      getUpToDateHistoryChatThunk({
+        toUserId: toUserIdParam, 
+        limit: LIMIT, 
+        offset: 0
+      })
+    ).unwrap()
+  }
+
   const fetchMore = async () => {
     const { response } = await dispatch(
-      getMoreHistoryChatThunk({
+      getHistoryChatThunk({
         toUserId: toUserIdParam, 
-        limit: LIMIT,
-        offset: currentOffset + LIMIT,
+        limit: currentOffset +  LIMIT * 2,
+        offset: 0,
       })
     ).unwrap()
 
@@ -211,19 +207,19 @@ export default function Chat({
   }, [])
 
   const isCloseToTop = (event : NativeScrollEvent)  => {
-    const paddingToTop = 80;
+    const paddingToTop = 20;
     return event.contentSize.height - event.layoutMeasurement.height - paddingToTop <= event.contentOffset.y;
   }
 
   const onScroll: OnScrollEventHandler = (event) => {
-    console.log(canLoadmore)
-    if (isCloseToTop(event.nativeEvent) && canLoadmore) { 
+    if (isCloseToTop(event.nativeEvent) && canLoadmore && !messageListLoading) { 
         fetchMore()
     }
   };
 
   return (
-    <GiftedChat
+    <>
+    {!messageListLoading && <GiftedChat
       messages={messages}
       onSend={messages => onSend(messages)}
       user={{
@@ -235,5 +231,17 @@ export default function Chat({
       }}
       infiniteScroll={true}
     />
+  }
+
+  {messageListLoading && (
+    <ActivityIndicator
+      animating={true}
+      size="small"
+      style={{
+        paddingVertical: 30,
+      }}
+    />
+  )}
+  </>
   )
 }

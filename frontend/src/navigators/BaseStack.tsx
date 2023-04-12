@@ -33,6 +33,7 @@ import ChallengeStats from '../screens/Group/Challenge/ChallengeStats'
 import { toast } from '../utils/toast/toast'
 import OtherUser from '../screens/OtherUser'
 import Chat from '../screens/OtherUser/Chat'
+import { Button } from 'react-native'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -324,6 +325,11 @@ export const BaseStack = () => {
             options={{
               title: 'Chat',
               headerBackVisible: true,
+              headerRight: () => (
+                <Button 
+                  title="Update count" 
+                  color='#fff'/>
+              ),
             }}
             component={Chat}
           />

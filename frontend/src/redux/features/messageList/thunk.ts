@@ -9,6 +9,13 @@ export const getHistoryChatThunk = createAsyncThunk(
   }
 )
 
+export const getUpToDateHistoryChatThunk = createAsyncThunk(
+  'chat/getUpToDateHistoryChat',
+  async (payload: GetHistoryChatRequest.AsObject) => {
+    return await chatClient.getHistoryChat(payload)
+  }
+)
+
 export const getMoreHistoryChatThunk = createAsyncThunk(
   'chat/getMoreHistoryChat',
   async (payload: GetHistoryChatRequest.AsObject) => {
