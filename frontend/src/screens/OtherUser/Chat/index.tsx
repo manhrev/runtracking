@@ -17,7 +17,8 @@ import {
 import {
  getHistoryChatThunk,
  deleteConversationThunk, 
- sendMessageThunk
+ sendMessageThunk, 
+ getMoreHistoryChatThunk
 } from '../../../redux/features/messageList/thunk'
 import { useAppDispatch, useAppSelector } from '../../../redux/store'
 import { useAppTheme } from '../../../theme'
@@ -38,9 +39,13 @@ import { selectMessageList } from '../../../redux/features/messageList/slice'
 import { isMemberListLoading } from '../../../redux/features/memberList/slice'
 import { MessageInfo } from '../../../lib/chat/chat_pb'
 import { UserInfo, UserPublicInfo } from '../../../lib/auth/auth_pb'
-import { toDate } from '../../../utils/helpers'
+import { dateTimeToTimestamp, toDate } from '../../../utils/helpers'
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb'
+import { useFocusEffect } from '@react-navigation/native';
+import { NativeSyntheticEvent } from 'react-native'
+import { NativeScrollEvent } from 'react-native'
 
-const LIMIT = 10
+const LIMIT = 1
 export interface IMessage {
   _id: string | number
   text: string
@@ -74,6 +79,8 @@ interface QuickReplies {
   keepIt?: boolean
 }
 
+type OnScrollEventHandler = (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+
 function TransformerUserPublicInfoToUser(userPublicInfo: UserPublicInfo.AsObject) : User{
   return {
     _id: userPublicInfo.userId, 
@@ -87,7 +94,7 @@ function TransformerMessageInfoListToMessageIList(messageInfoList: MessageInfo.A
     _id: messageInfo.id, 
     createdAt: new Date((messageInfo.time?.seconds || 0)*1000),
     text: messageInfo.message,
-    user: TransformerUserPublicInfoToUser(userInfoMap.get(messageInfo.toUserId)|| new UserPublicInfo().toObject())
+    user: TransformerUserPublicInfoToUser(userInfoMap.get(messageInfo.fromUserId)|| new UserPublicInfo().toObject())
   } as IMessage))
 }
 
@@ -112,59 +119,77 @@ export default function Chat({
   // const noData = groupList.length === 0 && !groupListLoading
   const [canLoadmore, setCanLoadmore] = useState(false)
 
-  const [searchQuery, setSearchQuery] = useState('')
 
-  const [asc, setAsc] = useState(false)
   const [currentOffset, setCurrentOffset] = useState(0)
-  const [searchByName, setSearchByName] = useState('')
-  const [sortBy, setSortBy] = useState(GroupSortBy.GROUP_SORT_BY_CREATED_TIME)
-  const filterBy = ListGroupRequest.FilterBy.FILTER_BY_IS_NOT_MEMBER
 
-  useEffect(() => {
-    getHistoryChat()
-    fetchUserData()
-  }, [dispatch, searchByName, sortBy, asc])
+  useFocusEffect(
+    useCallback(() => {
+       const userInfoMap = new Map<number, UserPublicInfo.AsObject>([
+    [userState.userId, userSender], 
+    [toUserIdParam, user]
+  ])
+      getHistoryChat(LIMIT)
+      fetchUserData()
+      
+      setMessages(TransformerMessageInfoListToMessageIList(messageList, userInfoMap))
 
+      
+
+
+    }, [dispatch])
+ )
+
+ useEffect(() => {
+  const userInfoMap = new Map<number, UserPublicInfo.AsObject>([
+    [userState.userId, userSender], 
+    [toUserIdParam, user]
+  ])
+
+  const interval = setInterval(() => {
+    console.log(LIMIT + currentOffset)
+    getHistoryChat(LIMIT + currentOffset)
+    console.log(messageList)
+    setMessages(TransformerMessageInfoListToMessageIList(messageList, userInfoMap))
+  }, 5000);
+  return () => clearInterval(interval);
+ }, [])
 
   const fetchUserData = async () => {
     dispatch(getUserPublicInfoThunk(userIdParam))
   }
 
-  const getHistoryChat = async () => {
+  const getHistoryChat = async (limit : number) => {
     const { response } = await dispatch(
       getHistoryChatThunk({
         toUserId: toUserIdParam, 
-        limit: 20, 
+        limit: limit, 
         offset: 0
       })
     ).unwrap()
 
-    // if (response) {
-    //   setCurrentOffset(0)
-    //   if (response.total > LIMIT) setCanLoadmore(true)
-    //   else setCanLoadmore(false)
-    // } else setCanLoadmore(false)
+    if (response) {
+      setCurrentOffset(0)
+      if (response.total > LIMIT) setCanLoadmore(true)
+      else setCanLoadmore(false)
+    } else setCanLoadmore(false)
   }
 
-  // const fetchMore = async () => {
-  //   const { response } = await dispatch(
-  //     listMoreGroupExploreThunk({
-  //       ascending: asc,
-  //       limit: LIMIT,
-  //       filterBy: filterBy,
-  //       offset: currentOffset + LIMIT,
-  //       searchByName: searchByName,
-  //       sortBy: sortBy,
-  //     })
-  //   ).unwrap()
+  const fetchMore = async () => {
+    const { response } = await dispatch(
+      getMoreHistoryChatThunk({
+        toUserId: toUserIdParam, 
+        limit: LIMIT,
+        offset: currentOffset + LIMIT,
+      })
+    ).unwrap()
 
-  //   if (response) {
-  //     if (currentOffset + 20 >= response.total) {
-  //       setCanLoadmore(false)
-  //     }
-  //     setCurrentOffset(currentOffset + 10)
-  //   }
-  // }
+    if (response) {
+      if (currentOffset + LIMIT*2 >= response.total) {
+        setCanLoadmore(false)
+      }
+      setCurrentOffset(currentOffset + LIMIT)
+    }
+  }
 
   const [messages, setMessages] = useState<IMessage[]>([]);
   const userSender = new UserPublicInfo().
@@ -173,19 +198,29 @@ export default function Chat({
                   setProfilePicture(userState.profiePicture).
                   toObject()
 
-  useEffect(() => {
-    const userInfoMap = new Map<number, UserPublicInfo.AsObject>([
-      [userState.userId, userSender], 
-      [toUserIdParam, user]
-    ])
-
-    console.log(TransformerMessageInfoListToMessageIList(messageList, userInfoMap))
-    setMessages(TransformerMessageInfoListToMessageIList(messageList, userInfoMap))
-  }, [])
-
   const onSend = useCallback((messages: IMessage[] = []) => {
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+    const iMessage = messages.at(0)
+    const timestampNow = new Timestamp()
+    timestampNow.fromDate(new Date())
+    dispatch(sendMessageThunk({
+      message: iMessage?.text || "",
+      toUserId: toUserIdParam,
+      time: timestampNow.toObject(),
+    }))
   }, [])
+
+  const isCloseToTop = (event : NativeScrollEvent)  => {
+    const paddingToTop = 80;
+    return event.contentSize.height - event.layoutMeasurement.height - paddingToTop <= event.contentOffset.y;
+  }
+
+  const onScroll: OnScrollEventHandler = (event) => {
+    console.log(canLoadmore)
+    if (isCloseToTop(event.nativeEvent) && canLoadmore) { 
+        fetchMore()
+    }
+  };
 
   return (
     <GiftedChat
@@ -194,6 +229,11 @@ export default function Chat({
       user={{
         _id: userState.userId,
       }}
+      listViewProps={{
+        scrollEventThrottle: 400,
+        onScroll: onScroll
+      }}
+      infiniteScroll={true}
     />
   )
 }

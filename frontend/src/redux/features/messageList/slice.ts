@@ -3,7 +3,7 @@ import { MessageInfo } from '../../../lib/chat/chat_pb'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
-import { deleteConversationThunk, getHistoryChatThunk, sendMessageThunk } from './thunk'
+import { deleteConversationThunk, getHistoryChatThunk, getMoreHistoryChatThunk, sendMessageThunk } from './thunk'
 
 type MessageListState = {
   messageList: Array<MessageInfo.AsObject>
@@ -33,6 +33,16 @@ const slice = createSlice({
         }
         state.messageList = response?.messageinfolistList || []
         state.total = response?.total || 0
+        state.status = StatusEnum.SUCCEEDED
+      }).addCase(getMoreHistoryChatThunk.pending, (state) => {
+        state.status = StatusEnum.LOADING
+      }).addCase(getMoreHistoryChatThunk.fulfilled, (state, {payload}) => {
+        const { response, error } = payload
+        if (error) {
+          state.status = StatusEnum.SUCCEEDED
+          return
+        }
+        state.messageList = state.messageList.concat(response?.messageinfolistList || [])
         state.status = StatusEnum.SUCCEEDED
       })
       // .addCase(acceptMemberThunk.fulfilled, (state, { payload }) => {
