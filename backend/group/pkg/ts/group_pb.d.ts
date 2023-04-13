@@ -3,6 +3,82 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 
+export class GetInProgressSeasonRequest extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetInProgressSeasonRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetInProgressSeasonRequest): GetInProgressSeasonRequest.AsObject;
+  static serializeBinaryToWriter(message: GetInProgressSeasonRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetInProgressSeasonRequest;
+  static deserializeBinaryFromReader(message: GetInProgressSeasonRequest, reader: jspb.BinaryReader): GetInProgressSeasonRequest;
+}
+
+export namespace GetInProgressSeasonRequest {
+  export type AsObject = {
+  }
+}
+
+export class GetInProgressSeasonReply extends jspb.Message {
+  getSeasoninfo(): SeasonInfo | undefined;
+  setSeasoninfo(value?: SeasonInfo): GetInProgressSeasonReply;
+  hasSeasoninfo(): boolean;
+  clearSeasoninfo(): GetInProgressSeasonReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetInProgressSeasonReply.AsObject;
+  static toObject(includeInstance: boolean, msg: GetInProgressSeasonReply): GetInProgressSeasonReply.AsObject;
+  static serializeBinaryToWriter(message: GetInProgressSeasonReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetInProgressSeasonReply;
+  static deserializeBinaryFromReader(message: GetInProgressSeasonReply, reader: jspb.BinaryReader): GetInProgressSeasonReply;
+}
+
+export namespace GetInProgressSeasonReply {
+  export type AsObject = {
+    seasoninfo?: SeasonInfo.AsObject,
+  }
+}
+
+export class ListInProgressChallengeRequest extends jspb.Message {
+  getUserId(): number;
+  setUserId(value: number): ListInProgressChallengeRequest;
+
+  getActivitytype(): ActivityType;
+  setActivitytype(value: ActivityType): ListInProgressChallengeRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListInProgressChallengeRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListInProgressChallengeRequest): ListInProgressChallengeRequest.AsObject;
+  static serializeBinaryToWriter(message: ListInProgressChallengeRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListInProgressChallengeRequest;
+  static deserializeBinaryFromReader(message: ListInProgressChallengeRequest, reader: jspb.BinaryReader): ListInProgressChallengeRequest;
+}
+
+export namespace ListInProgressChallengeRequest {
+  export type AsObject = {
+    userId: number,
+    activitytype: ActivityType,
+  }
+}
+
+export class ListInProgressChallengeReply extends jspb.Message {
+  getChallengeInfoListList(): Array<ChallengeInfo>;
+  setChallengeInfoListList(value: Array<ChallengeInfo>): ListInProgressChallengeReply;
+  clearChallengeInfoListList(): ListInProgressChallengeReply;
+  addChallengeInfoList(value?: ChallengeInfo, index?: number): ChallengeInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListInProgressChallengeReply.AsObject;
+  static toObject(includeInstance: boolean, msg: ListInProgressChallengeReply): ListInProgressChallengeReply.AsObject;
+  static serializeBinaryToWriter(message: ListInProgressChallengeReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListInProgressChallengeReply;
+  static deserializeBinaryFromReader(message: ListInProgressChallengeReply, reader: jspb.BinaryReader): ListInProgressChallengeReply;
+}
+
+export namespace ListInProgressChallengeReply {
+  export type AsObject = {
+    challengeInfoListList: Array<ChallengeInfo.AsObject>,
+  }
+}
+
 export class SeasonInfo extends jspb.Message {
   getId(): number;
   setId(value: number): SeasonInfo;

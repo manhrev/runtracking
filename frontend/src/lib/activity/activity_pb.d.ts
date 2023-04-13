@@ -351,14 +351,10 @@ export class CommitActivityRequest extends jspb.Message {
   getActivityId(): number;
   setActivityId(value: number): CommitActivityRequest;
 
-  getCommitId(): number;
-  setCommitId(value: number): CommitActivityRequest;
-
-  getCommitType(): CommitType;
-  setCommitType(value: CommitType): CommitActivityRequest;
-
-  getRule(): number;
-  setRule(value: number): CommitActivityRequest;
+  getCommitToList(): Array<CommitObject>;
+  setCommitToList(value: Array<CommitObject>): CommitActivityRequest;
+  clearCommitToList(): CommitActivityRequest;
+  addCommitTo(value?: CommitObject, index?: number): CommitObject;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CommitActivityRequest.AsObject;
@@ -371,6 +367,30 @@ export class CommitActivityRequest extends jspb.Message {
 export namespace CommitActivityRequest {
   export type AsObject = {
     activityId: number,
+    commitToList: Array<CommitObject.AsObject>,
+  }
+}
+
+export class CommitObject extends jspb.Message {
+  getCommitId(): number;
+  setCommitId(value: number): CommitObject;
+
+  getCommitType(): CommitType;
+  setCommitType(value: CommitType): CommitObject;
+
+  getRule(): number;
+  setRule(value: number): CommitObject;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CommitObject.AsObject;
+  static toObject(includeInstance: boolean, msg: CommitObject): CommitObject.AsObject;
+  static serializeBinaryToWriter(message: CommitObject, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CommitObject;
+  static deserializeBinaryFromReader(message: CommitObject, reader: jspb.BinaryReader): CommitObject;
+}
+
+export namespace CommitObject {
+  export type AsObject = {
     commitId: number,
     commitType: CommitType,
     rule: number,
