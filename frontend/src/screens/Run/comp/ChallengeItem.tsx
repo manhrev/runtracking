@@ -18,10 +18,7 @@ interface GroupItemProps {
     challenge: ChallengeInfo.AsObject
     selectedChallenge: ChallengeInfo.AsObject
     setSelectedChallenge: (challenge: ChallengeInfo.AsObject) => void
-    // deleteListId: number[]
-    // addOrRemoveFromDeleteList: (id: number) => void
-    // isLeader: boolean
-    // goToChallengeDetail: () => void
+    goToChallengeDetail: () => void
 }
 
 export default function GroupItem({
@@ -30,10 +27,7 @@ export default function GroupItem({
     challenge,
     selectedChallenge,
     setSelectedChallenge,
-    // deleteListId,
-    // addOrRemoveFromDeleteList,
-    // isLeader,
-    // goToChallengeDetail,
+    goToChallengeDetail,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const windowWidth = Dimensions.get('window').width;
@@ -49,7 +43,7 @@ export default function GroupItem({
 
   
   return (
-    <TouchableRipple onPress={() => {}}>
+    <TouchableRipple onPress={() => goToChallengeDetail()}>
       <>
         {!hideTopDivider && (
           <Divider bold style={{ width: '80%', alignSelf: 'flex-end' }} />

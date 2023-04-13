@@ -28,6 +28,7 @@ import { toast } from '../../utils/toast/toast'
 import ChallengeItem from './comp/ChallengeItem'
 import PlanItem from './comp/PlanItem'
 import { baseStyles } from '../baseStyle'
+import { text } from 'stream/consumers'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -47,13 +48,16 @@ export default function RunCommit({
     {} as PlanInfo.AsObject
   )
 
+  // user
+  const userState  = useAppSelector((state) => state.user);
+
   // challenge commit
   const [challengeList, setChallengeList] = useState<ChallengeInfo.AsObject[]>([])
   const [selectedChallenge, setSelectedChallenge] = useState<ChallengeInfo.AsObject>(
     {} as ChallengeInfo.AsObject
   )
   const fetchChallengeData = async () => {
-    const res = await groupClient.listInProgressChallenge({ userId: 24 })
+    const res = await groupClient.listInProgressChallenge({ userId: userState.userId, activitytype: route.params.activityType })
     if(res.error) {
       console.log(res.error)
     }
@@ -213,7 +217,7 @@ export default function RunCommit({
             <Text style={styles(theme).title}>
               Your activity has been recorded !!!
             </Text>
-            <Text style={styles(theme).title}>Choose to commit</Text>
+            <Text style={styles(theme).title}>{filteredPlanList.length == 0 && challengeList.length == 0 ? 'Nothing to commit' : 'Choose to commit'}</Text>
             <View>
               <View style={{
                   flexDirection: 'row',
@@ -331,11 +335,11 @@ export default function RunCommit({
                     showBottomDivider={true}
                     setSelectedChallenge={setSelectedChallenge}
                     selectedChallenge={selectedChallenge}
-                    // goToChallengeDetail={() => navigation.navigate('ChallengeDetail', {
-                    //   challengeId: challenge.id,
-                    //   canEdit: route.params.isLeader && challenge.status === RuleStatus.RULE_STATUS_COMING_SOON,
-                    //   leaderId: route.params.leaderId,
-                    // })}
+                    goToChallengeDetail={() => navigation.navigate('ChallengeDetail', {
+                      challengeId: selectedChallenge.id,
+                      canEdit: false,
+                      leaderId: -1, // missing
+                    })}
                   />
                 )
               }
@@ -349,44 +353,39 @@ export default function RunCommit({
                     showBottomDivider={idx === challengeList.length - 1}
                     setSelectedChallenge={setSelectedChallenge}
                     selectedChallenge={selectedChallenge}
-                    // goToChallengeDetail={() => navigation.navigate('ChallengeDetail', {
-                    //   challengeId: challenge.id,
-                    //   canEdit: route.params.isLeader && challenge.status === RuleStatus.RULE_STATUS_COMING_SOON,
-                    //   leaderId: route.params.leaderId,
-                    // })}
+                    goToChallengeDetail={() => navigation.navigate('ChallengeDetail', {
+                      challengeId: challenge.id,
+                      canEdit: false,
+                      leaderId: -1, // missing
+                    })}
                   />
                 )
               })}
             </View>
 
-            
-
-
-            
-
-
-
-
-
-            {filteredPlanList.length > 0 &&  challengeList.length > 0 && (
+            {(filteredPlanList.length > 0 ||  challengeList.length > 0) && (
               <Button
                 style={styles(theme).commitBtn}
                 mode="contained"
                 onPress={() => commitAll()}
               >
-                Commit all &gt;&gt;
+                Commit &gt;&gt;
               </Button>
             )}
 
             {filteredPlanList.length == 0 &&  challengeList.length == 0 && (
-              <Button
-                style={styles(theme).backToHomeBtn}
-                labelStyle={{ fontSize: 17 }}
-                mode="text"
-                onPress={() => backToHome()}
-              >
-                &lt;&lt; Back to home 
-              </Button>
+              <View style={{
+                alignItems: 'center',
+                marginTop: 50,
+              }}>
+                <Button
+                  labelStyle={{ fontSize: 17 }}
+                  mode="contained"
+                  onPress={() => backToHome()}
+                >
+                  &lt;&lt; Back to home 
+                </Button>
+              </View>
             )}
           </ScrollView>
         </View>
@@ -420,10 +419,6 @@ const styles = (theme: AppTheme) =>
       alignSelf: 'flex-end',
       marginRight: 20,
       marginTop: 10,
-    },
-    backToHomeBtn: {
-      alignItems: 'center',
-      marginTop: 30,
     },
     segmentedBtn: {
       marginTop: 10,

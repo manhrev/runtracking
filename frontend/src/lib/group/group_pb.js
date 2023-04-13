@@ -1549,7 +1549,8 @@ proto.group.ListInProgressChallengeRequest.prototype.toObject = function(opt_inc
  */
 proto.group.ListInProgressChallengeRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    userId: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    userId: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    activitytype: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -1590,6 +1591,10 @@ proto.group.ListInProgressChallengeRequest.deserializeBinaryFromReader = functio
       var value = /** @type {number} */ (reader.readInt64());
       msg.setUserId(value);
       break;
+    case 2:
+      var value = /** @type {!proto.group.ActivityType} */ (reader.readEnum());
+      msg.setActivitytype(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1626,6 +1631,13 @@ proto.group.ListInProgressChallengeRequest.serializeBinaryToWriter = function(me
       f
     );
   }
+  f = message.getActivitytype();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -1644,6 +1656,24 @@ proto.group.ListInProgressChallengeRequest.prototype.getUserId = function() {
  */
 proto.group.ListInProgressChallengeRequest.prototype.setUserId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
+};
+
+
+/**
+ * optional ActivityType activityType = 2;
+ * @return {!proto.group.ActivityType}
+ */
+proto.group.ListInProgressChallengeRequest.prototype.getActivitytype = function() {
+  return /** @type {!proto.group.ActivityType} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/**
+ * @param {!proto.group.ActivityType} value
+ * @return {!proto.group.ListInProgressChallengeRequest} returns this
+ */
+proto.group.ListInProgressChallengeRequest.prototype.setActivitytype = function(value) {
+  return jspb.Message.setProto3EnumField(this, 2, value);
 };
 
 

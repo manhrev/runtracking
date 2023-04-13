@@ -41,6 +41,9 @@ export class ListInProgressChallengeRequest extends jspb.Message {
   getUserId(): number;
   setUserId(value: number): ListInProgressChallengeRequest;
 
+  getActivitytype(): ActivityType;
+  setActivitytype(value: ActivityType): ListInProgressChallengeRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListInProgressChallengeRequest.AsObject;
   static toObject(includeInstance: boolean, msg: ListInProgressChallengeRequest): ListInProgressChallengeRequest.AsObject;
@@ -52,6 +55,7 @@ export class ListInProgressChallengeRequest extends jspb.Message {
 export namespace ListInProgressChallengeRequest {
   export type AsObject = {
     userId: number,
+    activitytype: ActivityType,
   }
 }
 

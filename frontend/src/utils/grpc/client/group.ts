@@ -232,6 +232,7 @@ class rpcGroupClient extends gRPCClientAbstract {
   async listInProgressChallenge(param: ListInProgressChallengeRequest.AsObject) {
     const req = new ListInProgressChallengeRequest()
     req.setUserId(param.userId)
+    req.setActivitytype(param.activitytype)
 
     return await this.gRPCClientRequest<ListInProgressChallengeReply.AsObject>(
       'listInProgressChallenge',
