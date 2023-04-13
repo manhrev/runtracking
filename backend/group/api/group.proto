@@ -45,6 +45,7 @@ message GetInProgressSeasonReply{
 
 message ListInProgressChallengeRequest{
     int64 user_id = 1;
+    ActivityType activityType = 2;
 }
 
 message ListInProgressChallengeReply{

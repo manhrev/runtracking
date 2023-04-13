@@ -12,7 +12,7 @@ func (c *challengeImpl) ListInProgressChallenge(
 	ctx context.Context,
 	request *group.ListInProgressChallengeRequest,
 ) (*group.ListInProgressChallengeReply, error) {
-	inprogressChallengeList, err := c.repository.Challenge.ListInProgressChallenge(ctx, request.UserId)
+	inprogressChallengeList, err := c.repository.Challenge.ListInProgressChallenge(ctx, request.UserId, request.GetActivityType())
 	if err != nil {
 		return nil, err
 	}

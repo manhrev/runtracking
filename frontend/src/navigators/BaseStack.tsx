@@ -325,11 +325,6 @@ export const BaseStack = () => {
             options={{
               title: 'Chat',
               headerBackVisible: true,
-              headerRight: () => (
-                <Button 
-                  title="Update count" 
-                  color='#fff'/>
-              ),
             }}
             component={Chat}
           />

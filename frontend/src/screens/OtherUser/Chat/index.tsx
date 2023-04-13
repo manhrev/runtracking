@@ -27,7 +27,7 @@ import { baseStyles } from '../../baseStyle'
 import { ConfirmDialog } from '../../../comp/ConfirmDialog'
 import { groupClient } from '../../../utils/grpc'
 import { toast } from '../../../utils/toast/toast'
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, InputToolbar } from 'react-native-gifted-chat'
 import {
   getUserPublicInfoThunk,
 } from '../../../redux/features/otherUser/thunks'
@@ -36,8 +36,7 @@ import {
   resetOtherUser,
   selectOtherUserSlice,
 } from '../../../redux/features/otherUser/slice'
-import { selectMessageList } from '../../../redux/features/messageList/slice'
-import { isMemberListLoading } from '../../../redux/features/memberList/slice'
+import { selectMessageList, getOffset, isMessageListLoading } from '../../../redux/features/messageList/slice'
 import { MessageInfo } from '../../../lib/chat/chat_pb'
 import { UserInfo, UserPublicInfo } from '../../../lib/auth/auth_pb'
 import { dateTimeToTimestamp, toDate } from '../../../utils/helpers'
@@ -81,8 +80,6 @@ interface QuickReplies {
   keepIt?: boolean
 }
 
-type OnScrollEventHandler = (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
-
 function TransformerUserPublicInfoToUser(userPublicInfo: UserPublicInfo.AsObject) : User{
   return {
     _id: userPublicInfo.userId, 
@@ -112,12 +109,10 @@ export default function Chat({
   const { user } = useAppSelector(selectOtherUserSlice)
   const userState = useAppSelector((state) => state.user)
   const { messageList } = useAppSelector(selectMessageList)
-  const messageListLoading = useAppSelector(isMemberListLoading)
-  // const noData = groupList.length === 0 && !groupListLoading
+  const messageListLoading = useAppSelector(isMessageListLoading)
   const [canLoadmore, setCanLoadmore] = useState(false)
 
-
-  const [currentOffset, setCurrentOffset] = useState(0)
+  const currentOffset = useAppSelector(getOffset)
 
   useFocusEffect(
     useCallback(() => {
@@ -129,7 +124,7 @@ export default function Chat({
  useEffect(() => {
   const interval = setInterval(() => {
     getUpToDateHistoryChat()
-  }, 4000);
+  }, 10000);
   return () => clearInterval(interval);
  }, [])
 
@@ -164,7 +159,7 @@ export default function Chat({
     await dispatch(
       getUpToDateHistoryChatThunk({
         toUserId: toUserIdParam, 
-        limit: LIMIT, 
+        limit: 5, 
         offset: 0
       })
     ).unwrap()
@@ -172,18 +167,17 @@ export default function Chat({
 
   const fetchMore = async () => {
     const { response } = await dispatch(
-      getHistoryChatThunk({
+      getMoreHistoryChatThunk({
         toUserId: toUserIdParam, 
-        limit: currentOffset +  LIMIT * 2,
-        offset: 0,
+        limit: LIMIT,
+        offset: currentOffset + LIMIT,
       })
     ).unwrap()
 
     if (response) {
-      if (currentOffset + LIMIT*2 >= response.total) {
+      if (currentOffset + LIMIT * 2 >= response.total) {
         setCanLoadmore(false)
       }
-      setCurrentOffset(currentOffset + LIMIT)
     }
   }
 
@@ -206,42 +200,18 @@ export default function Chat({
     }))
   }, [])
 
-  const isCloseToTop = (event : NativeScrollEvent)  => {
-    const paddingToTop = 20;
-    return event.contentSize.height - event.layoutMeasurement.height - paddingToTop <= event.contentOffset.y;
-  }
-
-  const onScroll: OnScrollEventHandler = (event) => {
-    if (isCloseToTop(event.nativeEvent) && canLoadmore && !messageListLoading) { 
-        fetchMore()
-    }
-  };
 
   return (
-    <>
-    {!messageListLoading && <GiftedChat
+  <GiftedChat
       messages={messages}
       onSend={messages => onSend(messages)}
       user={{
         _id: userState.userId,
       }}
-      listViewProps={{
-        scrollEventThrottle: 400,
-        onScroll: onScroll
-      }}
       infiniteScroll={true}
+      isLoadingEarlier={messageListLoading}
+      onLoadEarlier={() => fetchMore()}
+      loadEarlier={canLoadmore}
     />
-  }
-
-  {messageListLoading && (
-    <ActivityIndicator
-      animating={true}
-      size="small"
-      style={{
-        paddingVertical: 30,
-      }}
-    />
-  )}
-  </>
   )
 }

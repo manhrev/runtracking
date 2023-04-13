@@ -7,12 +7,14 @@ import { deleteConversationThunk, getUpToDateHistoryChatThunk, getHistoryChatThu
 
 type MessageListState = {
   messageList: Array<MessageInfo.AsObject>
-  total: number
+  total: number,
+  offset: number
 } & CommonState
 
 export const initialState: MessageListState = {
   messageList: [],
   status: StatusEnum.LOADING,
+  offset: 0,
   total: 0,
 }
 
@@ -34,6 +36,7 @@ const slice = createSlice({
         state.messageList = response?.messageinfolistList || []
         state.total = response?.total || 0
         state.status = StatusEnum.SUCCEEDED
+        state.offset = 0
       }).addCase(getMoreHistoryChatThunk.pending, (state) => {
         state.status = StatusEnum.LOADING
       }).addCase(getMoreHistoryChatThunk.fulfilled, (state, {payload}) => {
@@ -42,12 +45,9 @@ const slice = createSlice({
           state.status = StatusEnum.SUCCEEDED
           return
         }
-        // if(response){
-        //   state.
-        // }
-        // if(!state.messageList.includes()
         state.messageList = state.messageList.concat(response?.messageinfolistList || [])
         state.status = StatusEnum.SUCCEEDED
+        state.offset += 15
       }).addCase(getUpToDateHistoryChatThunk.pending, (state) => {
         state.status = StatusEnum.LOADING
       }).addCase(getUpToDateHistoryChatThunk.fulfilled, (state, { payload }) => {
@@ -69,6 +69,7 @@ const slice = createSlice({
 
         state.total = response?.total || 0
         state.status = StatusEnum.SUCCEEDED
+        state.offset -= upToDateMessageList.length
       })
       // .addCase(acceptMemberThunk.fulfilled, (state, { payload }) => {
       //   const { response, error } = payload
@@ -86,6 +87,6 @@ export const isMessageListLoading = (state: RootState) => {
   return state.messageList.status === StatusEnum.LOADING
 }
 export const selectMessageList = (state: RootState) => state.messageList
-
+export const getOffset = (state: RootState) => state.messageList.offset
 
 export default slice.reducer
