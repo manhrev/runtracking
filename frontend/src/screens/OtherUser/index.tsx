@@ -116,7 +116,10 @@ export default function OtherUser({
                 </Text>
               </View>
               <View style={{ justifyContent: 'center', flex: 1 }}>
-                <Button icon="send" mode="contained-tonal" onPress={() => {}}>
+                <Button icon="send" mode="contained-tonal" onPress={() => {
+                  navigation.navigate('Chat', 
+                    {userId: userId, toUserId: userIdParam})
+                }}>
                   Send message
                 </Button>
               </View>

@@ -32,6 +32,8 @@ import ChallengeDetail from '../screens/Group/Challenge/ChallengeDetail'
 import ChallengeStats from '../screens/Group/Challenge/ChallengeStats'
 import { toast } from '../utils/toast/toast'
 import OtherUser from '../screens/OtherUser'
+import Chat from '../screens/OtherUser/Chat'
+import { Button } from 'react-native'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -131,6 +133,11 @@ export type RootBaseStackParamList = {
   // user
   OtherUser: {
     userId: number
+  }
+
+  Chat: {
+    userId: number
+    toUserId: number
   }
 }
 
@@ -312,6 +319,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={OtherUser}
+          />
+          <Stack.Screen
+            name="Chat"
+            options={{
+              title: 'Chat',
+              headerBackVisible: true,
+            }}
+            component={Chat}
           />
         </>
       ) : (

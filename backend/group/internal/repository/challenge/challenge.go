@@ -120,6 +120,7 @@ type Challenge interface {
 	) (*ent.ChallengeMember, error)
 
 	ListInProgressChallenge(ctx context.Context, userId int64,
+		activityType group.ActivityType,
 	) ([]*ent.Challenge, error)
 }
 type challengeImpl struct {
@@ -619,15 +620,21 @@ func (c *challengeImpl) CheckDailyProgressChallenge(ctx context.Context, timeChe
 	return nil
 }
 
-func (c *challengeImpl) ListInProgressChallenge(ctx context.Context, userId int64) ([]*ent.Challenge, error) {
+func (c *challengeImpl) ListInProgressChallenge(ctx context.Context, userId int64,
+	activityType group.ActivityType,
+) ([]*ent.Challenge, error) {
 	// check inprogress challenge
-	inprogressChallengeEntList, err := c.entClient.Challenge.Query().
+	query := c.entClient.Challenge.Query().
 		Where(challenge.Status(int64(group.RuleStatus_RULE_STATUS_INPROGRESS)),
 			challenge.HasChallengeMembersWith(challengemember.HasMemberWith(member.UserIDEQ(userId)))).
 		WithChallengeRules().
-		WithGroupz().
-		All(ctx)
+		WithGroupz()
 
+	if activityType != group.ActivityType_ACTIVITY_TYPE_UNSPECIFIED {
+		query.Where(challenge.TypeIDEQ(int64(activityType)))
+	}
+
+	inprogressChallengeEntList, err := query.All(ctx)
 	if err != nil {
 		log.Printf("Error while query challenge to check challenge in progress daily: %v", err)
 		return nil, status.Internal(err.Error())
