@@ -20,6 +20,9 @@
 		},
 		{
 			"path": "frontend"
+		},
+		{
+			"path": "backend/chat"
 		}
 	],
 	"settings": {}

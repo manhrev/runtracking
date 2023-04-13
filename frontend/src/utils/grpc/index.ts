@@ -4,6 +4,7 @@ import rpcActivityClient from './client/activity'
 import rpcNotificationClient from './client/notification'
 import rpcPlanClient from './client/plan'
 import rpcGroupClient from './client/group'
+import rpcChatClient from './client/chat'
 import { toast } from '../toast/toast'
 
 export * from './abstract/gRPCClient'
@@ -41,8 +42,14 @@ const notificationConfig = {
   hostname: HOST,
   onError: onAuthError,
 }
-export const activityClient = new rpcActivityClient(activityConfig)
 
+const chatConfig = {
+  hostname: HOST,
+  onError: onAuthError,
+}
+
+export const activityClient = new rpcActivityClient(activityConfig)
+export const chatClient = new rpcChatClient(chatConfig)
 export const authClient = new rpcAuthClient(authConfig)
 export const notificationClient = new rpcNotificationClient(notificationConfig)
 export const planClient = new rpcPlanClient(notificationConfig)

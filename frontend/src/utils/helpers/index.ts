@@ -3,6 +3,10 @@ import moment from 'moment'
 import { ActivityType } from '../../lib/activity/activity_pb'
 import { Rule, PlanProgress } from '../../lib/plan/plan_pb'
 
+export function dateTimeToTimestamp(date: Date) : Timestamp.AsObject {
+  return new Timestamp().setSeconds(date.getTime() / 1000).toObject()
+}
+
 export function getIconWithActivityType(activityType: ActivityType) {
   return {
     [ActivityType.ACTIVITY_TYPE_CYCLING]: 'bike',
