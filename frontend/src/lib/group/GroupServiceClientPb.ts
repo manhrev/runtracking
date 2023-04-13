@@ -938,5 +938,91 @@ export class GroupClient {
     this.methodDescriptorGetSeason);
   }
 
+  methodDescriptorListInProgressChallenge = new grpcWeb.MethodDescriptor(
+    '/group.Group/ListInProgressChallenge',
+    grpcWeb.MethodType.UNARY,
+    group_pb.ListInProgressChallengeRequest,
+    group_pb.ListInProgressChallengeReply,
+    (request: group_pb.ListInProgressChallengeRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.ListInProgressChallengeReply.deserializeBinary
+  );
+
+  listInProgressChallenge(
+    request: group_pb.ListInProgressChallengeRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.ListInProgressChallengeReply>;
+
+  listInProgressChallenge(
+    request: group_pb.ListInProgressChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.ListInProgressChallengeReply) => void): grpcWeb.ClientReadableStream<group_pb.ListInProgressChallengeReply>;
+
+  listInProgressChallenge(
+    request: group_pb.ListInProgressChallengeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.ListInProgressChallengeReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/ListInProgressChallenge',
+        request,
+        metadata || {},
+        this.methodDescriptorListInProgressChallenge,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/ListInProgressChallenge',
+    request,
+    metadata || {},
+    this.methodDescriptorListInProgressChallenge);
+  }
+
+  methodDescriptorGetInProgressSeason = new grpcWeb.MethodDescriptor(
+    '/group.Group/GetInProgressSeason',
+    grpcWeb.MethodType.UNARY,
+    group_pb.GetInProgressSeasonRequest,
+    group_pb.GetInProgressSeasonReply,
+    (request: group_pb.GetInProgressSeasonRequest) => {
+      return request.serializeBinary();
+    },
+    group_pb.GetInProgressSeasonReply.deserializeBinary
+  );
+
+  getInProgressSeason(
+    request: group_pb.GetInProgressSeasonRequest,
+    metadata: grpcWeb.Metadata | null): Promise<group_pb.GetInProgressSeasonReply>;
+
+  getInProgressSeason(
+    request: group_pb.GetInProgressSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: group_pb.GetInProgressSeasonReply) => void): grpcWeb.ClientReadableStream<group_pb.GetInProgressSeasonReply>;
+
+  getInProgressSeason(
+    request: group_pb.GetInProgressSeasonRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: group_pb.GetInProgressSeasonReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/group.Group/GetInProgressSeason',
+        request,
+        metadata || {},
+        this.methodDescriptorGetInProgressSeason,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/group.Group/GetInProgressSeason',
+    request,
+    metadata || {},
+    this.methodDescriptorGetInProgressSeason);
+  }
+
 }
 

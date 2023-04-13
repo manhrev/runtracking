@@ -13,6 +13,7 @@ import {
   CreateChallengeRequest, CreateChallengeReply,
   DeleteChallengeRequest, DeleteChallengeReply,
   GetChallengeRequest, GetChallengeReply,
+  ListInProgressChallengeRequest, ListInProgressChallengeReply,
 } from '../../../lib/group/group_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -224,6 +225,16 @@ class rpcGroupClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<GetChallengeReply.AsObject>(
       'getChallenge',
+      req
+    )
+  }
+
+  async listInProgressChallenge(param: ListInProgressChallengeRequest.AsObject) {
+    const req = new ListInProgressChallengeRequest()
+    req.setUserId(param.userId)
+
+    return await this.gRPCClientRequest<ListInProgressChallengeReply.AsObject>(
+      'listInProgressChallenge',
       req
     )
   }

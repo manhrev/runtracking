@@ -13,6 +13,7 @@ import {
   CommitActivityReply,
   GetUsersAchievementRequest,
   GetUsersAchievementReply,
+  CommitObject,
 } from '../../../lib/activity/activity_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -109,13 +110,24 @@ class rpcActivityClient extends gRPCClientAbstract {
     )
   }
 
-  async commitActivity(commitObj: CommitActivityRequest.AsObject) {
+  async commitActivity(commitReq: CommitActivityRequest.AsObject) {
+    // list object
+    const commitToList: Array<CommitObject> = commitReq.commitToList.map(
+      (item) => {
+        // commit object
+        const commitObj = new CommitObject()
+        commitObj.setCommitId(item.commitId)
+        commitObj.setCommitType(item.commitType)
+        commitObj.setRule(item.rule)
+        return commitObj
+      }
+    )
+
+    // main req
     const req = new CommitActivityRequest()
     req
-      .setActivityId(commitObj.activityId)
-      .setCommitId(commitObj.commitId)
-      .setCommitType(commitObj.commitType)
-      .setRule(commitObj.rule)
+      .setActivityId(commitReq.activityId)
+      .setCommitToList(commitToList)
 
     return await this.gRPCClientRequest<CommitActivityReply.AsObject>(
       'commitActivity',
