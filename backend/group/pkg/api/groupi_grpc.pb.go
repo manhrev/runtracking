@@ -26,6 +26,8 @@ type GroupIClient interface {
 	// for intermediary, cloud schedule check daily progress -> call intermediary -> call groupi
 	CheckDailyProgressChallenge(ctx context.Context, in *CheckDailyProgressChallengeRequest, opts ...grpc.CallOption) (*CheckDailyProgressChallengeReply, error)
 	CheckDailyProgressSeason(ctx context.Context, in *CheckDailyProgressSeasonRequest, opts ...grpc.CallOption) (*CheckDailyProgressSeasonReply, error)
+	// season info for event to call
+	GetSeason(ctx context.Context, in *GetSeasonRequest, opts ...grpc.CallOption) (*GetSeasonReply, error)
 }
 
 type groupIClient struct {
@@ -63,6 +65,15 @@ func (c *groupIClient) CheckDailyProgressSeason(ctx context.Context, in *CheckDa
 	return out, nil
 }
 
+func (c *groupIClient) GetSeason(ctx context.Context, in *GetSeasonRequest, opts ...grpc.CallOption) (*GetSeasonReply, error) {
+	out := new(GetSeasonReply)
+	err := c.cc.Invoke(ctx, "/group.GroupI/GetSeason", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupIServer is the server API for GroupI service.
 // All implementations must embed UnimplementedGroupIServer
 // for forward compatibility
@@ -71,6 +82,8 @@ type GroupIServer interface {
 	// for intermediary, cloud schedule check daily progress -> call intermediary -> call groupi
 	CheckDailyProgressChallenge(context.Context, *CheckDailyProgressChallengeRequest) (*CheckDailyProgressChallengeReply, error)
 	CheckDailyProgressSeason(context.Context, *CheckDailyProgressSeasonRequest) (*CheckDailyProgressSeasonReply, error)
+	// season info for event to call
+	GetSeason(context.Context, *GetSeasonRequest) (*GetSeasonReply, error)
 	mustEmbedUnimplementedGroupIServer()
 }
 
@@ -86,6 +99,9 @@ func (UnimplementedGroupIServer) CheckDailyProgressChallenge(context.Context, *C
 }
 func (UnimplementedGroupIServer) CheckDailyProgressSeason(context.Context, *CheckDailyProgressSeasonRequest) (*CheckDailyProgressSeasonReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckDailyProgressSeason not implemented")
+}
+func (UnimplementedGroupIServer) GetSeason(context.Context, *GetSeasonRequest) (*GetSeasonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSeason not implemented")
 }
 func (UnimplementedGroupIServer) mustEmbedUnimplementedGroupIServer() {}
 
@@ -154,6 +170,24 @@ func _GroupI_CheckDailyProgressSeason_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GroupI_GetSeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSeasonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupIServer).GetSeason(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/group.GroupI/GetSeason",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupIServer).GetSeason(ctx, req.(*GetSeasonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GroupI_ServiceDesc is the grpc.ServiceDesc for GroupI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -172,6 +206,10 @@ var GroupI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckDailyProgressSeason",
 			Handler:    _GroupI_CheckDailyProgressSeason_Handler,
+		},
+		{
+			MethodName: "GetSeason",
+			Handler:    _GroupI_GetSeason_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
