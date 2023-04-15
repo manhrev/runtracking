@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import {
   ListChallengeRequest,
   CreateChallengeRequest,
+  UpdateChallengeRequest,
   DeleteChallengeRequest,
 } from '../../../lib/group/group_pb'
 import { groupClient } from '../../../utils/grpc'
@@ -17,6 +18,13 @@ export const createChallengeThunk = createAsyncThunk(
   'plan/createChallenge',
   async (param: CreateChallengeRequest.AsObject) => {
     return await groupClient.createChallenge(param)
+  }
+)
+
+export const updateChallengeThunk = createAsyncThunk(
+  'plan/updateChallenge',
+  async (param: UpdateChallengeRequest.AsObject) => {
+    return await groupClient.updateChallenge(param)
   }
 )
 

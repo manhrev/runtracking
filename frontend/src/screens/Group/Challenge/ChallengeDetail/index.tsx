@@ -84,11 +84,10 @@ export default function ChallengeDetail({
                 }}
                 icon="pencil"
                 size={30}
-                // onPress={() => navigation.navigate('GroupEdit', {
-                //     groupInfo: challengeDetail.groupinfo? challengeDetail.groupinfo : undefined,
-                //     reloadDetailFunc: fetchchallengeDetail,
-                // })}
-                onPress={() => alert('Coming soon')}
+                onPress={() => navigation.navigate('ChallengeEdit', {
+                    groupId: challengeDetail.challengeinfo?.groupId || 0,
+                    challengeInfo: challengeDetail.challengeinfo,
+                })}
             />}
             <Image
                 style={styles(theme).profilePicture}
