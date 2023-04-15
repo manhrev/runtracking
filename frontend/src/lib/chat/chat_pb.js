@@ -442,7 +442,9 @@ proto.chat.GetHistoryChatRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     toUserId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     limit: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    offset: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    offset: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    from: (f = msg.getFrom()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    to: (f = msg.getTo()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -490,6 +492,16 @@ proto.chat.GetHistoryChatRequest.deserializeBinaryFromReader = function(msg, rea
     case 4:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setOffset(value);
+      break;
+    case 5:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setFrom(value);
+      break;
+    case 6:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setTo(value);
       break;
     default:
       reader.skipField();
@@ -539,6 +551,22 @@ proto.chat.GetHistoryChatRequest.serializeBinaryToWriter = function(message, wri
     writer.writeUint64(
       4,
       f
+    );
+  }
+  f = message.getFrom();
+  if (f != null) {
+    writer.writeMessage(
+      5,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getTo();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
 };
@@ -595,6 +623,80 @@ proto.chat.GetHistoryChatRequest.prototype.getOffset = function() {
  */
 proto.chat.GetHistoryChatRequest.prototype.setOffset = function(value) {
   return jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp from = 5;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.chat.GetHistoryChatRequest.prototype.getFrom = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Timestamp|undefined} value
+ * @return {!proto.chat.GetHistoryChatRequest} returns this
+*/
+proto.chat.GetHistoryChatRequest.prototype.setFrom = function(value) {
+  return jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.chat.GetHistoryChatRequest} returns this
+ */
+proto.chat.GetHistoryChatRequest.prototype.clearFrom = function() {
+  return this.setFrom(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.chat.GetHistoryChatRequest.prototype.hasFrom = function() {
+  return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp to = 6;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.chat.GetHistoryChatRequest.prototype.getTo = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Timestamp|undefined} value
+ * @return {!proto.chat.GetHistoryChatRequest} returns this
+*/
+proto.chat.GetHistoryChatRequest.prototype.setTo = function(value) {
+  return jspb.Message.setWrapperField(this, 6, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.chat.GetHistoryChatRequest} returns this
+ */
+proto.chat.GetHistoryChatRequest.prototype.clearTo = function() {
+  return this.setTo(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.chat.GetHistoryChatRequest.prototype.hasTo = function() {
+  return jspb.Message.getField(this, 6) != null;
 };
 
 

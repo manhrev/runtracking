@@ -45,6 +45,16 @@ export class GetHistoryChatRequest extends jspb.Message {
   getOffset(): number;
   setOffset(value: number): GetHistoryChatRequest;
 
+  getFrom(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setFrom(value?: google_protobuf_timestamp_pb.Timestamp): GetHistoryChatRequest;
+  hasFrom(): boolean;
+  clearFrom(): GetHistoryChatRequest;
+
+  getTo(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setTo(value?: google_protobuf_timestamp_pb.Timestamp): GetHistoryChatRequest;
+  hasTo(): boolean;
+  clearTo(): GetHistoryChatRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetHistoryChatRequest.AsObject;
   static toObject(includeInstance: boolean, msg: GetHistoryChatRequest): GetHistoryChatRequest.AsObject;
@@ -58,6 +68,8 @@ export namespace GetHistoryChatRequest {
     toUserId: number,
     limit: number,
     offset: number,
+    from?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    to?: google_protobuf_timestamp_pb.Timestamp.AsObject,
   }
 }
 

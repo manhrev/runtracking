@@ -67,19 +67,10 @@ const slice = createSlice({
       }
         state.messageList = upToDateMessageList.concat(state.messageList)
 
-        state.total = response?.total || 0
+        state.total += upToDateMessageList.length
         state.status = StatusEnum.SUCCEEDED
-        state.offset -= upToDateMessageList.length
+        state.offset += upToDateMessageList.length
       })
-      // .addCase(acceptMemberThunk.fulfilled, (state, { payload }) => {
-      //   const { response, error } = payload
-      //   if (error) {
-      //     state.status = StatusEnum.SUCCEEDED
-      //     return
-      //   }
-
-      //   state.status = StatusEnum.SUCCEEDED
-      // })
   },
 })
 

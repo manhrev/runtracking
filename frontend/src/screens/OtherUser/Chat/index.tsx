@@ -2,18 +2,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState , useCallback} from 'react'
 import { ScrollView, View } from 'react-native'
 import { RefreshControl } from 'react-native-gesture-handler'
-import { ActivityIndicator, Button, Divider, Searchbar, Text } from 'react-native-paper'
 import { useDialog } from '../../../hooks/useDialog'
-import {
-  GroupInfo,
-  GroupSortBy,
-  ListGroupRequest,
-} from '../../../lib/group/group_pb'
-import { RootGroupTopTabsParamList } from '../../../navigators/GroupTopTab'
-import {
-  isGroupListLoading,
-  selectGroupList,
-} from '../../../redux/features/groupList/slice'
+
 import {
  getHistoryChatThunk,
  deleteConversationThunk, 
@@ -27,7 +17,7 @@ import { baseStyles } from '../../baseStyle'
 import { ConfirmDialog } from '../../../comp/ConfirmDialog'
 import { groupClient } from '../../../utils/grpc'
 import { toast } from '../../../utils/toast/toast'
-import { GiftedChat, InputToolbar } from 'react-native-gifted-chat'
+import { GiftedChat, InputToolbar, Message , Send} from 'react-native-gifted-chat'
 import {
   getUserPublicInfoThunk,
 } from '../../../redux/features/otherUser/thunks'
@@ -42,9 +32,9 @@ import { UserInfo, UserPublicInfo } from '../../../lib/auth/auth_pb'
 import { dateTimeToTimestamp, toDate } from '../../../utils/helpers'
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb'
 import { useFocusEffect } from '@react-navigation/native';
-import { NativeSyntheticEvent } from 'react-native'
-import { NativeScrollEvent } from 'react-native'
 import { RootBaseStackParamList } from '../../../navigators/BaseStack'
+import Icon from 'react-native-paper/lib/typescript/components/Icon'
+import { IconButton } from 'react-native-paper'
 
 const LIMIT = 15
 export interface IMessage {
@@ -124,7 +114,7 @@ export default function Chat({
  useEffect(() => {
   const interval = setInterval(() => {
     getUpToDateHistoryChat()
-  }, 10000);
+  }, 20000);
   return () => clearInterval(interval);
  }, [])
 
@@ -159,8 +149,20 @@ export default function Chat({
     await dispatch(
       getUpToDateHistoryChatThunk({
         toUserId: toUserIdParam, 
-        limit: 5, 
-        offset: 0
+        limit: LIMIT, 
+        offset: 0, 
+        from: {
+          seconds: Math.floor(
+            (Date.now() - 25000)/1000
+          ),
+          nanos: 0
+        }, 
+        to: {
+          seconds: Math.floor(
+            Date.now()/1000
+          ),
+          nanos: 0
+        }
       })
     ).unwrap()
   }
@@ -212,6 +214,20 @@ export default function Chat({
       isLoadingEarlier={messageListLoading}
       onLoadEarlier={() => fetchMore()}
       loadEarlier={canLoadmore}
+      renderInputToolbar={(props) => (
+        <InputToolbar {...props} />
+      )}
+
+      renderSend={(props) => (
+        <Send {...props} >
+            <View style={{justifyContent: 'center', height: '100%', marginRight: 10}}>
+              <IconButton icon="send" size={30} centered></IconButton>
+            </View>
+          </Send>
+    )}
+      // renderMessage={(props) => (
+      //   <Message {...props} containerStyle={{}}/>
+      // )}
     />
   )
 }
