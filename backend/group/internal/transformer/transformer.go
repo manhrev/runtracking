@@ -78,9 +78,11 @@ func TransformChallengeRuleEntListToChallengeRuleInfoList(challengeRuleEntList [
 	challengeRuleInfoList := []*group.ChallengeRuleInfo{}
 	for _, challengeRuleEnt := range challengeRuleEntList {
 		challengeRuleInfo := &group.ChallengeRuleInfo{
-			Id:   challengeRuleEnt.ID,
-			Goal: challengeRuleEnt.Goal,
-			Rule: group.Rule(challengeRuleEnt.RuleID),
+			Id:        challengeRuleEnt.ID,
+			Goal:      challengeRuleEnt.Goal,
+			Rule:      group.Rule(challengeRuleEnt.RuleID),
+			CreatedAt: timestamppb.New(challengeRuleEnt.CreatedAt),
+			UpdatedAt: timestamppb.New(challengeRuleEnt.UpdatedAt),
 		}
 		challengeRuleInfoList = append(challengeRuleInfoList, challengeRuleInfo)
 	}

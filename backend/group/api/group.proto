@@ -157,6 +157,8 @@ message UpdateChallengeRequest{
     ChallengeInfo challengeInfo = 1;
     int64 group_id = 2;
     repeated int64 ids_rule_to_delete = 3;
+    repeated ChallengeRuleInfo challenge_rules_to_add = 4;
+    
 }
 message UpdateChallengeReply{}
 

@@ -33,6 +33,10 @@ func (s *chatServer) ListConversation(ctx context.Context, request *chatpb.ListC
 		return nil, err
 	}
 
+	if err != nil {
+		return nil, status.Internal(err.Error())
+	}
+
 	partnerMap := GetPartnerMap(messages, userId)
 	lastConversationList := []*ent.Message{}
 	partnerIDs := []int64{}

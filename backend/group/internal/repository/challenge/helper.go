@@ -22,13 +22,21 @@ func checkValidPeriodChallenge(ctx context.Context,
 	entClient *ent.Client,
 	groupId int64,
 	from *timestamppb.Timestamp,
-	to *timestamppb.Timestamp) (bool, error) {
-	challengeEnList, err := entClient.Challenge.Query().
+	to *timestamppb.Timestamp,
+	isUpdating bool,
+	challengeId int64, // use when updating challenge to avoid scan itself
+) (bool, error) {
+	query := entClient.Challenge.Query().
 		Where(challenge.HasGroupzWith(groupz.IDEQ(groupId)),
-			challenge.StatusIn(int64(grouppb.RuleStatus_RULE_STATUS_COMING_SOON), int64(grouppb.RuleStatus_RULE_STATUS_INPROGRESS))).
+			challenge.StatusIn(int64(grouppb.RuleStatus_RULE_STATUS_COMING_SOON), int64(grouppb.RuleStatus_RULE_STATUS_INPROGRESS)))
+
+	if isUpdating {
+		query.Where(challenge.IDNEQ(challengeId))
+	}
+
+	challengeEnList, err := query.
 		Order(ent.Desc(challenge.FieldStartTime)).
 		All(ctx)
-
 	if err != nil {
 		return false, status.Internal(fmt.Sprintf("Error when fetching challenge list ent: %v", err.Error()))
 	}

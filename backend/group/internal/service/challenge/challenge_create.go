@@ -28,7 +28,7 @@ func (c *challengeImpl) CreateChallenge(
 
 	// set challenge rules
 	challengeRules, err := c.repository.Challenge.CreateBulkChallengeRules(ctx,
-		userId, groupEntity.ID, challengeEnt, request.ChallengeInfo)
+		userId, challengeEnt.ID, request.ChallengeInfo.GetChallengeRules())
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *challengeImpl) CreateChallenge(
 
 	// Create challenge Member rules
 	_, err = c.repository.Challenge.CreateBulkChallengeMemberRule(ctx,
-		challengeMembers, challengeRules, challengeEnt)
+		challengeMembers, challengeRules, challengeEnt.Status)
 	if err != nil {
 		return nil, err
 	}
