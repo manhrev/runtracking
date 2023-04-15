@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -11,7 +12,10 @@ import (
 	"github.com/manhrev/runtracking/backend/event/internal/server/event"
 	pb "github.com/manhrev/runtracking/backend/event/pkg/api"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent"
+	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -26,7 +30,12 @@ var (
 	//notificationi service
 	notificationi_domain string = os.Getenv("NOTIFICATIONI_DOMAIN")
 	notificationi_port   string = os.Getenv("NOTIFICATIONI_PORT")
-	is_secure_connection        = os.Getenv("IS_SECURE_CONNECTION")
+
+	// groupi service
+	groupi_domain string = os.Getenv("GROUPI_DOMAIN")
+	groupi_port   string = os.Getenv("GROUPI_PORT")
+
+	is_secure_connection = os.Getenv("IS_SECURE_CONNECTION")
 )
 
 func Run() {
@@ -55,20 +64,20 @@ func Serve(server *grpc.Server) {
 	}
 
 	// connection credentials
-	// creds := insecure.NewCredentials()
-	// if is_secure_connection == "true" {
-	// 	creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})
-	// }
+	creds := insecure.NewCredentials()
+	if is_secure_connection == "true" {
+		creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})
+	}
 
-	// notificationIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", notificationi_domain, notificationi_port), grpc.WithTransportCredentials(creds))
-	// if err != nil {
-	// 	log.Fatalf("error while create connect to notification service: %v", err)
-	// }
+	groupIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", groupi_domain, groupi_domain), grpc.WithTransportCredentials(creds))
+	if err != nil {
+		log.Fatalf("error while create connect to notification service: %v", err)
+	}
 
-	// notificationiClient := notification.NewNotificationIClient(notificationIConn)
+	groupiClient := group.NewGroupIClient(groupIConn)
 
 	// register main and other server servers
-	pb.RegisterEventServer(server, event.NewServer(entClient))
+	pb.RegisterEventServer(server, event.NewServer(entClient, groupiClient))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {

@@ -6,6 +6,7 @@ require (
 	entgo.io/ent v0.12.0
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/manhrev/runtracking/backend/auth v0.0.0-20230415052006-19dedb8983b5
+	github.com/manhrev/runtracking/backend/group v0.0.0-20230415142335-fd57b8807ffe
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 )

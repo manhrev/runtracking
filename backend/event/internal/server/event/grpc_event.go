@@ -4,16 +4,19 @@ import (
 	"github.com/manhrev/runtracking/backend/event/internal/repository"
 	plan "github.com/manhrev/runtracking/backend/event/pkg/api"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent"
+	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
-func NewServer(entClient *ent.Client) plan.EventServer {
+func NewServer(entClient *ent.Client, groupIClient group.GroupIClient) plan.EventServer {
 	return &eventServer{
-		repository: repository.New(entClient),
+		repository:   repository.New(entClient),
+		groupIClient: groupIClient,
 	}
 }
 
 type eventServer struct {
-	repository *repository.Repository
+	repository   *repository.Repository
+	groupIClient group.GroupIClient
 	// Other service client connection, db adapter go here
 	plan.UnimplementedEventServer
 }
