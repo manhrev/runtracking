@@ -201,6 +201,27 @@ services:
       # GCP_CLOUD_TASK_QUEUE_ID: notification
       IS_SECURE_CONNECTION: "false"
 
+  event:
+    build:
+      context: backend/event
+      dockerfile: Dockerfile
+    container_name: event
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - event_db
+    environment:
+      LISTEN_PORT: 8080
+      DB_USERNAME: root
+      DB_PASSWORD: password@1
+      DB_HOST: event_db
+      DB_PORT: 3306
+      DB_NAME: event
+      # NOTIFICATIONI_DOMAIN: notification
+      # NOTIFICATIONI_PORT: 8080
+      IS_SECURE_CONNECTION: "false"
+
   gcloud-tasks-emulator:
     image: ghcr.io/aertje/cloud-tasks-emulator:latest
     command: -host 0.0.0.0 -port 8123 -queue "projects/daring-acumen-370401/locations/asia-southeast2/queues/test-queue1"
@@ -298,3 +319,16 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     ports:
       - 33311:3306
+
+  event_db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password@1
+      MYSQL_DATABASE: event
+    container_name: 'db-event'
+    volumes:
+      - "./tmp/db/chat:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - 33312:3306
