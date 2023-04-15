@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -78,8 +78,8 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			event.Table:          event.ValidColumn,
-			eventgroup.Table:     eventgroup.ValidColumn,
-			groupprogress.Table:  groupprogress.ValidColumn,
+			eventgroupz.Table:    eventgroupz.ValidColumn,
+			groupzprogress.Table: groupzprogress.ValidColumn,
 			memberprogress.Table: memberprogress.ValidColumn,
 			subevent.Table:       subevent.ValidColumn,
 		})

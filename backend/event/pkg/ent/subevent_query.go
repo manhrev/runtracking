@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -25,7 +25,7 @@ type SubEventQuery struct {
 	inters     []Interceptor
 	predicates []predicate.SubEvent
 	withEvent  *EventQuery
-	withGroup  *GroupProgressQuery
+	withGroup  *GroupzProgressQuery
 	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -87,8 +87,8 @@ func (seq *SubEventQuery) QueryEvent() *EventQuery {
 }
 
 // QueryGroup chains the current query on the "group" edge.
-func (seq *SubEventQuery) QueryGroup() *GroupProgressQuery {
-	query := (&GroupProgressClient{config: seq.config}).Query()
+func (seq *SubEventQuery) QueryGroup() *GroupzProgressQuery {
+	query := (&GroupzProgressClient{config: seq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := seq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -99,7 +99,7 @@ func (seq *SubEventQuery) QueryGroup() *GroupProgressQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subevent.Table, subevent.FieldID, selector),
-			sqlgraph.To(groupprogress.Table, groupprogress.FieldID),
+			sqlgraph.To(groupzprogress.Table, groupzprogress.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, subevent.GroupTable, subevent.GroupColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(seq.driver.Dialect(), step)
@@ -321,8 +321,8 @@ func (seq *SubEventQuery) WithEvent(opts ...func(*EventQuery)) *SubEventQuery {
 
 // WithGroup tells the query-builder to eager-load the nodes that are connected to
 // the "group" edge. The optional arguments are used to configure the query builder of the edge.
-func (seq *SubEventQuery) WithGroup(opts ...func(*GroupProgressQuery)) *SubEventQuery {
-	query := (&GroupProgressClient{config: seq.config}).Query()
+func (seq *SubEventQuery) WithGroup(opts ...func(*GroupzProgressQuery)) *SubEventQuery {
+	query := (&GroupzProgressClient{config: seq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -451,8 +451,8 @@ func (seq *SubEventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Su
 	}
 	if query := seq.withGroup; query != nil {
 		if err := seq.loadGroup(ctx, query, nodes,
-			func(n *SubEvent) { n.Edges.Group = []*GroupProgress{} },
-			func(n *SubEvent, e *GroupProgress) { n.Edges.Group = append(n.Edges.Group, e) }); err != nil {
+			func(n *SubEvent) { n.Edges.Group = []*GroupzProgress{} },
+			func(n *SubEvent, e *GroupzProgress) { n.Edges.Group = append(n.Edges.Group, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -491,7 +491,7 @@ func (seq *SubEventQuery) loadEvent(ctx context.Context, query *EventQuery, node
 	}
 	return nil
 }
-func (seq *SubEventQuery) loadGroup(ctx context.Context, query *GroupProgressQuery, nodes []*SubEvent, init func(*SubEvent), assign func(*SubEvent, *GroupProgress)) error {
+func (seq *SubEventQuery) loadGroup(ctx context.Context, query *GroupzProgressQuery, nodes []*SubEvent, init func(*SubEvent), assign func(*SubEvent, *GroupzProgress)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int64]*SubEvent)
 	for i := range nodes {
@@ -502,7 +502,7 @@ func (seq *SubEventQuery) loadGroup(ctx context.Context, query *GroupProgressQue
 		}
 	}
 	query.withFKs = true
-	query.Where(predicate.GroupProgress(func(s *sql.Selector) {
+	query.Where(predicate.GroupzProgress(func(s *sql.Selector) {
 		s.Where(sql.InValues(subevent.GroupColumn, fks...))
 	}))
 	neighbors, err := query.All(ctx)

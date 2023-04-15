@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,58 +12,57 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 )
 
-// EventGroupQuery is the builder for querying EventGroup entities.
-type EventGroupQuery struct {
+// EventGroupzQuery is the builder for querying EventGroupz entities.
+type EventGroupzQuery struct {
 	config
 	ctx        *QueryContext
-	order      []eventgroup.Order
+	order      []eventgroupz.Order
 	inters     []Interceptor
-	predicates []predicate.EventGroup
+	predicates []predicate.EventGroupz
 	withEvent  *EventQuery
-	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the EventGroupQuery builder.
-func (egq *EventGroupQuery) Where(ps ...predicate.EventGroup) *EventGroupQuery {
+// Where adds a new predicate for the EventGroupzQuery builder.
+func (egq *EventGroupzQuery) Where(ps ...predicate.EventGroupz) *EventGroupzQuery {
 	egq.predicates = append(egq.predicates, ps...)
 	return egq
 }
 
 // Limit the number of records to be returned by this query.
-func (egq *EventGroupQuery) Limit(limit int) *EventGroupQuery {
+func (egq *EventGroupzQuery) Limit(limit int) *EventGroupzQuery {
 	egq.ctx.Limit = &limit
 	return egq
 }
 
 // Offset to start from.
-func (egq *EventGroupQuery) Offset(offset int) *EventGroupQuery {
+func (egq *EventGroupzQuery) Offset(offset int) *EventGroupzQuery {
 	egq.ctx.Offset = &offset
 	return egq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (egq *EventGroupQuery) Unique(unique bool) *EventGroupQuery {
+func (egq *EventGroupzQuery) Unique(unique bool) *EventGroupzQuery {
 	egq.ctx.Unique = &unique
 	return egq
 }
 
 // Order specifies how the records should be ordered.
-func (egq *EventGroupQuery) Order(o ...eventgroup.Order) *EventGroupQuery {
+func (egq *EventGroupzQuery) Order(o ...eventgroupz.Order) *EventGroupzQuery {
 	egq.order = append(egq.order, o...)
 	return egq
 }
 
 // QueryEvent chains the current query on the "event" edge.
-func (egq *EventGroupQuery) QueryEvent() *EventQuery {
+func (egq *EventGroupzQuery) QueryEvent() *EventQuery {
 	query := (&EventClient{config: egq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := egq.prepareQuery(ctx); err != nil {
@@ -73,9 +73,9 @@ func (egq *EventGroupQuery) QueryEvent() *EventQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(eventgroup.Table, eventgroup.FieldID, selector),
+			sqlgraph.From(eventgroupz.Table, eventgroupz.FieldID, selector),
 			sqlgraph.To(event.Table, event.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, eventgroup.EventTable, eventgroup.EventColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, eventgroupz.EventTable, eventgroupz.EventPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(egq.driver.Dialect(), step)
 		return fromU, nil
@@ -83,21 +83,21 @@ func (egq *EventGroupQuery) QueryEvent() *EventQuery {
 	return query
 }
 
-// First returns the first EventGroup entity from the query.
-// Returns a *NotFoundError when no EventGroup was found.
-func (egq *EventGroupQuery) First(ctx context.Context) (*EventGroup, error) {
+// First returns the first EventGroupz entity from the query.
+// Returns a *NotFoundError when no EventGroupz was found.
+func (egq *EventGroupzQuery) First(ctx context.Context) (*EventGroupz, error) {
 	nodes, err := egq.Limit(1).All(setContextOp(ctx, egq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{eventgroup.Label}
+		return nil, &NotFoundError{eventgroupz.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (egq *EventGroupQuery) FirstX(ctx context.Context) *EventGroup {
+func (egq *EventGroupzQuery) FirstX(ctx context.Context) *EventGroupz {
 	node, err := egq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -105,22 +105,22 @@ func (egq *EventGroupQuery) FirstX(ctx context.Context) *EventGroup {
 	return node
 }
 
-// FirstID returns the first EventGroup ID from the query.
-// Returns a *NotFoundError when no EventGroup ID was found.
-func (egq *EventGroupQuery) FirstID(ctx context.Context) (id int64, err error) {
+// FirstID returns the first EventGroupz ID from the query.
+// Returns a *NotFoundError when no EventGroupz ID was found.
+func (egq *EventGroupzQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = egq.Limit(1).IDs(setContextOp(ctx, egq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{eventgroup.Label}
+		err = &NotFoundError{eventgroupz.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (egq *EventGroupQuery) FirstIDX(ctx context.Context) int64 {
+func (egq *EventGroupzQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := egq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -128,10 +128,10 @@ func (egq *EventGroupQuery) FirstIDX(ctx context.Context) int64 {
 	return id
 }
 
-// Only returns a single EventGroup entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one EventGroup entity is found.
-// Returns a *NotFoundError when no EventGroup entities are found.
-func (egq *EventGroupQuery) Only(ctx context.Context) (*EventGroup, error) {
+// Only returns a single EventGroupz entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one EventGroupz entity is found.
+// Returns a *NotFoundError when no EventGroupz entities are found.
+func (egq *EventGroupzQuery) Only(ctx context.Context) (*EventGroupz, error) {
 	nodes, err := egq.Limit(2).All(setContextOp(ctx, egq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -140,14 +140,14 @@ func (egq *EventGroupQuery) Only(ctx context.Context) (*EventGroup, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{eventgroup.Label}
+		return nil, &NotFoundError{eventgroupz.Label}
 	default:
-		return nil, &NotSingularError{eventgroup.Label}
+		return nil, &NotSingularError{eventgroupz.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (egq *EventGroupQuery) OnlyX(ctx context.Context) *EventGroup {
+func (egq *EventGroupzQuery) OnlyX(ctx context.Context) *EventGroupz {
 	node, err := egq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -155,10 +155,10 @@ func (egq *EventGroupQuery) OnlyX(ctx context.Context) *EventGroup {
 	return node
 }
 
-// OnlyID is like Only, but returns the only EventGroup ID in the query.
-// Returns a *NotSingularError when more than one EventGroup ID is found.
+// OnlyID is like Only, but returns the only EventGroupz ID in the query.
+// Returns a *NotSingularError when more than one EventGroupz ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (egq *EventGroupQuery) OnlyID(ctx context.Context) (id int64, err error) {
+func (egq *EventGroupzQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = egq.Limit(2).IDs(setContextOp(ctx, egq.ctx, "OnlyID")); err != nil {
 		return
@@ -167,15 +167,15 @@ func (egq *EventGroupQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{eventgroup.Label}
+		err = &NotFoundError{eventgroupz.Label}
 	default:
-		err = &NotSingularError{eventgroup.Label}
+		err = &NotSingularError{eventgroupz.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (egq *EventGroupQuery) OnlyIDX(ctx context.Context) int64 {
+func (egq *EventGroupzQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := egq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -183,18 +183,18 @@ func (egq *EventGroupQuery) OnlyIDX(ctx context.Context) int64 {
 	return id
 }
 
-// All executes the query and returns a list of EventGroups.
-func (egq *EventGroupQuery) All(ctx context.Context) ([]*EventGroup, error) {
+// All executes the query and returns a list of EventGroupzs.
+func (egq *EventGroupzQuery) All(ctx context.Context) ([]*EventGroupz, error) {
 	ctx = setContextOp(ctx, egq.ctx, "All")
 	if err := egq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*EventGroup, *EventGroupQuery]()
-	return withInterceptors[[]*EventGroup](ctx, egq, qr, egq.inters)
+	qr := querierAll[[]*EventGroupz, *EventGroupzQuery]()
+	return withInterceptors[[]*EventGroupz](ctx, egq, qr, egq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (egq *EventGroupQuery) AllX(ctx context.Context) []*EventGroup {
+func (egq *EventGroupzQuery) AllX(ctx context.Context) []*EventGroupz {
 	nodes, err := egq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -202,20 +202,20 @@ func (egq *EventGroupQuery) AllX(ctx context.Context) []*EventGroup {
 	return nodes
 }
 
-// IDs executes the query and returns a list of EventGroup IDs.
-func (egq *EventGroupQuery) IDs(ctx context.Context) (ids []int64, err error) {
+// IDs executes the query and returns a list of EventGroupz IDs.
+func (egq *EventGroupzQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if egq.ctx.Unique == nil && egq.path != nil {
 		egq.Unique(true)
 	}
 	ctx = setContextOp(ctx, egq.ctx, "IDs")
-	if err = egq.Select(eventgroup.FieldID).Scan(ctx, &ids); err != nil {
+	if err = egq.Select(eventgroupz.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (egq *EventGroupQuery) IDsX(ctx context.Context) []int64 {
+func (egq *EventGroupzQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := egq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -224,16 +224,16 @@ func (egq *EventGroupQuery) IDsX(ctx context.Context) []int64 {
 }
 
 // Count returns the count of the given query.
-func (egq *EventGroupQuery) Count(ctx context.Context) (int, error) {
+func (egq *EventGroupzQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, egq.ctx, "Count")
 	if err := egq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, egq, querierCount[*EventGroupQuery](), egq.inters)
+	return withInterceptors[int](ctx, egq, querierCount[*EventGroupzQuery](), egq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (egq *EventGroupQuery) CountX(ctx context.Context) int {
+func (egq *EventGroupzQuery) CountX(ctx context.Context) int {
 	count, err := egq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -242,7 +242,7 @@ func (egq *EventGroupQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (egq *EventGroupQuery) Exist(ctx context.Context) (bool, error) {
+func (egq *EventGroupzQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, egq.ctx, "Exist")
 	switch _, err := egq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -255,7 +255,7 @@ func (egq *EventGroupQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (egq *EventGroupQuery) ExistX(ctx context.Context) bool {
+func (egq *EventGroupzQuery) ExistX(ctx context.Context) bool {
 	exist, err := egq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -263,18 +263,18 @@ func (egq *EventGroupQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the EventGroupQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the EventGroupzQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (egq *EventGroupQuery) Clone() *EventGroupQuery {
+func (egq *EventGroupzQuery) Clone() *EventGroupzQuery {
 	if egq == nil {
 		return nil
 	}
-	return &EventGroupQuery{
+	return &EventGroupzQuery{
 		config:     egq.config,
 		ctx:        egq.ctx.Clone(),
-		order:      append([]eventgroup.Order{}, egq.order...),
+		order:      append([]eventgroupz.Order{}, egq.order...),
 		inters:     append([]Interceptor{}, egq.inters...),
-		predicates: append([]predicate.EventGroup{}, egq.predicates...),
+		predicates: append([]predicate.EventGroupz{}, egq.predicates...),
 		withEvent:  egq.withEvent.Clone(),
 		// clone intermediate query.
 		sql:  egq.sql.Clone(),
@@ -284,7 +284,7 @@ func (egq *EventGroupQuery) Clone() *EventGroupQuery {
 
 // WithEvent tells the query-builder to eager-load the nodes that are connected to
 // the "event" edge. The optional arguments are used to configure the query builder of the edge.
-func (egq *EventGroupQuery) WithEvent(opts ...func(*EventQuery)) *EventGroupQuery {
+func (egq *EventGroupzQuery) WithEvent(opts ...func(*EventQuery)) *EventGroupzQuery {
 	query := (&EventClient{config: egq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
@@ -299,20 +299,20 @@ func (egq *EventGroupQuery) WithEvent(opts ...func(*EventQuery)) *EventGroupQuer
 // Example:
 //
 //	var v []struct {
-//		GroupID int64 `json:"group_id,omitempty"`
+//		JoinedAt time.Time `json:"joined_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.EventGroup.Query().
-//		GroupBy(eventgroup.FieldGroupID).
+//	client.EventGroupz.Query().
+//		GroupBy(eventgroupz.FieldJoinedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
-func (egq *EventGroupQuery) GroupBy(field string, fields ...string) *EventGroupGroupBy {
+func (egq *EventGroupzQuery) GroupBy(field string, fields ...string) *EventGroupzGroupBy {
 	egq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &EventGroupGroupBy{build: egq}
+	grbuild := &EventGroupzGroupBy{build: egq}
 	grbuild.flds = &egq.ctx.Fields
-	grbuild.label = eventgroup.Label
+	grbuild.label = eventgroupz.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -323,27 +323,27 @@ func (egq *EventGroupQuery) GroupBy(field string, fields ...string) *EventGroupG
 // Example:
 //
 //	var v []struct {
-//		GroupID int64 `json:"group_id,omitempty"`
+//		JoinedAt time.Time `json:"joined_at,omitempty"`
 //	}
 //
-//	client.EventGroup.Query().
-//		Select(eventgroup.FieldGroupID).
+//	client.EventGroupz.Query().
+//		Select(eventgroupz.FieldJoinedAt).
 //		Scan(ctx, &v)
 //
-func (egq *EventGroupQuery) Select(fields ...string) *EventGroupSelect {
+func (egq *EventGroupzQuery) Select(fields ...string) *EventGroupzSelect {
 	egq.ctx.Fields = append(egq.ctx.Fields, fields...)
-	sbuild := &EventGroupSelect{EventGroupQuery: egq}
-	sbuild.label = eventgroup.Label
+	sbuild := &EventGroupzSelect{EventGroupzQuery: egq}
+	sbuild.label = eventgroupz.Label
 	sbuild.flds, sbuild.scan = &egq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a EventGroupSelect configured with the given aggregations.
-func (egq *EventGroupQuery) Aggregate(fns ...AggregateFunc) *EventGroupSelect {
+// Aggregate returns a EventGroupzSelect configured with the given aggregations.
+func (egq *EventGroupzQuery) Aggregate(fns ...AggregateFunc) *EventGroupzSelect {
 	return egq.Select().Aggregate(fns...)
 }
 
-func (egq *EventGroupQuery) prepareQuery(ctx context.Context) error {
+func (egq *EventGroupzQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range egq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -355,7 +355,7 @@ func (egq *EventGroupQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range egq.ctx.Fields {
-		if !eventgroup.ValidColumn(f) {
+		if !eventgroupz.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -369,26 +369,19 @@ func (egq *EventGroupQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (egq *EventGroupQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*EventGroup, error) {
+func (egq *EventGroupzQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*EventGroupz, error) {
 	var (
-		nodes       = []*EventGroup{}
-		withFKs     = egq.withFKs
+		nodes       = []*EventGroupz{}
 		_spec       = egq.querySpec()
 		loadedTypes = [1]bool{
 			egq.withEvent != nil,
 		}
 	)
-	if egq.withEvent != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, eventgroup.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*EventGroup).scanValues(nil, columns)
+		return (*EventGroupz).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &EventGroup{config: egq.config}
+		node := &EventGroupz{config: egq.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -406,48 +399,78 @@ func (egq *EventGroupQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		return nodes, nil
 	}
 	if query := egq.withEvent; query != nil {
-		if err := egq.loadEvent(ctx, query, nodes, nil,
-			func(n *EventGroup, e *Event) { n.Edges.Event = e }); err != nil {
+		if err := egq.loadEvent(ctx, query, nodes,
+			func(n *EventGroupz) { n.Edges.Event = []*Event{} },
+			func(n *EventGroupz, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (egq *EventGroupQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*EventGroup, init func(*EventGroup), assign func(*EventGroup, *Event)) error {
-	ids := make([]int64, 0, len(nodes))
-	nodeids := make(map[int64][]*EventGroup)
-	for i := range nodes {
-		if nodes[i].event_groups == nil {
-			continue
+func (egq *EventGroupzQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*EventGroupz, init func(*EventGroupz), assign func(*EventGroupz, *Event)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int64]*EventGroupz)
+	nids := make(map[int64]map[*EventGroupz]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
 		}
-		fk := *nodes[i].event_groups
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(eventgroupz.EventTable)
+		s.Join(joinT).On(s.C(event.FieldID), joinT.C(eventgroupz.EventPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(eventgroupz.EventPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(eventgroupz.EventPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(event.IDIn(ids...))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullInt64).Int64
+				inValue := values[1].(*sql.NullInt64).Int64
+				if nids[inValue] == nil {
+					nids[inValue] = map[*EventGroupz]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Event](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "event_groups" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "event" node returned %v`, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
 }
 
-func (egq *EventGroupQuery) sqlCount(ctx context.Context) (int, error) {
+func (egq *EventGroupzQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := egq.querySpec()
 	if len(egq.modifiers) > 0 {
 		_spec.Modifiers = egq.modifiers
@@ -459,8 +482,8 @@ func (egq *EventGroupQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, egq.driver, _spec)
 }
 
-func (egq *EventGroupQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(eventgroup.Table, eventgroup.Columns, sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64))
+func (egq *EventGroupzQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(eventgroupz.Table, eventgroupz.Columns, sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64))
 	_spec.From = egq.sql
 	if unique := egq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -469,9 +492,9 @@ func (egq *EventGroupQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := egq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, eventgroup.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, eventgroupz.FieldID)
 		for i := range fields {
-			if fields[i] != eventgroup.FieldID {
+			if fields[i] != eventgroupz.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -499,12 +522,12 @@ func (egq *EventGroupQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (egq *EventGroupQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (egq *EventGroupzQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(egq.driver.Dialect())
-	t1 := builder.Table(eventgroup.Table)
+	t1 := builder.Table(eventgroupz.Table)
 	columns := egq.ctx.Fields
 	if len(columns) == 0 {
-		columns = eventgroup.Columns
+		columns = eventgroupz.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if egq.sql != nil {
@@ -535,33 +558,33 @@ func (egq *EventGroupQuery) sqlQuery(ctx context.Context) *sql.Selector {
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (egq *EventGroupQuery) Modify(modifiers ...func(s *sql.Selector)) *EventGroupSelect {
+func (egq *EventGroupzQuery) Modify(modifiers ...func(s *sql.Selector)) *EventGroupzSelect {
 	egq.modifiers = append(egq.modifiers, modifiers...)
 	return egq.Select()
 }
 
-// EventGroupGroupBy is the group-by builder for EventGroup entities.
-type EventGroupGroupBy struct {
+// EventGroupzGroupBy is the group-by builder for EventGroupz entities.
+type EventGroupzGroupBy struct {
 	selector
-	build *EventGroupQuery
+	build *EventGroupzQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (eggb *EventGroupGroupBy) Aggregate(fns ...AggregateFunc) *EventGroupGroupBy {
+func (eggb *EventGroupzGroupBy) Aggregate(fns ...AggregateFunc) *EventGroupzGroupBy {
 	eggb.fns = append(eggb.fns, fns...)
 	return eggb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (eggb *EventGroupGroupBy) Scan(ctx context.Context, v any) error {
+func (eggb *EventGroupzGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, eggb.build.ctx, "GroupBy")
 	if err := eggb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*EventGroupQuery, *EventGroupGroupBy](ctx, eggb.build, eggb, eggb.build.inters, v)
+	return scanWithInterceptors[*EventGroupzQuery, *EventGroupzGroupBy](ctx, eggb.build, eggb, eggb.build.inters, v)
 }
 
-func (eggb *EventGroupGroupBy) sqlScan(ctx context.Context, root *EventGroupQuery, v any) error {
+func (eggb *EventGroupzGroupBy) sqlScan(ctx context.Context, root *EventGroupzQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(eggb.fns))
 	for _, fn := range eggb.fns {
@@ -588,28 +611,28 @@ func (eggb *EventGroupGroupBy) sqlScan(ctx context.Context, root *EventGroupQuer
 	return sql.ScanSlice(rows, v)
 }
 
-// EventGroupSelect is the builder for selecting fields of EventGroup entities.
-type EventGroupSelect struct {
-	*EventGroupQuery
+// EventGroupzSelect is the builder for selecting fields of EventGroupz entities.
+type EventGroupzSelect struct {
+	*EventGroupzQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (egs *EventGroupSelect) Aggregate(fns ...AggregateFunc) *EventGroupSelect {
+func (egs *EventGroupzSelect) Aggregate(fns ...AggregateFunc) *EventGroupzSelect {
 	egs.fns = append(egs.fns, fns...)
 	return egs
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (egs *EventGroupSelect) Scan(ctx context.Context, v any) error {
+func (egs *EventGroupzSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, egs.ctx, "Select")
 	if err := egs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*EventGroupQuery, *EventGroupSelect](ctx, egs.EventGroupQuery, egs, egs.inters, v)
+	return scanWithInterceptors[*EventGroupzQuery, *EventGroupzSelect](ctx, egs.EventGroupzQuery, egs, egs.inters, v)
 }
 
-func (egs *EventGroupSelect) sqlScan(ctx context.Context, root *EventGroupQuery, v any) error {
+func (egs *EventGroupzSelect) sqlScan(ctx context.Context, root *EventGroupzQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(egs.fns))
 	for _, fn := range egs.fns {
@@ -631,7 +654,7 @@ func (egs *EventGroupSelect) sqlScan(ctx context.Context, root *EventGroupQuery,
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (egs *EventGroupSelect) Modify(modifiers ...func(s *sql.Selector)) *EventGroupSelect {
+func (egs *EventGroupzSelect) Modify(modifiers ...func(s *sql.Selector)) *EventGroupzSelect {
 	egs.modifiers = append(egs.modifiers, modifiers...)
 	return egs
 }

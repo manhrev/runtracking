@@ -23,6 +23,8 @@ type Event struct {
 	Name string `json:"name,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// StartAt holds the value of the "start_at" field.
+	StartAt time.Time `json:"start_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Picture holds the value of the "picture" field.
@@ -46,7 +48,7 @@ type EventEdges struct {
 	// Subevents holds the value of the subevents edge.
 	Subevents []*SubEvent `json:"subevents,omitempty"`
 	// Groups holds the value of the groups edge.
-	Groups []*EventGroup `json:"groups,omitempty"`
+	Groups []*EventGroupz `json:"groups,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -63,7 +65,7 @@ func (e EventEdges) SubeventsOrErr() ([]*SubEvent, error) {
 
 // GroupsOrErr returns the Groups value or an error if the edge
 // was not loaded in eager-loading.
-func (e EventEdges) GroupsOrErr() ([]*EventGroup, error) {
+func (e EventEdges) GroupsOrErr() ([]*EventGroupz, error) {
 	if e.loadedTypes[1] {
 		return e.Groups, nil
 	}
@@ -81,7 +83,7 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case event.FieldName, event.FieldPicture, event.FieldDescription:
 			values[i] = new(sql.NullString)
-		case event.FieldCreatedAt, event.FieldUpdatedAt:
+		case event.FieldCreatedAt, event.FieldStartAt, event.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -121,6 +123,12 @@ func (e *Event) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				e.CreatedAt = value.Time
+			}
+		case event.FieldStartAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field start_at", values[i])
+			} else if value.Valid {
+				e.StartAt = value.Time
 			}
 		case event.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -177,7 +185,7 @@ func (e *Event) QuerySubevents() *SubEventQuery {
 }
 
 // QueryGroups queries the "groups" edge of the Event entity.
-func (e *Event) QueryGroups() *EventGroupQuery {
+func (e *Event) QueryGroups() *EventGroupzQuery {
 	return NewEventClient(e.config).QueryGroups(e)
 }
 
@@ -212,6 +220,9 @@ func (e *Event) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(e.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("start_at=")
+	builder.WriteString(e.StartAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(e.UpdatedAt.Format(time.ANSIC))

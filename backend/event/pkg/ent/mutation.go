@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
@@ -29,8 +29,8 @@ const (
 
 	// Node types.
 	TypeEvent          = "Event"
-	TypeEventGroup     = "EventGroup"
-	TypeGroupProgress  = "GroupProgress"
+	TypeEventGroupz    = "EventGroupz"
+	TypeGroupzProgress = "GroupzProgress"
 	TypeMemberProgress = "MemberProgress"
 	TypeSubEvent       = "SubEvent"
 )
@@ -45,6 +45,7 @@ type EventMutation struct {
 	addowner_group_id   *int64
 	name                *string
 	created_at          *time.Time
+	start_at            *time.Time
 	updated_at          *time.Time
 	picture             *string
 	description         *string
@@ -308,6 +309,42 @@ func (m *EventMutation) OldCreatedAt(ctx context.Context) (v time.Time, err erro
 // ResetCreatedAt resets all changes to the "created_at" field.
 func (m *EventMutation) ResetCreatedAt() {
 	m.created_at = nil
+}
+
+// SetStartAt sets the "start_at" field.
+func (m *EventMutation) SetStartAt(t time.Time) {
+	m.start_at = &t
+}
+
+// StartAt returns the value of the "start_at" field in the mutation.
+func (m *EventMutation) StartAt() (r time.Time, exists bool) {
+	v := m.start_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartAt returns the old "start_at" field's value of the Event entity.
+// If the Event object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EventMutation) OldStartAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartAt: %w", err)
+	}
+	return oldValue.StartAt, nil
+}
+
+// ResetStartAt resets all changes to the "start_at" field.
+func (m *EventMutation) ResetStartAt() {
+	m.start_at = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -633,7 +670,7 @@ func (m *EventMutation) ResetSubevents() {
 	m.removedsubevents = nil
 }
 
-// AddGroupIDs adds the "groups" edge to the EventGroup entity by ids.
+// AddGroupIDs adds the "groups" edge to the EventGroupz entity by ids.
 func (m *EventMutation) AddGroupIDs(ids ...int64) {
 	if m.groups == nil {
 		m.groups = make(map[int64]struct{})
@@ -643,17 +680,17 @@ func (m *EventMutation) AddGroupIDs(ids ...int64) {
 	}
 }
 
-// ClearGroups clears the "groups" edge to the EventGroup entity.
+// ClearGroups clears the "groups" edge to the EventGroupz entity.
 func (m *EventMutation) ClearGroups() {
 	m.clearedgroups = true
 }
 
-// GroupsCleared reports if the "groups" edge to the EventGroup entity was cleared.
+// GroupsCleared reports if the "groups" edge to the EventGroupz entity was cleared.
 func (m *EventMutation) GroupsCleared() bool {
 	return m.clearedgroups
 }
 
-// RemoveGroupIDs removes the "groups" edge to the EventGroup entity by IDs.
+// RemoveGroupIDs removes the "groups" edge to the EventGroupz entity by IDs.
 func (m *EventMutation) RemoveGroupIDs(ids ...int64) {
 	if m.removedgroups == nil {
 		m.removedgroups = make(map[int64]struct{})
@@ -664,7 +701,7 @@ func (m *EventMutation) RemoveGroupIDs(ids ...int64) {
 	}
 }
 
-// RemovedGroups returns the removed IDs of the "groups" edge to the EventGroup entity.
+// RemovedGroups returns the removed IDs of the "groups" edge to the EventGroupz entity.
 func (m *EventMutation) RemovedGroupsIDs() (ids []int64) {
 	for id := range m.removedgroups {
 		ids = append(ids, id)
@@ -721,7 +758,7 @@ func (m *EventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EventMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.owner_group_id != nil {
 		fields = append(fields, event.FieldOwnerGroupID)
 	}
@@ -730,6 +767,9 @@ func (m *EventMutation) Fields() []string {
 	}
 	if m.created_at != nil {
 		fields = append(fields, event.FieldCreatedAt)
+	}
+	if m.start_at != nil {
+		fields = append(fields, event.FieldStartAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, event.FieldUpdatedAt)
@@ -763,6 +803,8 @@ func (m *EventMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case event.FieldCreatedAt:
 		return m.CreatedAt()
+	case event.FieldStartAt:
+		return m.StartAt()
 	case event.FieldUpdatedAt:
 		return m.UpdatedAt()
 	case event.FieldPicture:
@@ -790,6 +832,8 @@ func (m *EventMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldName(ctx)
 	case event.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case event.FieldStartAt:
+		return m.OldStartAt(ctx)
 	case event.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
 	case event.FieldPicture:
@@ -831,6 +875,13 @@ func (m *EventMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case event.FieldStartAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartAt(v)
 		return nil
 	case event.FieldUpdatedAt:
 		v, ok := value.(time.Time)
@@ -986,6 +1037,9 @@ func (m *EventMutation) ResetField(name string) error {
 	case event.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
+	case event.FieldStartAt:
+		m.ResetStartAt()
+		return nil
 	case event.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
@@ -1118,36 +1172,35 @@ func (m *EventMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Event edge %s", name)
 }
 
-// EventGroupMutation represents an operation that mutates the EventGroup nodes in the graph.
-type EventGroupMutation struct {
+// EventGroupzMutation represents an operation that mutates the EventGroupz nodes in the graph.
+type EventGroupzMutation struct {
 	config
 	op            Op
 	typ           string
 	id            *int64
-	group_id      *int64
-	addgroup_id   *int64
 	joined_at     *time.Time
 	status        *int64
 	addstatus     *int64
 	clearedFields map[string]struct{}
-	event         *int64
+	event         map[int64]struct{}
+	removedevent  map[int64]struct{}
 	clearedevent  bool
 	done          bool
-	oldValue      func(context.Context) (*EventGroup, error)
-	predicates    []predicate.EventGroup
+	oldValue      func(context.Context) (*EventGroupz, error)
+	predicates    []predicate.EventGroupz
 }
 
-var _ ent.Mutation = (*EventGroupMutation)(nil)
+var _ ent.Mutation = (*EventGroupzMutation)(nil)
 
-// eventgroupOption allows management of the mutation configuration using functional options.
-type eventgroupOption func(*EventGroupMutation)
+// eventgroupzOption allows management of the mutation configuration using functional options.
+type eventgroupzOption func(*EventGroupzMutation)
 
-// newEventGroupMutation creates new mutation for the EventGroup entity.
-func newEventGroupMutation(c config, op Op, opts ...eventgroupOption) *EventGroupMutation {
-	m := &EventGroupMutation{
+// newEventGroupzMutation creates new mutation for the EventGroupz entity.
+func newEventGroupzMutation(c config, op Op, opts ...eventgroupzOption) *EventGroupzMutation {
+	m := &EventGroupzMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeEventGroup,
+		typ:           TypeEventGroupz,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -1156,20 +1209,20 @@ func newEventGroupMutation(c config, op Op, opts ...eventgroupOption) *EventGrou
 	return m
 }
 
-// withEventGroupID sets the ID field of the mutation.
-func withEventGroupID(id int64) eventgroupOption {
-	return func(m *EventGroupMutation) {
+// withEventGroupzID sets the ID field of the mutation.
+func withEventGroupzID(id int64) eventgroupzOption {
+	return func(m *EventGroupzMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *EventGroup
+			value *EventGroupz
 		)
-		m.oldValue = func(ctx context.Context) (*EventGroup, error) {
+		m.oldValue = func(ctx context.Context) (*EventGroupz, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().EventGroup.Get(ctx, id)
+					value, err = m.Client().EventGroupz.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -1178,10 +1231,10 @@ func withEventGroupID(id int64) eventgroupOption {
 	}
 }
 
-// withEventGroup sets the old EventGroup of the mutation.
-func withEventGroup(node *EventGroup) eventgroupOption {
-	return func(m *EventGroupMutation) {
-		m.oldValue = func(context.Context) (*EventGroup, error) {
+// withEventGroupz sets the old EventGroupz of the mutation.
+func withEventGroupz(node *EventGroupz) eventgroupzOption {
+	return func(m *EventGroupzMutation) {
+		m.oldValue = func(context.Context) (*EventGroupz, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -1190,7 +1243,7 @@ func withEventGroup(node *EventGroup) eventgroupOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m EventGroupMutation) Client() *Client {
+func (m EventGroupzMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -1198,7 +1251,7 @@ func (m EventGroupMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m EventGroupMutation) Tx() (*Tx, error) {
+func (m EventGroupzMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -1208,14 +1261,14 @@ func (m EventGroupMutation) Tx() (*Tx, error) {
 }
 
 // SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of EventGroup entities.
-func (m *EventGroupMutation) SetID(id int64) {
+// operation is only accepted on creation of EventGroupz entities.
+func (m *EventGroupzMutation) SetID(id int64) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *EventGroupMutation) ID() (id int64, exists bool) {
+func (m *EventGroupzMutation) ID() (id int64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1226,7 +1279,7 @@ func (m *EventGroupMutation) ID() (id int64, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *EventGroupMutation) IDs(ctx context.Context) ([]int64, error) {
+func (m *EventGroupzMutation) IDs(ctx context.Context) ([]int64, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -1235,75 +1288,19 @@ func (m *EventGroupMutation) IDs(ctx context.Context) ([]int64, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().EventGroup.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().EventGroupz.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// SetGroupID sets the "group_id" field.
-func (m *EventGroupMutation) SetGroupID(i int64) {
-	m.group_id = &i
-	m.addgroup_id = nil
-}
-
-// GroupID returns the value of the "group_id" field in the mutation.
-func (m *EventGroupMutation) GroupID() (r int64, exists bool) {
-	v := m.group_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldGroupID returns the old "group_id" field's value of the EventGroup entity.
-// If the EventGroup object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EventGroupMutation) OldGroupID(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldGroupID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldGroupID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldGroupID: %w", err)
-	}
-	return oldValue.GroupID, nil
-}
-
-// AddGroupID adds i to the "group_id" field.
-func (m *EventGroupMutation) AddGroupID(i int64) {
-	if m.addgroup_id != nil {
-		*m.addgroup_id += i
-	} else {
-		m.addgroup_id = &i
-	}
-}
-
-// AddedGroupID returns the value that was added to the "group_id" field in this mutation.
-func (m *EventGroupMutation) AddedGroupID() (r int64, exists bool) {
-	v := m.addgroup_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetGroupID resets all changes to the "group_id" field.
-func (m *EventGroupMutation) ResetGroupID() {
-	m.group_id = nil
-	m.addgroup_id = nil
-}
-
 // SetJoinedAt sets the "joined_at" field.
-func (m *EventGroupMutation) SetJoinedAt(t time.Time) {
+func (m *EventGroupzMutation) SetJoinedAt(t time.Time) {
 	m.joined_at = &t
 }
 
 // JoinedAt returns the value of the "joined_at" field in the mutation.
-func (m *EventGroupMutation) JoinedAt() (r time.Time, exists bool) {
+func (m *EventGroupzMutation) JoinedAt() (r time.Time, exists bool) {
 	v := m.joined_at
 	if v == nil {
 		return
@@ -1311,10 +1308,10 @@ func (m *EventGroupMutation) JoinedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldJoinedAt returns the old "joined_at" field's value of the EventGroup entity.
-// If the EventGroup object wasn't provided to the builder, the object is fetched from the database.
+// OldJoinedAt returns the old "joined_at" field's value of the EventGroupz entity.
+// If the EventGroupz object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EventGroupMutation) OldJoinedAt(ctx context.Context) (v time.Time, err error) {
+func (m *EventGroupzMutation) OldJoinedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldJoinedAt is only allowed on UpdateOne operations")
 	}
@@ -1329,18 +1326,18 @@ func (m *EventGroupMutation) OldJoinedAt(ctx context.Context) (v time.Time, err 
 }
 
 // ResetJoinedAt resets all changes to the "joined_at" field.
-func (m *EventGroupMutation) ResetJoinedAt() {
+func (m *EventGroupzMutation) ResetJoinedAt() {
 	m.joined_at = nil
 }
 
 // SetStatus sets the "status" field.
-func (m *EventGroupMutation) SetStatus(i int64) {
+func (m *EventGroupzMutation) SetStatus(i int64) {
 	m.status = &i
 	m.addstatus = nil
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *EventGroupMutation) Status() (r int64, exists bool) {
+func (m *EventGroupzMutation) Status() (r int64, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -1348,10 +1345,10 @@ func (m *EventGroupMutation) Status() (r int64, exists bool) {
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the EventGroup entity.
-// If the EventGroup object wasn't provided to the builder, the object is fetched from the database.
+// OldStatus returns the old "status" field's value of the EventGroupz entity.
+// If the EventGroupz object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EventGroupMutation) OldStatus(ctx context.Context) (v int64, err error) {
+func (m *EventGroupzMutation) OldStatus(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -1366,7 +1363,7 @@ func (m *EventGroupMutation) OldStatus(ctx context.Context) (v int64, err error)
 }
 
 // AddStatus adds i to the "status" field.
-func (m *EventGroupMutation) AddStatus(i int64) {
+func (m *EventGroupzMutation) AddStatus(i int64) {
 	if m.addstatus != nil {
 		*m.addstatus += i
 	} else {
@@ -1375,7 +1372,7 @@ func (m *EventGroupMutation) AddStatus(i int64) {
 }
 
 // AddedStatus returns the value that was added to the "status" field in this mutation.
-func (m *EventGroupMutation) AddedStatus() (r int64, exists bool) {
+func (m *EventGroupzMutation) AddedStatus() (r int64, exists bool) {
 	v := m.addstatus
 	if v == nil {
 		return
@@ -1384,59 +1381,74 @@ func (m *EventGroupMutation) AddedStatus() (r int64, exists bool) {
 }
 
 // ResetStatus resets all changes to the "status" field.
-func (m *EventGroupMutation) ResetStatus() {
+func (m *EventGroupzMutation) ResetStatus() {
 	m.status = nil
 	m.addstatus = nil
 }
 
-// SetEventID sets the "event" edge to the Event entity by id.
-func (m *EventGroupMutation) SetEventID(id int64) {
-	m.event = &id
+// AddEventIDs adds the "event" edge to the Event entity by ids.
+func (m *EventGroupzMutation) AddEventIDs(ids ...int64) {
+	if m.event == nil {
+		m.event = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.event[ids[i]] = struct{}{}
+	}
 }
 
 // ClearEvent clears the "event" edge to the Event entity.
-func (m *EventGroupMutation) ClearEvent() {
+func (m *EventGroupzMutation) ClearEvent() {
 	m.clearedevent = true
 }
 
 // EventCleared reports if the "event" edge to the Event entity was cleared.
-func (m *EventGroupMutation) EventCleared() bool {
+func (m *EventGroupzMutation) EventCleared() bool {
 	return m.clearedevent
 }
 
-// EventID returns the "event" edge ID in the mutation.
-func (m *EventGroupMutation) EventID() (id int64, exists bool) {
-	if m.event != nil {
-		return *m.event, true
+// RemoveEventIDs removes the "event" edge to the Event entity by IDs.
+func (m *EventGroupzMutation) RemoveEventIDs(ids ...int64) {
+	if m.removedevent == nil {
+		m.removedevent = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.event, ids[i])
+		m.removedevent[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEvent returns the removed IDs of the "event" edge to the Event entity.
+func (m *EventGroupzMutation) RemovedEventIDs() (ids []int64) {
+	for id := range m.removedevent {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // EventIDs returns the "event" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// EventID instead. It exists only for internal usage by the builders.
-func (m *EventGroupMutation) EventIDs() (ids []int64) {
-	if id := m.event; id != nil {
-		ids = append(ids, *id)
+func (m *EventGroupzMutation) EventIDs() (ids []int64) {
+	for id := range m.event {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // ResetEvent resets all changes to the "event" edge.
-func (m *EventGroupMutation) ResetEvent() {
+func (m *EventGroupzMutation) ResetEvent() {
 	m.event = nil
 	m.clearedevent = false
+	m.removedevent = nil
 }
 
-// Where appends a list predicates to the EventGroupMutation builder.
-func (m *EventGroupMutation) Where(ps ...predicate.EventGroup) {
+// Where appends a list predicates to the EventGroupzMutation builder.
+func (m *EventGroupzMutation) Where(ps ...predicate.EventGroupz) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the EventGroupMutation builder. Using this method,
+// WhereP appends storage-level predicates to the EventGroupzMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *EventGroupMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.EventGroup, len(ps))
+func (m *EventGroupzMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.EventGroupz, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -1444,33 +1456,30 @@ func (m *EventGroupMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *EventGroupMutation) Op() Op {
+func (m *EventGroupzMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *EventGroupMutation) SetOp(op Op) {
+func (m *EventGroupzMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (EventGroup).
-func (m *EventGroupMutation) Type() string {
+// Type returns the node type of this mutation (EventGroupz).
+func (m *EventGroupzMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *EventGroupMutation) Fields() []string {
-	fields := make([]string, 0, 3)
-	if m.group_id != nil {
-		fields = append(fields, eventgroup.FieldGroupID)
-	}
+func (m *EventGroupzMutation) Fields() []string {
+	fields := make([]string, 0, 2)
 	if m.joined_at != nil {
-		fields = append(fields, eventgroup.FieldJoinedAt)
+		fields = append(fields, eventgroupz.FieldJoinedAt)
 	}
 	if m.status != nil {
-		fields = append(fields, eventgroup.FieldStatus)
+		fields = append(fields, eventgroupz.FieldStatus)
 	}
 	return fields
 }
@@ -1478,13 +1487,11 @@ func (m *EventGroupMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *EventGroupMutation) Field(name string) (ent.Value, bool) {
+func (m *EventGroupzMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case eventgroup.FieldGroupID:
-		return m.GroupID()
-	case eventgroup.FieldJoinedAt:
+	case eventgroupz.FieldJoinedAt:
 		return m.JoinedAt()
-	case eventgroup.FieldStatus:
+	case eventgroupz.FieldStatus:
 		return m.Status()
 	}
 	return nil, false
@@ -1493,38 +1500,29 @@ func (m *EventGroupMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *EventGroupMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *EventGroupzMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case eventgroup.FieldGroupID:
-		return m.OldGroupID(ctx)
-	case eventgroup.FieldJoinedAt:
+	case eventgroupz.FieldJoinedAt:
 		return m.OldJoinedAt(ctx)
-	case eventgroup.FieldStatus:
+	case eventgroupz.FieldStatus:
 		return m.OldStatus(ctx)
 	}
-	return nil, fmt.Errorf("unknown EventGroup field %s", name)
+	return nil, fmt.Errorf("unknown EventGroupz field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EventGroupMutation) SetField(name string, value ent.Value) error {
+func (m *EventGroupzMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case eventgroup.FieldGroupID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetGroupID(v)
-		return nil
-	case eventgroup.FieldJoinedAt:
+	case eventgroupz.FieldJoinedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetJoinedAt(v)
 		return nil
-	case eventgroup.FieldStatus:
+	case eventgroupz.FieldStatus:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -1532,18 +1530,15 @@ func (m *EventGroupMutation) SetField(name string, value ent.Value) error {
 		m.SetStatus(v)
 		return nil
 	}
-	return fmt.Errorf("unknown EventGroup field %s", name)
+	return fmt.Errorf("unknown EventGroupz field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *EventGroupMutation) AddedFields() []string {
+func (m *EventGroupzMutation) AddedFields() []string {
 	var fields []string
-	if m.addgroup_id != nil {
-		fields = append(fields, eventgroup.FieldGroupID)
-	}
 	if m.addstatus != nil {
-		fields = append(fields, eventgroup.FieldStatus)
+		fields = append(fields, eventgroupz.FieldStatus)
 	}
 	return fields
 }
@@ -1551,11 +1546,9 @@ func (m *EventGroupMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *EventGroupMutation) AddedField(name string) (ent.Value, bool) {
+func (m *EventGroupzMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case eventgroup.FieldGroupID:
-		return m.AddedGroupID()
-	case eventgroup.FieldStatus:
+	case eventgroupz.FieldStatus:
 		return m.AddedStatus()
 	}
 	return nil, false
@@ -1564,16 +1557,9 @@ func (m *EventGroupMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EventGroupMutation) AddField(name string, value ent.Value) error {
+func (m *EventGroupzMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case eventgroup.FieldGroupID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddGroupID(v)
-		return nil
-	case eventgroup.FieldStatus:
+	case eventgroupz.FieldStatus:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -1581,92 +1567,102 @@ func (m *EventGroupMutation) AddField(name string, value ent.Value) error {
 		m.AddStatus(v)
 		return nil
 	}
-	return fmt.Errorf("unknown EventGroup numeric field %s", name)
+	return fmt.Errorf("unknown EventGroupz numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *EventGroupMutation) ClearedFields() []string {
+func (m *EventGroupzMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *EventGroupMutation) FieldCleared(name string) bool {
+func (m *EventGroupzMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *EventGroupMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown EventGroup nullable field %s", name)
+func (m *EventGroupzMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown EventGroupz nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *EventGroupMutation) ResetField(name string) error {
+func (m *EventGroupzMutation) ResetField(name string) error {
 	switch name {
-	case eventgroup.FieldGroupID:
-		m.ResetGroupID()
-		return nil
-	case eventgroup.FieldJoinedAt:
+	case eventgroupz.FieldJoinedAt:
 		m.ResetJoinedAt()
 		return nil
-	case eventgroup.FieldStatus:
+	case eventgroupz.FieldStatus:
 		m.ResetStatus()
 		return nil
 	}
-	return fmt.Errorf("unknown EventGroup field %s", name)
+	return fmt.Errorf("unknown EventGroupz field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *EventGroupMutation) AddedEdges() []string {
+func (m *EventGroupzMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
 	if m.event != nil {
-		edges = append(edges, eventgroup.EdgeEvent)
+		edges = append(edges, eventgroupz.EdgeEvent)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *EventGroupMutation) AddedIDs(name string) []ent.Value {
+func (m *EventGroupzMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case eventgroup.EdgeEvent:
-		if id := m.event; id != nil {
-			return []ent.Value{*id}
+	case eventgroupz.EdgeEvent:
+		ids := make([]ent.Value, 0, len(m.event))
+		for id := range m.event {
+			ids = append(ids, id)
 		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *EventGroupMutation) RemovedEdges() []string {
+func (m *EventGroupzMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
+	if m.removedevent != nil {
+		edges = append(edges, eventgroupz.EdgeEvent)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *EventGroupMutation) RemovedIDs(name string) []ent.Value {
+func (m *EventGroupzMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case eventgroupz.EdgeEvent:
+		ids := make([]ent.Value, 0, len(m.removedevent))
+		for id := range m.removedevent {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *EventGroupMutation) ClearedEdges() []string {
+func (m *EventGroupzMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
 	if m.clearedevent {
-		edges = append(edges, eventgroup.EdgeEvent)
+		edges = append(edges, eventgroupz.EdgeEvent)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *EventGroupMutation) EdgeCleared(name string) bool {
+func (m *EventGroupzMutation) EdgeCleared(name string) bool {
 	switch name {
-	case eventgroup.EdgeEvent:
+	case eventgroupz.EdgeEvent:
 		return m.clearedevent
 	}
 	return false
@@ -1674,28 +1670,25 @@ func (m *EventGroupMutation) EdgeCleared(name string) bool {
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *EventGroupMutation) ClearEdge(name string) error {
+func (m *EventGroupzMutation) ClearEdge(name string) error {
 	switch name {
-	case eventgroup.EdgeEvent:
-		m.ClearEvent()
-		return nil
 	}
-	return fmt.Errorf("unknown EventGroup unique edge %s", name)
+	return fmt.Errorf("unknown EventGroupz unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *EventGroupMutation) ResetEdge(name string) error {
+func (m *EventGroupzMutation) ResetEdge(name string) error {
 	switch name {
-	case eventgroup.EdgeEvent:
+	case eventgroupz.EdgeEvent:
 		m.ResetEvent()
 		return nil
 	}
-	return fmt.Errorf("unknown EventGroup edge %s", name)
+	return fmt.Errorf("unknown EventGroupz edge %s", name)
 }
 
-// GroupProgressMutation represents an operation that mutates the GroupProgress nodes in the graph.
-type GroupProgressMutation struct {
+// GroupzProgressMutation represents an operation that mutates the GroupzProgress nodes in the graph.
+type GroupzProgressMutation struct {
 	config
 	op               Op
 	typ              string
@@ -1711,21 +1704,21 @@ type GroupProgressMutation struct {
 	removedmember    map[int64]struct{}
 	clearedmember    bool
 	done             bool
-	oldValue         func(context.Context) (*GroupProgress, error)
-	predicates       []predicate.GroupProgress
+	oldValue         func(context.Context) (*GroupzProgress, error)
+	predicates       []predicate.GroupzProgress
 }
 
-var _ ent.Mutation = (*GroupProgressMutation)(nil)
+var _ ent.Mutation = (*GroupzProgressMutation)(nil)
 
-// groupprogressOption allows management of the mutation configuration using functional options.
-type groupprogressOption func(*GroupProgressMutation)
+// groupzprogressOption allows management of the mutation configuration using functional options.
+type groupzprogressOption func(*GroupzProgressMutation)
 
-// newGroupProgressMutation creates new mutation for the GroupProgress entity.
-func newGroupProgressMutation(c config, op Op, opts ...groupprogressOption) *GroupProgressMutation {
-	m := &GroupProgressMutation{
+// newGroupzProgressMutation creates new mutation for the GroupzProgress entity.
+func newGroupzProgressMutation(c config, op Op, opts ...groupzprogressOption) *GroupzProgressMutation {
+	m := &GroupzProgressMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeGroupProgress,
+		typ:           TypeGroupzProgress,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -1734,20 +1727,20 @@ func newGroupProgressMutation(c config, op Op, opts ...groupprogressOption) *Gro
 	return m
 }
 
-// withGroupProgressID sets the ID field of the mutation.
-func withGroupProgressID(id int64) groupprogressOption {
-	return func(m *GroupProgressMutation) {
+// withGroupzProgressID sets the ID field of the mutation.
+func withGroupzProgressID(id int64) groupzprogressOption {
+	return func(m *GroupzProgressMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *GroupProgress
+			value *GroupzProgress
 		)
-		m.oldValue = func(ctx context.Context) (*GroupProgress, error) {
+		m.oldValue = func(ctx context.Context) (*GroupzProgress, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().GroupProgress.Get(ctx, id)
+					value, err = m.Client().GroupzProgress.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -1756,10 +1749,10 @@ func withGroupProgressID(id int64) groupprogressOption {
 	}
 }
 
-// withGroupProgress sets the old GroupProgress of the mutation.
-func withGroupProgress(node *GroupProgress) groupprogressOption {
-	return func(m *GroupProgressMutation) {
-		m.oldValue = func(context.Context) (*GroupProgress, error) {
+// withGroupzProgress sets the old GroupzProgress of the mutation.
+func withGroupzProgress(node *GroupzProgress) groupzprogressOption {
+	return func(m *GroupzProgressMutation) {
+		m.oldValue = func(context.Context) (*GroupzProgress, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -1768,7 +1761,7 @@ func withGroupProgress(node *GroupProgress) groupprogressOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m GroupProgressMutation) Client() *Client {
+func (m GroupzProgressMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -1776,7 +1769,7 @@ func (m GroupProgressMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m GroupProgressMutation) Tx() (*Tx, error) {
+func (m GroupzProgressMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -1786,14 +1779,14 @@ func (m GroupProgressMutation) Tx() (*Tx, error) {
 }
 
 // SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of GroupProgress entities.
-func (m *GroupProgressMutation) SetID(id int64) {
+// operation is only accepted on creation of GroupzProgress entities.
+func (m *GroupzProgressMutation) SetID(id int64) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *GroupProgressMutation) ID() (id int64, exists bool) {
+func (m *GroupzProgressMutation) ID() (id int64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1804,7 +1797,7 @@ func (m *GroupProgressMutation) ID() (id int64, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *GroupProgressMutation) IDs(ctx context.Context) ([]int64, error) {
+func (m *GroupzProgressMutation) IDs(ctx context.Context) ([]int64, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -1813,20 +1806,20 @@ func (m *GroupProgressMutation) IDs(ctx context.Context) ([]int64, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().GroupProgress.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().GroupzProgress.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
 // SetGroupID sets the "group_id" field.
-func (m *GroupProgressMutation) SetGroupID(i int64) {
+func (m *GroupzProgressMutation) SetGroupID(i int64) {
 	m.group_id = &i
 	m.addgroup_id = nil
 }
 
 // GroupID returns the value of the "group_id" field in the mutation.
-func (m *GroupProgressMutation) GroupID() (r int64, exists bool) {
+func (m *GroupzProgressMutation) GroupID() (r int64, exists bool) {
 	v := m.group_id
 	if v == nil {
 		return
@@ -1834,10 +1827,10 @@ func (m *GroupProgressMutation) GroupID() (r int64, exists bool) {
 	return *v, true
 }
 
-// OldGroupID returns the old "group_id" field's value of the GroupProgress entity.
-// If the GroupProgress object wasn't provided to the builder, the object is fetched from the database.
+// OldGroupID returns the old "group_id" field's value of the GroupzProgress entity.
+// If the GroupzProgress object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GroupProgressMutation) OldGroupID(ctx context.Context) (v int64, err error) {
+func (m *GroupzProgressMutation) OldGroupID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldGroupID is only allowed on UpdateOne operations")
 	}
@@ -1852,7 +1845,7 @@ func (m *GroupProgressMutation) OldGroupID(ctx context.Context) (v int64, err er
 }
 
 // AddGroupID adds i to the "group_id" field.
-func (m *GroupProgressMutation) AddGroupID(i int64) {
+func (m *GroupzProgressMutation) AddGroupID(i int64) {
 	if m.addgroup_id != nil {
 		*m.addgroup_id += i
 	} else {
@@ -1861,7 +1854,7 @@ func (m *GroupProgressMutation) AddGroupID(i int64) {
 }
 
 // AddedGroupID returns the value that was added to the "group_id" field in this mutation.
-func (m *GroupProgressMutation) AddedGroupID() (r int64, exists bool) {
+func (m *GroupzProgressMutation) AddedGroupID() (r int64, exists bool) {
 	v := m.addgroup_id
 	if v == nil {
 		return
@@ -1870,19 +1863,19 @@ func (m *GroupProgressMutation) AddedGroupID() (r int64, exists bool) {
 }
 
 // ResetGroupID resets all changes to the "group_id" field.
-func (m *GroupProgressMutation) ResetGroupID() {
+func (m *GroupzProgressMutation) ResetGroupID() {
 	m.group_id = nil
 	m.addgroup_id = nil
 }
 
 // SetProgress sets the "progress" field.
-func (m *GroupProgressMutation) SetProgress(i int64) {
+func (m *GroupzProgressMutation) SetProgress(i int64) {
 	m.progress = &i
 	m.addprogress = nil
 }
 
 // Progress returns the value of the "progress" field in the mutation.
-func (m *GroupProgressMutation) Progress() (r int64, exists bool) {
+func (m *GroupzProgressMutation) Progress() (r int64, exists bool) {
 	v := m.progress
 	if v == nil {
 		return
@@ -1890,10 +1883,10 @@ func (m *GroupProgressMutation) Progress() (r int64, exists bool) {
 	return *v, true
 }
 
-// OldProgress returns the old "progress" field's value of the GroupProgress entity.
-// If the GroupProgress object wasn't provided to the builder, the object is fetched from the database.
+// OldProgress returns the old "progress" field's value of the GroupzProgress entity.
+// If the GroupzProgress object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GroupProgressMutation) OldProgress(ctx context.Context) (v int64, err error) {
+func (m *GroupzProgressMutation) OldProgress(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldProgress is only allowed on UpdateOne operations")
 	}
@@ -1908,7 +1901,7 @@ func (m *GroupProgressMutation) OldProgress(ctx context.Context) (v int64, err e
 }
 
 // AddProgress adds i to the "progress" field.
-func (m *GroupProgressMutation) AddProgress(i int64) {
+func (m *GroupzProgressMutation) AddProgress(i int64) {
 	if m.addprogress != nil {
 		*m.addprogress += i
 	} else {
@@ -1917,7 +1910,7 @@ func (m *GroupProgressMutation) AddProgress(i int64) {
 }
 
 // AddedProgress returns the value that was added to the "progress" field in this mutation.
-func (m *GroupProgressMutation) AddedProgress() (r int64, exists bool) {
+func (m *GroupzProgressMutation) AddedProgress() (r int64, exists bool) {
 	v := m.addprogress
 	if v == nil {
 		return
@@ -1926,28 +1919,28 @@ func (m *GroupProgressMutation) AddedProgress() (r int64, exists bool) {
 }
 
 // ResetProgress resets all changes to the "progress" field.
-func (m *GroupProgressMutation) ResetProgress() {
+func (m *GroupzProgressMutation) ResetProgress() {
 	m.progress = nil
 	m.addprogress = nil
 }
 
 // SetSubEventID sets the "sub_event" edge to the SubEvent entity by id.
-func (m *GroupProgressMutation) SetSubEventID(id int64) {
+func (m *GroupzProgressMutation) SetSubEventID(id int64) {
 	m.sub_event = &id
 }
 
 // ClearSubEvent clears the "sub_event" edge to the SubEvent entity.
-func (m *GroupProgressMutation) ClearSubEvent() {
+func (m *GroupzProgressMutation) ClearSubEvent() {
 	m.clearedsub_event = true
 }
 
 // SubEventCleared reports if the "sub_event" edge to the SubEvent entity was cleared.
-func (m *GroupProgressMutation) SubEventCleared() bool {
+func (m *GroupzProgressMutation) SubEventCleared() bool {
 	return m.clearedsub_event
 }
 
 // SubEventID returns the "sub_event" edge ID in the mutation.
-func (m *GroupProgressMutation) SubEventID() (id int64, exists bool) {
+func (m *GroupzProgressMutation) SubEventID() (id int64, exists bool) {
 	if m.sub_event != nil {
 		return *m.sub_event, true
 	}
@@ -1957,7 +1950,7 @@ func (m *GroupProgressMutation) SubEventID() (id int64, exists bool) {
 // SubEventIDs returns the "sub_event" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // SubEventID instead. It exists only for internal usage by the builders.
-func (m *GroupProgressMutation) SubEventIDs() (ids []int64) {
+func (m *GroupzProgressMutation) SubEventIDs() (ids []int64) {
 	if id := m.sub_event; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1965,13 +1958,13 @@ func (m *GroupProgressMutation) SubEventIDs() (ids []int64) {
 }
 
 // ResetSubEvent resets all changes to the "sub_event" edge.
-func (m *GroupProgressMutation) ResetSubEvent() {
+func (m *GroupzProgressMutation) ResetSubEvent() {
 	m.sub_event = nil
 	m.clearedsub_event = false
 }
 
 // AddMemberIDs adds the "member" edge to the MemberProgress entity by ids.
-func (m *GroupProgressMutation) AddMemberIDs(ids ...int64) {
+func (m *GroupzProgressMutation) AddMemberIDs(ids ...int64) {
 	if m.member == nil {
 		m.member = make(map[int64]struct{})
 	}
@@ -1981,17 +1974,17 @@ func (m *GroupProgressMutation) AddMemberIDs(ids ...int64) {
 }
 
 // ClearMember clears the "member" edge to the MemberProgress entity.
-func (m *GroupProgressMutation) ClearMember() {
+func (m *GroupzProgressMutation) ClearMember() {
 	m.clearedmember = true
 }
 
 // MemberCleared reports if the "member" edge to the MemberProgress entity was cleared.
-func (m *GroupProgressMutation) MemberCleared() bool {
+func (m *GroupzProgressMutation) MemberCleared() bool {
 	return m.clearedmember
 }
 
 // RemoveMemberIDs removes the "member" edge to the MemberProgress entity by IDs.
-func (m *GroupProgressMutation) RemoveMemberIDs(ids ...int64) {
+func (m *GroupzProgressMutation) RemoveMemberIDs(ids ...int64) {
 	if m.removedmember == nil {
 		m.removedmember = make(map[int64]struct{})
 	}
@@ -2002,7 +1995,7 @@ func (m *GroupProgressMutation) RemoveMemberIDs(ids ...int64) {
 }
 
 // RemovedMember returns the removed IDs of the "member" edge to the MemberProgress entity.
-func (m *GroupProgressMutation) RemovedMemberIDs() (ids []int64) {
+func (m *GroupzProgressMutation) RemovedMemberIDs() (ids []int64) {
 	for id := range m.removedmember {
 		ids = append(ids, id)
 	}
@@ -2010,7 +2003,7 @@ func (m *GroupProgressMutation) RemovedMemberIDs() (ids []int64) {
 }
 
 // MemberIDs returns the "member" edge IDs in the mutation.
-func (m *GroupProgressMutation) MemberIDs() (ids []int64) {
+func (m *GroupzProgressMutation) MemberIDs() (ids []int64) {
 	for id := range m.member {
 		ids = append(ids, id)
 	}
@@ -2018,21 +2011,21 @@ func (m *GroupProgressMutation) MemberIDs() (ids []int64) {
 }
 
 // ResetMember resets all changes to the "member" edge.
-func (m *GroupProgressMutation) ResetMember() {
+func (m *GroupzProgressMutation) ResetMember() {
 	m.member = nil
 	m.clearedmember = false
 	m.removedmember = nil
 }
 
-// Where appends a list predicates to the GroupProgressMutation builder.
-func (m *GroupProgressMutation) Where(ps ...predicate.GroupProgress) {
+// Where appends a list predicates to the GroupzProgressMutation builder.
+func (m *GroupzProgressMutation) Where(ps ...predicate.GroupzProgress) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the GroupProgressMutation builder. Using this method,
+// WhereP appends storage-level predicates to the GroupzProgressMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *GroupProgressMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.GroupProgress, len(ps))
+func (m *GroupzProgressMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.GroupzProgress, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -2040,30 +2033,30 @@ func (m *GroupProgressMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *GroupProgressMutation) Op() Op {
+func (m *GroupzProgressMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *GroupProgressMutation) SetOp(op Op) {
+func (m *GroupzProgressMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (GroupProgress).
-func (m *GroupProgressMutation) Type() string {
+// Type returns the node type of this mutation (GroupzProgress).
+func (m *GroupzProgressMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *GroupProgressMutation) Fields() []string {
+func (m *GroupzProgressMutation) Fields() []string {
 	fields := make([]string, 0, 2)
 	if m.group_id != nil {
-		fields = append(fields, groupprogress.FieldGroupID)
+		fields = append(fields, groupzprogress.FieldGroupID)
 	}
 	if m.progress != nil {
-		fields = append(fields, groupprogress.FieldProgress)
+		fields = append(fields, groupzprogress.FieldProgress)
 	}
 	return fields
 }
@@ -2071,11 +2064,11 @@ func (m *GroupProgressMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *GroupProgressMutation) Field(name string) (ent.Value, bool) {
+func (m *GroupzProgressMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case groupprogress.FieldGroupID:
+	case groupzprogress.FieldGroupID:
 		return m.GroupID()
-	case groupprogress.FieldProgress:
+	case groupzprogress.FieldProgress:
 		return m.Progress()
 	}
 	return nil, false
@@ -2084,29 +2077,29 @@ func (m *GroupProgressMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *GroupProgressMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *GroupzProgressMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case groupprogress.FieldGroupID:
+	case groupzprogress.FieldGroupID:
 		return m.OldGroupID(ctx)
-	case groupprogress.FieldProgress:
+	case groupzprogress.FieldProgress:
 		return m.OldProgress(ctx)
 	}
-	return nil, fmt.Errorf("unknown GroupProgress field %s", name)
+	return nil, fmt.Errorf("unknown GroupzProgress field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *GroupProgressMutation) SetField(name string, value ent.Value) error {
+func (m *GroupzProgressMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case groupprogress.FieldGroupID:
+	case groupzprogress.FieldGroupID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetGroupID(v)
 		return nil
-	case groupprogress.FieldProgress:
+	case groupzprogress.FieldProgress:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -2114,18 +2107,18 @@ func (m *GroupProgressMutation) SetField(name string, value ent.Value) error {
 		m.SetProgress(v)
 		return nil
 	}
-	return fmt.Errorf("unknown GroupProgress field %s", name)
+	return fmt.Errorf("unknown GroupzProgress field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *GroupProgressMutation) AddedFields() []string {
+func (m *GroupzProgressMutation) AddedFields() []string {
 	var fields []string
 	if m.addgroup_id != nil {
-		fields = append(fields, groupprogress.FieldGroupID)
+		fields = append(fields, groupzprogress.FieldGroupID)
 	}
 	if m.addprogress != nil {
-		fields = append(fields, groupprogress.FieldProgress)
+		fields = append(fields, groupzprogress.FieldProgress)
 	}
 	return fields
 }
@@ -2133,11 +2126,11 @@ func (m *GroupProgressMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *GroupProgressMutation) AddedField(name string) (ent.Value, bool) {
+func (m *GroupzProgressMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case groupprogress.FieldGroupID:
+	case groupzprogress.FieldGroupID:
 		return m.AddedGroupID()
-	case groupprogress.FieldProgress:
+	case groupzprogress.FieldProgress:
 		return m.AddedProgress()
 	}
 	return nil, false
@@ -2146,16 +2139,16 @@ func (m *GroupProgressMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *GroupProgressMutation) AddField(name string, value ent.Value) error {
+func (m *GroupzProgressMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case groupprogress.FieldGroupID:
+	case groupzprogress.FieldGroupID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddGroupID(v)
 		return nil
-	case groupprogress.FieldProgress:
+	case groupzprogress.FieldProgress:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -2163,63 +2156,63 @@ func (m *GroupProgressMutation) AddField(name string, value ent.Value) error {
 		m.AddProgress(v)
 		return nil
 	}
-	return fmt.Errorf("unknown GroupProgress numeric field %s", name)
+	return fmt.Errorf("unknown GroupzProgress numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *GroupProgressMutation) ClearedFields() []string {
+func (m *GroupzProgressMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *GroupProgressMutation) FieldCleared(name string) bool {
+func (m *GroupzProgressMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *GroupProgressMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown GroupProgress nullable field %s", name)
+func (m *GroupzProgressMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown GroupzProgress nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *GroupProgressMutation) ResetField(name string) error {
+func (m *GroupzProgressMutation) ResetField(name string) error {
 	switch name {
-	case groupprogress.FieldGroupID:
+	case groupzprogress.FieldGroupID:
 		m.ResetGroupID()
 		return nil
-	case groupprogress.FieldProgress:
+	case groupzprogress.FieldProgress:
 		m.ResetProgress()
 		return nil
 	}
-	return fmt.Errorf("unknown GroupProgress field %s", name)
+	return fmt.Errorf("unknown GroupzProgress field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *GroupProgressMutation) AddedEdges() []string {
+func (m *GroupzProgressMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.sub_event != nil {
-		edges = append(edges, groupprogress.EdgeSubEvent)
+		edges = append(edges, groupzprogress.EdgeSubEvent)
 	}
 	if m.member != nil {
-		edges = append(edges, groupprogress.EdgeMember)
+		edges = append(edges, groupzprogress.EdgeMember)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *GroupProgressMutation) AddedIDs(name string) []ent.Value {
+func (m *GroupzProgressMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case groupprogress.EdgeSubEvent:
+	case groupzprogress.EdgeSubEvent:
 		if id := m.sub_event; id != nil {
 			return []ent.Value{*id}
 		}
-	case groupprogress.EdgeMember:
+	case groupzprogress.EdgeMember:
 		ids := make([]ent.Value, 0, len(m.member))
 		for id := range m.member {
 			ids = append(ids, id)
@@ -2230,19 +2223,19 @@ func (m *GroupProgressMutation) AddedIDs(name string) []ent.Value {
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *GroupProgressMutation) RemovedEdges() []string {
+func (m *GroupzProgressMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.removedmember != nil {
-		edges = append(edges, groupprogress.EdgeMember)
+		edges = append(edges, groupzprogress.EdgeMember)
 	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *GroupProgressMutation) RemovedIDs(name string) []ent.Value {
+func (m *GroupzProgressMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case groupprogress.EdgeMember:
+	case groupzprogress.EdgeMember:
 		ids := make([]ent.Value, 0, len(m.removedmember))
 		for id := range m.removedmember {
 			ids = append(ids, id)
@@ -2253,24 +2246,24 @@ func (m *GroupProgressMutation) RemovedIDs(name string) []ent.Value {
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *GroupProgressMutation) ClearedEdges() []string {
+func (m *GroupzProgressMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.clearedsub_event {
-		edges = append(edges, groupprogress.EdgeSubEvent)
+		edges = append(edges, groupzprogress.EdgeSubEvent)
 	}
 	if m.clearedmember {
-		edges = append(edges, groupprogress.EdgeMember)
+		edges = append(edges, groupzprogress.EdgeMember)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *GroupProgressMutation) EdgeCleared(name string) bool {
+func (m *GroupzProgressMutation) EdgeCleared(name string) bool {
 	switch name {
-	case groupprogress.EdgeSubEvent:
+	case groupzprogress.EdgeSubEvent:
 		return m.clearedsub_event
-	case groupprogress.EdgeMember:
+	case groupzprogress.EdgeMember:
 		return m.clearedmember
 	}
 	return false
@@ -2278,27 +2271,27 @@ func (m *GroupProgressMutation) EdgeCleared(name string) bool {
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *GroupProgressMutation) ClearEdge(name string) error {
+func (m *GroupzProgressMutation) ClearEdge(name string) error {
 	switch name {
-	case groupprogress.EdgeSubEvent:
+	case groupzprogress.EdgeSubEvent:
 		m.ClearSubEvent()
 		return nil
 	}
-	return fmt.Errorf("unknown GroupProgress unique edge %s", name)
+	return fmt.Errorf("unknown GroupzProgress unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *GroupProgressMutation) ResetEdge(name string) error {
+func (m *GroupzProgressMutation) ResetEdge(name string) error {
 	switch name {
-	case groupprogress.EdgeSubEvent:
+	case groupzprogress.EdgeSubEvent:
 		m.ResetSubEvent()
 		return nil
-	case groupprogress.EdgeMember:
+	case groupzprogress.EdgeMember:
 		m.ResetMember()
 		return nil
 	}
-	return fmt.Errorf("unknown GroupProgress edge %s", name)
+	return fmt.Errorf("unknown GroupzProgress edge %s", name)
 }
 
 // MemberProgressMutation represents an operation that mutates the MemberProgress nodes in the graph.
@@ -2593,17 +2586,17 @@ func (m *MemberProgressMutation) ResetProgress() {
 	m.addprogress = nil
 }
 
-// SetGroupID sets the "group" edge to the GroupProgress entity by id.
+// SetGroupID sets the "group" edge to the GroupzProgress entity by id.
 func (m *MemberProgressMutation) SetGroupID(id int64) {
 	m.group = &id
 }
 
-// ClearGroup clears the "group" edge to the GroupProgress entity.
+// ClearGroup clears the "group" edge to the GroupzProgress entity.
 func (m *MemberProgressMutation) ClearGroup() {
 	m.clearedgroup = true
 }
 
-// GroupCleared reports if the "group" edge to the GroupProgress entity was cleared.
+// GroupCleared reports if the "group" edge to the GroupzProgress entity was cleared.
 func (m *MemberProgressMutation) GroupCleared() bool {
 	return m.clearedgroup
 }
@@ -3455,7 +3448,7 @@ func (m *SubEventMutation) ResetEvent() {
 	m.clearedevent = false
 }
 
-// AddGroupIDs adds the "group" edge to the GroupProgress entity by ids.
+// AddGroupIDs adds the "group" edge to the GroupzProgress entity by ids.
 func (m *SubEventMutation) AddGroupIDs(ids ...int64) {
 	if m.group == nil {
 		m.group = make(map[int64]struct{})
@@ -3465,17 +3458,17 @@ func (m *SubEventMutation) AddGroupIDs(ids ...int64) {
 	}
 }
 
-// ClearGroup clears the "group" edge to the GroupProgress entity.
+// ClearGroup clears the "group" edge to the GroupzProgress entity.
 func (m *SubEventMutation) ClearGroup() {
 	m.clearedgroup = true
 }
 
-// GroupCleared reports if the "group" edge to the GroupProgress entity was cleared.
+// GroupCleared reports if the "group" edge to the GroupzProgress entity was cleared.
 func (m *SubEventMutation) GroupCleared() bool {
 	return m.clearedgroup
 }
 
-// RemoveGroupIDs removes the "group" edge to the GroupProgress entity by IDs.
+// RemoveGroupIDs removes the "group" edge to the GroupzProgress entity by IDs.
 func (m *SubEventMutation) RemoveGroupIDs(ids ...int64) {
 	if m.removedgroup == nil {
 		m.removedgroup = make(map[int64]struct{})
@@ -3486,7 +3479,7 @@ func (m *SubEventMutation) RemoveGroupIDs(ids ...int64) {
 	}
 }
 
-// RemovedGroup returns the removed IDs of the "group" edge to the GroupProgress entity.
+// RemovedGroup returns the removed IDs of the "group" edge to the GroupzProgress entity.
 func (m *SubEventMutation) RemovedGroupIDs() (ids []int64) {
 	for id := range m.removedgroup {
 		ids = append(ids, id)

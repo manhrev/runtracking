@@ -21,6 +21,8 @@ func (Event) Fields() []ent.Field {
 			Optional(),
 		field.Time("created_at").
 			Default(time.Now),
+		field.Time("start_at").
+			Default(time.Now),
 		field.Time("updated_at").
 			Default(time.Now),
 		field.String("picture").
@@ -37,6 +39,6 @@ func (Event) Fields() []ent.Field {
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("subevents", SubEvent.Type),
-		edge.To("groups", EventGroup.Type),
+		edge.To("groups", EventGroupz.Type),
 	}
 }

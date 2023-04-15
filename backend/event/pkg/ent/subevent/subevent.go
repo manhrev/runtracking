@@ -42,10 +42,10 @@ const (
 	// EventColumn is the table column denoting the event relation/edge.
 	EventColumn = "event_subevents"
 	// GroupTable is the table that holds the group relation/edge.
-	GroupTable = "group_progresses"
-	// GroupInverseTable is the table name for the GroupProgress entity.
-	// It exists in this package in order to avoid circular dependency with the "groupprogress" package.
-	GroupInverseTable = "group_progresses"
+	GroupTable = "groupz_progresses"
+	// GroupInverseTable is the table name for the GroupzProgress entity.
+	// It exists in this package in order to avoid circular dependency with the "groupzprogress" package.
+	GroupInverseTable = "groupz_progresses"
 	// GroupColumn is the table column denoting the group relation/edge.
 	GroupColumn = "sub_event_group"
 )

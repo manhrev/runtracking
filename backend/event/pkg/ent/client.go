@@ -15,8 +15,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -28,10 +28,10 @@ type Client struct {
 	Schema *migrate.Schema
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
-	// EventGroup is the client for interacting with the EventGroup builders.
-	EventGroup *EventGroupClient
-	// GroupProgress is the client for interacting with the GroupProgress builders.
-	GroupProgress *GroupProgressClient
+	// EventGroupz is the client for interacting with the EventGroupz builders.
+	EventGroupz *EventGroupzClient
+	// GroupzProgress is the client for interacting with the GroupzProgress builders.
+	GroupzProgress *GroupzProgressClient
 	// MemberProgress is the client for interacting with the MemberProgress builders.
 	MemberProgress *MemberProgressClient
 	// SubEvent is the client for interacting with the SubEvent builders.
@@ -50,8 +50,8 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Event = NewEventClient(c.config)
-	c.EventGroup = NewEventGroupClient(c.config)
-	c.GroupProgress = NewGroupProgressClient(c.config)
+	c.EventGroupz = NewEventGroupzClient(c.config)
+	c.GroupzProgress = NewGroupzProgressClient(c.config)
 	c.MemberProgress = NewMemberProgressClient(c.config)
 	c.SubEvent = NewSubEventClient(c.config)
 }
@@ -137,8 +137,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:            ctx,
 		config:         cfg,
 		Event:          NewEventClient(cfg),
-		EventGroup:     NewEventGroupClient(cfg),
-		GroupProgress:  NewGroupProgressClient(cfg),
+		EventGroupz:    NewEventGroupzClient(cfg),
+		GroupzProgress: NewGroupzProgressClient(cfg),
 		MemberProgress: NewMemberProgressClient(cfg),
 		SubEvent:       NewSubEventClient(cfg),
 	}, nil
@@ -161,8 +161,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:            ctx,
 		config:         cfg,
 		Event:          NewEventClient(cfg),
-		EventGroup:     NewEventGroupClient(cfg),
-		GroupProgress:  NewGroupProgressClient(cfg),
+		EventGroupz:    NewEventGroupzClient(cfg),
+		GroupzProgress: NewGroupzProgressClient(cfg),
 		MemberProgress: NewMemberProgressClient(cfg),
 		SubEvent:       NewSubEventClient(cfg),
 	}, nil
@@ -195,8 +195,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Event.Use(hooks...)
-	c.EventGroup.Use(hooks...)
-	c.GroupProgress.Use(hooks...)
+	c.EventGroupz.Use(hooks...)
+	c.GroupzProgress.Use(hooks...)
 	c.MemberProgress.Use(hooks...)
 	c.SubEvent.Use(hooks...)
 }
@@ -205,8 +205,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Event.Intercept(interceptors...)
-	c.EventGroup.Intercept(interceptors...)
-	c.GroupProgress.Intercept(interceptors...)
+	c.EventGroupz.Intercept(interceptors...)
+	c.GroupzProgress.Intercept(interceptors...)
 	c.MemberProgress.Intercept(interceptors...)
 	c.SubEvent.Intercept(interceptors...)
 }
@@ -216,10 +216,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *EventMutation:
 		return c.Event.mutate(ctx, m)
-	case *EventGroupMutation:
-		return c.EventGroup.mutate(ctx, m)
-	case *GroupProgressMutation:
-		return c.GroupProgress.mutate(ctx, m)
+	case *EventGroupzMutation:
+		return c.EventGroupz.mutate(ctx, m)
+	case *GroupzProgressMutation:
+		return c.GroupzProgress.mutate(ctx, m)
 	case *MemberProgressMutation:
 		return c.MemberProgress.mutate(ctx, m)
 	case *SubEventMutation:
@@ -339,14 +339,14 @@ func (c *EventClient) QuerySubevents(e *Event) *SubEventQuery {
 }
 
 // QueryGroups queries the groups edge of a Event.
-func (c *EventClient) QueryGroups(e *Event) *EventGroupQuery {
-	query := (&EventGroupClient{config: c.config}).Query()
+func (c *EventClient) QueryGroups(e *Event) *EventGroupzQuery {
+	query := (&EventGroupzClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(event.Table, event.FieldID, id),
-			sqlgraph.To(eventgroup.Table, eventgroup.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, event.GroupsTable, event.GroupsColumn),
+			sqlgraph.To(eventgroupz.Table, eventgroupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, event.GroupsTable, event.GroupsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -379,92 +379,92 @@ func (c *EventClient) mutate(ctx context.Context, m *EventMutation) (Value, erro
 	}
 }
 
-// EventGroupClient is a client for the EventGroup schema.
-type EventGroupClient struct {
+// EventGroupzClient is a client for the EventGroupz schema.
+type EventGroupzClient struct {
 	config
 }
 
-// NewEventGroupClient returns a client for the EventGroup from the given config.
-func NewEventGroupClient(c config) *EventGroupClient {
-	return &EventGroupClient{config: c}
+// NewEventGroupzClient returns a client for the EventGroupz from the given config.
+func NewEventGroupzClient(c config) *EventGroupzClient {
+	return &EventGroupzClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `eventgroup.Hooks(f(g(h())))`.
-func (c *EventGroupClient) Use(hooks ...Hook) {
-	c.hooks.EventGroup = append(c.hooks.EventGroup, hooks...)
+// A call to `Use(f, g, h)` equals to `eventgroupz.Hooks(f(g(h())))`.
+func (c *EventGroupzClient) Use(hooks ...Hook) {
+	c.hooks.EventGroupz = append(c.hooks.EventGroupz, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `eventgroup.Intercept(f(g(h())))`.
-func (c *EventGroupClient) Intercept(interceptors ...Interceptor) {
-	c.inters.EventGroup = append(c.inters.EventGroup, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `eventgroupz.Intercept(f(g(h())))`.
+func (c *EventGroupzClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EventGroupz = append(c.inters.EventGroupz, interceptors...)
 }
 
-// Create returns a builder for creating a EventGroup entity.
-func (c *EventGroupClient) Create() *EventGroupCreate {
-	mutation := newEventGroupMutation(c.config, OpCreate)
-	return &EventGroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a EventGroupz entity.
+func (c *EventGroupzClient) Create() *EventGroupzCreate {
+	mutation := newEventGroupzMutation(c.config, OpCreate)
+	return &EventGroupzCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of EventGroup entities.
-func (c *EventGroupClient) CreateBulk(builders ...*EventGroupCreate) *EventGroupCreateBulk {
-	return &EventGroupCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of EventGroupz entities.
+func (c *EventGroupzClient) CreateBulk(builders ...*EventGroupzCreate) *EventGroupzCreateBulk {
+	return &EventGroupzCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for EventGroup.
-func (c *EventGroupClient) Update() *EventGroupUpdate {
-	mutation := newEventGroupMutation(c.config, OpUpdate)
-	return &EventGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for EventGroupz.
+func (c *EventGroupzClient) Update() *EventGroupzUpdate {
+	mutation := newEventGroupzMutation(c.config, OpUpdate)
+	return &EventGroupzUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *EventGroupClient) UpdateOne(eg *EventGroup) *EventGroupUpdateOne {
-	mutation := newEventGroupMutation(c.config, OpUpdateOne, withEventGroup(eg))
-	return &EventGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventGroupzClient) UpdateOne(eg *EventGroupz) *EventGroupzUpdateOne {
+	mutation := newEventGroupzMutation(c.config, OpUpdateOne, withEventGroupz(eg))
+	return &EventGroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EventGroupClient) UpdateOneID(id int64) *EventGroupUpdateOne {
-	mutation := newEventGroupMutation(c.config, OpUpdateOne, withEventGroupID(id))
-	return &EventGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventGroupzClient) UpdateOneID(id int64) *EventGroupzUpdateOne {
+	mutation := newEventGroupzMutation(c.config, OpUpdateOne, withEventGroupzID(id))
+	return &EventGroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for EventGroup.
-func (c *EventGroupClient) Delete() *EventGroupDelete {
-	mutation := newEventGroupMutation(c.config, OpDelete)
-	return &EventGroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for EventGroupz.
+func (c *EventGroupzClient) Delete() *EventGroupzDelete {
+	mutation := newEventGroupzMutation(c.config, OpDelete)
+	return &EventGroupzDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *EventGroupClient) DeleteOne(eg *EventGroup) *EventGroupDeleteOne {
+func (c *EventGroupzClient) DeleteOne(eg *EventGroupz) *EventGroupzDeleteOne {
 	return c.DeleteOneID(eg.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EventGroupClient) DeleteOneID(id int64) *EventGroupDeleteOne {
-	builder := c.Delete().Where(eventgroup.ID(id))
+func (c *EventGroupzClient) DeleteOneID(id int64) *EventGroupzDeleteOne {
+	builder := c.Delete().Where(eventgroupz.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &EventGroupDeleteOne{builder}
+	return &EventGroupzDeleteOne{builder}
 }
 
-// Query returns a query builder for EventGroup.
-func (c *EventGroupClient) Query() *EventGroupQuery {
-	return &EventGroupQuery{
+// Query returns a query builder for EventGroupz.
+func (c *EventGroupzClient) Query() *EventGroupzQuery {
+	return &EventGroupzQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeEventGroup},
+		ctx:    &QueryContext{Type: TypeEventGroupz},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a EventGroup entity by its id.
-func (c *EventGroupClient) Get(ctx context.Context, id int64) (*EventGroup, error) {
-	return c.Query().Where(eventgroup.ID(id)).Only(ctx)
+// Get returns a EventGroupz entity by its id.
+func (c *EventGroupzClient) Get(ctx context.Context, id int64) (*EventGroupz, error) {
+	return c.Query().Where(eventgroupz.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EventGroupClient) GetX(ctx context.Context, id int64) *EventGroup {
+func (c *EventGroupzClient) GetX(ctx context.Context, id int64) *EventGroupz {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -472,15 +472,15 @@ func (c *EventGroupClient) GetX(ctx context.Context, id int64) *EventGroup {
 	return obj
 }
 
-// QueryEvent queries the event edge of a EventGroup.
-func (c *EventGroupClient) QueryEvent(eg *EventGroup) *EventQuery {
+// QueryEvent queries the event edge of a EventGroupz.
+func (c *EventGroupzClient) QueryEvent(eg *EventGroupz) *EventQuery {
 	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := eg.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(eventgroup.Table, eventgroup.FieldID, id),
+			sqlgraph.From(eventgroupz.Table, eventgroupz.FieldID, id),
 			sqlgraph.To(event.Table, event.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, eventgroup.EventTable, eventgroup.EventColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, eventgroupz.EventTable, eventgroupz.EventPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(eg.driver.Dialect(), step)
 		return fromV, nil
@@ -489,116 +489,116 @@ func (c *EventGroupClient) QueryEvent(eg *EventGroup) *EventQuery {
 }
 
 // Hooks returns the client hooks.
-func (c *EventGroupClient) Hooks() []Hook {
-	return c.hooks.EventGroup
+func (c *EventGroupzClient) Hooks() []Hook {
+	return c.hooks.EventGroupz
 }
 
 // Interceptors returns the client interceptors.
-func (c *EventGroupClient) Interceptors() []Interceptor {
-	return c.inters.EventGroup
+func (c *EventGroupzClient) Interceptors() []Interceptor {
+	return c.inters.EventGroupz
 }
 
-func (c *EventGroupClient) mutate(ctx context.Context, m *EventGroupMutation) (Value, error) {
+func (c *EventGroupzClient) mutate(ctx context.Context, m *EventGroupzMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&EventGroupCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventGroupzCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&EventGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventGroupzUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&EventGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventGroupzUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&EventGroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&EventGroupzDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown EventGroup mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown EventGroupz mutation op: %q", m.Op())
 	}
 }
 
-// GroupProgressClient is a client for the GroupProgress schema.
-type GroupProgressClient struct {
+// GroupzProgressClient is a client for the GroupzProgress schema.
+type GroupzProgressClient struct {
 	config
 }
 
-// NewGroupProgressClient returns a client for the GroupProgress from the given config.
-func NewGroupProgressClient(c config) *GroupProgressClient {
-	return &GroupProgressClient{config: c}
+// NewGroupzProgressClient returns a client for the GroupzProgress from the given config.
+func NewGroupzProgressClient(c config) *GroupzProgressClient {
+	return &GroupzProgressClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `groupprogress.Hooks(f(g(h())))`.
-func (c *GroupProgressClient) Use(hooks ...Hook) {
-	c.hooks.GroupProgress = append(c.hooks.GroupProgress, hooks...)
+// A call to `Use(f, g, h)` equals to `groupzprogress.Hooks(f(g(h())))`.
+func (c *GroupzProgressClient) Use(hooks ...Hook) {
+	c.hooks.GroupzProgress = append(c.hooks.GroupzProgress, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `groupprogress.Intercept(f(g(h())))`.
-func (c *GroupProgressClient) Intercept(interceptors ...Interceptor) {
-	c.inters.GroupProgress = append(c.inters.GroupProgress, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `groupzprogress.Intercept(f(g(h())))`.
+func (c *GroupzProgressClient) Intercept(interceptors ...Interceptor) {
+	c.inters.GroupzProgress = append(c.inters.GroupzProgress, interceptors...)
 }
 
-// Create returns a builder for creating a GroupProgress entity.
-func (c *GroupProgressClient) Create() *GroupProgressCreate {
-	mutation := newGroupProgressMutation(c.config, OpCreate)
-	return &GroupProgressCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a GroupzProgress entity.
+func (c *GroupzProgressClient) Create() *GroupzProgressCreate {
+	mutation := newGroupzProgressMutation(c.config, OpCreate)
+	return &GroupzProgressCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of GroupProgress entities.
-func (c *GroupProgressClient) CreateBulk(builders ...*GroupProgressCreate) *GroupProgressCreateBulk {
-	return &GroupProgressCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of GroupzProgress entities.
+func (c *GroupzProgressClient) CreateBulk(builders ...*GroupzProgressCreate) *GroupzProgressCreateBulk {
+	return &GroupzProgressCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for GroupProgress.
-func (c *GroupProgressClient) Update() *GroupProgressUpdate {
-	mutation := newGroupProgressMutation(c.config, OpUpdate)
-	return &GroupProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for GroupzProgress.
+func (c *GroupzProgressClient) Update() *GroupzProgressUpdate {
+	mutation := newGroupzProgressMutation(c.config, OpUpdate)
+	return &GroupzProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *GroupProgressClient) UpdateOne(gp *GroupProgress) *GroupProgressUpdateOne {
-	mutation := newGroupProgressMutation(c.config, OpUpdateOne, withGroupProgress(gp))
-	return &GroupProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *GroupzProgressClient) UpdateOne(gp *GroupzProgress) *GroupzProgressUpdateOne {
+	mutation := newGroupzProgressMutation(c.config, OpUpdateOne, withGroupzProgress(gp))
+	return &GroupzProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *GroupProgressClient) UpdateOneID(id int64) *GroupProgressUpdateOne {
-	mutation := newGroupProgressMutation(c.config, OpUpdateOne, withGroupProgressID(id))
-	return &GroupProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *GroupzProgressClient) UpdateOneID(id int64) *GroupzProgressUpdateOne {
+	mutation := newGroupzProgressMutation(c.config, OpUpdateOne, withGroupzProgressID(id))
+	return &GroupzProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for GroupProgress.
-func (c *GroupProgressClient) Delete() *GroupProgressDelete {
-	mutation := newGroupProgressMutation(c.config, OpDelete)
-	return &GroupProgressDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for GroupzProgress.
+func (c *GroupzProgressClient) Delete() *GroupzProgressDelete {
+	mutation := newGroupzProgressMutation(c.config, OpDelete)
+	return &GroupzProgressDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *GroupProgressClient) DeleteOne(gp *GroupProgress) *GroupProgressDeleteOne {
+func (c *GroupzProgressClient) DeleteOne(gp *GroupzProgress) *GroupzProgressDeleteOne {
 	return c.DeleteOneID(gp.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *GroupProgressClient) DeleteOneID(id int64) *GroupProgressDeleteOne {
-	builder := c.Delete().Where(groupprogress.ID(id))
+func (c *GroupzProgressClient) DeleteOneID(id int64) *GroupzProgressDeleteOne {
+	builder := c.Delete().Where(groupzprogress.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &GroupProgressDeleteOne{builder}
+	return &GroupzProgressDeleteOne{builder}
 }
 
-// Query returns a query builder for GroupProgress.
-func (c *GroupProgressClient) Query() *GroupProgressQuery {
-	return &GroupProgressQuery{
+// Query returns a query builder for GroupzProgress.
+func (c *GroupzProgressClient) Query() *GroupzProgressQuery {
+	return &GroupzProgressQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeGroupProgress},
+		ctx:    &QueryContext{Type: TypeGroupzProgress},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a GroupProgress entity by its id.
-func (c *GroupProgressClient) Get(ctx context.Context, id int64) (*GroupProgress, error) {
-	return c.Query().Where(groupprogress.ID(id)).Only(ctx)
+// Get returns a GroupzProgress entity by its id.
+func (c *GroupzProgressClient) Get(ctx context.Context, id int64) (*GroupzProgress, error) {
+	return c.Query().Where(groupzprogress.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *GroupProgressClient) GetX(ctx context.Context, id int64) *GroupProgress {
+func (c *GroupzProgressClient) GetX(ctx context.Context, id int64) *GroupzProgress {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -606,15 +606,15 @@ func (c *GroupProgressClient) GetX(ctx context.Context, id int64) *GroupProgress
 	return obj
 }
 
-// QuerySubEvent queries the sub_event edge of a GroupProgress.
-func (c *GroupProgressClient) QuerySubEvent(gp *GroupProgress) *SubEventQuery {
+// QuerySubEvent queries the sub_event edge of a GroupzProgress.
+func (c *GroupzProgressClient) QuerySubEvent(gp *GroupzProgress) *SubEventQuery {
 	query := (&SubEventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := gp.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(groupprogress.Table, groupprogress.FieldID, id),
+			sqlgraph.From(groupzprogress.Table, groupzprogress.FieldID, id),
 			sqlgraph.To(subevent.Table, subevent.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, groupprogress.SubEventTable, groupprogress.SubEventColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, groupzprogress.SubEventTable, groupzprogress.SubEventColumn),
 		)
 		fromV = sqlgraph.Neighbors(gp.driver.Dialect(), step)
 		return fromV, nil
@@ -622,15 +622,15 @@ func (c *GroupProgressClient) QuerySubEvent(gp *GroupProgress) *SubEventQuery {
 	return query
 }
 
-// QueryMember queries the member edge of a GroupProgress.
-func (c *GroupProgressClient) QueryMember(gp *GroupProgress) *MemberProgressQuery {
+// QueryMember queries the member edge of a GroupzProgress.
+func (c *GroupzProgressClient) QueryMember(gp *GroupzProgress) *MemberProgressQuery {
 	query := (&MemberProgressClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := gp.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(groupprogress.Table, groupprogress.FieldID, id),
+			sqlgraph.From(groupzprogress.Table, groupzprogress.FieldID, id),
 			sqlgraph.To(memberprogress.Table, memberprogress.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, groupprogress.MemberTable, groupprogress.MemberColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, groupzprogress.MemberTable, groupzprogress.MemberColumn),
 		)
 		fromV = sqlgraph.Neighbors(gp.driver.Dialect(), step)
 		return fromV, nil
@@ -639,27 +639,27 @@ func (c *GroupProgressClient) QueryMember(gp *GroupProgress) *MemberProgressQuer
 }
 
 // Hooks returns the client hooks.
-func (c *GroupProgressClient) Hooks() []Hook {
-	return c.hooks.GroupProgress
+func (c *GroupzProgressClient) Hooks() []Hook {
+	return c.hooks.GroupzProgress
 }
 
 // Interceptors returns the client interceptors.
-func (c *GroupProgressClient) Interceptors() []Interceptor {
-	return c.inters.GroupProgress
+func (c *GroupzProgressClient) Interceptors() []Interceptor {
+	return c.inters.GroupzProgress
 }
 
-func (c *GroupProgressClient) mutate(ctx context.Context, m *GroupProgressMutation) (Value, error) {
+func (c *GroupzProgressClient) mutate(ctx context.Context, m *GroupzProgressMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&GroupProgressCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&GroupzProgressCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&GroupProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&GroupzProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&GroupProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&GroupzProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&GroupProgressDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&GroupzProgressDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown GroupProgress mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown GroupzProgress mutation op: %q", m.Op())
 	}
 }
 
@@ -757,13 +757,13 @@ func (c *MemberProgressClient) GetX(ctx context.Context, id int64) *MemberProgre
 }
 
 // QueryGroup queries the group edge of a MemberProgress.
-func (c *MemberProgressClient) QueryGroup(mp *MemberProgress) *GroupProgressQuery {
-	query := (&GroupProgressClient{config: c.config}).Query()
+func (c *MemberProgressClient) QueryGroup(mp *MemberProgress) *GroupzProgressQuery {
+	query := (&GroupzProgressClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := mp.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(memberprogress.Table, memberprogress.FieldID, id),
-			sqlgraph.To(groupprogress.Table, groupprogress.FieldID),
+			sqlgraph.To(groupzprogress.Table, groupzprogress.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, memberprogress.GroupTable, memberprogress.GroupColumn),
 		)
 		fromV = sqlgraph.Neighbors(mp.driver.Dialect(), step)
@@ -907,13 +907,13 @@ func (c *SubEventClient) QueryEvent(se *SubEvent) *EventQuery {
 }
 
 // QueryGroup queries the group edge of a SubEvent.
-func (c *SubEventClient) QueryGroup(se *SubEvent) *GroupProgressQuery {
-	query := (&GroupProgressClient{config: c.config}).Query()
+func (c *SubEventClient) QueryGroup(se *SubEvent) *GroupzProgressQuery {
+	query := (&GroupzProgressClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := se.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subevent.Table, subevent.FieldID, id),
-			sqlgraph.To(groupprogress.Table, groupprogress.FieldID),
+			sqlgraph.To(groupzprogress.Table, groupzprogress.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, subevent.GroupTable, subevent.GroupColumn),
 		)
 		fromV = sqlgraph.Neighbors(se.driver.Dialect(), step)
@@ -950,9 +950,9 @@ func (c *SubEventClient) mutate(ctx context.Context, m *SubEventMutation) (Value
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Event, EventGroup, GroupProgress, MemberProgress, SubEvent []ent.Hook
+		Event, EventGroupz, GroupzProgress, MemberProgress, SubEvent []ent.Hook
 	}
 	inters struct {
-		Event, EventGroup, GroupProgress, MemberProgress, SubEvent []ent.Interceptor
+		Event, EventGroupz, GroupzProgress, MemberProgress, SubEvent []ent.Interceptor
 	}
 )

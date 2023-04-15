@@ -11,19 +11,19 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
-// GroupProgressQuery is the builder for querying GroupProgress entities.
-type GroupProgressQuery struct {
+// GroupzProgressQuery is the builder for querying GroupzProgress entities.
+type GroupzProgressQuery struct {
 	config
 	ctx          *QueryContext
-	order        []groupprogress.Order
+	order        []groupzprogress.Order
 	inters       []Interceptor
-	predicates   []predicate.GroupProgress
+	predicates   []predicate.GroupzProgress
 	withSubEvent *SubEventQuery
 	withMember   *MemberProgressQuery
 	withFKs      bool
@@ -33,39 +33,39 @@ type GroupProgressQuery struct {
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the GroupProgressQuery builder.
-func (gpq *GroupProgressQuery) Where(ps ...predicate.GroupProgress) *GroupProgressQuery {
+// Where adds a new predicate for the GroupzProgressQuery builder.
+func (gpq *GroupzProgressQuery) Where(ps ...predicate.GroupzProgress) *GroupzProgressQuery {
 	gpq.predicates = append(gpq.predicates, ps...)
 	return gpq
 }
 
 // Limit the number of records to be returned by this query.
-func (gpq *GroupProgressQuery) Limit(limit int) *GroupProgressQuery {
+func (gpq *GroupzProgressQuery) Limit(limit int) *GroupzProgressQuery {
 	gpq.ctx.Limit = &limit
 	return gpq
 }
 
 // Offset to start from.
-func (gpq *GroupProgressQuery) Offset(offset int) *GroupProgressQuery {
+func (gpq *GroupzProgressQuery) Offset(offset int) *GroupzProgressQuery {
 	gpq.ctx.Offset = &offset
 	return gpq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (gpq *GroupProgressQuery) Unique(unique bool) *GroupProgressQuery {
+func (gpq *GroupzProgressQuery) Unique(unique bool) *GroupzProgressQuery {
 	gpq.ctx.Unique = &unique
 	return gpq
 }
 
 // Order specifies how the records should be ordered.
-func (gpq *GroupProgressQuery) Order(o ...groupprogress.Order) *GroupProgressQuery {
+func (gpq *GroupzProgressQuery) Order(o ...groupzprogress.Order) *GroupzProgressQuery {
 	gpq.order = append(gpq.order, o...)
 	return gpq
 }
 
 // QuerySubEvent chains the current query on the "sub_event" edge.
-func (gpq *GroupProgressQuery) QuerySubEvent() *SubEventQuery {
+func (gpq *GroupzProgressQuery) QuerySubEvent() *SubEventQuery {
 	query := (&SubEventClient{config: gpq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := gpq.prepareQuery(ctx); err != nil {
@@ -76,9 +76,9 @@ func (gpq *GroupProgressQuery) QuerySubEvent() *SubEventQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(groupprogress.Table, groupprogress.FieldID, selector),
+			sqlgraph.From(groupzprogress.Table, groupzprogress.FieldID, selector),
 			sqlgraph.To(subevent.Table, subevent.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, groupprogress.SubEventTable, groupprogress.SubEventColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, groupzprogress.SubEventTable, groupzprogress.SubEventColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(gpq.driver.Dialect(), step)
 		return fromU, nil
@@ -87,7 +87,7 @@ func (gpq *GroupProgressQuery) QuerySubEvent() *SubEventQuery {
 }
 
 // QueryMember chains the current query on the "member" edge.
-func (gpq *GroupProgressQuery) QueryMember() *MemberProgressQuery {
+func (gpq *GroupzProgressQuery) QueryMember() *MemberProgressQuery {
 	query := (&MemberProgressClient{config: gpq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := gpq.prepareQuery(ctx); err != nil {
@@ -98,9 +98,9 @@ func (gpq *GroupProgressQuery) QueryMember() *MemberProgressQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(groupprogress.Table, groupprogress.FieldID, selector),
+			sqlgraph.From(groupzprogress.Table, groupzprogress.FieldID, selector),
 			sqlgraph.To(memberprogress.Table, memberprogress.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, groupprogress.MemberTable, groupprogress.MemberColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, groupzprogress.MemberTable, groupzprogress.MemberColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(gpq.driver.Dialect(), step)
 		return fromU, nil
@@ -108,21 +108,21 @@ func (gpq *GroupProgressQuery) QueryMember() *MemberProgressQuery {
 	return query
 }
 
-// First returns the first GroupProgress entity from the query.
-// Returns a *NotFoundError when no GroupProgress was found.
-func (gpq *GroupProgressQuery) First(ctx context.Context) (*GroupProgress, error) {
+// First returns the first GroupzProgress entity from the query.
+// Returns a *NotFoundError when no GroupzProgress was found.
+func (gpq *GroupzProgressQuery) First(ctx context.Context) (*GroupzProgress, error) {
 	nodes, err := gpq.Limit(1).All(setContextOp(ctx, gpq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{groupprogress.Label}
+		return nil, &NotFoundError{groupzprogress.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (gpq *GroupProgressQuery) FirstX(ctx context.Context) *GroupProgress {
+func (gpq *GroupzProgressQuery) FirstX(ctx context.Context) *GroupzProgress {
 	node, err := gpq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -130,22 +130,22 @@ func (gpq *GroupProgressQuery) FirstX(ctx context.Context) *GroupProgress {
 	return node
 }
 
-// FirstID returns the first GroupProgress ID from the query.
-// Returns a *NotFoundError when no GroupProgress ID was found.
-func (gpq *GroupProgressQuery) FirstID(ctx context.Context) (id int64, err error) {
+// FirstID returns the first GroupzProgress ID from the query.
+// Returns a *NotFoundError when no GroupzProgress ID was found.
+func (gpq *GroupzProgressQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = gpq.Limit(1).IDs(setContextOp(ctx, gpq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{groupprogress.Label}
+		err = &NotFoundError{groupzprogress.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (gpq *GroupProgressQuery) FirstIDX(ctx context.Context) int64 {
+func (gpq *GroupzProgressQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := gpq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -153,10 +153,10 @@ func (gpq *GroupProgressQuery) FirstIDX(ctx context.Context) int64 {
 	return id
 }
 
-// Only returns a single GroupProgress entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one GroupProgress entity is found.
-// Returns a *NotFoundError when no GroupProgress entities are found.
-func (gpq *GroupProgressQuery) Only(ctx context.Context) (*GroupProgress, error) {
+// Only returns a single GroupzProgress entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one GroupzProgress entity is found.
+// Returns a *NotFoundError when no GroupzProgress entities are found.
+func (gpq *GroupzProgressQuery) Only(ctx context.Context) (*GroupzProgress, error) {
 	nodes, err := gpq.Limit(2).All(setContextOp(ctx, gpq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -165,14 +165,14 @@ func (gpq *GroupProgressQuery) Only(ctx context.Context) (*GroupProgress, error)
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{groupprogress.Label}
+		return nil, &NotFoundError{groupzprogress.Label}
 	default:
-		return nil, &NotSingularError{groupprogress.Label}
+		return nil, &NotSingularError{groupzprogress.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (gpq *GroupProgressQuery) OnlyX(ctx context.Context) *GroupProgress {
+func (gpq *GroupzProgressQuery) OnlyX(ctx context.Context) *GroupzProgress {
 	node, err := gpq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -180,10 +180,10 @@ func (gpq *GroupProgressQuery) OnlyX(ctx context.Context) *GroupProgress {
 	return node
 }
 
-// OnlyID is like Only, but returns the only GroupProgress ID in the query.
-// Returns a *NotSingularError when more than one GroupProgress ID is found.
+// OnlyID is like Only, but returns the only GroupzProgress ID in the query.
+// Returns a *NotSingularError when more than one GroupzProgress ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (gpq *GroupProgressQuery) OnlyID(ctx context.Context) (id int64, err error) {
+func (gpq *GroupzProgressQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = gpq.Limit(2).IDs(setContextOp(ctx, gpq.ctx, "OnlyID")); err != nil {
 		return
@@ -192,15 +192,15 @@ func (gpq *GroupProgressQuery) OnlyID(ctx context.Context) (id int64, err error)
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{groupprogress.Label}
+		err = &NotFoundError{groupzprogress.Label}
 	default:
-		err = &NotSingularError{groupprogress.Label}
+		err = &NotSingularError{groupzprogress.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (gpq *GroupProgressQuery) OnlyIDX(ctx context.Context) int64 {
+func (gpq *GroupzProgressQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := gpq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -208,18 +208,18 @@ func (gpq *GroupProgressQuery) OnlyIDX(ctx context.Context) int64 {
 	return id
 }
 
-// All executes the query and returns a list of GroupProgresses.
-func (gpq *GroupProgressQuery) All(ctx context.Context) ([]*GroupProgress, error) {
+// All executes the query and returns a list of GroupzProgresses.
+func (gpq *GroupzProgressQuery) All(ctx context.Context) ([]*GroupzProgress, error) {
 	ctx = setContextOp(ctx, gpq.ctx, "All")
 	if err := gpq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*GroupProgress, *GroupProgressQuery]()
-	return withInterceptors[[]*GroupProgress](ctx, gpq, qr, gpq.inters)
+	qr := querierAll[[]*GroupzProgress, *GroupzProgressQuery]()
+	return withInterceptors[[]*GroupzProgress](ctx, gpq, qr, gpq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (gpq *GroupProgressQuery) AllX(ctx context.Context) []*GroupProgress {
+func (gpq *GroupzProgressQuery) AllX(ctx context.Context) []*GroupzProgress {
 	nodes, err := gpq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -227,20 +227,20 @@ func (gpq *GroupProgressQuery) AllX(ctx context.Context) []*GroupProgress {
 	return nodes
 }
 
-// IDs executes the query and returns a list of GroupProgress IDs.
-func (gpq *GroupProgressQuery) IDs(ctx context.Context) (ids []int64, err error) {
+// IDs executes the query and returns a list of GroupzProgress IDs.
+func (gpq *GroupzProgressQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if gpq.ctx.Unique == nil && gpq.path != nil {
 		gpq.Unique(true)
 	}
 	ctx = setContextOp(ctx, gpq.ctx, "IDs")
-	if err = gpq.Select(groupprogress.FieldID).Scan(ctx, &ids); err != nil {
+	if err = gpq.Select(groupzprogress.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (gpq *GroupProgressQuery) IDsX(ctx context.Context) []int64 {
+func (gpq *GroupzProgressQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := gpq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -249,16 +249,16 @@ func (gpq *GroupProgressQuery) IDsX(ctx context.Context) []int64 {
 }
 
 // Count returns the count of the given query.
-func (gpq *GroupProgressQuery) Count(ctx context.Context) (int, error) {
+func (gpq *GroupzProgressQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, gpq.ctx, "Count")
 	if err := gpq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, gpq, querierCount[*GroupProgressQuery](), gpq.inters)
+	return withInterceptors[int](ctx, gpq, querierCount[*GroupzProgressQuery](), gpq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (gpq *GroupProgressQuery) CountX(ctx context.Context) int {
+func (gpq *GroupzProgressQuery) CountX(ctx context.Context) int {
 	count, err := gpq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -267,7 +267,7 @@ func (gpq *GroupProgressQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (gpq *GroupProgressQuery) Exist(ctx context.Context) (bool, error) {
+func (gpq *GroupzProgressQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, gpq.ctx, "Exist")
 	switch _, err := gpq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -280,7 +280,7 @@ func (gpq *GroupProgressQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (gpq *GroupProgressQuery) ExistX(ctx context.Context) bool {
+func (gpq *GroupzProgressQuery) ExistX(ctx context.Context) bool {
 	exist, err := gpq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -288,18 +288,18 @@ func (gpq *GroupProgressQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the GroupProgressQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the GroupzProgressQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (gpq *GroupProgressQuery) Clone() *GroupProgressQuery {
+func (gpq *GroupzProgressQuery) Clone() *GroupzProgressQuery {
 	if gpq == nil {
 		return nil
 	}
-	return &GroupProgressQuery{
+	return &GroupzProgressQuery{
 		config:       gpq.config,
 		ctx:          gpq.ctx.Clone(),
-		order:        append([]groupprogress.Order{}, gpq.order...),
+		order:        append([]groupzprogress.Order{}, gpq.order...),
 		inters:       append([]Interceptor{}, gpq.inters...),
-		predicates:   append([]predicate.GroupProgress{}, gpq.predicates...),
+		predicates:   append([]predicate.GroupzProgress{}, gpq.predicates...),
 		withSubEvent: gpq.withSubEvent.Clone(),
 		withMember:   gpq.withMember.Clone(),
 		// clone intermediate query.
@@ -310,7 +310,7 @@ func (gpq *GroupProgressQuery) Clone() *GroupProgressQuery {
 
 // WithSubEvent tells the query-builder to eager-load the nodes that are connected to
 // the "sub_event" edge. The optional arguments are used to configure the query builder of the edge.
-func (gpq *GroupProgressQuery) WithSubEvent(opts ...func(*SubEventQuery)) *GroupProgressQuery {
+func (gpq *GroupzProgressQuery) WithSubEvent(opts ...func(*SubEventQuery)) *GroupzProgressQuery {
 	query := (&SubEventClient{config: gpq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
@@ -321,7 +321,7 @@ func (gpq *GroupProgressQuery) WithSubEvent(opts ...func(*SubEventQuery)) *Group
 
 // WithMember tells the query-builder to eager-load the nodes that are connected to
 // the "member" edge. The optional arguments are used to configure the query builder of the edge.
-func (gpq *GroupProgressQuery) WithMember(opts ...func(*MemberProgressQuery)) *GroupProgressQuery {
+func (gpq *GroupzProgressQuery) WithMember(opts ...func(*MemberProgressQuery)) *GroupzProgressQuery {
 	query := (&MemberProgressClient{config: gpq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
@@ -340,16 +340,16 @@ func (gpq *GroupProgressQuery) WithMember(opts ...func(*MemberProgressQuery)) *G
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.GroupProgress.Query().
-//		GroupBy(groupprogress.FieldGroupID).
+//	client.GroupzProgress.Query().
+//		GroupBy(groupzprogress.FieldGroupID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
-func (gpq *GroupProgressQuery) GroupBy(field string, fields ...string) *GroupProgressGroupBy {
+func (gpq *GroupzProgressQuery) GroupBy(field string, fields ...string) *GroupzProgressGroupBy {
 	gpq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &GroupProgressGroupBy{build: gpq}
+	grbuild := &GroupzProgressGroupBy{build: gpq}
 	grbuild.flds = &gpq.ctx.Fields
-	grbuild.label = groupprogress.Label
+	grbuild.label = groupzprogress.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -363,24 +363,24 @@ func (gpq *GroupProgressQuery) GroupBy(field string, fields ...string) *GroupPro
 //		GroupID int64 `json:"group_id,omitempty"`
 //	}
 //
-//	client.GroupProgress.Query().
-//		Select(groupprogress.FieldGroupID).
+//	client.GroupzProgress.Query().
+//		Select(groupzprogress.FieldGroupID).
 //		Scan(ctx, &v)
 //
-func (gpq *GroupProgressQuery) Select(fields ...string) *GroupProgressSelect {
+func (gpq *GroupzProgressQuery) Select(fields ...string) *GroupzProgressSelect {
 	gpq.ctx.Fields = append(gpq.ctx.Fields, fields...)
-	sbuild := &GroupProgressSelect{GroupProgressQuery: gpq}
-	sbuild.label = groupprogress.Label
+	sbuild := &GroupzProgressSelect{GroupzProgressQuery: gpq}
+	sbuild.label = groupzprogress.Label
 	sbuild.flds, sbuild.scan = &gpq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a GroupProgressSelect configured with the given aggregations.
-func (gpq *GroupProgressQuery) Aggregate(fns ...AggregateFunc) *GroupProgressSelect {
+// Aggregate returns a GroupzProgressSelect configured with the given aggregations.
+func (gpq *GroupzProgressQuery) Aggregate(fns ...AggregateFunc) *GroupzProgressSelect {
 	return gpq.Select().Aggregate(fns...)
 }
 
-func (gpq *GroupProgressQuery) prepareQuery(ctx context.Context) error {
+func (gpq *GroupzProgressQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range gpq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -392,7 +392,7 @@ func (gpq *GroupProgressQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range gpq.ctx.Fields {
-		if !groupprogress.ValidColumn(f) {
+		if !groupzprogress.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -406,9 +406,9 @@ func (gpq *GroupProgressQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (gpq *GroupProgressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*GroupProgress, error) {
+func (gpq *GroupzProgressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*GroupzProgress, error) {
 	var (
-		nodes       = []*GroupProgress{}
+		nodes       = []*GroupzProgress{}
 		withFKs     = gpq.withFKs
 		_spec       = gpq.querySpec()
 		loadedTypes = [2]bool{
@@ -420,13 +420,13 @@ func (gpq *GroupProgressQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 		withFKs = true
 	}
 	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, groupprogress.ForeignKeys...)
+		_spec.Node.Columns = append(_spec.Node.Columns, groupzprogress.ForeignKeys...)
 	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*GroupProgress).scanValues(nil, columns)
+		return (*GroupzProgress).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &GroupProgress{config: gpq.config}
+		node := &GroupzProgress{config: gpq.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -445,23 +445,23 @@ func (gpq *GroupProgressQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	}
 	if query := gpq.withSubEvent; query != nil {
 		if err := gpq.loadSubEvent(ctx, query, nodes, nil,
-			func(n *GroupProgress, e *SubEvent) { n.Edges.SubEvent = e }); err != nil {
+			func(n *GroupzProgress, e *SubEvent) { n.Edges.SubEvent = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := gpq.withMember; query != nil {
 		if err := gpq.loadMember(ctx, query, nodes,
-			func(n *GroupProgress) { n.Edges.Member = []*MemberProgress{} },
-			func(n *GroupProgress, e *MemberProgress) { n.Edges.Member = append(n.Edges.Member, e) }); err != nil {
+			func(n *GroupzProgress) { n.Edges.Member = []*MemberProgress{} },
+			func(n *GroupzProgress, e *MemberProgress) { n.Edges.Member = append(n.Edges.Member, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (gpq *GroupProgressQuery) loadSubEvent(ctx context.Context, query *SubEventQuery, nodes []*GroupProgress, init func(*GroupProgress), assign func(*GroupProgress, *SubEvent)) error {
+func (gpq *GroupzProgressQuery) loadSubEvent(ctx context.Context, query *SubEventQuery, nodes []*GroupzProgress, init func(*GroupzProgress), assign func(*GroupzProgress, *SubEvent)) error {
 	ids := make([]int64, 0, len(nodes))
-	nodeids := make(map[int64][]*GroupProgress)
+	nodeids := make(map[int64][]*GroupzProgress)
 	for i := range nodes {
 		if nodes[i].sub_event_group == nil {
 			continue
@@ -491,9 +491,9 @@ func (gpq *GroupProgressQuery) loadSubEvent(ctx context.Context, query *SubEvent
 	}
 	return nil
 }
-func (gpq *GroupProgressQuery) loadMember(ctx context.Context, query *MemberProgressQuery, nodes []*GroupProgress, init func(*GroupProgress), assign func(*GroupProgress, *MemberProgress)) error {
+func (gpq *GroupzProgressQuery) loadMember(ctx context.Context, query *MemberProgressQuery, nodes []*GroupzProgress, init func(*GroupzProgress), assign func(*GroupzProgress, *MemberProgress)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int64]*GroupProgress)
+	nodeids := make(map[int64]*GroupzProgress)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -503,27 +503,27 @@ func (gpq *GroupProgressQuery) loadMember(ctx context.Context, query *MemberProg
 	}
 	query.withFKs = true
 	query.Where(predicate.MemberProgress(func(s *sql.Selector) {
-		s.Where(sql.InValues(groupprogress.MemberColumn, fks...))
+		s.Where(sql.InValues(groupzprogress.MemberColumn, fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.group_progress_member
+		fk := n.groupz_progress_member
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "group_progress_member" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "groupz_progress_member" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "group_progress_member" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "groupz_progress_member" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
 
-func (gpq *GroupProgressQuery) sqlCount(ctx context.Context) (int, error) {
+func (gpq *GroupzProgressQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := gpq.querySpec()
 	if len(gpq.modifiers) > 0 {
 		_spec.Modifiers = gpq.modifiers
@@ -535,8 +535,8 @@ func (gpq *GroupProgressQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, gpq.driver, _spec)
 }
 
-func (gpq *GroupProgressQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(groupprogress.Table, groupprogress.Columns, sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64))
+func (gpq *GroupzProgressQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(groupzprogress.Table, groupzprogress.Columns, sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64))
 	_spec.From = gpq.sql
 	if unique := gpq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -545,9 +545,9 @@ func (gpq *GroupProgressQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := gpq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, groupprogress.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, groupzprogress.FieldID)
 		for i := range fields {
-			if fields[i] != groupprogress.FieldID {
+			if fields[i] != groupzprogress.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -575,12 +575,12 @@ func (gpq *GroupProgressQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (gpq *GroupProgressQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (gpq *GroupzProgressQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(gpq.driver.Dialect())
-	t1 := builder.Table(groupprogress.Table)
+	t1 := builder.Table(groupzprogress.Table)
 	columns := gpq.ctx.Fields
 	if len(columns) == 0 {
-		columns = groupprogress.Columns
+		columns = groupzprogress.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if gpq.sql != nil {
@@ -611,33 +611,33 @@ func (gpq *GroupProgressQuery) sqlQuery(ctx context.Context) *sql.Selector {
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (gpq *GroupProgressQuery) Modify(modifiers ...func(s *sql.Selector)) *GroupProgressSelect {
+func (gpq *GroupzProgressQuery) Modify(modifiers ...func(s *sql.Selector)) *GroupzProgressSelect {
 	gpq.modifiers = append(gpq.modifiers, modifiers...)
 	return gpq.Select()
 }
 
-// GroupProgressGroupBy is the group-by builder for GroupProgress entities.
-type GroupProgressGroupBy struct {
+// GroupzProgressGroupBy is the group-by builder for GroupzProgress entities.
+type GroupzProgressGroupBy struct {
 	selector
-	build *GroupProgressQuery
+	build *GroupzProgressQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (gpgb *GroupProgressGroupBy) Aggregate(fns ...AggregateFunc) *GroupProgressGroupBy {
+func (gpgb *GroupzProgressGroupBy) Aggregate(fns ...AggregateFunc) *GroupzProgressGroupBy {
 	gpgb.fns = append(gpgb.fns, fns...)
 	return gpgb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (gpgb *GroupProgressGroupBy) Scan(ctx context.Context, v any) error {
+func (gpgb *GroupzProgressGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, gpgb.build.ctx, "GroupBy")
 	if err := gpgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*GroupProgressQuery, *GroupProgressGroupBy](ctx, gpgb.build, gpgb, gpgb.build.inters, v)
+	return scanWithInterceptors[*GroupzProgressQuery, *GroupzProgressGroupBy](ctx, gpgb.build, gpgb, gpgb.build.inters, v)
 }
 
-func (gpgb *GroupProgressGroupBy) sqlScan(ctx context.Context, root *GroupProgressQuery, v any) error {
+func (gpgb *GroupzProgressGroupBy) sqlScan(ctx context.Context, root *GroupzProgressQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(gpgb.fns))
 	for _, fn := range gpgb.fns {
@@ -664,28 +664,28 @@ func (gpgb *GroupProgressGroupBy) sqlScan(ctx context.Context, root *GroupProgre
 	return sql.ScanSlice(rows, v)
 }
 
-// GroupProgressSelect is the builder for selecting fields of GroupProgress entities.
-type GroupProgressSelect struct {
-	*GroupProgressQuery
+// GroupzProgressSelect is the builder for selecting fields of GroupzProgress entities.
+type GroupzProgressSelect struct {
+	*GroupzProgressQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (gps *GroupProgressSelect) Aggregate(fns ...AggregateFunc) *GroupProgressSelect {
+func (gps *GroupzProgressSelect) Aggregate(fns ...AggregateFunc) *GroupzProgressSelect {
 	gps.fns = append(gps.fns, fns...)
 	return gps
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (gps *GroupProgressSelect) Scan(ctx context.Context, v any) error {
+func (gps *GroupzProgressSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, gps.ctx, "Select")
 	if err := gps.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*GroupProgressQuery, *GroupProgressSelect](ctx, gps.GroupProgressQuery, gps, gps.inters, v)
+	return scanWithInterceptors[*GroupzProgressQuery, *GroupzProgressSelect](ctx, gps.GroupzProgressQuery, gps, gps.inters, v)
 }
 
-func (gps *GroupProgressSelect) sqlScan(ctx context.Context, root *GroupProgressQuery, v any) error {
+func (gps *GroupzProgressSelect) sqlScan(ctx context.Context, root *GroupzProgressQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(gps.fns))
 	for _, fn := range gps.fns {
@@ -707,7 +707,7 @@ func (gps *GroupProgressSelect) sqlScan(ctx context.Context, root *GroupProgress
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (gps *GroupProgressSelect) Modify(modifiers ...func(s *sql.Selector)) *GroupProgressSelect {
+func (gps *GroupzProgressSelect) Modify(modifiers ...func(s *sql.Selector)) *GroupzProgressSelect {
 	gps.modifiers = append(gps.modifiers, modifiers...)
 	return gps
 }

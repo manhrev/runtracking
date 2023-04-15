@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/schema"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
@@ -23,38 +23,42 @@ func init() {
 	eventDescCreatedAt := eventFields[3].Descriptor()
 	// event.DefaultCreatedAt holds the default value on creation for the created_at field.
 	event.DefaultCreatedAt = eventDescCreatedAt.Default.(func() time.Time)
+	// eventDescStartAt is the schema descriptor for start_at field.
+	eventDescStartAt := eventFields[4].Descriptor()
+	// event.DefaultStartAt holds the default value on creation for the start_at field.
+	event.DefaultStartAt = eventDescStartAt.Default.(func() time.Time)
 	// eventDescUpdatedAt is the schema descriptor for updated_at field.
-	eventDescUpdatedAt := eventFields[4].Descriptor()
+	eventDescUpdatedAt := eventFields[5].Descriptor()
 	// event.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	event.DefaultUpdatedAt = eventDescUpdatedAt.Default.(func() time.Time)
 	// eventDescPicture is the schema descriptor for picture field.
-	eventDescPicture := eventFields[5].Descriptor()
+	eventDescPicture := eventFields[6].Descriptor()
 	// event.DefaultPicture holds the default value on creation for the picture field.
 	event.DefaultPicture = eventDescPicture.Default.(string)
 	// eventDescStatus is the schema descriptor for status field.
-	eventDescStatus := eventFields[7].Descriptor()
+	eventDescStatus := eventFields[8].Descriptor()
 	// event.DefaultStatus holds the default value on creation for the status field.
 	event.DefaultStatus = eventDescStatus.Default.(int64)
 	// eventDescIsGlobal is the schema descriptor for is_global field.
-	eventDescIsGlobal := eventFields[8].Descriptor()
+	eventDescIsGlobal := eventFields[9].Descriptor()
 	// event.DefaultIsGlobal holds the default value on creation for the is_global field.
 	event.DefaultIsGlobal = eventDescIsGlobal.Default.(bool)
-	eventgroupFields := schema.EventGroup{}.Fields()
-	_ = eventgroupFields
-	// eventgroupDescJoinedAt is the schema descriptor for joined_at field.
-	eventgroupDescJoinedAt := eventgroupFields[2].Descriptor()
-	// eventgroup.DefaultJoinedAt holds the default value on creation for the joined_at field.
-	eventgroup.DefaultJoinedAt = eventgroupDescJoinedAt.Default.(func() time.Time)
-	// eventgroupDescStatus is the schema descriptor for status field.
-	eventgroupDescStatus := eventgroupFields[3].Descriptor()
-	// eventgroup.DefaultStatus holds the default value on creation for the status field.
-	eventgroup.DefaultStatus = eventgroupDescStatus.Default.(int64)
-	groupprogressFields := schema.GroupProgress{}.Fields()
-	_ = groupprogressFields
-	// groupprogressDescProgress is the schema descriptor for progress field.
-	groupprogressDescProgress := groupprogressFields[2].Descriptor()
-	// groupprogress.DefaultProgress holds the default value on creation for the progress field.
-	groupprogress.DefaultProgress = groupprogressDescProgress.Default.(int64)
+	eventgroupzFields := schema.EventGroupz{}.Fields()
+	_ = eventgroupzFields
+	// eventgroupzDescJoinedAt is the schema descriptor for joined_at field.
+	eventgroupzDescJoinedAt := eventgroupzFields[1].Descriptor()
+	// eventgroupz.DefaultJoinedAt holds the default value on creation for the joined_at field.
+	eventgroupz.DefaultJoinedAt = eventgroupzDescJoinedAt.Default.(func() time.Time)
+	// eventgroupzDescStatus is the schema descriptor for status field.
+	eventgroupzDescStatus := eventgroupzFields[2].Descriptor()
+	// eventgroupz.DefaultStatus holds the default value on creation for the status field.
+	eventgroupz.DefaultStatus = eventgroupzDescStatus.Default.(int64)
+	groupzprogressFields := schema.GroupzProgress{}.Fields()
+	_ = groupzprogressFields
+	// groupzprogressDescProgress is the schema descriptor for progress field.
+	groupzprogressDescProgress := groupzprogressFields[2].Descriptor()
+	// groupzprogress.DefaultProgress holds the default value on creation for the progress field.
+	groupzprogress.DefaultProgress = groupzprogressDescProgress.Default.(int64)
 	memberprogressFields := schema.MemberProgress{}.Fields()
 	_ = memberprogressFields
 	// memberprogressDescProgress is the schema descriptor for progress field.

@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -25,7 +25,7 @@ type EventQuery struct {
 	inters        []Interceptor
 	predicates    []predicate.Event
 	withSubevents *SubEventQuery
-	withGroups    *EventGroupQuery
+	withGroups    *EventGroupzQuery
 	modifiers     []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -86,8 +86,8 @@ func (eq *EventQuery) QuerySubevents() *SubEventQuery {
 }
 
 // QueryGroups chains the current query on the "groups" edge.
-func (eq *EventQuery) QueryGroups() *EventGroupQuery {
-	query := (&EventGroupClient{config: eq.config}).Query()
+func (eq *EventQuery) QueryGroups() *EventGroupzQuery {
+	query := (&EventGroupzClient{config: eq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -98,8 +98,8 @@ func (eq *EventQuery) QueryGroups() *EventGroupQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(event.Table, event.FieldID, selector),
-			sqlgraph.To(eventgroup.Table, eventgroup.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, event.GroupsTable, event.GroupsColumn),
+			sqlgraph.To(eventgroupz.Table, eventgroupz.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, event.GroupsTable, event.GroupsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -320,8 +320,8 @@ func (eq *EventQuery) WithSubevents(opts ...func(*SubEventQuery)) *EventQuery {
 
 // WithGroups tells the query-builder to eager-load the nodes that are connected to
 // the "groups" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EventQuery) WithGroups(opts ...func(*EventGroupQuery)) *EventQuery {
-	query := (&EventGroupClient{config: eq.config}).Query()
+func (eq *EventQuery) WithGroups(opts ...func(*EventGroupzQuery)) *EventQuery {
+	query := (&EventGroupzClient{config: eq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -444,8 +444,8 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	}
 	if query := eq.withGroups; query != nil {
 		if err := eq.loadGroups(ctx, query, nodes,
-			func(n *Event) { n.Edges.Groups = []*EventGroup{} },
-			func(n *Event, e *EventGroup) { n.Edges.Groups = append(n.Edges.Groups, e) }); err != nil {
+			func(n *Event) { n.Edges.Groups = []*EventGroupz{} },
+			func(n *Event, e *EventGroupz) { n.Edges.Groups = append(n.Edges.Groups, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -483,34 +483,64 @@ func (eq *EventQuery) loadSubevents(ctx context.Context, query *SubEventQuery, n
 	}
 	return nil
 }
-func (eq *EventQuery) loadGroups(ctx context.Context, query *EventGroupQuery, nodes []*Event, init func(*Event), assign func(*Event, *EventGroup)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int64]*Event)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+func (eq *EventQuery) loadGroups(ctx context.Context, query *EventGroupzQuery, nodes []*Event, init func(*Event), assign func(*Event, *EventGroupz)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int64]*Event)
+	nids := make(map[int64]map[*Event]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.EventGroup(func(s *sql.Selector) {
-		s.Where(sql.InValues(event.GroupsColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(event.GroupsTable)
+		s.Join(joinT).On(s.C(eventgroupz.FieldID), joinT.C(event.GroupsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(event.GroupsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(event.GroupsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullInt64).Int64
+				inValue := values[1].(*sql.NullInt64).Int64
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Event]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*EventGroupz](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.event_groups
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "event_groups" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "event_groups" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "groups" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

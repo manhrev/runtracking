@@ -6,11 +6,11 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type GroupProgress struct {
+type GroupzProgress struct {
 	ent.Schema
 }
 
-func (GroupProgress) Fields() []ent.Field {
+func (GroupzProgress) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Unique(),
@@ -20,7 +20,7 @@ func (GroupProgress) Fields() []ent.Field {
 	}
 }
 
-func (GroupProgress) Edges() []ent.Edge {
+func (GroupzProgress) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("sub_event", SubEvent.Type).
 			Ref("group").

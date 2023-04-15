@@ -20,6 +20,8 @@ const (
 	FieldName = "name"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldStartAt holds the string denoting the start_at field in the database.
+	FieldStartAt = "start_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// FieldPicture holds the string denoting the picture field in the database.
@@ -45,13 +47,11 @@ const (
 	SubeventsInverseTable = "sub_events"
 	// SubeventsColumn is the table column denoting the subevents relation/edge.
 	SubeventsColumn = "event_subevents"
-	// GroupsTable is the table that holds the groups relation/edge.
+	// GroupsTable is the table that holds the groups relation/edge. The primary key declared below.
 	GroupsTable = "event_groups"
-	// GroupsInverseTable is the table name for the EventGroup entity.
-	// It exists in this package in order to avoid circular dependency with the "eventgroup" package.
-	GroupsInverseTable = "event_groups"
-	// GroupsColumn is the table column denoting the groups relation/edge.
-	GroupsColumn = "event_groups"
+	// GroupsInverseTable is the table name for the EventGroupz entity.
+	// It exists in this package in order to avoid circular dependency with the "eventgroupz" package.
+	GroupsInverseTable = "event_groupzs"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -60,6 +60,7 @@ var Columns = []string{
 	FieldOwnerGroupID,
 	FieldName,
 	FieldCreatedAt,
+	FieldStartAt,
 	FieldUpdatedAt,
 	FieldPicture,
 	FieldDescription,
@@ -67,6 +68,12 @@ var Columns = []string{
 	FieldIsGlobal,
 	FieldNumberOfGroups,
 }
+
+var (
+	// GroupsPrimaryKey and GroupsColumn2 are the table columns denoting the
+	// primary key for the groups relation (M2M).
+	GroupsPrimaryKey = []string{"event_id", "event_groupz_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -81,6 +88,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultStartAt holds the default value on creation for the "start_at" field.
+	DefaultStartAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
 	// DefaultPicture holds the default value on creation for the "picture" field.
@@ -112,6 +121,11 @@ func ByName(opts ...sql.OrderTermOption) Order {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) Order {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByStartAt orders the results by the start_at field.
+func ByStartAt(opts ...sql.OrderTermOption) Order {
+	return sql.OrderByField(FieldStartAt, opts...).ToFunc()
 }
 
 // ByUpdatedAt orders the results by the updated_at field.
@@ -182,6 +196,6 @@ func newGroupsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(GroupsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, GroupsTable, GroupsColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, GroupsTable, GroupsPrimaryKey...),
 	)
 }

@@ -24,11 +24,11 @@ const (
 	Table = "member_progresses"
 	// GroupTable is the table that holds the group relation/edge.
 	GroupTable = "member_progresses"
-	// GroupInverseTable is the table name for the GroupProgress entity.
-	// It exists in this package in order to avoid circular dependency with the "groupprogress" package.
-	GroupInverseTable = "group_progresses"
+	// GroupInverseTable is the table name for the GroupzProgress entity.
+	// It exists in this package in order to avoid circular dependency with the "groupzprogress" package.
+	GroupInverseTable = "groupz_progresses"
 	// GroupColumn is the table column denoting the group relation/edge.
-	GroupColumn = "group_progress_member"
+	GroupColumn = "groupz_progress_member"
 )
 
 // Columns holds all SQL columns for memberprogress fields.
@@ -42,7 +42,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "member_progresses"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"group_progress_member",
+	"groupz_progress_member",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

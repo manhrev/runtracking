@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
@@ -135,14 +135,14 @@ func (sec *SubEventCreate) SetEvent(e *Event) *SubEventCreate {
 	return sec.SetEventID(e.ID)
 }
 
-// AddGroupIDs adds the "group" edge to the GroupProgress entity by IDs.
+// AddGroupIDs adds the "group" edge to the GroupzProgress entity by IDs.
 func (sec *SubEventCreate) AddGroupIDs(ids ...int64) *SubEventCreate {
 	sec.mutation.AddGroupIDs(ids...)
 	return sec
 }
 
-// AddGroup adds the "group" edges to the GroupProgress entity.
-func (sec *SubEventCreate) AddGroup(g ...*GroupProgress) *SubEventCreate {
+// AddGroup adds the "group" edges to the GroupzProgress entity.
+func (sec *SubEventCreate) AddGroup(g ...*GroupzProgress) *SubEventCreate {
 	ids := make([]int64, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
@@ -308,7 +308,7 @@ func (sec *SubEventCreate) createSpec() (*SubEvent, *sqlgraph.CreateSpec) {
 			Columns: []string{subevent.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

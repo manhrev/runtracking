@@ -200,7 +200,7 @@ func HasGroup() predicate.MemberProgress {
 }
 
 // HasGroupWith applies the HasEdge predicate on the "group" edge with a given conditions (other predicates).
-func HasGroupWith(preds ...predicate.GroupProgress) predicate.MemberProgress {
+func HasGroupWith(preds ...predicate.GroupzProgress) predicate.MemberProgress {
 	return predicate.MemberProgress(func(s *sql.Selector) {
 		step := newGroupStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

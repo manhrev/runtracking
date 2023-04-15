@@ -11,30 +11,24 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 )
 
-// EventGroupCreate is the builder for creating a EventGroup entity.
-type EventGroupCreate struct {
+// EventGroupzCreate is the builder for creating a EventGroupz entity.
+type EventGroupzCreate struct {
 	config
-	mutation *EventGroupMutation
+	mutation *EventGroupzMutation
 	hooks    []Hook
 }
 
-// SetGroupID sets the "group_id" field.
-func (egc *EventGroupCreate) SetGroupID(i int64) *EventGroupCreate {
-	egc.mutation.SetGroupID(i)
-	return egc
-}
-
 // SetJoinedAt sets the "joined_at" field.
-func (egc *EventGroupCreate) SetJoinedAt(t time.Time) *EventGroupCreate {
+func (egc *EventGroupzCreate) SetJoinedAt(t time.Time) *EventGroupzCreate {
 	egc.mutation.SetJoinedAt(t)
 	return egc
 }
 
 // SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
-func (egc *EventGroupCreate) SetNillableJoinedAt(t *time.Time) *EventGroupCreate {
+func (egc *EventGroupzCreate) SetNillableJoinedAt(t *time.Time) *EventGroupzCreate {
 	if t != nil {
 		egc.SetJoinedAt(*t)
 	}
@@ -42,13 +36,13 @@ func (egc *EventGroupCreate) SetNillableJoinedAt(t *time.Time) *EventGroupCreate
 }
 
 // SetStatus sets the "status" field.
-func (egc *EventGroupCreate) SetStatus(i int64) *EventGroupCreate {
+func (egc *EventGroupzCreate) SetStatus(i int64) *EventGroupzCreate {
 	egc.mutation.SetStatus(i)
 	return egc
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (egc *EventGroupCreate) SetNillableStatus(i *int64) *EventGroupCreate {
+func (egc *EventGroupzCreate) SetNillableStatus(i *int64) *EventGroupzCreate {
 	if i != nil {
 		egc.SetStatus(*i)
 	}
@@ -56,43 +50,39 @@ func (egc *EventGroupCreate) SetNillableStatus(i *int64) *EventGroupCreate {
 }
 
 // SetID sets the "id" field.
-func (egc *EventGroupCreate) SetID(i int64) *EventGroupCreate {
+func (egc *EventGroupzCreate) SetID(i int64) *EventGroupzCreate {
 	egc.mutation.SetID(i)
 	return egc
 }
 
-// SetEventID sets the "event" edge to the Event entity by ID.
-func (egc *EventGroupCreate) SetEventID(id int64) *EventGroupCreate {
-	egc.mutation.SetEventID(id)
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (egc *EventGroupzCreate) AddEventIDs(ids ...int64) *EventGroupzCreate {
+	egc.mutation.AddEventIDs(ids...)
 	return egc
 }
 
-// SetNillableEventID sets the "event" edge to the Event entity by ID if the given value is not nil.
-func (egc *EventGroupCreate) SetNillableEventID(id *int64) *EventGroupCreate {
-	if id != nil {
-		egc = egc.SetEventID(*id)
+// AddEvent adds the "event" edges to the Event entity.
+func (egc *EventGroupzCreate) AddEvent(e ...*Event) *EventGroupzCreate {
+	ids := make([]int64, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return egc
+	return egc.AddEventIDs(ids...)
 }
 
-// SetEvent sets the "event" edge to the Event entity.
-func (egc *EventGroupCreate) SetEvent(e *Event) *EventGroupCreate {
-	return egc.SetEventID(e.ID)
-}
-
-// Mutation returns the EventGroupMutation object of the builder.
-func (egc *EventGroupCreate) Mutation() *EventGroupMutation {
+// Mutation returns the EventGroupzMutation object of the builder.
+func (egc *EventGroupzCreate) Mutation() *EventGroupzMutation {
 	return egc.mutation
 }
 
-// Save creates the EventGroup in the database.
-func (egc *EventGroupCreate) Save(ctx context.Context) (*EventGroup, error) {
+// Save creates the EventGroupz in the database.
+func (egc *EventGroupzCreate) Save(ctx context.Context) (*EventGroupz, error) {
 	egc.defaults()
-	return withHooks[*EventGroup, EventGroupMutation](ctx, egc.sqlSave, egc.mutation, egc.hooks)
+	return withHooks[*EventGroupz, EventGroupzMutation](ctx, egc.sqlSave, egc.mutation, egc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (egc *EventGroupCreate) SaveX(ctx context.Context) *EventGroup {
+func (egc *EventGroupzCreate) SaveX(ctx context.Context) *EventGroupz {
 	v, err := egc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -101,45 +91,42 @@ func (egc *EventGroupCreate) SaveX(ctx context.Context) *EventGroup {
 }
 
 // Exec executes the query.
-func (egc *EventGroupCreate) Exec(ctx context.Context) error {
+func (egc *EventGroupzCreate) Exec(ctx context.Context) error {
 	_, err := egc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (egc *EventGroupCreate) ExecX(ctx context.Context) {
+func (egc *EventGroupzCreate) ExecX(ctx context.Context) {
 	if err := egc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (egc *EventGroupCreate) defaults() {
+func (egc *EventGroupzCreate) defaults() {
 	if _, ok := egc.mutation.JoinedAt(); !ok {
-		v := eventgroup.DefaultJoinedAt()
+		v := eventgroupz.DefaultJoinedAt()
 		egc.mutation.SetJoinedAt(v)
 	}
 	if _, ok := egc.mutation.Status(); !ok {
-		v := eventgroup.DefaultStatus
+		v := eventgroupz.DefaultStatus
 		egc.mutation.SetStatus(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (egc *EventGroupCreate) check() error {
-	if _, ok := egc.mutation.GroupID(); !ok {
-		return &ValidationError{Name: "group_id", err: errors.New(`ent: missing required field "EventGroup.group_id"`)}
-	}
+func (egc *EventGroupzCreate) check() error {
 	if _, ok := egc.mutation.JoinedAt(); !ok {
-		return &ValidationError{Name: "joined_at", err: errors.New(`ent: missing required field "EventGroup.joined_at"`)}
+		return &ValidationError{Name: "joined_at", err: errors.New(`ent: missing required field "EventGroupz.joined_at"`)}
 	}
 	if _, ok := egc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "EventGroup.status"`)}
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "EventGroupz.status"`)}
 	}
 	return nil
 }
 
-func (egc *EventGroupCreate) sqlSave(ctx context.Context) (*EventGroup, error) {
+func (egc *EventGroupzCreate) sqlSave(ctx context.Context) (*EventGroupz, error) {
 	if err := egc.check(); err != nil {
 		return nil, err
 	}
@@ -159,33 +146,29 @@ func (egc *EventGroupCreate) sqlSave(ctx context.Context) (*EventGroup, error) {
 	return _node, nil
 }
 
-func (egc *EventGroupCreate) createSpec() (*EventGroup, *sqlgraph.CreateSpec) {
+func (egc *EventGroupzCreate) createSpec() (*EventGroupz, *sqlgraph.CreateSpec) {
 	var (
-		_node = &EventGroup{config: egc.config}
-		_spec = sqlgraph.NewCreateSpec(eventgroup.Table, sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64))
+		_node = &EventGroupz{config: egc.config}
+		_spec = sqlgraph.NewCreateSpec(eventgroupz.Table, sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64))
 	)
 	if id, ok := egc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := egc.mutation.GroupID(); ok {
-		_spec.SetField(eventgroup.FieldGroupID, field.TypeInt64, value)
-		_node.GroupID = value
-	}
 	if value, ok := egc.mutation.JoinedAt(); ok {
-		_spec.SetField(eventgroup.FieldJoinedAt, field.TypeTime, value)
+		_spec.SetField(eventgroupz.FieldJoinedAt, field.TypeTime, value)
 		_node.JoinedAt = value
 	}
 	if value, ok := egc.mutation.Status(); ok {
-		_spec.SetField(eventgroup.FieldStatus, field.TypeInt64, value)
+		_spec.SetField(eventgroupz.FieldStatus, field.TypeInt64, value)
 		_node.Status = value
 	}
 	if nodes := egc.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   eventgroup.EventTable,
-			Columns: []string{eventgroup.EventColumn},
+			Table:   eventgroupz.EventTable,
+			Columns: eventgroupz.EventPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt64),
@@ -194,29 +177,28 @@ func (egc *EventGroupCreate) createSpec() (*EventGroup, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.event_groups = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
 
-// EventGroupCreateBulk is the builder for creating many EventGroup entities in bulk.
-type EventGroupCreateBulk struct {
+// EventGroupzCreateBulk is the builder for creating many EventGroupz entities in bulk.
+type EventGroupzCreateBulk struct {
 	config
-	builders []*EventGroupCreate
+	builders []*EventGroupzCreate
 }
 
-// Save creates the EventGroup entities in the database.
-func (egcb *EventGroupCreateBulk) Save(ctx context.Context) ([]*EventGroup, error) {
+// Save creates the EventGroupz entities in the database.
+func (egcb *EventGroupzCreateBulk) Save(ctx context.Context) ([]*EventGroupz, error) {
 	specs := make([]*sqlgraph.CreateSpec, len(egcb.builders))
-	nodes := make([]*EventGroup, len(egcb.builders))
+	nodes := make([]*EventGroupz, len(egcb.builders))
 	mutators := make([]Mutator, len(egcb.builders))
 	for i := range egcb.builders {
 		func(i int, root context.Context) {
 			builder := egcb.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*EventGroupMutation)
+				mutation, ok := m.(*EventGroupzMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -263,7 +245,7 @@ func (egcb *EventGroupCreateBulk) Save(ctx context.Context) ([]*EventGroup, erro
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (egcb *EventGroupCreateBulk) SaveX(ctx context.Context) []*EventGroup {
+func (egcb *EventGroupzCreateBulk) SaveX(ctx context.Context) []*EventGroupz {
 	v, err := egcb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -272,13 +254,13 @@ func (egcb *EventGroupCreateBulk) SaveX(ctx context.Context) []*EventGroup {
 }
 
 // Exec executes the query.
-func (egcb *EventGroupCreateBulk) Exec(ctx context.Context) error {
+func (egcb *EventGroupzCreateBulk) Exec(ctx context.Context) error {
 	_, err := egcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (egcb *EventGroupCreateBulk) ExecX(ctx context.Context) {
+func (egcb *EventGroupzCreateBulk) ExecX(ctx context.Context) {
 	if err := egcb.Exec(ctx); err != nil {
 		panic(err)
 	}

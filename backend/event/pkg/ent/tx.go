@@ -14,10 +14,10 @@ type Tx struct {
 	config
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
-	// EventGroup is the client for interacting with the EventGroup builders.
-	EventGroup *EventGroupClient
-	// GroupProgress is the client for interacting with the GroupProgress builders.
-	GroupProgress *GroupProgressClient
+	// EventGroupz is the client for interacting with the EventGroupz builders.
+	EventGroupz *EventGroupzClient
+	// GroupzProgress is the client for interacting with the GroupzProgress builders.
+	GroupzProgress *GroupzProgressClient
 	// MemberProgress is the client for interacting with the MemberProgress builders.
 	MemberProgress *MemberProgressClient
 	// SubEvent is the client for interacting with the SubEvent builders.
@@ -154,8 +154,8 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Event = NewEventClient(tx.config)
-	tx.EventGroup = NewEventGroupClient(tx.config)
-	tx.GroupProgress = NewGroupProgressClient(tx.config)
+	tx.EventGroupz = NewEventGroupzClient(tx.config)
+	tx.GroupzProgress = NewGroupzProgressClient(tx.config)
 	tx.MemberProgress = NewMemberProgressClient(tx.config)
 	tx.SubEvent = NewSubEventClient(tx.config)
 }

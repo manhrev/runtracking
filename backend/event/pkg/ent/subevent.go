@@ -46,7 +46,7 @@ type SubEventEdges struct {
 	// Event holds the value of the event edge.
 	Event *Event `json:"event,omitempty"`
 	// Group holds the value of the group edge.
-	Group []*GroupProgress `json:"group,omitempty"`
+	Group []*GroupzProgress `json:"group,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -67,7 +67,7 @@ func (e SubEventEdges) EventOrErr() (*Event, error) {
 
 // GroupOrErr returns the Group value or an error if the edge
 // was not loaded in eager-loading.
-func (e SubEventEdges) GroupOrErr() ([]*GroupProgress, error) {
+func (e SubEventEdges) GroupOrErr() ([]*GroupzProgress, error) {
 	if e.loadedTypes[1] {
 		return e.Group, nil
 	}
@@ -182,7 +182,7 @@ func (se *SubEvent) QueryEvent() *EventQuery {
 }
 
 // QueryGroup queries the "group" edge of the SubEvent entity.
-func (se *SubEvent) QueryGroup() *GroupProgressQuery {
+func (se *SubEvent) QueryGroup() *GroupzProgressQuery {
 	return NewSubEventClient(se.config).QueryGroup(se)
 }
 

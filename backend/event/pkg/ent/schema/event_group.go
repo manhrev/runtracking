@@ -8,15 +8,14 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type EventGroup struct {
+type EventGroupz struct {
 	ent.Schema
 }
 
-func (EventGroup) Fields() []ent.Field {
+func (EventGroupz) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Unique(),
-		field.Int64("group_id"),
 		field.Time("joined_at").
 			Default(time.Now),
 		field.Int64("status").
@@ -24,8 +23,8 @@ func (EventGroup) Fields() []ent.Field {
 	}
 }
 
-func (EventGroup) Edges() []ent.Edge {
+func (EventGroupz) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("event", Event.Type).Ref("groups").Unique(),
+		edge.From("event", Event.Type).Ref("groups"),
 	}
 }

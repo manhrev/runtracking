@@ -8,12 +8,12 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
-// GroupProgress is the model entity for the GroupProgress schema.
-type GroupProgress struct {
+// GroupzProgress is the model entity for the GroupzProgress schema.
+type GroupzProgress struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
@@ -22,14 +22,14 @@ type GroupProgress struct {
 	// Progress holds the value of the "progress" field.
 	Progress int64 `json:"progress,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the GroupProgressQuery when eager-loading is set.
-	Edges           GroupProgressEdges `json:"edges"`
+	// The values are being populated by the GroupzProgressQuery when eager-loading is set.
+	Edges           GroupzProgressEdges `json:"edges"`
 	sub_event_group *int64
 	selectValues    sql.SelectValues
 }
 
-// GroupProgressEdges holds the relations/edges for other nodes in the graph.
-type GroupProgressEdges struct {
+// GroupzProgressEdges holds the relations/edges for other nodes in the graph.
+type GroupzProgressEdges struct {
 	// SubEvent holds the value of the sub_event edge.
 	SubEvent *SubEvent `json:"sub_event,omitempty"`
 	// Member holds the value of the member edge.
@@ -41,7 +41,7 @@ type GroupProgressEdges struct {
 
 // SubEventOrErr returns the SubEvent value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e GroupProgressEdges) SubEventOrErr() (*SubEvent, error) {
+func (e GroupzProgressEdges) SubEventOrErr() (*SubEvent, error) {
 	if e.loadedTypes[0] {
 		if e.SubEvent == nil {
 			// Edge was loaded but was not found.
@@ -54,7 +54,7 @@ func (e GroupProgressEdges) SubEventOrErr() (*SubEvent, error) {
 
 // MemberOrErr returns the Member value or an error if the edge
 // was not loaded in eager-loading.
-func (e GroupProgressEdges) MemberOrErr() ([]*MemberProgress, error) {
+func (e GroupzProgressEdges) MemberOrErr() ([]*MemberProgress, error) {
 	if e.loadedTypes[1] {
 		return e.Member, nil
 	}
@@ -62,13 +62,13 @@ func (e GroupProgressEdges) MemberOrErr() ([]*MemberProgress, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*GroupProgress) scanValues(columns []string) ([]any, error) {
+func (*GroupzProgress) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case groupprogress.FieldID, groupprogress.FieldGroupID, groupprogress.FieldProgress:
+		case groupzprogress.FieldID, groupzprogress.FieldGroupID, groupzprogress.FieldProgress:
 			values[i] = new(sql.NullInt64)
-		case groupprogress.ForeignKeys[0]: // sub_event_group
+		case groupzprogress.ForeignKeys[0]: // sub_event_group
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -78,32 +78,32 @@ func (*GroupProgress) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the GroupProgress fields.
-func (gp *GroupProgress) assignValues(columns []string, values []any) error {
+// to the GroupzProgress fields.
+func (gp *GroupzProgress) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case groupprogress.FieldID:
+		case groupzprogress.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			gp.ID = int64(value.Int64)
-		case groupprogress.FieldGroupID:
+		case groupzprogress.FieldGroupID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field group_id", values[i])
 			} else if value.Valid {
 				gp.GroupID = value.Int64
 			}
-		case groupprogress.FieldProgress:
+		case groupzprogress.FieldProgress:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field progress", values[i])
 			} else if value.Valid {
 				gp.Progress = value.Int64
 			}
-		case groupprogress.ForeignKeys[0]:
+		case groupzprogress.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field sub_event_group", value)
 			} else if value.Valid {
@@ -117,44 +117,44 @@ func (gp *GroupProgress) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the GroupProgress.
+// Value returns the ent.Value that was dynamically selected and assigned to the GroupzProgress.
 // This includes values selected through modifiers, order, etc.
-func (gp *GroupProgress) Value(name string) (ent.Value, error) {
+func (gp *GroupzProgress) Value(name string) (ent.Value, error) {
 	return gp.selectValues.Get(name)
 }
 
-// QuerySubEvent queries the "sub_event" edge of the GroupProgress entity.
-func (gp *GroupProgress) QuerySubEvent() *SubEventQuery {
-	return NewGroupProgressClient(gp.config).QuerySubEvent(gp)
+// QuerySubEvent queries the "sub_event" edge of the GroupzProgress entity.
+func (gp *GroupzProgress) QuerySubEvent() *SubEventQuery {
+	return NewGroupzProgressClient(gp.config).QuerySubEvent(gp)
 }
 
-// QueryMember queries the "member" edge of the GroupProgress entity.
-func (gp *GroupProgress) QueryMember() *MemberProgressQuery {
-	return NewGroupProgressClient(gp.config).QueryMember(gp)
+// QueryMember queries the "member" edge of the GroupzProgress entity.
+func (gp *GroupzProgress) QueryMember() *MemberProgressQuery {
+	return NewGroupzProgressClient(gp.config).QueryMember(gp)
 }
 
-// Update returns a builder for updating this GroupProgress.
-// Note that you need to call GroupProgress.Unwrap() before calling this method if this GroupProgress
+// Update returns a builder for updating this GroupzProgress.
+// Note that you need to call GroupzProgress.Unwrap() before calling this method if this GroupzProgress
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (gp *GroupProgress) Update() *GroupProgressUpdateOne {
-	return NewGroupProgressClient(gp.config).UpdateOne(gp)
+func (gp *GroupzProgress) Update() *GroupzProgressUpdateOne {
+	return NewGroupzProgressClient(gp.config).UpdateOne(gp)
 }
 
-// Unwrap unwraps the GroupProgress entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the GroupzProgress entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (gp *GroupProgress) Unwrap() *GroupProgress {
+func (gp *GroupzProgress) Unwrap() *GroupzProgress {
 	_tx, ok := gp.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: GroupProgress is not a transactional entity")
+		panic("ent: GroupzProgress is not a transactional entity")
 	}
 	gp.config.driver = _tx.drv
 	return gp
 }
 
 // String implements the fmt.Stringer.
-func (gp *GroupProgress) String() string {
+func (gp *GroupzProgress) String() string {
 	var builder strings.Builder
-	builder.WriteString("GroupProgress(")
+	builder.WriteString("GroupzProgress(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", gp.ID))
 	builder.WriteString("group_id=")
 	builder.WriteString(fmt.Sprintf("%v", gp.GroupID))
@@ -165,5 +165,5 @@ func (gp *GroupProgress) String() string {
 	return builder.String()
 }
 
-// GroupProgresses is a parsable slice of GroupProgress.
-type GroupProgresses []*GroupProgress
+// GroupzProgresses is a parsable slice of GroupzProgress.
+type GroupzProgresses []*GroupzProgress

@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 )
@@ -76,13 +76,13 @@ func (mpu *MemberProgressUpdate) AddProgress(i int64) *MemberProgressUpdate {
 	return mpu
 }
 
-// SetGroupID sets the "group" edge to the GroupProgress entity by ID.
+// SetGroupID sets the "group" edge to the GroupzProgress entity by ID.
 func (mpu *MemberProgressUpdate) SetGroupID(id int64) *MemberProgressUpdate {
 	mpu.mutation.SetGroupID(id)
 	return mpu
 }
 
-// SetNillableGroupID sets the "group" edge to the GroupProgress entity by ID if the given value is not nil.
+// SetNillableGroupID sets the "group" edge to the GroupzProgress entity by ID if the given value is not nil.
 func (mpu *MemberProgressUpdate) SetNillableGroupID(id *int64) *MemberProgressUpdate {
 	if id != nil {
 		mpu = mpu.SetGroupID(*id)
@@ -90,8 +90,8 @@ func (mpu *MemberProgressUpdate) SetNillableGroupID(id *int64) *MemberProgressUp
 	return mpu
 }
 
-// SetGroup sets the "group" edge to the GroupProgress entity.
-func (mpu *MemberProgressUpdate) SetGroup(g *GroupProgress) *MemberProgressUpdate {
+// SetGroup sets the "group" edge to the GroupzProgress entity.
+func (mpu *MemberProgressUpdate) SetGroup(g *GroupzProgress) *MemberProgressUpdate {
 	return mpu.SetGroupID(g.ID)
 }
 
@@ -100,7 +100,7 @@ func (mpu *MemberProgressUpdate) Mutation() *MemberProgressMutation {
 	return mpu.mutation
 }
 
-// ClearGroup clears the "group" edge to the GroupProgress entity.
+// ClearGroup clears the "group" edge to the GroupzProgress entity.
 func (mpu *MemberProgressUpdate) ClearGroup() *MemberProgressUpdate {
 	mpu.mutation.ClearGroup()
 	return mpu
@@ -174,7 +174,7 @@ func (mpu *MemberProgressUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{memberprogress.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -187,7 +187,7 @@ func (mpu *MemberProgressUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{memberprogress.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -264,13 +264,13 @@ func (mpuo *MemberProgressUpdateOne) AddProgress(i int64) *MemberProgressUpdateO
 	return mpuo
 }
 
-// SetGroupID sets the "group" edge to the GroupProgress entity by ID.
+// SetGroupID sets the "group" edge to the GroupzProgress entity by ID.
 func (mpuo *MemberProgressUpdateOne) SetGroupID(id int64) *MemberProgressUpdateOne {
 	mpuo.mutation.SetGroupID(id)
 	return mpuo
 }
 
-// SetNillableGroupID sets the "group" edge to the GroupProgress entity by ID if the given value is not nil.
+// SetNillableGroupID sets the "group" edge to the GroupzProgress entity by ID if the given value is not nil.
 func (mpuo *MemberProgressUpdateOne) SetNillableGroupID(id *int64) *MemberProgressUpdateOne {
 	if id != nil {
 		mpuo = mpuo.SetGroupID(*id)
@@ -278,8 +278,8 @@ func (mpuo *MemberProgressUpdateOne) SetNillableGroupID(id *int64) *MemberProgre
 	return mpuo
 }
 
-// SetGroup sets the "group" edge to the GroupProgress entity.
-func (mpuo *MemberProgressUpdateOne) SetGroup(g *GroupProgress) *MemberProgressUpdateOne {
+// SetGroup sets the "group" edge to the GroupzProgress entity.
+func (mpuo *MemberProgressUpdateOne) SetGroup(g *GroupzProgress) *MemberProgressUpdateOne {
 	return mpuo.SetGroupID(g.ID)
 }
 
@@ -288,7 +288,7 @@ func (mpuo *MemberProgressUpdateOne) Mutation() *MemberProgressMutation {
 	return mpuo.mutation
 }
 
-// ClearGroup clears the "group" edge to the GroupProgress entity.
+// ClearGroup clears the "group" edge to the GroupzProgress entity.
 func (mpuo *MemberProgressUpdateOne) ClearGroup() *MemberProgressUpdateOne {
 	mpuo.mutation.ClearGroup()
 	return mpuo
@@ -392,7 +392,7 @@ func (mpuo *MemberProgressUpdateOne) sqlSave(ctx context.Context) (_node *Member
 			Columns: []string{memberprogress.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -405,7 +405,7 @@ func (mpuo *MemberProgressUpdateOne) sqlSave(ctx context.Context) (_node *Member
 			Columns: []string{memberprogress.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

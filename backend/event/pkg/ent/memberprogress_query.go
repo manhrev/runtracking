@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 )
@@ -22,7 +22,7 @@ type MemberProgressQuery struct {
 	order      []memberprogress.Order
 	inters     []Interceptor
 	predicates []predicate.MemberProgress
-	withGroup  *GroupProgressQuery
+	withGroup  *GroupzProgressQuery
 	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -62,8 +62,8 @@ func (mpq *MemberProgressQuery) Order(o ...memberprogress.Order) *MemberProgress
 }
 
 // QueryGroup chains the current query on the "group" edge.
-func (mpq *MemberProgressQuery) QueryGroup() *GroupProgressQuery {
-	query := (&GroupProgressClient{config: mpq.config}).Query()
+func (mpq *MemberProgressQuery) QueryGroup() *GroupzProgressQuery {
+	query := (&GroupzProgressClient{config: mpq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mpq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -74,7 +74,7 @@ func (mpq *MemberProgressQuery) QueryGroup() *GroupProgressQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(memberprogress.Table, memberprogress.FieldID, selector),
-			sqlgraph.To(groupprogress.Table, groupprogress.FieldID),
+			sqlgraph.To(groupzprogress.Table, groupzprogress.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, memberprogress.GroupTable, memberprogress.GroupColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mpq.driver.Dialect(), step)
@@ -284,8 +284,8 @@ func (mpq *MemberProgressQuery) Clone() *MemberProgressQuery {
 
 // WithGroup tells the query-builder to eager-load the nodes that are connected to
 // the "group" edge. The optional arguments are used to configure the query builder of the edge.
-func (mpq *MemberProgressQuery) WithGroup(opts ...func(*GroupProgressQuery)) *MemberProgressQuery {
-	query := (&GroupProgressClient{config: mpq.config}).Query()
+func (mpq *MemberProgressQuery) WithGroup(opts ...func(*GroupzProgressQuery)) *MemberProgressQuery {
+	query := (&GroupzProgressClient{config: mpq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -407,21 +407,21 @@ func (mpq *MemberProgressQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	}
 	if query := mpq.withGroup; query != nil {
 		if err := mpq.loadGroup(ctx, query, nodes, nil,
-			func(n *MemberProgress, e *GroupProgress) { n.Edges.Group = e }); err != nil {
+			func(n *MemberProgress, e *GroupzProgress) { n.Edges.Group = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (mpq *MemberProgressQuery) loadGroup(ctx context.Context, query *GroupProgressQuery, nodes []*MemberProgress, init func(*MemberProgress), assign func(*MemberProgress, *GroupProgress)) error {
+func (mpq *MemberProgressQuery) loadGroup(ctx context.Context, query *GroupzProgressQuery, nodes []*MemberProgress, init func(*MemberProgress), assign func(*MemberProgress, *GroupzProgress)) error {
 	ids := make([]int64, 0, len(nodes))
 	nodeids := make(map[int64][]*MemberProgress)
 	for i := range nodes {
-		if nodes[i].group_progress_member == nil {
+		if nodes[i].groupz_progress_member == nil {
 			continue
 		}
-		fk := *nodes[i].group_progress_member
+		fk := *nodes[i].groupz_progress_member
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -430,7 +430,7 @@ func (mpq *MemberProgressQuery) loadGroup(ctx context.Context, query *GroupProgr
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(groupprogress.IDIn(ids...))
+	query.Where(groupzprogress.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -438,7 +438,7 @@ func (mpq *MemberProgressQuery) loadGroup(ctx context.Context, query *GroupProgr
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "group_progress_member" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "groupz_progress_member" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

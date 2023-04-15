@@ -10,48 +10,48 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
-// GroupProgressUpdate is the builder for updating GroupProgress entities.
-type GroupProgressUpdate struct {
+// GroupzProgressUpdate is the builder for updating GroupzProgress entities.
+type GroupzProgressUpdate struct {
 	config
 	hooks     []Hook
-	mutation  *GroupProgressMutation
+	mutation  *GroupzProgressMutation
 	modifiers []func(*sql.UpdateBuilder)
 }
 
-// Where appends a list predicates to the GroupProgressUpdate builder.
-func (gpu *GroupProgressUpdate) Where(ps ...predicate.GroupProgress) *GroupProgressUpdate {
+// Where appends a list predicates to the GroupzProgressUpdate builder.
+func (gpu *GroupzProgressUpdate) Where(ps ...predicate.GroupzProgress) *GroupzProgressUpdate {
 	gpu.mutation.Where(ps...)
 	return gpu
 }
 
 // SetGroupID sets the "group_id" field.
-func (gpu *GroupProgressUpdate) SetGroupID(i int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) SetGroupID(i int64) *GroupzProgressUpdate {
 	gpu.mutation.ResetGroupID()
 	gpu.mutation.SetGroupID(i)
 	return gpu
 }
 
 // AddGroupID adds i to the "group_id" field.
-func (gpu *GroupProgressUpdate) AddGroupID(i int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) AddGroupID(i int64) *GroupzProgressUpdate {
 	gpu.mutation.AddGroupID(i)
 	return gpu
 }
 
 // SetProgress sets the "progress" field.
-func (gpu *GroupProgressUpdate) SetProgress(i int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) SetProgress(i int64) *GroupzProgressUpdate {
 	gpu.mutation.ResetProgress()
 	gpu.mutation.SetProgress(i)
 	return gpu
 }
 
 // SetNillableProgress sets the "progress" field if the given value is not nil.
-func (gpu *GroupProgressUpdate) SetNillableProgress(i *int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) SetNillableProgress(i *int64) *GroupzProgressUpdate {
 	if i != nil {
 		gpu.SetProgress(*i)
 	}
@@ -59,19 +59,19 @@ func (gpu *GroupProgressUpdate) SetNillableProgress(i *int64) *GroupProgressUpda
 }
 
 // AddProgress adds i to the "progress" field.
-func (gpu *GroupProgressUpdate) AddProgress(i int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) AddProgress(i int64) *GroupzProgressUpdate {
 	gpu.mutation.AddProgress(i)
 	return gpu
 }
 
 // SetSubEventID sets the "sub_event" edge to the SubEvent entity by ID.
-func (gpu *GroupProgressUpdate) SetSubEventID(id int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) SetSubEventID(id int64) *GroupzProgressUpdate {
 	gpu.mutation.SetSubEventID(id)
 	return gpu
 }
 
 // SetNillableSubEventID sets the "sub_event" edge to the SubEvent entity by ID if the given value is not nil.
-func (gpu *GroupProgressUpdate) SetNillableSubEventID(id *int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) SetNillableSubEventID(id *int64) *GroupzProgressUpdate {
 	if id != nil {
 		gpu = gpu.SetSubEventID(*id)
 	}
@@ -79,18 +79,18 @@ func (gpu *GroupProgressUpdate) SetNillableSubEventID(id *int64) *GroupProgressU
 }
 
 // SetSubEvent sets the "sub_event" edge to the SubEvent entity.
-func (gpu *GroupProgressUpdate) SetSubEvent(s *SubEvent) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) SetSubEvent(s *SubEvent) *GroupzProgressUpdate {
 	return gpu.SetSubEventID(s.ID)
 }
 
 // AddMemberIDs adds the "member" edge to the MemberProgress entity by IDs.
-func (gpu *GroupProgressUpdate) AddMemberIDs(ids ...int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) AddMemberIDs(ids ...int64) *GroupzProgressUpdate {
 	gpu.mutation.AddMemberIDs(ids...)
 	return gpu
 }
 
 // AddMember adds the "member" edges to the MemberProgress entity.
-func (gpu *GroupProgressUpdate) AddMember(m ...*MemberProgress) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) AddMember(m ...*MemberProgress) *GroupzProgressUpdate {
 	ids := make([]int64, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -98,31 +98,31 @@ func (gpu *GroupProgressUpdate) AddMember(m ...*MemberProgress) *GroupProgressUp
 	return gpu.AddMemberIDs(ids...)
 }
 
-// Mutation returns the GroupProgressMutation object of the builder.
-func (gpu *GroupProgressUpdate) Mutation() *GroupProgressMutation {
+// Mutation returns the GroupzProgressMutation object of the builder.
+func (gpu *GroupzProgressUpdate) Mutation() *GroupzProgressMutation {
 	return gpu.mutation
 }
 
 // ClearSubEvent clears the "sub_event" edge to the SubEvent entity.
-func (gpu *GroupProgressUpdate) ClearSubEvent() *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) ClearSubEvent() *GroupzProgressUpdate {
 	gpu.mutation.ClearSubEvent()
 	return gpu
 }
 
 // ClearMember clears all "member" edges to the MemberProgress entity.
-func (gpu *GroupProgressUpdate) ClearMember() *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) ClearMember() *GroupzProgressUpdate {
 	gpu.mutation.ClearMember()
 	return gpu
 }
 
 // RemoveMemberIDs removes the "member" edge to MemberProgress entities by IDs.
-func (gpu *GroupProgressUpdate) RemoveMemberIDs(ids ...int64) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) RemoveMemberIDs(ids ...int64) *GroupzProgressUpdate {
 	gpu.mutation.RemoveMemberIDs(ids...)
 	return gpu
 }
 
 // RemoveMember removes "member" edges to MemberProgress entities.
-func (gpu *GroupProgressUpdate) RemoveMember(m ...*MemberProgress) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) RemoveMember(m ...*MemberProgress) *GroupzProgressUpdate {
 	ids := make([]int64, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -131,12 +131,12 @@ func (gpu *GroupProgressUpdate) RemoveMember(m ...*MemberProgress) *GroupProgres
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (gpu *GroupProgressUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, GroupProgressMutation](ctx, gpu.sqlSave, gpu.mutation, gpu.hooks)
+func (gpu *GroupzProgressUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks[int, GroupzProgressMutation](ctx, gpu.sqlSave, gpu.mutation, gpu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (gpu *GroupProgressUpdate) SaveX(ctx context.Context) int {
+func (gpu *GroupzProgressUpdate) SaveX(ctx context.Context) int {
 	affected, err := gpu.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -145,26 +145,26 @@ func (gpu *GroupProgressUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (gpu *GroupProgressUpdate) Exec(ctx context.Context) error {
+func (gpu *GroupzProgressUpdate) Exec(ctx context.Context) error {
 	_, err := gpu.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gpu *GroupProgressUpdate) ExecX(ctx context.Context) {
+func (gpu *GroupzProgressUpdate) ExecX(ctx context.Context) {
 	if err := gpu.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (gpu *GroupProgressUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *GroupProgressUpdate {
+func (gpu *GroupzProgressUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *GroupzProgressUpdate {
 	gpu.modifiers = append(gpu.modifiers, modifiers...)
 	return gpu
 }
 
-func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(groupprogress.Table, groupprogress.Columns, sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64))
+func (gpu *GroupzProgressUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	_spec := sqlgraph.NewUpdateSpec(groupzprogress.Table, groupzprogress.Columns, sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64))
 	if ps := gpu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -173,23 +173,23 @@ func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 	}
 	if value, ok := gpu.mutation.GroupID(); ok {
-		_spec.SetField(groupprogress.FieldGroupID, field.TypeInt64, value)
+		_spec.SetField(groupzprogress.FieldGroupID, field.TypeInt64, value)
 	}
 	if value, ok := gpu.mutation.AddedGroupID(); ok {
-		_spec.AddField(groupprogress.FieldGroupID, field.TypeInt64, value)
+		_spec.AddField(groupzprogress.FieldGroupID, field.TypeInt64, value)
 	}
 	if value, ok := gpu.mutation.Progress(); ok {
-		_spec.SetField(groupprogress.FieldProgress, field.TypeInt64, value)
+		_spec.SetField(groupzprogress.FieldProgress, field.TypeInt64, value)
 	}
 	if value, ok := gpu.mutation.AddedProgress(); ok {
-		_spec.AddField(groupprogress.FieldProgress, field.TypeInt64, value)
+		_spec.AddField(groupzprogress.FieldProgress, field.TypeInt64, value)
 	}
 	if gpu.mutation.SubEventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   groupprogress.SubEventTable,
-			Columns: []string{groupprogress.SubEventColumn},
+			Table:   groupzprogress.SubEventTable,
+			Columns: []string{groupzprogress.SubEventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subevent.FieldID, field.TypeInt64),
@@ -201,8 +201,8 @@ func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   groupprogress.SubEventTable,
-			Columns: []string{groupprogress.SubEventColumn},
+			Table:   groupzprogress.SubEventTable,
+			Columns: []string{groupzprogress.SubEventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subevent.FieldID, field.TypeInt64),
@@ -217,8 +217,8 @@ func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   groupprogress.MemberTable,
-			Columns: []string{groupprogress.MemberColumn},
+			Table:   groupzprogress.MemberTable,
+			Columns: []string{groupzprogress.MemberColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memberprogress.FieldID, field.TypeInt64),
@@ -230,8 +230,8 @@ func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   groupprogress.MemberTable,
-			Columns: []string{groupprogress.MemberColumn},
+			Table:   groupzprogress.MemberTable,
+			Columns: []string{groupzprogress.MemberColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memberprogress.FieldID, field.TypeInt64),
@@ -246,8 +246,8 @@ func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   groupprogress.MemberTable,
-			Columns: []string{groupprogress.MemberColumn},
+			Table:   groupzprogress.MemberTable,
+			Columns: []string{groupzprogress.MemberColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memberprogress.FieldID, field.TypeInt64),
@@ -261,7 +261,7 @@ func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	_spec.AddModifiers(gpu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, gpu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{groupprogress.Label}
+			err = &NotFoundError{groupzprogress.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -271,37 +271,37 @@ func (gpu *GroupProgressUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	return n, nil
 }
 
-// GroupProgressUpdateOne is the builder for updating a single GroupProgress entity.
-type GroupProgressUpdateOne struct {
+// GroupzProgressUpdateOne is the builder for updating a single GroupzProgress entity.
+type GroupzProgressUpdateOne struct {
 	config
 	fields    []string
 	hooks     []Hook
-	mutation  *GroupProgressMutation
+	mutation  *GroupzProgressMutation
 	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetGroupID sets the "group_id" field.
-func (gpuo *GroupProgressUpdateOne) SetGroupID(i int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) SetGroupID(i int64) *GroupzProgressUpdateOne {
 	gpuo.mutation.ResetGroupID()
 	gpuo.mutation.SetGroupID(i)
 	return gpuo
 }
 
 // AddGroupID adds i to the "group_id" field.
-func (gpuo *GroupProgressUpdateOne) AddGroupID(i int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) AddGroupID(i int64) *GroupzProgressUpdateOne {
 	gpuo.mutation.AddGroupID(i)
 	return gpuo
 }
 
 // SetProgress sets the "progress" field.
-func (gpuo *GroupProgressUpdateOne) SetProgress(i int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) SetProgress(i int64) *GroupzProgressUpdateOne {
 	gpuo.mutation.ResetProgress()
 	gpuo.mutation.SetProgress(i)
 	return gpuo
 }
 
 // SetNillableProgress sets the "progress" field if the given value is not nil.
-func (gpuo *GroupProgressUpdateOne) SetNillableProgress(i *int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) SetNillableProgress(i *int64) *GroupzProgressUpdateOne {
 	if i != nil {
 		gpuo.SetProgress(*i)
 	}
@@ -309,19 +309,19 @@ func (gpuo *GroupProgressUpdateOne) SetNillableProgress(i *int64) *GroupProgress
 }
 
 // AddProgress adds i to the "progress" field.
-func (gpuo *GroupProgressUpdateOne) AddProgress(i int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) AddProgress(i int64) *GroupzProgressUpdateOne {
 	gpuo.mutation.AddProgress(i)
 	return gpuo
 }
 
 // SetSubEventID sets the "sub_event" edge to the SubEvent entity by ID.
-func (gpuo *GroupProgressUpdateOne) SetSubEventID(id int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) SetSubEventID(id int64) *GroupzProgressUpdateOne {
 	gpuo.mutation.SetSubEventID(id)
 	return gpuo
 }
 
 // SetNillableSubEventID sets the "sub_event" edge to the SubEvent entity by ID if the given value is not nil.
-func (gpuo *GroupProgressUpdateOne) SetNillableSubEventID(id *int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) SetNillableSubEventID(id *int64) *GroupzProgressUpdateOne {
 	if id != nil {
 		gpuo = gpuo.SetSubEventID(*id)
 	}
@@ -329,18 +329,18 @@ func (gpuo *GroupProgressUpdateOne) SetNillableSubEventID(id *int64) *GroupProgr
 }
 
 // SetSubEvent sets the "sub_event" edge to the SubEvent entity.
-func (gpuo *GroupProgressUpdateOne) SetSubEvent(s *SubEvent) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) SetSubEvent(s *SubEvent) *GroupzProgressUpdateOne {
 	return gpuo.SetSubEventID(s.ID)
 }
 
 // AddMemberIDs adds the "member" edge to the MemberProgress entity by IDs.
-func (gpuo *GroupProgressUpdateOne) AddMemberIDs(ids ...int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) AddMemberIDs(ids ...int64) *GroupzProgressUpdateOne {
 	gpuo.mutation.AddMemberIDs(ids...)
 	return gpuo
 }
 
 // AddMember adds the "member" edges to the MemberProgress entity.
-func (gpuo *GroupProgressUpdateOne) AddMember(m ...*MemberProgress) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) AddMember(m ...*MemberProgress) *GroupzProgressUpdateOne {
 	ids := make([]int64, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -348,31 +348,31 @@ func (gpuo *GroupProgressUpdateOne) AddMember(m ...*MemberProgress) *GroupProgre
 	return gpuo.AddMemberIDs(ids...)
 }
 
-// Mutation returns the GroupProgressMutation object of the builder.
-func (gpuo *GroupProgressUpdateOne) Mutation() *GroupProgressMutation {
+// Mutation returns the GroupzProgressMutation object of the builder.
+func (gpuo *GroupzProgressUpdateOne) Mutation() *GroupzProgressMutation {
 	return gpuo.mutation
 }
 
 // ClearSubEvent clears the "sub_event" edge to the SubEvent entity.
-func (gpuo *GroupProgressUpdateOne) ClearSubEvent() *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) ClearSubEvent() *GroupzProgressUpdateOne {
 	gpuo.mutation.ClearSubEvent()
 	return gpuo
 }
 
 // ClearMember clears all "member" edges to the MemberProgress entity.
-func (gpuo *GroupProgressUpdateOne) ClearMember() *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) ClearMember() *GroupzProgressUpdateOne {
 	gpuo.mutation.ClearMember()
 	return gpuo
 }
 
 // RemoveMemberIDs removes the "member" edge to MemberProgress entities by IDs.
-func (gpuo *GroupProgressUpdateOne) RemoveMemberIDs(ids ...int64) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) RemoveMemberIDs(ids ...int64) *GroupzProgressUpdateOne {
 	gpuo.mutation.RemoveMemberIDs(ids...)
 	return gpuo
 }
 
 // RemoveMember removes "member" edges to MemberProgress entities.
-func (gpuo *GroupProgressUpdateOne) RemoveMember(m ...*MemberProgress) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) RemoveMember(m ...*MemberProgress) *GroupzProgressUpdateOne {
 	ids := make([]int64, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -380,26 +380,26 @@ func (gpuo *GroupProgressUpdateOne) RemoveMember(m ...*MemberProgress) *GroupPro
 	return gpuo.RemoveMemberIDs(ids...)
 }
 
-// Where appends a list predicates to the GroupProgressUpdate builder.
-func (gpuo *GroupProgressUpdateOne) Where(ps ...predicate.GroupProgress) *GroupProgressUpdateOne {
+// Where appends a list predicates to the GroupzProgressUpdate builder.
+func (gpuo *GroupzProgressUpdateOne) Where(ps ...predicate.GroupzProgress) *GroupzProgressUpdateOne {
 	gpuo.mutation.Where(ps...)
 	return gpuo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (gpuo *GroupProgressUpdateOne) Select(field string, fields ...string) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) Select(field string, fields ...string) *GroupzProgressUpdateOne {
 	gpuo.fields = append([]string{field}, fields...)
 	return gpuo
 }
 
-// Save executes the query and returns the updated GroupProgress entity.
-func (gpuo *GroupProgressUpdateOne) Save(ctx context.Context) (*GroupProgress, error) {
-	return withHooks[*GroupProgress, GroupProgressMutation](ctx, gpuo.sqlSave, gpuo.mutation, gpuo.hooks)
+// Save executes the query and returns the updated GroupzProgress entity.
+func (gpuo *GroupzProgressUpdateOne) Save(ctx context.Context) (*GroupzProgress, error) {
+	return withHooks[*GroupzProgress, GroupzProgressMutation](ctx, gpuo.sqlSave, gpuo.mutation, gpuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (gpuo *GroupProgressUpdateOne) SaveX(ctx context.Context) *GroupProgress {
+func (gpuo *GroupzProgressUpdateOne) SaveX(ctx context.Context) *GroupzProgress {
 	node, err := gpuo.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -408,39 +408,39 @@ func (gpuo *GroupProgressUpdateOne) SaveX(ctx context.Context) *GroupProgress {
 }
 
 // Exec executes the query on the entity.
-func (gpuo *GroupProgressUpdateOne) Exec(ctx context.Context) error {
+func (gpuo *GroupzProgressUpdateOne) Exec(ctx context.Context) error {
 	_, err := gpuo.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gpuo *GroupProgressUpdateOne) ExecX(ctx context.Context) {
+func (gpuo *GroupzProgressUpdateOne) ExecX(ctx context.Context) {
 	if err := gpuo.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (gpuo *GroupProgressUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *GroupProgressUpdateOne {
+func (gpuo *GroupzProgressUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *GroupzProgressUpdateOne {
 	gpuo.modifiers = append(gpuo.modifiers, modifiers...)
 	return gpuo
 }
 
-func (gpuo *GroupProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupProgress, err error) {
-	_spec := sqlgraph.NewUpdateSpec(groupprogress.Table, groupprogress.Columns, sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64))
+func (gpuo *GroupzProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupzProgress, err error) {
+	_spec := sqlgraph.NewUpdateSpec(groupzprogress.Table, groupzprogress.Columns, sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64))
 	id, ok := gpuo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "GroupProgress.id" for update`)}
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "GroupzProgress.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := gpuo.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, groupprogress.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, groupzprogress.FieldID)
 		for _, f := range fields {
-			if !groupprogress.ValidColumn(f) {
+			if !groupzprogress.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != groupprogress.FieldID {
+			if f != groupzprogress.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, f)
 			}
 		}
@@ -453,23 +453,23 @@ func (gpuo *GroupProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupPr
 		}
 	}
 	if value, ok := gpuo.mutation.GroupID(); ok {
-		_spec.SetField(groupprogress.FieldGroupID, field.TypeInt64, value)
+		_spec.SetField(groupzprogress.FieldGroupID, field.TypeInt64, value)
 	}
 	if value, ok := gpuo.mutation.AddedGroupID(); ok {
-		_spec.AddField(groupprogress.FieldGroupID, field.TypeInt64, value)
+		_spec.AddField(groupzprogress.FieldGroupID, field.TypeInt64, value)
 	}
 	if value, ok := gpuo.mutation.Progress(); ok {
-		_spec.SetField(groupprogress.FieldProgress, field.TypeInt64, value)
+		_spec.SetField(groupzprogress.FieldProgress, field.TypeInt64, value)
 	}
 	if value, ok := gpuo.mutation.AddedProgress(); ok {
-		_spec.AddField(groupprogress.FieldProgress, field.TypeInt64, value)
+		_spec.AddField(groupzprogress.FieldProgress, field.TypeInt64, value)
 	}
 	if gpuo.mutation.SubEventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   groupprogress.SubEventTable,
-			Columns: []string{groupprogress.SubEventColumn},
+			Table:   groupzprogress.SubEventTable,
+			Columns: []string{groupzprogress.SubEventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subevent.FieldID, field.TypeInt64),
@@ -481,8 +481,8 @@ func (gpuo *GroupProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupPr
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   groupprogress.SubEventTable,
-			Columns: []string{groupprogress.SubEventColumn},
+			Table:   groupzprogress.SubEventTable,
+			Columns: []string{groupzprogress.SubEventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subevent.FieldID, field.TypeInt64),
@@ -497,8 +497,8 @@ func (gpuo *GroupProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupPr
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   groupprogress.MemberTable,
-			Columns: []string{groupprogress.MemberColumn},
+			Table:   groupzprogress.MemberTable,
+			Columns: []string{groupzprogress.MemberColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memberprogress.FieldID, field.TypeInt64),
@@ -510,8 +510,8 @@ func (gpuo *GroupProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupPr
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   groupprogress.MemberTable,
-			Columns: []string{groupprogress.MemberColumn},
+			Table:   groupzprogress.MemberTable,
+			Columns: []string{groupzprogress.MemberColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memberprogress.FieldID, field.TypeInt64),
@@ -526,8 +526,8 @@ func (gpuo *GroupProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupPr
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   groupprogress.MemberTable,
-			Columns: []string{groupprogress.MemberColumn},
+			Table:   groupzprogress.MemberTable,
+			Columns: []string{groupzprogress.MemberColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memberprogress.FieldID, field.TypeInt64),
@@ -539,12 +539,12 @@ func (gpuo *GroupProgressUpdateOne) sqlSave(ctx context.Context) (_node *GroupPr
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(gpuo.modifiers...)
-	_node = &GroupProgress{config: gpuo.config}
+	_node = &GroupzProgress{config: gpuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, gpuo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{groupprogress.Label}
+			err = &NotFoundError{groupzprogress.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}

@@ -327,7 +327,7 @@ services:
       MYSQL_DATABASE: event
     container_name: 'db-event'
     volumes:
-      - "./tmp/db/chat:/var/lib/mysql"
+      - "./tmp/db/event:/var/lib/mysql"
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
     ports:

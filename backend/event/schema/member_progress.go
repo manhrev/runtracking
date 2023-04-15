@@ -22,7 +22,7 @@ func (MemberProgress) Fields() []ent.Field {
 
 func (MemberProgress) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("group", GroupProgress.Type).
+		edge.From("group", GroupzProgress.Type).
 			Ref("member").
 			Unique(),
 	}

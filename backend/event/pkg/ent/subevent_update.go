@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -171,14 +171,14 @@ func (seu *SubEventUpdate) SetEvent(e *Event) *SubEventUpdate {
 	return seu.SetEventID(e.ID)
 }
 
-// AddGroupIDs adds the "group" edge to the GroupProgress entity by IDs.
+// AddGroupIDs adds the "group" edge to the GroupzProgress entity by IDs.
 func (seu *SubEventUpdate) AddGroupIDs(ids ...int64) *SubEventUpdate {
 	seu.mutation.AddGroupIDs(ids...)
 	return seu
 }
 
-// AddGroup adds the "group" edges to the GroupProgress entity.
-func (seu *SubEventUpdate) AddGroup(g ...*GroupProgress) *SubEventUpdate {
+// AddGroup adds the "group" edges to the GroupzProgress entity.
+func (seu *SubEventUpdate) AddGroup(g ...*GroupzProgress) *SubEventUpdate {
 	ids := make([]int64, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
@@ -197,20 +197,20 @@ func (seu *SubEventUpdate) ClearEvent() *SubEventUpdate {
 	return seu
 }
 
-// ClearGroup clears all "group" edges to the GroupProgress entity.
+// ClearGroup clears all "group" edges to the GroupzProgress entity.
 func (seu *SubEventUpdate) ClearGroup() *SubEventUpdate {
 	seu.mutation.ClearGroup()
 	return seu
 }
 
-// RemoveGroupIDs removes the "group" edge to GroupProgress entities by IDs.
+// RemoveGroupIDs removes the "group" edge to GroupzProgress entities by IDs.
 func (seu *SubEventUpdate) RemoveGroupIDs(ids ...int64) *SubEventUpdate {
 	seu.mutation.RemoveGroupIDs(ids...)
 	return seu
 }
 
-// RemoveGroup removes "group" edges to GroupProgress entities.
-func (seu *SubEventUpdate) RemoveGroup(g ...*GroupProgress) *SubEventUpdate {
+// RemoveGroup removes "group" edges to GroupzProgress entities.
+func (seu *SubEventUpdate) RemoveGroup(g ...*GroupzProgress) *SubEventUpdate {
 	ids := make([]int64, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
@@ -336,7 +336,7 @@ func (seu *SubEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{subevent.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -349,7 +349,7 @@ func (seu *SubEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{subevent.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -365,7 +365,7 @@ func (seu *SubEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{subevent.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -535,14 +535,14 @@ func (seuo *SubEventUpdateOne) SetEvent(e *Event) *SubEventUpdateOne {
 	return seuo.SetEventID(e.ID)
 }
 
-// AddGroupIDs adds the "group" edge to the GroupProgress entity by IDs.
+// AddGroupIDs adds the "group" edge to the GroupzProgress entity by IDs.
 func (seuo *SubEventUpdateOne) AddGroupIDs(ids ...int64) *SubEventUpdateOne {
 	seuo.mutation.AddGroupIDs(ids...)
 	return seuo
 }
 
-// AddGroup adds the "group" edges to the GroupProgress entity.
-func (seuo *SubEventUpdateOne) AddGroup(g ...*GroupProgress) *SubEventUpdateOne {
+// AddGroup adds the "group" edges to the GroupzProgress entity.
+func (seuo *SubEventUpdateOne) AddGroup(g ...*GroupzProgress) *SubEventUpdateOne {
 	ids := make([]int64, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
@@ -561,20 +561,20 @@ func (seuo *SubEventUpdateOne) ClearEvent() *SubEventUpdateOne {
 	return seuo
 }
 
-// ClearGroup clears all "group" edges to the GroupProgress entity.
+// ClearGroup clears all "group" edges to the GroupzProgress entity.
 func (seuo *SubEventUpdateOne) ClearGroup() *SubEventUpdateOne {
 	seuo.mutation.ClearGroup()
 	return seuo
 }
 
-// RemoveGroupIDs removes the "group" edge to GroupProgress entities by IDs.
+// RemoveGroupIDs removes the "group" edge to GroupzProgress entities by IDs.
 func (seuo *SubEventUpdateOne) RemoveGroupIDs(ids ...int64) *SubEventUpdateOne {
 	seuo.mutation.RemoveGroupIDs(ids...)
 	return seuo
 }
 
-// RemoveGroup removes "group" edges to GroupProgress entities.
-func (seuo *SubEventUpdateOne) RemoveGroup(g ...*GroupProgress) *SubEventUpdateOne {
+// RemoveGroup removes "group" edges to GroupzProgress entities.
+func (seuo *SubEventUpdateOne) RemoveGroup(g ...*GroupzProgress) *SubEventUpdateOne {
 	ids := make([]int64, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
@@ -730,7 +730,7 @@ func (seuo *SubEventUpdateOne) sqlSave(ctx context.Context) (_node *SubEvent, er
 			Columns: []string{subevent.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -743,7 +743,7 @@ func (seuo *SubEventUpdateOne) sqlSave(ctx context.Context) (_node *SubEvent, er
 			Columns: []string{subevent.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -759,7 +759,7 @@ func (seuo *SubEventUpdateOne) sqlSave(ctx context.Context) (_node *SubEvent, er
 			Columns: []string{subevent.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

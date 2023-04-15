@@ -14,6 +14,7 @@ var (
 		{Name: "owner_group_id", Type: field.TypeInt64},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "start_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
 		{Name: "description", Type: field.TypeString, Nullable: true},
@@ -27,44 +28,34 @@ var (
 		Columns:    EventsColumns,
 		PrimaryKey: []*schema.Column{EventsColumns[0]},
 	}
-	// EventGroupsColumns holds the columns for the "event_groups" table.
-	EventGroupsColumns = []*schema.Column{
+	// EventGroupzsColumns holds the columns for the "event_groupzs" table.
+	EventGroupzsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "group_id", Type: field.TypeInt64},
 		{Name: "joined_at", Type: field.TypeTime},
 		{Name: "status", Type: field.TypeInt64, Default: 0},
-		{Name: "event_groups", Type: field.TypeInt64, Nullable: true},
 	}
-	// EventGroupsTable holds the schema information for the "event_groups" table.
-	EventGroupsTable = &schema.Table{
-		Name:       "event_groups",
-		Columns:    EventGroupsColumns,
-		PrimaryKey: []*schema.Column{EventGroupsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "event_groups_events_groups",
-				Columns:    []*schema.Column{EventGroupsColumns[4]},
-				RefColumns: []*schema.Column{EventsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
+	// EventGroupzsTable holds the schema information for the "event_groupzs" table.
+	EventGroupzsTable = &schema.Table{
+		Name:       "event_groupzs",
+		Columns:    EventGroupzsColumns,
+		PrimaryKey: []*schema.Column{EventGroupzsColumns[0]},
 	}
-	// GroupProgressesColumns holds the columns for the "group_progresses" table.
-	GroupProgressesColumns = []*schema.Column{
+	// GroupzProgressesColumns holds the columns for the "groupz_progresses" table.
+	GroupzProgressesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "group_id", Type: field.TypeInt64},
 		{Name: "progress", Type: field.TypeInt64, Default: 0},
 		{Name: "sub_event_group", Type: field.TypeInt64, Nullable: true},
 	}
-	// GroupProgressesTable holds the schema information for the "group_progresses" table.
-	GroupProgressesTable = &schema.Table{
-		Name:       "group_progresses",
-		Columns:    GroupProgressesColumns,
-		PrimaryKey: []*schema.Column{GroupProgressesColumns[0]},
+	// GroupzProgressesTable holds the schema information for the "groupz_progresses" table.
+	GroupzProgressesTable = &schema.Table{
+		Name:       "groupz_progresses",
+		Columns:    GroupzProgressesColumns,
+		PrimaryKey: []*schema.Column{GroupzProgressesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "group_progresses_sub_events_group",
-				Columns:    []*schema.Column{GroupProgressesColumns[3]},
+				Symbol:     "groupz_progresses_sub_events_group",
+				Columns:    []*schema.Column{GroupzProgressesColumns[3]},
 				RefColumns: []*schema.Column{SubEventsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -76,7 +67,7 @@ var (
 		{Name: "member_id", Type: field.TypeInt64},
 		{Name: "user_id", Type: field.TypeInt64},
 		{Name: "progress", Type: field.TypeInt64, Default: 0},
-		{Name: "group_progress_member", Type: field.TypeInt64, Nullable: true},
+		{Name: "groupz_progress_member", Type: field.TypeInt64, Nullable: true},
 	}
 	// MemberProgressesTable holds the schema information for the "member_progresses" table.
 	MemberProgressesTable = &schema.Table{
@@ -85,9 +76,9 @@ var (
 		PrimaryKey: []*schema.Column{MemberProgressesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "member_progresses_group_progresses_member",
+				Symbol:     "member_progresses_groupz_progresses_member",
 				Columns:    []*schema.Column{MemberProgressesColumns[4]},
-				RefColumns: []*schema.Column{GroupProgressesColumns[0]},
+				RefColumns: []*schema.Column{GroupzProgressesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -119,19 +110,46 @@ var (
 			},
 		},
 	}
+	// EventGroupsColumns holds the columns for the "event_groups" table.
+	EventGroupsColumns = []*schema.Column{
+		{Name: "event_id", Type: field.TypeInt64},
+		{Name: "event_groupz_id", Type: field.TypeInt64},
+	}
+	// EventGroupsTable holds the schema information for the "event_groups" table.
+	EventGroupsTable = &schema.Table{
+		Name:       "event_groups",
+		Columns:    EventGroupsColumns,
+		PrimaryKey: []*schema.Column{EventGroupsColumns[0], EventGroupsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "event_groups_event_id",
+				Columns:    []*schema.Column{EventGroupsColumns[0]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "event_groups_event_groupz_id",
+				Columns:    []*schema.Column{EventGroupsColumns[1]},
+				RefColumns: []*schema.Column{EventGroupzsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		EventsTable,
-		EventGroupsTable,
-		GroupProgressesTable,
+		EventGroupzsTable,
+		GroupzProgressesTable,
 		MemberProgressesTable,
 		SubEventsTable,
+		EventGroupsTable,
 	}
 )
 
 func init() {
-	EventGroupsTable.ForeignKeys[0].RefTable = EventsTable
-	GroupProgressesTable.ForeignKeys[0].RefTable = SubEventsTable
-	MemberProgressesTable.ForeignKeys[0].RefTable = GroupProgressesTable
+	GroupzProgressesTable.ForeignKeys[0].RefTable = SubEventsTable
+	MemberProgressesTable.ForeignKeys[0].RefTable = GroupzProgressesTable
 	SubEventsTable.ForeignKeys[0].RefTable = EventsTable
+	EventGroupsTable.ForeignKeys[0].RefTable = EventsTable
+	EventGroupsTable.ForeignKeys[1].RefTable = EventGroupzsTable
 }

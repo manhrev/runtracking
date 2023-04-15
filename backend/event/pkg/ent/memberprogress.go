@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 )
 
@@ -25,15 +25,15 @@ type MemberProgress struct {
 	Progress int64 `json:"progress,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MemberProgressQuery when eager-loading is set.
-	Edges                 MemberProgressEdges `json:"edges"`
-	group_progress_member *int64
-	selectValues          sql.SelectValues
+	Edges                  MemberProgressEdges `json:"edges"`
+	groupz_progress_member *int64
+	selectValues           sql.SelectValues
 }
 
 // MemberProgressEdges holds the relations/edges for other nodes in the graph.
 type MemberProgressEdges struct {
 	// Group holds the value of the group edge.
-	Group *GroupProgress `json:"group,omitempty"`
+	Group *GroupzProgress `json:"group,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -41,11 +41,11 @@ type MemberProgressEdges struct {
 
 // GroupOrErr returns the Group value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e MemberProgressEdges) GroupOrErr() (*GroupProgress, error) {
+func (e MemberProgressEdges) GroupOrErr() (*GroupzProgress, error) {
 	if e.loadedTypes[0] {
 		if e.Group == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: groupprogress.Label}
+			return nil, &NotFoundError{label: groupzprogress.Label}
 		}
 		return e.Group, nil
 	}
@@ -59,7 +59,7 @@ func (*MemberProgress) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case memberprogress.FieldID, memberprogress.FieldMemberID, memberprogress.FieldUserID, memberprogress.FieldProgress:
 			values[i] = new(sql.NullInt64)
-		case memberprogress.ForeignKeys[0]: // group_progress_member
+		case memberprogress.ForeignKeys[0]: // groupz_progress_member
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -102,10 +102,10 @@ func (mp *MemberProgress) assignValues(columns []string, values []any) error {
 			}
 		case memberprogress.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field group_progress_member", value)
+				return fmt.Errorf("unexpected type %T for edge-field groupz_progress_member", value)
 			} else if value.Valid {
-				mp.group_progress_member = new(int64)
-				*mp.group_progress_member = int64(value.Int64)
+				mp.groupz_progress_member = new(int64)
+				*mp.groupz_progress_member = int64(value.Int64)
 			}
 		default:
 			mp.selectValues.Set(columns[i], values[i])
@@ -121,7 +121,7 @@ func (mp *MemberProgress) Value(name string) (ent.Value, error) {
 }
 
 // QueryGroup queries the "group" edge of the MemberProgress entity.
-func (mp *MemberProgress) QueryGroup() *GroupProgressQuery {
+func (mp *MemberProgress) QueryGroup() *GroupzProgressQuery {
 	return NewMemberProgressClient(mp.config).QueryGroup(mp)
 }
 

@@ -9,32 +9,32 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
-// GroupProgressCreate is the builder for creating a GroupProgress entity.
-type GroupProgressCreate struct {
+// GroupzProgressCreate is the builder for creating a GroupzProgress entity.
+type GroupzProgressCreate struct {
 	config
-	mutation *GroupProgressMutation
+	mutation *GroupzProgressMutation
 	hooks    []Hook
 }
 
 // SetGroupID sets the "group_id" field.
-func (gpc *GroupProgressCreate) SetGroupID(i int64) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) SetGroupID(i int64) *GroupzProgressCreate {
 	gpc.mutation.SetGroupID(i)
 	return gpc
 }
 
 // SetProgress sets the "progress" field.
-func (gpc *GroupProgressCreate) SetProgress(i int64) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) SetProgress(i int64) *GroupzProgressCreate {
 	gpc.mutation.SetProgress(i)
 	return gpc
 }
 
 // SetNillableProgress sets the "progress" field if the given value is not nil.
-func (gpc *GroupProgressCreate) SetNillableProgress(i *int64) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) SetNillableProgress(i *int64) *GroupzProgressCreate {
 	if i != nil {
 		gpc.SetProgress(*i)
 	}
@@ -42,19 +42,19 @@ func (gpc *GroupProgressCreate) SetNillableProgress(i *int64) *GroupProgressCrea
 }
 
 // SetID sets the "id" field.
-func (gpc *GroupProgressCreate) SetID(i int64) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) SetID(i int64) *GroupzProgressCreate {
 	gpc.mutation.SetID(i)
 	return gpc
 }
 
 // SetSubEventID sets the "sub_event" edge to the SubEvent entity by ID.
-func (gpc *GroupProgressCreate) SetSubEventID(id int64) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) SetSubEventID(id int64) *GroupzProgressCreate {
 	gpc.mutation.SetSubEventID(id)
 	return gpc
 }
 
 // SetNillableSubEventID sets the "sub_event" edge to the SubEvent entity by ID if the given value is not nil.
-func (gpc *GroupProgressCreate) SetNillableSubEventID(id *int64) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) SetNillableSubEventID(id *int64) *GroupzProgressCreate {
 	if id != nil {
 		gpc = gpc.SetSubEventID(*id)
 	}
@@ -62,18 +62,18 @@ func (gpc *GroupProgressCreate) SetNillableSubEventID(id *int64) *GroupProgressC
 }
 
 // SetSubEvent sets the "sub_event" edge to the SubEvent entity.
-func (gpc *GroupProgressCreate) SetSubEvent(s *SubEvent) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) SetSubEvent(s *SubEvent) *GroupzProgressCreate {
 	return gpc.SetSubEventID(s.ID)
 }
 
 // AddMemberIDs adds the "member" edge to the MemberProgress entity by IDs.
-func (gpc *GroupProgressCreate) AddMemberIDs(ids ...int64) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) AddMemberIDs(ids ...int64) *GroupzProgressCreate {
 	gpc.mutation.AddMemberIDs(ids...)
 	return gpc
 }
 
 // AddMember adds the "member" edges to the MemberProgress entity.
-func (gpc *GroupProgressCreate) AddMember(m ...*MemberProgress) *GroupProgressCreate {
+func (gpc *GroupzProgressCreate) AddMember(m ...*MemberProgress) *GroupzProgressCreate {
 	ids := make([]int64, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -81,19 +81,19 @@ func (gpc *GroupProgressCreate) AddMember(m ...*MemberProgress) *GroupProgressCr
 	return gpc.AddMemberIDs(ids...)
 }
 
-// Mutation returns the GroupProgressMutation object of the builder.
-func (gpc *GroupProgressCreate) Mutation() *GroupProgressMutation {
+// Mutation returns the GroupzProgressMutation object of the builder.
+func (gpc *GroupzProgressCreate) Mutation() *GroupzProgressMutation {
 	return gpc.mutation
 }
 
-// Save creates the GroupProgress in the database.
-func (gpc *GroupProgressCreate) Save(ctx context.Context) (*GroupProgress, error) {
+// Save creates the GroupzProgress in the database.
+func (gpc *GroupzProgressCreate) Save(ctx context.Context) (*GroupzProgress, error) {
 	gpc.defaults()
-	return withHooks[*GroupProgress, GroupProgressMutation](ctx, gpc.sqlSave, gpc.mutation, gpc.hooks)
+	return withHooks[*GroupzProgress, GroupzProgressMutation](ctx, gpc.sqlSave, gpc.mutation, gpc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (gpc *GroupProgressCreate) SaveX(ctx context.Context) *GroupProgress {
+func (gpc *GroupzProgressCreate) SaveX(ctx context.Context) *GroupzProgress {
 	v, err := gpc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -102,38 +102,38 @@ func (gpc *GroupProgressCreate) SaveX(ctx context.Context) *GroupProgress {
 }
 
 // Exec executes the query.
-func (gpc *GroupProgressCreate) Exec(ctx context.Context) error {
+func (gpc *GroupzProgressCreate) Exec(ctx context.Context) error {
 	_, err := gpc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gpc *GroupProgressCreate) ExecX(ctx context.Context) {
+func (gpc *GroupzProgressCreate) ExecX(ctx context.Context) {
 	if err := gpc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (gpc *GroupProgressCreate) defaults() {
+func (gpc *GroupzProgressCreate) defaults() {
 	if _, ok := gpc.mutation.Progress(); !ok {
-		v := groupprogress.DefaultProgress
+		v := groupzprogress.DefaultProgress
 		gpc.mutation.SetProgress(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (gpc *GroupProgressCreate) check() error {
+func (gpc *GroupzProgressCreate) check() error {
 	if _, ok := gpc.mutation.GroupID(); !ok {
-		return &ValidationError{Name: "group_id", err: errors.New(`ent: missing required field "GroupProgress.group_id"`)}
+		return &ValidationError{Name: "group_id", err: errors.New(`ent: missing required field "GroupzProgress.group_id"`)}
 	}
 	if _, ok := gpc.mutation.Progress(); !ok {
-		return &ValidationError{Name: "progress", err: errors.New(`ent: missing required field "GroupProgress.progress"`)}
+		return &ValidationError{Name: "progress", err: errors.New(`ent: missing required field "GroupzProgress.progress"`)}
 	}
 	return nil
 }
 
-func (gpc *GroupProgressCreate) sqlSave(ctx context.Context) (*GroupProgress, error) {
+func (gpc *GroupzProgressCreate) sqlSave(ctx context.Context) (*GroupzProgress, error) {
 	if err := gpc.check(); err != nil {
 		return nil, err
 	}
@@ -153,29 +153,29 @@ func (gpc *GroupProgressCreate) sqlSave(ctx context.Context) (*GroupProgress, er
 	return _node, nil
 }
 
-func (gpc *GroupProgressCreate) createSpec() (*GroupProgress, *sqlgraph.CreateSpec) {
+func (gpc *GroupzProgressCreate) createSpec() (*GroupzProgress, *sqlgraph.CreateSpec) {
 	var (
-		_node = &GroupProgress{config: gpc.config}
-		_spec = sqlgraph.NewCreateSpec(groupprogress.Table, sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64))
+		_node = &GroupzProgress{config: gpc.config}
+		_spec = sqlgraph.NewCreateSpec(groupzprogress.Table, sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64))
 	)
 	if id, ok := gpc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
 	if value, ok := gpc.mutation.GroupID(); ok {
-		_spec.SetField(groupprogress.FieldGroupID, field.TypeInt64, value)
+		_spec.SetField(groupzprogress.FieldGroupID, field.TypeInt64, value)
 		_node.GroupID = value
 	}
 	if value, ok := gpc.mutation.Progress(); ok {
-		_spec.SetField(groupprogress.FieldProgress, field.TypeInt64, value)
+		_spec.SetField(groupzprogress.FieldProgress, field.TypeInt64, value)
 		_node.Progress = value
 	}
 	if nodes := gpc.mutation.SubEventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   groupprogress.SubEventTable,
-			Columns: []string{groupprogress.SubEventColumn},
+			Table:   groupzprogress.SubEventTable,
+			Columns: []string{groupzprogress.SubEventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subevent.FieldID, field.TypeInt64),
@@ -191,8 +191,8 @@ func (gpc *GroupProgressCreate) createSpec() (*GroupProgress, *sqlgraph.CreateSp
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   groupprogress.MemberTable,
-			Columns: []string{groupprogress.MemberColumn},
+			Table:   groupzprogress.MemberTable,
+			Columns: []string{groupzprogress.MemberColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memberprogress.FieldID, field.TypeInt64),
@@ -206,23 +206,23 @@ func (gpc *GroupProgressCreate) createSpec() (*GroupProgress, *sqlgraph.CreateSp
 	return _node, _spec
 }
 
-// GroupProgressCreateBulk is the builder for creating many GroupProgress entities in bulk.
-type GroupProgressCreateBulk struct {
+// GroupzProgressCreateBulk is the builder for creating many GroupzProgress entities in bulk.
+type GroupzProgressCreateBulk struct {
 	config
-	builders []*GroupProgressCreate
+	builders []*GroupzProgressCreate
 }
 
-// Save creates the GroupProgress entities in the database.
-func (gpcb *GroupProgressCreateBulk) Save(ctx context.Context) ([]*GroupProgress, error) {
+// Save creates the GroupzProgress entities in the database.
+func (gpcb *GroupzProgressCreateBulk) Save(ctx context.Context) ([]*GroupzProgress, error) {
 	specs := make([]*sqlgraph.CreateSpec, len(gpcb.builders))
-	nodes := make([]*GroupProgress, len(gpcb.builders))
+	nodes := make([]*GroupzProgress, len(gpcb.builders))
 	mutators := make([]Mutator, len(gpcb.builders))
 	for i := range gpcb.builders {
 		func(i int, root context.Context) {
 			builder := gpcb.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*GroupProgressMutation)
+				mutation, ok := m.(*GroupzProgressMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -269,7 +269,7 @@ func (gpcb *GroupProgressCreateBulk) Save(ctx context.Context) ([]*GroupProgress
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (gpcb *GroupProgressCreateBulk) SaveX(ctx context.Context) []*GroupProgress {
+func (gpcb *GroupzProgressCreateBulk) SaveX(ctx context.Context) []*GroupzProgress {
 	v, err := gpcb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -278,13 +278,13 @@ func (gpcb *GroupProgressCreateBulk) SaveX(ctx context.Context) []*GroupProgress
 }
 
 // Exec executes the query.
-func (gpcb *GroupProgressCreateBulk) Exec(ctx context.Context) error {
+func (gpcb *GroupzProgressCreateBulk) Exec(ctx context.Context) error {
 	_, err := gpcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (gpcb *GroupProgressCreateBulk) ExecX(ctx context.Context) {
+func (gpcb *GroupzProgressCreateBulk) ExecX(ctx context.Context) {
 	if err := gpcb.Exec(ctx); err != nil {
 		panic(err)
 	}

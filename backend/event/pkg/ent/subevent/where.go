@@ -545,7 +545,7 @@ func HasGroup() predicate.SubEvent {
 }
 
 // HasGroupWith applies the HasEdge predicate on the "group" edge with a given conditions (other predicates).
-func HasGroupWith(preds ...predicate.GroupProgress) predicate.SubEvent {
+func HasGroupWith(preds ...predicate.GroupzProgress) predicate.SubEvent {
 	return predicate.SubEvent(func(s *sql.Selector) {
 		step := newGroupStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -74,6 +74,20 @@ func (eu *EventUpdate) SetCreatedAt(t time.Time) *EventUpdate {
 func (eu *EventUpdate) SetNillableCreatedAt(t *time.Time) *EventUpdate {
 	if t != nil {
 		eu.SetCreatedAt(*t)
+	}
+	return eu
+}
+
+// SetStartAt sets the "start_at" field.
+func (eu *EventUpdate) SetStartAt(t time.Time) *EventUpdate {
+	eu.mutation.SetStartAt(t)
+	return eu
+}
+
+// SetNillableStartAt sets the "start_at" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableStartAt(t *time.Time) *EventUpdate {
+	if t != nil {
+		eu.SetStartAt(*t)
 	}
 	return eu
 }
@@ -189,14 +203,14 @@ func (eu *EventUpdate) AddSubevents(s ...*SubEvent) *EventUpdate {
 	return eu.AddSubeventIDs(ids...)
 }
 
-// AddGroupIDs adds the "groups" edge to the EventGroup entity by IDs.
+// AddGroupIDs adds the "groups" edge to the EventGroupz entity by IDs.
 func (eu *EventUpdate) AddGroupIDs(ids ...int64) *EventUpdate {
 	eu.mutation.AddGroupIDs(ids...)
 	return eu
 }
 
-// AddGroups adds the "groups" edges to the EventGroup entity.
-func (eu *EventUpdate) AddGroups(e ...*EventGroup) *EventUpdate {
+// AddGroups adds the "groups" edges to the EventGroupz entity.
+func (eu *EventUpdate) AddGroups(e ...*EventGroupz) *EventUpdate {
 	ids := make([]int64, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -230,20 +244,20 @@ func (eu *EventUpdate) RemoveSubevents(s ...*SubEvent) *EventUpdate {
 	return eu.RemoveSubeventIDs(ids...)
 }
 
-// ClearGroups clears all "groups" edges to the EventGroup entity.
+// ClearGroups clears all "groups" edges to the EventGroupz entity.
 func (eu *EventUpdate) ClearGroups() *EventUpdate {
 	eu.mutation.ClearGroups()
 	return eu
 }
 
-// RemoveGroupIDs removes the "groups" edge to EventGroup entities by IDs.
+// RemoveGroupIDs removes the "groups" edge to EventGroupz entities by IDs.
 func (eu *EventUpdate) RemoveGroupIDs(ids ...int64) *EventUpdate {
 	eu.mutation.RemoveGroupIDs(ids...)
 	return eu
 }
 
-// RemoveGroups removes "groups" edges to EventGroup entities.
-func (eu *EventUpdate) RemoveGroups(e ...*EventGroup) *EventUpdate {
+// RemoveGroups removes "groups" edges to EventGroupz entities.
+func (eu *EventUpdate) RemoveGroups(e ...*EventGroupz) *EventUpdate {
 	ids := make([]int64, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -307,6 +321,9 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.CreatedAt(); ok {
 		_spec.SetField(event.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := eu.mutation.StartAt(); ok {
+		_spec.SetField(event.FieldStartAt, field.TypeTime, value)
 	}
 	if value, ok := eu.mutation.UpdatedAt(); ok {
 		_spec.SetField(event.FieldUpdatedAt, field.TypeTime, value)
@@ -382,26 +399,26 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.GroupsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.GroupsTable,
-			Columns: []string{event.GroupsColumn},
+			Columns: event.GroupsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.RemovedGroupsIDs(); len(nodes) > 0 && !eu.mutation.GroupsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.GroupsTable,
-			Columns: []string{event.GroupsColumn},
+			Columns: event.GroupsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -411,13 +428,13 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := eu.mutation.GroupsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.GroupsTable,
-			Columns: []string{event.GroupsColumn},
+			Columns: event.GroupsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -490,6 +507,20 @@ func (euo *EventUpdateOne) SetCreatedAt(t time.Time) *EventUpdateOne {
 func (euo *EventUpdateOne) SetNillableCreatedAt(t *time.Time) *EventUpdateOne {
 	if t != nil {
 		euo.SetCreatedAt(*t)
+	}
+	return euo
+}
+
+// SetStartAt sets the "start_at" field.
+func (euo *EventUpdateOne) SetStartAt(t time.Time) *EventUpdateOne {
+	euo.mutation.SetStartAt(t)
+	return euo
+}
+
+// SetNillableStartAt sets the "start_at" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableStartAt(t *time.Time) *EventUpdateOne {
+	if t != nil {
+		euo.SetStartAt(*t)
 	}
 	return euo
 }
@@ -605,14 +636,14 @@ func (euo *EventUpdateOne) AddSubevents(s ...*SubEvent) *EventUpdateOne {
 	return euo.AddSubeventIDs(ids...)
 }
 
-// AddGroupIDs adds the "groups" edge to the EventGroup entity by IDs.
+// AddGroupIDs adds the "groups" edge to the EventGroupz entity by IDs.
 func (euo *EventUpdateOne) AddGroupIDs(ids ...int64) *EventUpdateOne {
 	euo.mutation.AddGroupIDs(ids...)
 	return euo
 }
 
-// AddGroups adds the "groups" edges to the EventGroup entity.
-func (euo *EventUpdateOne) AddGroups(e ...*EventGroup) *EventUpdateOne {
+// AddGroups adds the "groups" edges to the EventGroupz entity.
+func (euo *EventUpdateOne) AddGroups(e ...*EventGroupz) *EventUpdateOne {
 	ids := make([]int64, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -646,20 +677,20 @@ func (euo *EventUpdateOne) RemoveSubevents(s ...*SubEvent) *EventUpdateOne {
 	return euo.RemoveSubeventIDs(ids...)
 }
 
-// ClearGroups clears all "groups" edges to the EventGroup entity.
+// ClearGroups clears all "groups" edges to the EventGroupz entity.
 func (euo *EventUpdateOne) ClearGroups() *EventUpdateOne {
 	euo.mutation.ClearGroups()
 	return euo
 }
 
-// RemoveGroupIDs removes the "groups" edge to EventGroup entities by IDs.
+// RemoveGroupIDs removes the "groups" edge to EventGroupz entities by IDs.
 func (euo *EventUpdateOne) RemoveGroupIDs(ids ...int64) *EventUpdateOne {
 	euo.mutation.RemoveGroupIDs(ids...)
 	return euo
 }
 
-// RemoveGroups removes "groups" edges to EventGroup entities.
-func (euo *EventUpdateOne) RemoveGroups(e ...*EventGroup) *EventUpdateOne {
+// RemoveGroups removes "groups" edges to EventGroupz entities.
+func (euo *EventUpdateOne) RemoveGroups(e ...*EventGroupz) *EventUpdateOne {
 	ids := make([]int64, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -754,6 +785,9 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	if value, ok := euo.mutation.CreatedAt(); ok {
 		_spec.SetField(event.FieldCreatedAt, field.TypeTime, value)
 	}
+	if value, ok := euo.mutation.StartAt(); ok {
+		_spec.SetField(event.FieldStartAt, field.TypeTime, value)
+	}
 	if value, ok := euo.mutation.UpdatedAt(); ok {
 		_spec.SetField(event.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -828,26 +862,26 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	}
 	if euo.mutation.GroupsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.GroupsTable,
-			Columns: []string{event.GroupsColumn},
+			Columns: event.GroupsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.RemovedGroupsIDs(); len(nodes) > 0 && !euo.mutation.GroupsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.GroupsTable,
-			Columns: []string{event.GroupsColumn},
+			Columns: event.GroupsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -857,13 +891,13 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	}
 	if nodes := euo.mutation.GroupsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.GroupsTable,
-			Columns: []string{event.GroupsColumn},
+			Columns: event.GroupsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

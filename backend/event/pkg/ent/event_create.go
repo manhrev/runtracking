@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroup"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
@@ -52,6 +52,20 @@ func (ec *EventCreate) SetCreatedAt(t time.Time) *EventCreate {
 func (ec *EventCreate) SetNillableCreatedAt(t *time.Time) *EventCreate {
 	if t != nil {
 		ec.SetCreatedAt(*t)
+	}
+	return ec
+}
+
+// SetStartAt sets the "start_at" field.
+func (ec *EventCreate) SetStartAt(t time.Time) *EventCreate {
+	ec.mutation.SetStartAt(t)
+	return ec
+}
+
+// SetNillableStartAt sets the "start_at" field if the given value is not nil.
+func (ec *EventCreate) SetNillableStartAt(t *time.Time) *EventCreate {
+	if t != nil {
+		ec.SetStartAt(*t)
 	}
 	return ec
 }
@@ -153,14 +167,14 @@ func (ec *EventCreate) AddSubevents(s ...*SubEvent) *EventCreate {
 	return ec.AddSubeventIDs(ids...)
 }
 
-// AddGroupIDs adds the "groups" edge to the EventGroup entity by IDs.
+// AddGroupIDs adds the "groups" edge to the EventGroupz entity by IDs.
 func (ec *EventCreate) AddGroupIDs(ids ...int64) *EventCreate {
 	ec.mutation.AddGroupIDs(ids...)
 	return ec
 }
 
-// AddGroups adds the "groups" edges to the EventGroup entity.
-func (ec *EventCreate) AddGroups(e ...*EventGroup) *EventCreate {
+// AddGroups adds the "groups" edges to the EventGroupz entity.
+func (ec *EventCreate) AddGroups(e ...*EventGroupz) *EventCreate {
 	ids := make([]int64, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -207,6 +221,10 @@ func (ec *EventCreate) defaults() {
 		v := event.DefaultCreatedAt()
 		ec.mutation.SetCreatedAt(v)
 	}
+	if _, ok := ec.mutation.StartAt(); !ok {
+		v := event.DefaultStartAt()
+		ec.mutation.SetStartAt(v)
+	}
 	if _, ok := ec.mutation.UpdatedAt(); !ok {
 		v := event.DefaultUpdatedAt()
 		ec.mutation.SetUpdatedAt(v)
@@ -232,6 +250,9 @@ func (ec *EventCreate) check() error {
 	}
 	if _, ok := ec.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Event.created_at"`)}
+	}
+	if _, ok := ec.mutation.StartAt(); !ok {
+		return &ValidationError{Name: "start_at", err: errors.New(`ent: missing required field "Event.start_at"`)}
 	}
 	if _, ok := ec.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Event.updated_at"`)}
@@ -292,6 +313,10 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 		_spec.SetField(event.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
+	if value, ok := ec.mutation.StartAt(); ok {
+		_spec.SetField(event.FieldStartAt, field.TypeTime, value)
+		_node.StartAt = value
+	}
 	if value, ok := ec.mutation.UpdatedAt(); ok {
 		_spec.SetField(event.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
@@ -334,13 +359,13 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ec.mutation.GroupsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.GroupsTable,
-			Columns: []string{event.GroupsColumn},
+			Columns: event.GroupsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(eventgroup.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

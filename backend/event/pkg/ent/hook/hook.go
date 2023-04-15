@@ -21,28 +21,28 @@ func (f EventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EventMutation", m)
 }
 
-// The EventGroupFunc type is an adapter to allow the use of ordinary
-// function as EventGroup mutator.
-type EventGroupFunc func(context.Context, *ent.EventGroupMutation) (ent.Value, error)
+// The EventGroupzFunc type is an adapter to allow the use of ordinary
+// function as EventGroupz mutator.
+type EventGroupzFunc func(context.Context, *ent.EventGroupzMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f EventGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.EventGroupMutation); ok {
+func (f EventGroupzFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EventGroupzMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EventGroupMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EventGroupzMutation", m)
 }
 
-// The GroupProgressFunc type is an adapter to allow the use of ordinary
-// function as GroupProgress mutator.
-type GroupProgressFunc func(context.Context, *ent.GroupProgressMutation) (ent.Value, error)
+// The GroupzProgressFunc type is an adapter to allow the use of ordinary
+// function as GroupzProgress mutator.
+type GroupzProgressFunc func(context.Context, *ent.GroupzProgressMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f GroupProgressFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.GroupProgressMutation); ok {
+func (f GroupzProgressFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.GroupzProgressMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupProgressMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupzProgressMutation", m)
 }
 
 // The MemberProgressFunc type is an adapter to allow the use of ordinary

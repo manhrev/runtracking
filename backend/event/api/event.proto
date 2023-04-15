@@ -54,6 +54,7 @@ message CreateEventRequest {
     bool is_global = 4; // only app admin can use, if not admin, this field will be ignored
     repeated CreateSubEvent sub_events = 5;
     int64 owner_group_id = 6;
+    google.protobuf.Timestamp start_at = 7;
 
     message CreateSubEvent {
         string name = 1;

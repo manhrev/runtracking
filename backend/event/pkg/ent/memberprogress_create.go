@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
 )
 
@@ -52,13 +52,13 @@ func (mpc *MemberProgressCreate) SetID(i int64) *MemberProgressCreate {
 	return mpc
 }
 
-// SetGroupID sets the "group" edge to the GroupProgress entity by ID.
+// SetGroupID sets the "group" edge to the GroupzProgress entity by ID.
 func (mpc *MemberProgressCreate) SetGroupID(id int64) *MemberProgressCreate {
 	mpc.mutation.SetGroupID(id)
 	return mpc
 }
 
-// SetNillableGroupID sets the "group" edge to the GroupProgress entity by ID if the given value is not nil.
+// SetNillableGroupID sets the "group" edge to the GroupzProgress entity by ID if the given value is not nil.
 func (mpc *MemberProgressCreate) SetNillableGroupID(id *int64) *MemberProgressCreate {
 	if id != nil {
 		mpc = mpc.SetGroupID(*id)
@@ -66,8 +66,8 @@ func (mpc *MemberProgressCreate) SetNillableGroupID(id *int64) *MemberProgressCr
 	return mpc
 }
 
-// SetGroup sets the "group" edge to the GroupProgress entity.
-func (mpc *MemberProgressCreate) SetGroup(g *GroupProgress) *MemberProgressCreate {
+// SetGroup sets the "group" edge to the GroupzProgress entity.
+func (mpc *MemberProgressCreate) SetGroup(g *GroupzProgress) *MemberProgressCreate {
 	return mpc.SetGroupID(g.ID)
 }
 
@@ -175,13 +175,13 @@ func (mpc *MemberProgressCreate) createSpec() (*MemberProgress, *sqlgraph.Create
 			Columns: []string{memberprogress.GroupColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(groupprogress.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(groupzprogress.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.group_progress_member = &nodes[0]
+		_node.groupz_progress_member = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -35,6 +35,6 @@ func (SubEvent) Edges() []ent.Edge {
 		edge.From("event", Event.Type).
 			Ref("subevents").
 			Unique(),
-		edge.To("group", GroupProgress.Type),
+		edge.To("group", GroupzProgress.Type),
 	}
 }
