@@ -4,7 +4,7 @@ import (
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 
-	code "github.com/manhrev/runtracking/backend/activity/pkg/code"
+	code "github.com/manhrev/runtracking/backend/plan/pkg/code"
 )
 
 var Unauthenticated = Error(code.Code_UNAUTHENTICATED)
