@@ -17,3 +17,10 @@ func ConvertIntsToInt64s(nums []int) []int64 {
 
 	return res
 }
+
+func GetPartnerID(fromUserID int64, toUserID int64, userID int64) int64 {
+	if fromUserID == userID {
+		return toUserID
+	}
+	return fromUserID
+}

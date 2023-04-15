@@ -21,7 +21,14 @@ func (s *chatServer) GetHistoryChat(ctx context.Context, request *chatpb.GetHist
 		return nil, err
 	}
 
-	messageEntList, total, err := s.repository.Message.List(ctx, userId, request.ToUserId, request.Limit, request.Offset)
+	messageEntList, total, err := s.repository.Message.List(ctx,
+		userId,
+		request.ToUserId,
+		request.Limit,
+		request.Offset,
+		request.From,
+		request.To,
+	)
 	if err != nil {
 		return nil, err
 	}

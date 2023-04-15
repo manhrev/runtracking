@@ -3,8 +3,8 @@ package message
 import (
 	"context"
 	"fmt"
-	"math"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/manhrev/runtracking/backend/chat/internal/status"
 	"github.com/manhrev/runtracking/backend/chat/pkg/code"
 	"github.com/manhrev/runtracking/backend/chat/pkg/ent"
@@ -25,7 +25,9 @@ type Message interface {
 		fromUserID int64,
 		toUserID int64,
 		limit uint32,
-		offset uint64) ([]*ent.Message, int, error)
+		offset uint64,
+		from *timestamppb.Timestamp,
+		to *timestamppb.Timestamp) ([]*ent.Message, int, error)
 
 	Update(ctx context.Context,
 		fromUserID int64,
@@ -35,6 +37,9 @@ type Message interface {
 	Delete(ctx context.Context,
 		fromUserID int64,
 		toUserID int64) error
+
+	ListConversation(ctx context.Context,
+		userID int64) ([]*ent.Message, error)
 }
 
 type messageImpl struct {
@@ -94,13 +99,23 @@ func (m *messageImpl) List(ctx context.Context,
 	fromUserID int64,
 	toUserID int64,
 	limit uint32,
-	offset uint64) ([]*ent.Message, int, error) {
+	offset uint64,
+	from *timestamppb.Timestamp,
+	to *timestamppb.Timestamp) ([]*ent.Message, int, error) {
 	query := m.entClient.Message.Query().
 		Where(message.Or(
 			message.And(message.FromUserIDEQ(fromUserID), message.ToUserIDEQ(toUserID), message.SoftDeleteFromUserIDEQ(false)),
 			message.And(message.FromUserIDEQ(toUserID), message.ToUserIDEQ(fromUserID), message.SoftDeleteToUserIDEQ(false))),
 		).
-		Order(ent.Desc(message.FieldCreatedAt))
+		Order(ent.Desc(message.FieldCreatedAt, message.FieldID))
+
+	// time range
+	if from != nil && to != nil {
+		query.Where(
+			message.CreatedAtGTE(from.AsTime().Local()),
+			message.CreatedAtLTE(to.AsTime().Local()),
+		)
+	}
 
 	// Count number of records
 	total, err := query.Count(ctx)
@@ -129,6 +144,32 @@ func (m *messageImpl) List(ctx context.Context,
 	return messageEntList, total, nil
 }
 
+func (c *messageImpl) ListConversation(ctx context.Context,
+	userID int64) ([]*ent.Message, error) {
+
+	messages, err := c.entClient.Debug().Message.Query().Where(func(s *sql.Selector) {
+		t := sql.Table(message.Table).As("t2")
+		s.Where(
+			sql.And(
+				sql.EQ(
+					s.C(message.FieldCreatedAt),
+					sql.Select(sql.Max(t.C(message.FieldCreatedAt))).From(t).
+						Where(sql.And(
+							sql.ColumnsEQ(s.C(message.FieldToUserID), t.C(message.FieldToUserID)),
+							sql.ColumnsEQ(s.C(message.FieldFromUserID), t.C(message.FieldFromUserID)),
+						)),
+				),
+				sql.Or(sql.EQ(s.C(message.FieldFromUserID), userID), sql.EQ(s.C(message.FieldToUserID), userID)),
+			))
+	}).All(ctx)
+
+	if err != nil {
+		return nil, status.Internal(fmt.Sprintf("Error when fetch conversation: %v", err))
+	}
+
+	return messages, nil
+}
+
 func (c *messageImpl) Delete(ctx context.Context,
 	fromUserID int64,
 	toUserID int64) error {
@@ -151,9 +192,4 @@ func (c *messageImpl) Delete(ctx context.Context,
 	}
 
 	return nil
-}
-
-func reorderUserID(userId1 int64, userId2 int64) (int64, int64) {
-	userIdF1, userIdF2 := float64(userId1), float64(userId2)
-	return int64(math.Max(userIdF1, userIdF2)), int64(math.Min(userIdF1, userIdF2))
 }
