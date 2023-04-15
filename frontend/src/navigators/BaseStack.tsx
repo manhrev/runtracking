@@ -16,7 +16,7 @@ import PlanAdd from '../screens/Plan/PlanAdd'
 import RunCommit from '../screens/Run/RunCommit'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
 import { TrackPoint, ActivityType } from '../lib/activity/activity_pb'
-import { GroupInfo } from '../lib/group/group_pb'
+import { GroupInfo, ChallengeInfo } from '../lib/group/group_pb'
 import { useAppDispatch, useAppSelector } from '../redux/store'
 import { selectUserSlice } from '../redux/features/user/slice'
 import { useEffect } from 'react'
@@ -28,6 +28,7 @@ import GroupEdit from '../screens/Group/YourGroups/GroupEdit'
 import GroupMembers from '../screens/Group/YourGroups/GroupMembers'
 import ChallengeList from '../screens/Group/Challenge/ChallengeList'
 import ChallengeAdd from '../screens/Group/Challenge/ChallengeAdd'
+import ChallengeEdit from '../screens/Group/Challenge/ChallengeEdit'
 import ChallengeDetail from '../screens/Group/Challenge/ChallengeDetail'
 import ChallengeStats from '../screens/Group/Challenge/ChallengeStats'
 import { toast } from '../utils/toast/toast'
@@ -119,6 +120,10 @@ export type RootBaseStackParamList = {
   }
   ChallengeAdd: {
     groupId: number
+  }
+  ChallengeEdit: {
+    groupId: number
+    challengeInfo: ChallengeInfo.AsObject | undefined
   }
   ChallengeDetail: {
     challengeId: number
@@ -295,6 +300,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={ChallengeAdd}
+          />
+          <Stack.Screen
+            name="ChallengeEdit"
+            options={{
+              title: 'Edit Challenge',
+              headerBackVisible: true,
+            }}
+            component={ChallengeEdit}
           />
           <Stack.Screen
             name="ChallengeDetail"

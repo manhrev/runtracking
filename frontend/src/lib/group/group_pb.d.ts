@@ -529,6 +529,11 @@ export class UpdateChallengeRequest extends jspb.Message {
   clearIdsRuleToDeleteList(): UpdateChallengeRequest;
   addIdsRuleToDelete(value: number, index?: number): UpdateChallengeRequest;
 
+  getChallengeRulesToAddList(): Array<ChallengeRuleInfo>;
+  setChallengeRulesToAddList(value: Array<ChallengeRuleInfo>): UpdateChallengeRequest;
+  clearChallengeRulesToAddList(): UpdateChallengeRequest;
+  addChallengeRulesToAdd(value?: ChallengeRuleInfo, index?: number): ChallengeRuleInfo;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UpdateChallengeRequest.AsObject;
   static toObject(includeInstance: boolean, msg: UpdateChallengeRequest): UpdateChallengeRequest.AsObject;
@@ -542,6 +547,7 @@ export namespace UpdateChallengeRequest {
     challengeinfo?: ChallengeInfo.AsObject,
     groupId: number,
     idsRuleToDeleteList: Array<number>,
+    challengeRulesToAddList: Array<ChallengeRuleInfo.AsObject>,
   }
 }
 

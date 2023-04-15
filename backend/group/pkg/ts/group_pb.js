@@ -5056,7 +5056,7 @@ proto.group.ListChallengeReply.prototype.setTotal = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.group.UpdateChallengeRequest.repeatedFields_ = [3];
+proto.group.UpdateChallengeRequest.repeatedFields_ = [3,4];
 
 
 
@@ -5091,7 +5091,9 @@ proto.group.UpdateChallengeRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     challengeinfo: (f = msg.getChallengeinfo()) && proto.group.ChallengeInfo.toObject(includeInstance, f),
     groupId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    idsRuleToDeleteList: (f = jspb.Message.getRepeatedField(msg, 3)) == null ? undefined : f
+    idsRuleToDeleteList: (f = jspb.Message.getRepeatedField(msg, 3)) == null ? undefined : f,
+    challengeRulesToAddList: jspb.Message.toObjectList(msg.getChallengeRulesToAddList(),
+    proto.group.ChallengeRuleInfo.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -5143,6 +5145,11 @@ proto.group.UpdateChallengeRequest.deserializeBinaryFromReader = function(msg, r
         msg.addIdsRuleToDelete(values[i]);
       }
       break;
+    case 4:
+      var value = new proto.group.ChallengeRuleInfo;
+      reader.readMessage(value,proto.group.ChallengeRuleInfo.deserializeBinaryFromReader);
+      msg.addChallengeRulesToAdd(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -5192,6 +5199,14 @@ proto.group.UpdateChallengeRequest.serializeBinaryToWriter = function(message, w
     writer.writePackedInt64(
       3,
       f
+    );
+  }
+  f = message.getChallengeRulesToAddList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      4,
+      f,
+      proto.group.ChallengeRuleInfo.serializeBinaryToWriter
     );
   }
 };
@@ -5286,6 +5301,44 @@ proto.group.UpdateChallengeRequest.prototype.addIdsRuleToDelete = function(value
  */
 proto.group.UpdateChallengeRequest.prototype.clearIdsRuleToDeleteList = function() {
   return this.setIdsRuleToDeleteList([]);
+};
+
+
+/**
+ * repeated ChallengeRuleInfo challenge_rules_to_add = 4;
+ * @return {!Array<!proto.group.ChallengeRuleInfo>}
+ */
+proto.group.UpdateChallengeRequest.prototype.getChallengeRulesToAddList = function() {
+  return /** @type{!Array<!proto.group.ChallengeRuleInfo>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.group.ChallengeRuleInfo, 4));
+};
+
+
+/**
+ * @param {!Array<!proto.group.ChallengeRuleInfo>} value
+ * @return {!proto.group.UpdateChallengeRequest} returns this
+*/
+proto.group.UpdateChallengeRequest.prototype.setChallengeRulesToAddList = function(value) {
+  return jspb.Message.setRepeatedWrapperField(this, 4, value);
+};
+
+
+/**
+ * @param {!proto.group.ChallengeRuleInfo=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.group.ChallengeRuleInfo}
+ */
+proto.group.UpdateChallengeRequest.prototype.addChallengeRulesToAdd = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.group.ChallengeRuleInfo, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.group.UpdateChallengeRequest} returns this
+ */
+proto.group.UpdateChallengeRequest.prototype.clearChallengeRulesToAddList = function() {
+  return this.setChallengeRulesToAddList([]);
 };
 
 

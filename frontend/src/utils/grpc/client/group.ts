@@ -11,6 +11,7 @@ import {
   LeaveGroupRequest, LeaveGroupReply,
   ListChallengeRequest, ListChallengeReply,
   CreateChallengeRequest, CreateChallengeReply,
+  UpdateChallengeRequest, UpdateChallengeReply,
   DeleteChallengeRequest, DeleteChallengeReply,
   GetChallengeRequest, GetChallengeReply,
   ListInProgressChallengeRequest, ListInProgressChallengeReply,
@@ -205,6 +206,60 @@ class rpcGroupClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<CreateChallengeReply.AsObject>(
       'createChallenge',
+      req
+    )
+  }
+
+  async updateChallenge(param: UpdateChallengeRequest.AsObject) {
+    const challengeRuleList = Array<ChallengeRuleInfo>()
+    param.challengeinfo?.challengerulesList?.forEach((rule) => { // old rule list without deleted rule
+      const challengeRuleInfo = new ChallengeRuleInfo()
+      challengeRuleInfo.setRule(rule.rule)
+      challengeRuleInfo.setId(rule.id)
+      challengeRuleInfo.setGoal(rule.goal)
+
+      challengeRuleList.push(challengeRuleInfo)
+    })
+
+    const challengeRulesToAddList = Array<ChallengeRuleInfo>() // new rule list need to add
+    param.challengeRulesToAddList?.forEach((rule) => {
+      const challengeRuleInfo = new ChallengeRuleInfo()
+      challengeRuleInfo.setRule(rule.rule)
+      challengeRuleInfo.setId(rule.id)
+      challengeRuleInfo.setGoal(rule.goal)
+
+      challengeRulesToAddList.push(challengeRuleInfo)
+    })
+
+    const challengeInfo = new ChallengeInfo()
+    challengeInfo.setName(param.challengeinfo?.name || '')
+    challengeInfo.setDescription(param.challengeinfo?.description || '')
+    challengeInfo.setPicture(param.challengeinfo?.picture || '')
+    challengeInfo.setType(param.challengeinfo?.type || 0)
+    challengeInfo.setStatus(param.challengeinfo?.status || 0)
+    challengeInfo.setFrom(
+      new Timestamp().setSeconds(param.challengeinfo?.from?.seconds || 0)
+    )
+    challengeInfo.setTo(
+      new Timestamp().setSeconds(param.challengeinfo?.to?.seconds || 0)
+    )
+    challengeInfo.setChallengerulesList(challengeRuleList)
+    challengeInfo.setId(param.challengeinfo?.id || 0)
+
+    // dont need
+    challengeInfo.setGroupId(param.challengeinfo?.groupId || 0)
+    challengeInfo.setMemberProgressListList([])
+    challengeInfo.setCompletedFirstMember(undefined)
+
+    // main req
+    const req = new UpdateChallengeRequest()
+    req.setGroupId(param.groupId)
+    req.setIdsRuleToDeleteList(param.idsRuleToDeleteList)
+    req.setChallengeRulesToAddList(challengeRulesToAddList)
+    req.setChallengeinfo(challengeInfo)
+
+    return await this.gRPCClientRequest<UpdateChallengeReply.AsObject>(
+      'updateChallenge',
       req
     )
   }

@@ -6,6 +6,7 @@ import { RootState } from '../../reducers'
 import {
   listChallengeThunk,
   createChallengeThunk,
+  updateChallengeThunk,
   deleteChallengeThunk,
 } from './thunk'
 
@@ -39,6 +40,18 @@ const slice = createSlice({
       state.status = StatusEnum.LOADING
     })
     builder.addCase(createChallengeThunk.fulfilled, (state, { payload }) => {
+      const { response, error } = payload
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
+      state.status = StatusEnum.SUCCEEDED
+      // state.challengeList.push(response?.challengeinfo || {})
+    })
+    builder.addCase(updateChallengeThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING
+    })
+    builder.addCase(updateChallengeThunk.fulfilled, (state, { payload }) => {
       const { response, error } = payload
       if (error) {
         state.status = StatusEnum.SUCCEEDED
