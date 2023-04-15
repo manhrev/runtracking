@@ -24,6 +24,8 @@ import {
       req.setToUserId(param.toUserId)
       req.setLimit(param.limit)
       req.setOffset(param.offset)
+      req.setFrom(param.from ? new Timestamp().setSeconds(param.from?.seconds || 0) : undefined)
+      req.setTo(param.to ? new Timestamp().setSeconds(param.to?.seconds || 0) : undefined)
   
       return await this.gRPCClientRequest<GetHistoryChatReply.AsObject>(
         'getHistoryChat',

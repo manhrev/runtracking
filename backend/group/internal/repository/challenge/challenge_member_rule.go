@@ -14,7 +14,7 @@ func (c *challengeImpl) CreateBulkChallengeMemberRule(
 	ctx context.Context,
 	challengeMemberEnts []*ent.ChallengeMember,
 	challengeRuleEnts []*ent.ChallengeRule,
-	challengeEnt *ent.Challenge,
+	challengeStatus int64,
 ) ([]*ent.ChallengeMemberRule, error) {
 	bulk := make([]*ent.ChallengeMemberRuleCreate, len(challengeRuleEnts)*len(challengeMemberEnts))
 	for i, challengeRule := range challengeRuleEnts {
@@ -23,7 +23,7 @@ func (c *challengeImpl) CreateBulkChallengeMemberRule(
 				SetChallengeMember(challengeMemberEnt).
 				SetRuleID(challengeRule.RuleID).
 				SetChallengeRule(challengeRule).
-				SetStatus(challengeEnt.Status)
+				SetStatus(challengeStatus)
 		}
 	}
 

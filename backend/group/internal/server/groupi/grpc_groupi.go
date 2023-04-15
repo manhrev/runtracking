@@ -14,12 +14,14 @@ func NewServer(entClient *ent.Client,
 	return &groupIServer{
 		service:             service.New(entClient, authClient, notificationIClient),
 		notificationIClient: notificationIClient,
+		entClient:           entClient,
 	}
 }
 
 type groupIServer struct {
 	service             *service.Service
 	notificationIClient notification.NotificationIClient
+	entClient           *ent.Client
 	// Other service client connection, db adapter go here
 	groupi.UnimplementedGroupIServer
 }

@@ -50,14 +50,13 @@ func (c *challengeImpl) DeleteChallengeRule(
 func (c *challengeImpl) CreateBulkChallengeRules(
 	ctx context.Context,
 	userId int64,
-	groupId int64,
-	challengeEnt *ent.Challenge,
-	challengeInfo *group.ChallengeInfo,
+	challengeId int64,
+	challengeRuleInfoList []*group.ChallengeRuleInfo,
 ) ([]*ent.ChallengeRule, error) {
-	bulk := make([]*ent.ChallengeRuleCreate, len(challengeInfo.ChallengeRules))
-	for i, rule := range challengeInfo.ChallengeRules {
+	bulk := make([]*ent.ChallengeRuleCreate, len(challengeRuleInfoList))
+	for i, rule := range challengeRuleInfoList {
 		bulk[i] = c.entClient.ChallengeRule.Create().
-			SetChallengeID(challengeEnt.ID).
+			SetChallengeID(challengeId).
 			SetRuleID(int64(rule.GetRule())).
 			SetGoal(rule.Goal)
 	}

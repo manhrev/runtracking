@@ -10,6 +10,29 @@ service Chat {
     rpc GetHistoryChat(GetHistoryChatRequest) returns(GetHistoryChatReply) {};
     rpc SendMessage(SendMessageRequest) returns(SendMessageReply) {};
     rpc DeleteConversation(DeleteConversationRequest) returns(DeleteConversationReply) {};
+    rpc ListConversation(ListConversationRequest) returns(ListConversationReply) {};
+}
+
+message ListConversationRequest{
+    uint32 limit = 3;
+    uint64 offset = 4;
+}
+
+message ListConversationReply{
+    repeated ConversationInfo conversations = 1;
+    int64 total = 2;
+}
+
+message ConversationInfo{
+    UserInfo partner = 1;
+    MessageInfo lastMessage = 2;
+}
+
+message UserInfo{
+    int64 user_id = 1;
+    string display_name = 2;
+    string profile_picture = 3;
+    string username = 4;
 }
 
 message DeleteConversationRequest{
@@ -22,6 +45,10 @@ message GetHistoryChatRequest{
     int64 to_user_id = 2;
     uint32 limit = 3;
     uint64 offset = 4;
+
+    // optional
+    google.protobuf.Timestamp from = 5; 
+    google.protobuf.Timestamp to = 6; 
 }
 message GetHistoryChatReply{
     repeated MessageInfo messageInfoList = 1;

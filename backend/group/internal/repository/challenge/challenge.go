@@ -57,9 +57,8 @@ type Challenge interface {
 	CreateBulkChallengeRules(
 		ctx context.Context,
 		userId int64,
-		groupId int64,
-		challengeEnt *ent.Challenge,
-		challengeInfo *group.ChallengeInfo,
+		challengeId int64,
+		challengeRuleInfoList []*group.ChallengeRuleInfo,
 	) ([]*ent.ChallengeRule, error)
 
 	CreateBulkChallengeMember(
@@ -72,7 +71,7 @@ type Challenge interface {
 		ctx context.Context,
 		challengeMemberEnts []*ent.ChallengeMember,
 		challengeRuleEnts []*ent.ChallengeRule,
-		challengeEnt *ent.Challenge,
+		challengeId int64,
 	) ([]*ent.ChallengeMemberRule, error)
 
 	Delete(
@@ -155,7 +154,7 @@ func (c *challengeImpl) Create(
 	}
 
 	// check Start time and End time of challenge
-	isValidDay, err := checkValidPeriodChallenge(ctx, c.entClient, groupId, challengeInfo.From, challengeInfo.To)
+	isValidDay, err := checkValidPeriodChallenge(ctx, c.entClient, groupId, challengeInfo.From, challengeInfo.To, false, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +184,7 @@ func (c *challengeImpl) Update(
 		SetDescription(challengeInfo.Description).
 		SetTypeID(int64(challengeInfo.Type))
 
-	_, err := checkValidPeriodChallenge(ctx, c.entClient, groupId, challengeInfo.From, challengeInfo.To)
+	_, err := checkValidPeriodChallenge(ctx, c.entClient, groupId, challengeInfo.From, challengeInfo.To, true, challengeInfo.Id)
 	if err != nil {
 		return err
 	}

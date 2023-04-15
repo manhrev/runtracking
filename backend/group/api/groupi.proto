@@ -16,6 +16,7 @@ service GroupI {
 
     // season info for event to call
     rpc GetSeason(GetSeasonRequest) returns(GetSeasonReply) {};
+    rpc ListGroupI(ListGroupIRequest) returns(ListGroupIReply){};
 }
 
 message CheckDailyProgressSeasonRequest{
@@ -57,3 +58,12 @@ message UpdateChallengeProgressReply {
 
 // message CheckDailyReply {
 // }
+
+message ListGroupIRequest {
+    // if no ids, return none
+    repeated int64 group_ids = 1;
+}
+
+message ListGroupIReply {
+    repeated GroupInfo groups = 1;
+}
