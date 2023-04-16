@@ -39,7 +39,9 @@ message DeleteConversationRequest{
     int64 to_user_id = 1;
 }
 
-message DeleteConversationReply{}
+message DeleteConversationReply{
+    int64 id = 1;
+}
 
 message GetHistoryChatRequest{
     int64 to_user_id = 2;
