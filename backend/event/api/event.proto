@@ -131,8 +131,8 @@ message ListEventsRequest {
     bool ascending = 3;
     SortBy sort_by = 4;
     repeated int64 ids = 5;
-    int64 group_id = 6; // list event for group, if not set, will list all events
-
+    repeated int64 group_ids = 6; // list event for group, if not set, will list all events
+    bool isGlobal = 7;
     enum SortBy {
         SORT_BY_UNSPECIFIED = 0;
         SORT_BY_NAME = 1;

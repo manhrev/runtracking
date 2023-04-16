@@ -15,7 +15,8 @@ type Member interface {
 		limit uint32,
 		offset uint64,
 		ascending bool,
-		group_id int64,
+		group_ids []int64,
+		isGlobal bool,
 		sort_by event_pb.ListEventsRequest_SortBy,
 		ids []int64,
 	) ([]*ent.Event, int64, error)
