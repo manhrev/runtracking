@@ -106,6 +106,15 @@ static_resources:
                             auto_host_rewrite: true
 
                         - match:
+                            prefix: /event.Event/
+                          route:
+                            cluster: event_cluster
+                            timeout: 0s
+                            max_stream_duration:
+                              grpc_timeout_header_max: 0s
+                            auto_host_rewrite: true
+
+                        - match:
                             prefix: /plan.Plan/
                           route:
                             cluster: plan_cluster
@@ -255,6 +264,26 @@ static_resources:
                   address:
                     socket_address:
                       address: chat-jzg35jprna-as.a.run.app
+                      port_value: 443
+
+    - name: event_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      dns_lookup_family: V4_ONLY
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+      load_assignment:
+        cluster_name: event_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: event-jzg35jprna-as.a.run.app
                       port_value: 443
 
     - name: plan_cluster
