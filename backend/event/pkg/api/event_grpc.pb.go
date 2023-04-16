@@ -31,6 +31,7 @@ type EventClient interface {
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error)
 	ListSubEvents(ctx context.Context, in *ListSubEventsRequest, opts ...grpc.CallOption) (*ListSubEventsReply, error)
 	ListGroupsInEvent(ctx context.Context, in *ListGroupsInEventRequest, opts ...grpc.CallOption) (*ListGroupsInEventReply, error)
+	ListGroupProgressInEvent(ctx context.Context, in *ListGroupProgressInEventRequest, opts ...grpc.CallOption) (*ListGroupProgressInEventReply, error)
 }
 
 type eventClient struct {
@@ -104,6 +105,15 @@ func (c *eventClient) ListGroupsInEvent(ctx context.Context, in *ListGroupsInEve
 	return out, nil
 }
 
+func (c *eventClient) ListGroupProgressInEvent(ctx context.Context, in *ListGroupProgressInEventRequest, opts ...grpc.CallOption) (*ListGroupProgressInEventReply, error) {
+	out := new(ListGroupProgressInEventReply)
+	err := c.cc.Invoke(ctx, "/event.Event/ListGroupProgressInEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventServer is the server API for Event service.
 // All implementations must embed UnimplementedEventServer
 // for forward compatibility
@@ -117,6 +127,7 @@ type EventServer interface {
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error)
 	ListSubEvents(context.Context, *ListSubEventsRequest) (*ListSubEventsReply, error)
 	ListGroupsInEvent(context.Context, *ListGroupsInEventRequest) (*ListGroupsInEventReply, error)
+	ListGroupProgressInEvent(context.Context, *ListGroupProgressInEventRequest) (*ListGroupProgressInEventReply, error)
 	mustEmbedUnimplementedEventServer()
 }
 
@@ -144,6 +155,9 @@ func (UnimplementedEventServer) ListSubEvents(context.Context, *ListSubEventsReq
 }
 func (UnimplementedEventServer) ListGroupsInEvent(context.Context, *ListGroupsInEventRequest) (*ListGroupsInEventReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListGroupsInEvent not implemented")
+}
+func (UnimplementedEventServer) ListGroupProgressInEvent(context.Context, *ListGroupProgressInEventRequest) (*ListGroupProgressInEventReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListGroupProgressInEvent not implemented")
 }
 func (UnimplementedEventServer) mustEmbedUnimplementedEventServer() {}
 
@@ -284,6 +298,24 @@ func _Event_ListGroupsInEvent_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Event_ListGroupProgressInEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListGroupProgressInEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServer).ListGroupProgressInEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.Event/ListGroupProgressInEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServer).ListGroupProgressInEvent(ctx, req.(*ListGroupProgressInEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Event_ServiceDesc is the grpc.ServiceDesc for Event service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -318,6 +350,10 @@ var Event_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListGroupsInEvent",
 			Handler:    _Event_ListGroupsInEvent_Handler,
+		},
+		{
+			MethodName: "ListGroupProgressInEvent",
+			Handler:    _Event_ListGroupProgressInEvent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
