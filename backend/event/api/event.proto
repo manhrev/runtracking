@@ -131,6 +131,7 @@ message ListEventsRequest {
     bool ascending = 3;
     SortBy sort_by = 4;
     repeated int64 ids = 5;
+    int64 group_id = 6; // list event for group, if not set, will list all events
 
     enum SortBy {
         SORT_BY_UNSPECIFIED = 0;
@@ -149,7 +150,7 @@ message ListEventsReply {
 
 message ListSubEventsRequest {
     int64 event_id = 1;
-    // sort by always by start_at
+    // sort by always by start_at, desc
 }
 
 message ListSubEventsReply {

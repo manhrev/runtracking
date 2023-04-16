@@ -21,6 +21,16 @@ type Admin interface {
 		subEvents []*event_pb.CreateEventRequest_CreateSubEvent,
 		ownerGroupId int64,
 	) (int64, error)
+	JoinEvent(
+		ctx context.Context,
+		eventId int64,
+		groupId int64,
+	) error
+	ApproveJoinEvent(
+		ctx context.Context,
+		eventId int64,
+		groupId int64,
+	) error
 }
 
 type adminImpl struct {
