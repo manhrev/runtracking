@@ -1,0 +1,195 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = "github.com/manhrev/runtracking/backend/event/pkg/api;event";
+
+import "google/protobuf/timestamp.proto";
+
+service Event {
+    // for group admin or app admin
+    rpc CreateEvent (CreateEventRequest) returns (CreateEventReply) {}
+    rpc UpdateEventInfo (UpdateEventInfoRequest) returns (UpdateEventInfoReply) {} // update event's basic info
+    rpc JoinEvent (JoinEventRequest) returns (JoinEventReply) {} // join event
+    rpc ApproveJoinEvent (ApproveJoinEventRequest) returns (ApproveJoinEventReply) {} // approve join event
+
+    // for all
+    rpc ListEvents (ListEventsRequest) returns (ListEventsReply) {} // get event list with basic infos
+    rpc ListSubEvents (ListSubEventsRequest) returns (ListSubEventsReply) {} // get subevent of an event
+    rpc ListGroupsInEvent (ListGroupsInEventRequest) returns (ListGroupsInEventReply) {} // get list of groups in an event
+    //rpc ListProgressOfGroupInEvent (ListProgressOfGroupInEventRequest) returns (ListProgressOfGroupInEventReply) {} // get progress of a group in an event
+    //rpc GetGroupRankingInEvent (GetGroupRankingInEventRequest) returns (GetGroupRankingInEventReply) {} // get ranking of a group in an event
+}   //rpc GetGroupRankingInSubEvent (GetGroupRankingInSubEventRequest) returns (GetGroupRankingInSubEventReply) {} // get ranking of a group in a subevent
+
+message SubEvent {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string picture = 4;
+    int64 goal = 5;
+    Rule rule = 6;
+    google.protobuf.Timestamp start_at = 7;
+    google.protobuf.Timestamp end_at = 8;
+    SubEventStatus status = 9;
+}
+
+message EventDetail {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string picture = 4;
+    bool is_global = 5;
+    google.protobuf.Timestamp start_at = 7;
+    google.protobuf.Timestamp end_at = 8;
+    int64 owner_group_id = 9;
+    uint32 num_of_groups = 10;
+}
+
+// ==================== Create Event ====================
+
+message CreateEventRequest {
+    string name = 1;
+    string description = 2;
+    string picture = 3;
+    bool is_global = 4; // only app admin can use, if not admin, this field will be ignored
+    repeated CreateSubEvent sub_events = 5;
+    int64 owner_group_id = 6;
+    google.protobuf.Timestamp start_at = 7;
+
+    message CreateSubEvent {
+        string name = 1;
+        string description = 2;
+        string picture = 3;
+        int64 goal = 4;
+        Rule rule = 5;
+        google.protobuf.Timestamp start_at = 6;
+        google.protobuf.Timestamp end_at = 7;
+    }
+}
+
+message CreateEventReply {
+    int64 id_created = 1;
+}
+
+// ==================== Update Event ====================
+
+message UpdateEventInfoRequest {
+    // if any field is empty (0 or "" ...), it will be ignored
+    string name = 2;
+    string description = 3;
+    string picture = 4;
+}
+
+message UpdateEventInfoReply {
+}
+
+// ==================== Join Event ====================
+
+message JoinEventRequest {
+    int64 event_id = 1;
+    int64 group_id = 2;
+}
+
+message JoinEventReply {
+}
+
+// ==================== List Groups In Event ====================
+
+message ListGroupsInEventRequest {
+    int64 event_id = 1;
+    uint32 limit = 2;
+    uint32 offset = 3;
+    // default sortby time joined
+}
+
+message GroupInEvent {
+    int64 id = 1;
+    int64 group_id = 2;
+    GroupStatus status = 3;
+}
+
+message ListGroupsInEventReply {
+    repeated GroupInEvent group_ids = 1;
+    int64 total = 2;
+}
+
+// ==================== Approve Join Event ====================
+
+message ApproveJoinEventRequest {
+    int64 event_id = 1;
+    int64 group_id = 2;
+}
+
+message ApproveJoinEventReply {
+}
+
+// ==================== List Event ====================
+
+message ListEventsRequest {
+    uint32 limit = 1;
+    uint64 offset = 2;
+    bool ascending = 3;
+    SortBy sort_by = 4;
+    repeated int64 ids = 5;
+    int64 group_id = 6; // list event for group, if not set, will list all events
+
+    enum SortBy {
+        SORT_BY_UNSPECIFIED = 0;
+        SORT_BY_NAME = 1;
+        SORT_BY_START_AT = 2;
+        SORT_BY_NUM_OF_GROUPS = 3;
+    }
+}
+
+message ListEventsReply {
+    repeated EventDetail events = 1;
+    int64 total = 2;
+}
+
+// ==================== List Sub Event ====================
+
+message ListSubEventsRequest {
+    int64 event_id = 1;
+    // sort by always by start_at, desc
+}
+
+message ListSubEventsReply {
+    repeated SubEvent sub_events = 1;
+}
+
+enum ActivityType {
+    ACTIVITY_TYPE_UNSPECIFIED = 0;
+    ACTIVITY_TYPE_RUNNING = 1;
+    ACTIVITY_TYPE_CYCLING = 2;
+    ACTIVITY_TYPE_WALKING = 3;
+}
+
+enum Rule {
+    RULE_UNSPECIFIED = 0;
+    RULE_TOTAL_DISTANCE = 1;
+    RULE_TOTAL_TIME = 2;
+    RULE_TOTAL_ACTIVITY = 3;
+    RULE_TOTAL_CALORIES = 4;
+}
+
+enum RuleStatus {
+    RULE_STATUS_UNSPECIFIED = 0;
+    RULE_STATUS_FAILED = 1;
+    RULE_STATUS_COMPLETED = 2;
+    RULE_STATUS_INPROGRESS = 3;
+}
+
+enum SubEventStatus {
+    SUB_EVENT_STATUS_UNSPECIFIED = 0;
+    SUB_EVENT_STATUS_NEW = 1;
+    SUB_EVENT_STATUS_ENDED = 2;
+}
+
+enum GroupStatus {
+    GROUP_STATUS_UNSPECIFIED = 0;
+    GROUP_STATUS_REQUESTED = 1;
+    GROUP_STATUS_ACTIVE = 2;
+    GROUP_STATUS_BANNED = 5;
+    GROUP_STATUS_REJECTED = 3;
+    GROUP_STATUS_LEFT = 4;
+}

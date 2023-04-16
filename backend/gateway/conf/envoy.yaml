@@ -70,22 +70,22 @@ static_resources:
                             prefix: /umage
                           route:
                             cluster: umage_http_cluster
-                            auto_host_rewrite: true
-
                         - match:
                             prefix: /activity.Activity/
                           route:
                             cluster: activity_cluster
-
                         - match:
                             prefix: /plan.Plan/
                           route:
                             cluster: plan_cluster
-                        
                         - match:
                             prefix: /chat.Chat/
                           route:
                             cluster: chat_cluster
+                        - match:
+                            prefix: /event.Event/
+                          route:
+                            cluster: event_cluster
 
                 http_filters:
                   - name: envoy.filters.http.grpc_web
@@ -226,7 +226,7 @@ static_resources:
                     socket_address:
                       address: plan
                       port_value: 8080
-    
+
     - name: chat_cluster
       connect_timeout: 1s
       type: logical_dns
@@ -240,4 +240,19 @@ static_resources:
                   address:
                     socket_address:
                       address: chat
+                      port_value: 8080
+
+    - name: event_cluster
+      connect_timeout: 1s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: event_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: event
                       port_value: 8080
