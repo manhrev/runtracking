@@ -67,7 +67,7 @@ func (a *adminImpl) CreateEvent(
 	}
 
 	// create subevent inside event
-	for _, subEvent := range subEvents {
+	for idx, subEvent := range subEvents {
 		// create progress for admin who create this
 		adminProgress, err := tx.GroupzProgress.Create().
 			SetGroupID(entOwnerGroupId).
@@ -93,6 +93,9 @@ func (a *adminImpl) CreateEvent(
 
 		// add sub event to event
 		query.AddSubevents(entSubEvent)
+		if idx == 0 {
+			query.SetStartAt(subEvent.StartAt.AsTime())
+		}
 	}
 
 	entEventCreated, err := query.Save(ctx)
