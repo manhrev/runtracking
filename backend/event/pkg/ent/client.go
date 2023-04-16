@@ -18,6 +18,7 @@ import (
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/participate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
@@ -34,6 +35,8 @@ type Client struct {
 	GroupzProgress *GroupzProgressClient
 	// MemberProgress is the client for interacting with the MemberProgress builders.
 	MemberProgress *MemberProgressClient
+	// Participate is the client for interacting with the Participate builders.
+	Participate *ParticipateClient
 	// SubEvent is the client for interacting with the SubEvent builders.
 	SubEvent *SubEventClient
 }
@@ -53,6 +56,7 @@ func (c *Client) init() {
 	c.EventGroupz = NewEventGroupzClient(c.config)
 	c.GroupzProgress = NewGroupzProgressClient(c.config)
 	c.MemberProgress = NewMemberProgressClient(c.config)
+	c.Participate = NewParticipateClient(c.config)
 	c.SubEvent = NewSubEventClient(c.config)
 }
 
@@ -140,6 +144,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		EventGroupz:    NewEventGroupzClient(cfg),
 		GroupzProgress: NewGroupzProgressClient(cfg),
 		MemberProgress: NewMemberProgressClient(cfg),
+		Participate:    NewParticipateClient(cfg),
 		SubEvent:       NewSubEventClient(cfg),
 	}, nil
 }
@@ -164,6 +169,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		EventGroupz:    NewEventGroupzClient(cfg),
 		GroupzProgress: NewGroupzProgressClient(cfg),
 		MemberProgress: NewMemberProgressClient(cfg),
+		Participate:    NewParticipateClient(cfg),
 		SubEvent:       NewSubEventClient(cfg),
 	}, nil
 }
@@ -194,21 +200,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Event.Use(hooks...)
-	c.EventGroupz.Use(hooks...)
-	c.GroupzProgress.Use(hooks...)
-	c.MemberProgress.Use(hooks...)
-	c.SubEvent.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Event, c.EventGroupz, c.GroupzProgress, c.MemberProgress, c.Participate,
+		c.SubEvent,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Event.Intercept(interceptors...)
-	c.EventGroupz.Intercept(interceptors...)
-	c.GroupzProgress.Intercept(interceptors...)
-	c.MemberProgress.Intercept(interceptors...)
-	c.SubEvent.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Event, c.EventGroupz, c.GroupzProgress, c.MemberProgress, c.Participate,
+		c.SubEvent,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -222,6 +230,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.GroupzProgress.mutate(ctx, m)
 	case *MemberProgressMutation:
 		return c.MemberProgress.mutate(ctx, m)
+	case *ParticipateMutation:
+		return c.Participate.mutate(ctx, m)
 	case *SubEventMutation:
 		return c.SubEvent.mutate(ctx, m)
 	default:
@@ -347,6 +357,22 @@ func (c *EventClient) QueryGroups(e *Event) *EventGroupzQuery {
 			sqlgraph.From(event.Table, event.FieldID, id),
 			sqlgraph.To(eventgroupz.Table, eventgroupz.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, event.GroupsTable, event.GroupsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParticipates queries the participates edge of a Event.
+func (c *EventClient) QueryParticipates(e *Event) *ParticipateQuery {
+	query := (&ParticipateClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(participate.Table, participate.EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, event.ParticipatesTable, event.ParticipatesColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -481,6 +507,22 @@ func (c *EventGroupzClient) QueryEvent(eg *EventGroupz) *EventQuery {
 			sqlgraph.From(eventgroupz.Table, eventgroupz.FieldID, id),
 			sqlgraph.To(event.Table, event.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, eventgroupz.EventTable, eventgroupz.EventPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(eg.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParticipates queries the participates edge of a EventGroupz.
+func (c *EventGroupzClient) QueryParticipates(eg *EventGroupz) *ParticipateQuery {
+	query := (&ParticipateClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := eg.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventgroupz.Table, eventgroupz.FieldID, id),
+			sqlgraph.To(participate.Table, participate.EventGroupColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, eventgroupz.ParticipatesTable, eventgroupz.ParticipatesColumn),
 		)
 		fromV = sqlgraph.Neighbors(eg.driver.Dialect(), step)
 		return fromV, nil
@@ -797,6 +839,107 @@ func (c *MemberProgressClient) mutate(ctx context.Context, m *MemberProgressMuta
 	}
 }
 
+// ParticipateClient is a client for the Participate schema.
+type ParticipateClient struct {
+	config
+}
+
+// NewParticipateClient returns a client for the Participate from the given config.
+func NewParticipateClient(c config) *ParticipateClient {
+	return &ParticipateClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `participate.Hooks(f(g(h())))`.
+func (c *ParticipateClient) Use(hooks ...Hook) {
+	c.hooks.Participate = append(c.hooks.Participate, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `participate.Intercept(f(g(h())))`.
+func (c *ParticipateClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Participate = append(c.inters.Participate, interceptors...)
+}
+
+// Create returns a builder for creating a Participate entity.
+func (c *ParticipateClient) Create() *ParticipateCreate {
+	mutation := newParticipateMutation(c.config, OpCreate)
+	return &ParticipateCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Participate entities.
+func (c *ParticipateClient) CreateBulk(builders ...*ParticipateCreate) *ParticipateCreateBulk {
+	return &ParticipateCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Participate.
+func (c *ParticipateClient) Update() *ParticipateUpdate {
+	mutation := newParticipateMutation(c.config, OpUpdate)
+	return &ParticipateUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ParticipateClient) UpdateOne(pa *Participate) *ParticipateUpdateOne {
+	mutation := newParticipateMutation(c.config, OpUpdateOne)
+	mutation.event = &pa.EventID
+	mutation.event_group = &pa.EventGroupID
+	return &ParticipateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Participate.
+func (c *ParticipateClient) Delete() *ParticipateDelete {
+	mutation := newParticipateMutation(c.config, OpDelete)
+	return &ParticipateDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for Participate.
+func (c *ParticipateClient) Query() *ParticipateQuery {
+	return &ParticipateQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeParticipate},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryEvent queries the event edge of a Participate.
+func (c *ParticipateClient) QueryEvent(pa *Participate) *EventQuery {
+	return c.Query().
+		Where(participate.EventID(pa.EventID), participate.EventGroupID(pa.EventGroupID)).
+		QueryEvent()
+}
+
+// QueryEventGroup queries the event_group edge of a Participate.
+func (c *ParticipateClient) QueryEventGroup(pa *Participate) *EventGroupzQuery {
+	return c.Query().
+		Where(participate.EventID(pa.EventID), participate.EventGroupID(pa.EventGroupID)).
+		QueryEventGroup()
+}
+
+// Hooks returns the client hooks.
+func (c *ParticipateClient) Hooks() []Hook {
+	return c.hooks.Participate
+}
+
+// Interceptors returns the client interceptors.
+func (c *ParticipateClient) Interceptors() []Interceptor {
+	return c.inters.Participate
+}
+
+func (c *ParticipateClient) mutate(ctx context.Context, m *ParticipateMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ParticipateCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ParticipateUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ParticipateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ParticipateDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Participate mutation op: %q", m.Op())
+	}
+}
+
 // SubEventClient is a client for the SubEvent schema.
 type SubEventClient struct {
 	config
@@ -950,9 +1093,11 @@ func (c *SubEventClient) mutate(ctx context.Context, m *SubEventMutation) (Value
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Event, EventGroupz, GroupzProgress, MemberProgress, SubEvent []ent.Hook
+		Event, EventGroupz, GroupzProgress, MemberProgress, Participate,
+		SubEvent []ent.Hook
 	}
 	inters struct {
-		Event, EventGroupz, GroupzProgress, MemberProgress, SubEvent []ent.Interceptor
+		Event, EventGroupz, GroupzProgress, MemberProgress, Participate,
+		SubEvent []ent.Interceptor
 	}
 )

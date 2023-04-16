@@ -38,6 +38,8 @@ const (
 	EdgeSubevents = "subevents"
 	// EdgeGroups holds the string denoting the groups edge name in mutations.
 	EdgeGroups = "groups"
+	// EdgeParticipates holds the string denoting the participates edge name in mutations.
+	EdgeParticipates = "participates"
 	// Table holds the table name of the event in the database.
 	Table = "events"
 	// SubeventsTable is the table that holds the subevents relation/edge.
@@ -48,10 +50,17 @@ const (
 	// SubeventsColumn is the table column denoting the subevents relation/edge.
 	SubeventsColumn = "event_subevents"
 	// GroupsTable is the table that holds the groups relation/edge. The primary key declared below.
-	GroupsTable = "event_groups"
+	GroupsTable = "participates"
 	// GroupsInverseTable is the table name for the EventGroupz entity.
 	// It exists in this package in order to avoid circular dependency with the "eventgroupz" package.
 	GroupsInverseTable = "event_groupzs"
+	// ParticipatesTable is the table that holds the participates relation/edge.
+	ParticipatesTable = "participates"
+	// ParticipatesInverseTable is the table name for the Participate entity.
+	// It exists in this package in order to avoid circular dependency with the "participate" package.
+	ParticipatesInverseTable = "participates"
+	// ParticipatesColumn is the table column denoting the participates relation/edge.
+	ParticipatesColumn = "event_id"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -72,7 +81,7 @@ var Columns = []string{
 var (
 	// GroupsPrimaryKey and GroupsColumn2 are the table columns denoting the
 	// primary key for the groups relation (M2M).
-	GroupsPrimaryKey = []string{"event_id", "event_groupz_id"}
+	GroupsPrimaryKey = []string{"event_id", "event_group_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -185,6 +194,20 @@ func ByGroups(term sql.OrderTerm, terms ...sql.OrderTerm) Order {
 		sqlgraph.OrderByNeighborTerms(s, newGroupsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByParticipatesCount orders the results by participates count.
+func ByParticipatesCount(opts ...sql.OrderTermOption) Order {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newParticipatesStep(), opts...)
+	}
+}
+
+// ByParticipates orders the results by participates terms.
+func ByParticipates(term sql.OrderTerm, terms ...sql.OrderTerm) Order {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newParticipatesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newSubeventsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -197,5 +220,12 @@ func newGroupsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(GroupsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, GroupsTable, GroupsPrimaryKey...),
+	)
+}
+func newParticipatesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ParticipatesInverseTable, ParticipatesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ParticipatesTable, ParticipatesColumn),
 	)
 }

@@ -20,6 +20,8 @@ type Tx struct {
 	GroupzProgress *GroupzProgressClient
 	// MemberProgress is the client for interacting with the MemberProgress builders.
 	MemberProgress *MemberProgressClient
+	// Participate is the client for interacting with the Participate builders.
+	Participate *ParticipateClient
 	// SubEvent is the client for interacting with the SubEvent builders.
 	SubEvent *SubEventClient
 
@@ -157,6 +159,7 @@ func (tx *Tx) init() {
 	tx.EventGroupz = NewEventGroupzClient(tx.config)
 	tx.GroupzProgress = NewGroupzProgressClient(tx.config)
 	tx.MemberProgress = NewMemberProgressClient(tx.config)
+	tx.Participate = NewParticipateClient(tx.config)
 	tx.SubEvent = NewSubEventClient(tx.config)
 }
 

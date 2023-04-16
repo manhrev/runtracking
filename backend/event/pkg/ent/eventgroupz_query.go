@@ -13,18 +13,20 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/participate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 )
 
 // EventGroupzQuery is the builder for querying EventGroupz entities.
 type EventGroupzQuery struct {
 	config
-	ctx        *QueryContext
-	order      []eventgroupz.Order
-	inters     []Interceptor
-	predicates []predicate.EventGroupz
-	withEvent  *EventQuery
-	modifiers  []func(*sql.Selector)
+	ctx              *QueryContext
+	order            []eventgroupz.Order
+	inters           []Interceptor
+	predicates       []predicate.EventGroupz
+	withEvent        *EventQuery
+	withParticipates *ParticipateQuery
+	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,28 @@ func (egq *EventGroupzQuery) QueryEvent() *EventQuery {
 			sqlgraph.From(eventgroupz.Table, eventgroupz.FieldID, selector),
 			sqlgraph.To(event.Table, event.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, eventgroupz.EventTable, eventgroupz.EventPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(egq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParticipates chains the current query on the "participates" edge.
+func (egq *EventGroupzQuery) QueryParticipates() *ParticipateQuery {
+	query := (&ParticipateClient{config: egq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := egq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := egq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventgroupz.Table, eventgroupz.FieldID, selector),
+			sqlgraph.To(participate.Table, participate.EventGroupColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, eventgroupz.ParticipatesTable, eventgroupz.ParticipatesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(egq.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +294,13 @@ func (egq *EventGroupzQuery) Clone() *EventGroupzQuery {
 		return nil
 	}
 	return &EventGroupzQuery{
-		config:     egq.config,
-		ctx:        egq.ctx.Clone(),
-		order:      append([]eventgroupz.Order{}, egq.order...),
-		inters:     append([]Interceptor{}, egq.inters...),
-		predicates: append([]predicate.EventGroupz{}, egq.predicates...),
-		withEvent:  egq.withEvent.Clone(),
+		config:           egq.config,
+		ctx:              egq.ctx.Clone(),
+		order:            append([]eventgroupz.Order{}, egq.order...),
+		inters:           append([]Interceptor{}, egq.inters...),
+		predicates:       append([]predicate.EventGroupz{}, egq.predicates...),
+		withEvent:        egq.withEvent.Clone(),
+		withParticipates: egq.withParticipates.Clone(),
 		// clone intermediate query.
 		sql:  egq.sql.Clone(),
 		path: egq.path,
@@ -293,21 +318,19 @@ func (egq *EventGroupzQuery) WithEvent(opts ...func(*EventQuery)) *EventGroupzQu
 	return egq
 }
 
+// WithParticipates tells the query-builder to eager-load the nodes that are connected to
+// the "participates" edge. The optional arguments are used to configure the query builder of the edge.
+func (egq *EventGroupzQuery) WithParticipates(opts ...func(*ParticipateQuery)) *EventGroupzQuery {
+	query := (&ParticipateClient{config: egq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	egq.withParticipates = query
+	return egq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
-//
-// Example:
-//
-//	var v []struct {
-//		JoinedAt time.Time `json:"joined_at,omitempty"`
-//		Count int `json:"count,omitempty"`
-//	}
-//
-//	client.EventGroupz.Query().
-//		GroupBy(eventgroupz.FieldJoinedAt).
-//		Aggregate(ent.Count()).
-//		Scan(ctx, &v)
-//
 func (egq *EventGroupzQuery) GroupBy(field string, fields ...string) *EventGroupzGroupBy {
 	egq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &EventGroupzGroupBy{build: egq}
@@ -319,17 +342,6 @@ func (egq *EventGroupzQuery) GroupBy(field string, fields ...string) *EventGroup
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
-//
-// Example:
-//
-//	var v []struct {
-//		JoinedAt time.Time `json:"joined_at,omitempty"`
-//	}
-//
-//	client.EventGroupz.Query().
-//		Select(eventgroupz.FieldJoinedAt).
-//		Scan(ctx, &v)
-//
 func (egq *EventGroupzQuery) Select(fields ...string) *EventGroupzSelect {
 	egq.ctx.Fields = append(egq.ctx.Fields, fields...)
 	sbuild := &EventGroupzSelect{EventGroupzQuery: egq}
@@ -373,8 +385,9 @@ func (egq *EventGroupzQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	var (
 		nodes       = []*EventGroupz{}
 		_spec       = egq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			egq.withEvent != nil,
+			egq.withParticipates != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -402,6 +415,13 @@ func (egq *EventGroupzQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		if err := egq.loadEvent(ctx, query, nodes,
 			func(n *EventGroupz) { n.Edges.Event = []*Event{} },
 			func(n *EventGroupz, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := egq.withParticipates; query != nil {
+		if err := egq.loadParticipates(ctx, query, nodes,
+			func(n *EventGroupz) { n.Edges.Participates = []*Participate{} },
+			func(n *EventGroupz, e *Participate) { n.Edges.Participates = append(n.Edges.Participates, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -466,6 +486,33 @@ func (egq *EventGroupzQuery) loadEvent(ctx context.Context, query *EventQuery, n
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (egq *EventGroupzQuery) loadParticipates(ctx context.Context, query *ParticipateQuery, nodes []*EventGroupz, init func(*EventGroupz), assign func(*EventGroupz, *Participate)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*EventGroupz)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.Where(predicate.Participate(func(s *sql.Selector) {
+		s.Where(sql.InValues(eventgroupz.ParticipatesColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.EventGroupID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "event_group_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
 	}
 	return nil
 }

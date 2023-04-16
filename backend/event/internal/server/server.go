@@ -69,7 +69,7 @@ func Serve(server *grpc.Server) {
 		creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})
 	}
 
-	groupIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", groupi_domain, groupi_domain), grpc.WithTransportCredentials(creds))
+	groupIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", groupi_domain, groupi_port), grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("error while create connect to notification service: %v", err)
 	}

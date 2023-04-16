@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/participate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -20,13 +21,14 @@ import (
 // EventQuery is the builder for querying Event entities.
 type EventQuery struct {
 	config
-	ctx           *QueryContext
-	order         []event.Order
-	inters        []Interceptor
-	predicates    []predicate.Event
-	withSubevents *SubEventQuery
-	withGroups    *EventGroupzQuery
-	modifiers     []func(*sql.Selector)
+	ctx              *QueryContext
+	order            []event.Order
+	inters           []Interceptor
+	predicates       []predicate.Event
+	withSubevents    *SubEventQuery
+	withGroups       *EventGroupzQuery
+	withParticipates *ParticipateQuery
+	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -100,6 +102,28 @@ func (eq *EventQuery) QueryGroups() *EventGroupzQuery {
 			sqlgraph.From(event.Table, event.FieldID, selector),
 			sqlgraph.To(eventgroupz.Table, eventgroupz.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, event.GroupsTable, event.GroupsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParticipates chains the current query on the "participates" edge.
+func (eq *EventQuery) QueryParticipates() *ParticipateQuery {
+	query := (&ParticipateClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(participate.Table, participate.EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, event.ParticipatesTable, event.ParticipatesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,13 +318,14 @@ func (eq *EventQuery) Clone() *EventQuery {
 		return nil
 	}
 	return &EventQuery{
-		config:        eq.config,
-		ctx:           eq.ctx.Clone(),
-		order:         append([]event.Order{}, eq.order...),
-		inters:        append([]Interceptor{}, eq.inters...),
-		predicates:    append([]predicate.Event{}, eq.predicates...),
-		withSubevents: eq.withSubevents.Clone(),
-		withGroups:    eq.withGroups.Clone(),
+		config:           eq.config,
+		ctx:              eq.ctx.Clone(),
+		order:            append([]event.Order{}, eq.order...),
+		inters:           append([]Interceptor{}, eq.inters...),
+		predicates:       append([]predicate.Event{}, eq.predicates...),
+		withSubevents:    eq.withSubevents.Clone(),
+		withGroups:       eq.withGroups.Clone(),
+		withParticipates: eq.withParticipates.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -326,6 +351,17 @@ func (eq *EventQuery) WithGroups(opts ...func(*EventGroupzQuery)) *EventQuery {
 		opt(query)
 	}
 	eq.withGroups = query
+	return eq
+}
+
+// WithParticipates tells the query-builder to eager-load the nodes that are connected to
+// the "participates" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithParticipates(opts ...func(*ParticipateQuery)) *EventQuery {
+	query := (&ParticipateClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withParticipates = query
 	return eq
 }
 
@@ -409,9 +445,10 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	var (
 		nodes       = []*Event{}
 		_spec       = eq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			eq.withSubevents != nil,
 			eq.withGroups != nil,
+			eq.withParticipates != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -446,6 +483,13 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 		if err := eq.loadGroups(ctx, query, nodes,
 			func(n *Event) { n.Edges.Groups = []*EventGroupz{} },
 			func(n *Event, e *EventGroupz) { n.Edges.Groups = append(n.Edges.Groups, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withParticipates; query != nil {
+		if err := eq.loadParticipates(ctx, query, nodes,
+			func(n *Event) { n.Edges.Participates = []*Participate{} },
+			func(n *Event, e *Participate) { n.Edges.Participates = append(n.Edges.Participates, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -541,6 +585,33 @@ func (eq *EventQuery) loadGroups(ctx context.Context, query *EventGroupzQuery, n
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (eq *EventQuery) loadParticipates(ctx context.Context, query *ParticipateQuery, nodes []*Event, init func(*Event), assign func(*Event, *Participate)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.Where(predicate.Participate(func(s *sql.Selector) {
+		s.Where(sql.InValues(event.ParticipatesColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.EventID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "event_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
 	}
 	return nil
 }

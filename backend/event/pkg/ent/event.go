@@ -49,9 +49,11 @@ type EventEdges struct {
 	Subevents []*SubEvent `json:"subevents,omitempty"`
 	// Groups holds the value of the groups edge.
 	Groups []*EventGroupz `json:"groups,omitempty"`
+	// Participates holds the value of the participates edge.
+	Participates []*Participate `json:"participates,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // SubeventsOrErr returns the Subevents value or an error if the edge
@@ -70,6 +72,15 @@ func (e EventEdges) GroupsOrErr() ([]*EventGroupz, error) {
 		return e.Groups, nil
 	}
 	return nil, &NotLoadedError{edge: "groups"}
+}
+
+// ParticipatesOrErr returns the Participates value or an error if the edge
+// was not loaded in eager-loading.
+func (e EventEdges) ParticipatesOrErr() ([]*Participate, error) {
+	if e.loadedTypes[2] {
+		return e.Participates, nil
+	}
+	return nil, &NotLoadedError{edge: "participates"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -187,6 +198,11 @@ func (e *Event) QuerySubevents() *SubEventQuery {
 // QueryGroups queries the "groups" edge of the Event entity.
 func (e *Event) QueryGroups() *EventGroupzQuery {
 	return NewEventClient(e.config).QueryGroups(e)
+}
+
+// QueryParticipates queries the "participates" edge of the Event entity.
+func (e *Event) QueryParticipates() *ParticipateQuery {
+	return NewEventClient(e.config).QueryParticipates(e)
 }
 
 // Update returns a builder for updating this Event.

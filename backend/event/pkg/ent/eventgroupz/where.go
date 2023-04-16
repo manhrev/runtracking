@@ -3,8 +3,6 @@
 package eventgroupz
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
@@ -55,96 +53,6 @@ func IDLTE(id int64) predicate.EventGroupz {
 	return predicate.EventGroupz(sql.FieldLTE(FieldID, id))
 }
 
-// JoinedAt applies equality check predicate on the "joined_at" field. It's identical to JoinedAtEQ.
-func JoinedAt(v time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldEQ(FieldJoinedAt, v))
-}
-
-// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldEQ(FieldStatus, v))
-}
-
-// JoinedAtEQ applies the EQ predicate on the "joined_at" field.
-func JoinedAtEQ(v time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldEQ(FieldJoinedAt, v))
-}
-
-// JoinedAtNEQ applies the NEQ predicate on the "joined_at" field.
-func JoinedAtNEQ(v time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldNEQ(FieldJoinedAt, v))
-}
-
-// JoinedAtIn applies the In predicate on the "joined_at" field.
-func JoinedAtIn(vs ...time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldIn(FieldJoinedAt, vs...))
-}
-
-// JoinedAtNotIn applies the NotIn predicate on the "joined_at" field.
-func JoinedAtNotIn(vs ...time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldNotIn(FieldJoinedAt, vs...))
-}
-
-// JoinedAtGT applies the GT predicate on the "joined_at" field.
-func JoinedAtGT(v time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldGT(FieldJoinedAt, v))
-}
-
-// JoinedAtGTE applies the GTE predicate on the "joined_at" field.
-func JoinedAtGTE(v time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldGTE(FieldJoinedAt, v))
-}
-
-// JoinedAtLT applies the LT predicate on the "joined_at" field.
-func JoinedAtLT(v time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldLT(FieldJoinedAt, v))
-}
-
-// JoinedAtLTE applies the LTE predicate on the "joined_at" field.
-func JoinedAtLTE(v time.Time) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldLTE(FieldJoinedAt, v))
-}
-
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldEQ(FieldStatus, v))
-}
-
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldNEQ(FieldStatus, v))
-}
-
-// StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldIn(FieldStatus, vs...))
-}
-
-// StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldNotIn(FieldStatus, vs...))
-}
-
-// StatusGT applies the GT predicate on the "status" field.
-func StatusGT(v int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldGT(FieldStatus, v))
-}
-
-// StatusGTE applies the GTE predicate on the "status" field.
-func StatusGTE(v int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldGTE(FieldStatus, v))
-}
-
-// StatusLT applies the LT predicate on the "status" field.
-func StatusLT(v int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldLT(FieldStatus, v))
-}
-
-// StatusLTE applies the LTE predicate on the "status" field.
-func StatusLTE(v int64) predicate.EventGroupz {
-	return predicate.EventGroupz(sql.FieldLTE(FieldStatus, v))
-}
-
 // HasEvent applies the HasEdge predicate on the "event" edge.
 func HasEvent() predicate.EventGroupz {
 	return predicate.EventGroupz(func(s *sql.Selector) {
@@ -160,6 +68,29 @@ func HasEvent() predicate.EventGroupz {
 func HasEventWith(preds ...predicate.Event) predicate.EventGroupz {
 	return predicate.EventGroupz(func(s *sql.Selector) {
 		step := newEventStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParticipates applies the HasEdge predicate on the "participates" edge.
+func HasParticipates() predicate.EventGroupz {
+	return predicate.EventGroupz(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, ParticipatesTable, ParticipatesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParticipatesWith applies the HasEdge predicate on the "participates" edge with a given conditions (other predicates).
+func HasParticipatesWith(preds ...predicate.Participate) predicate.EventGroupz {
+	return predicate.EventGroupz(func(s *sql.Selector) {
+		step := newParticipatesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

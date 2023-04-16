@@ -408,6 +408,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
+		createE := &ParticipateCreate{config: eu.config, mutation: newParticipateMutation(eu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.RemovedGroupsIDs(); len(nodes) > 0 && !eu.mutation.GroupsCleared() {
@@ -424,6 +428,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: eu.config, mutation: newParticipateMutation(eu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.GroupsIDs(); len(nodes) > 0 {
@@ -440,6 +448,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: eu.config, mutation: newParticipateMutation(eu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(eu.modifiers...)
@@ -871,6 +883,10 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 				IDSpec: sqlgraph.NewFieldSpec(eventgroupz.FieldID, field.TypeInt64),
 			},
 		}
+		createE := &ParticipateCreate{config: euo.config, mutation: newParticipateMutation(euo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.RemovedGroupsIDs(); len(nodes) > 0 && !euo.mutation.GroupsCleared() {
@@ -887,6 +903,10 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: euo.config, mutation: newParticipateMutation(euo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.GroupsIDs(); len(nodes) > 0 {
@@ -903,6 +923,10 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: euo.config, mutation: newParticipateMutation(euo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(euo.modifiers...)

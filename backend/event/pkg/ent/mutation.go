@@ -15,6 +15,7 @@ import (
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/participate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/predicate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -32,6 +33,7 @@ const (
 	TypeEventGroupz    = "EventGroupz"
 	TypeGroupzProgress = "GroupzProgress"
 	TypeMemberProgress = "MemberProgress"
+	TypeParticipate    = "Participate"
 	TypeSubEvent       = "SubEvent"
 )
 
@@ -1178,9 +1180,6 @@ type EventGroupzMutation struct {
 	op            Op
 	typ           string
 	id            *int64
-	joined_at     *time.Time
-	status        *int64
-	addstatus     *int64
 	clearedFields map[string]struct{}
 	event         map[int64]struct{}
 	removedevent  map[int64]struct{}
@@ -1294,98 +1293,6 @@ func (m *EventGroupzMutation) IDs(ctx context.Context) ([]int64, error) {
 	}
 }
 
-// SetJoinedAt sets the "joined_at" field.
-func (m *EventGroupzMutation) SetJoinedAt(t time.Time) {
-	m.joined_at = &t
-}
-
-// JoinedAt returns the value of the "joined_at" field in the mutation.
-func (m *EventGroupzMutation) JoinedAt() (r time.Time, exists bool) {
-	v := m.joined_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldJoinedAt returns the old "joined_at" field's value of the EventGroupz entity.
-// If the EventGroupz object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EventGroupzMutation) OldJoinedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldJoinedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldJoinedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldJoinedAt: %w", err)
-	}
-	return oldValue.JoinedAt, nil
-}
-
-// ResetJoinedAt resets all changes to the "joined_at" field.
-func (m *EventGroupzMutation) ResetJoinedAt() {
-	m.joined_at = nil
-}
-
-// SetStatus sets the "status" field.
-func (m *EventGroupzMutation) SetStatus(i int64) {
-	m.status = &i
-	m.addstatus = nil
-}
-
-// Status returns the value of the "status" field in the mutation.
-func (m *EventGroupzMutation) Status() (r int64, exists bool) {
-	v := m.status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStatus returns the old "status" field's value of the EventGroupz entity.
-// If the EventGroupz object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EventGroupzMutation) OldStatus(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
-	}
-	return oldValue.Status, nil
-}
-
-// AddStatus adds i to the "status" field.
-func (m *EventGroupzMutation) AddStatus(i int64) {
-	if m.addstatus != nil {
-		*m.addstatus += i
-	} else {
-		m.addstatus = &i
-	}
-}
-
-// AddedStatus returns the value that was added to the "status" field in this mutation.
-func (m *EventGroupzMutation) AddedStatus() (r int64, exists bool) {
-	v := m.addstatus
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetStatus resets all changes to the "status" field.
-func (m *EventGroupzMutation) ResetStatus() {
-	m.status = nil
-	m.addstatus = nil
-}
-
 // AddEventIDs adds the "event" edge to the Event entity by ids.
 func (m *EventGroupzMutation) AddEventIDs(ids ...int64) {
 	if m.event == nil {
@@ -1474,13 +1381,7 @@ func (m *EventGroupzMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EventGroupzMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.joined_at != nil {
-		fields = append(fields, eventgroupz.FieldJoinedAt)
-	}
-	if m.status != nil {
-		fields = append(fields, eventgroupz.FieldStatus)
-	}
+	fields := make([]string, 0, 0)
 	return fields
 }
 
@@ -1488,12 +1389,6 @@ func (m *EventGroupzMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *EventGroupzMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case eventgroupz.FieldJoinedAt:
-		return m.JoinedAt()
-	case eventgroupz.FieldStatus:
-		return m.Status()
-	}
 	return nil, false
 }
 
@@ -1501,12 +1396,6 @@ func (m *EventGroupzMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *EventGroupzMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case eventgroupz.FieldJoinedAt:
-		return m.OldJoinedAt(ctx)
-	case eventgroupz.FieldStatus:
-		return m.OldStatus(ctx)
-	}
 	return nil, fmt.Errorf("unknown EventGroupz field %s", name)
 }
 
@@ -1515,20 +1404,6 @@ func (m *EventGroupzMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *EventGroupzMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case eventgroupz.FieldJoinedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetJoinedAt(v)
-		return nil
-	case eventgroupz.FieldStatus:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStatus(v)
-		return nil
 	}
 	return fmt.Errorf("unknown EventGroupz field %s", name)
 }
@@ -1536,21 +1411,13 @@ func (m *EventGroupzMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *EventGroupzMutation) AddedFields() []string {
-	var fields []string
-	if m.addstatus != nil {
-		fields = append(fields, eventgroupz.FieldStatus)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *EventGroupzMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case eventgroupz.FieldStatus:
-		return m.AddedStatus()
-	}
 	return nil, false
 }
 
@@ -1558,15 +1425,6 @@ func (m *EventGroupzMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *EventGroupzMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case eventgroupz.FieldStatus:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddStatus(v)
-		return nil
-	}
 	return fmt.Errorf("unknown EventGroupz numeric field %s", name)
 }
 
@@ -1592,14 +1450,6 @@ func (m *EventGroupzMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *EventGroupzMutation) ResetField(name string) error {
-	switch name {
-	case eventgroupz.FieldJoinedAt:
-		m.ResetJoinedAt()
-		return nil
-	case eventgroupz.FieldStatus:
-		m.ResetStatus()
-		return nil
-	}
 	return fmt.Errorf("unknown EventGroupz field %s", name)
 }
 
@@ -2901,6 +2751,489 @@ func (m *MemberProgressMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown MemberProgress edge %s", name)
+}
+
+// ParticipateMutation represents an operation that mutates the Participate nodes in the graph.
+type ParticipateMutation struct {
+	config
+	op                 Op
+	typ                string
+	joined_at          *time.Time
+	status             *int64
+	addstatus          *int64
+	clearedFields      map[string]struct{}
+	event              *int64
+	clearedevent       bool
+	event_group        *int64
+	clearedevent_group bool
+	done               bool
+	oldValue           func(context.Context) (*Participate, error)
+	predicates         []predicate.Participate
+}
+
+var _ ent.Mutation = (*ParticipateMutation)(nil)
+
+// participateOption allows management of the mutation configuration using functional options.
+type participateOption func(*ParticipateMutation)
+
+// newParticipateMutation creates new mutation for the Participate entity.
+func newParticipateMutation(c config, op Op, opts ...participateOption) *ParticipateMutation {
+	m := &ParticipateMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeParticipate,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ParticipateMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ParticipateMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetEventGroupID sets the "event_group_id" field.
+func (m *ParticipateMutation) SetEventGroupID(i int64) {
+	m.event_group = &i
+}
+
+// EventGroupID returns the value of the "event_group_id" field in the mutation.
+func (m *ParticipateMutation) EventGroupID() (r int64, exists bool) {
+	v := m.event_group
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEventGroupID resets all changes to the "event_group_id" field.
+func (m *ParticipateMutation) ResetEventGroupID() {
+	m.event_group = nil
+}
+
+// SetEventID sets the "event_id" field.
+func (m *ParticipateMutation) SetEventID(i int64) {
+	m.event = &i
+}
+
+// EventID returns the value of the "event_id" field in the mutation.
+func (m *ParticipateMutation) EventID() (r int64, exists bool) {
+	v := m.event
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEventID resets all changes to the "event_id" field.
+func (m *ParticipateMutation) ResetEventID() {
+	m.event = nil
+}
+
+// SetJoinedAt sets the "joined_at" field.
+func (m *ParticipateMutation) SetJoinedAt(t time.Time) {
+	m.joined_at = &t
+}
+
+// JoinedAt returns the value of the "joined_at" field in the mutation.
+func (m *ParticipateMutation) JoinedAt() (r time.Time, exists bool) {
+	v := m.joined_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetJoinedAt resets all changes to the "joined_at" field.
+func (m *ParticipateMutation) ResetJoinedAt() {
+	m.joined_at = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *ParticipateMutation) SetStatus(i int64) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ParticipateMutation) Status() (r int64, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// AddStatus adds i to the "status" field.
+func (m *ParticipateMutation) AddStatus(i int64) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *ParticipateMutation) AddedStatus() (r int64, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ParticipateMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// ClearEvent clears the "event" edge to the Event entity.
+func (m *ParticipateMutation) ClearEvent() {
+	m.clearedevent = true
+}
+
+// EventCleared reports if the "event" edge to the Event entity was cleared.
+func (m *ParticipateMutation) EventCleared() bool {
+	return m.clearedevent
+}
+
+// EventIDs returns the "event" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EventID instead. It exists only for internal usage by the builders.
+func (m *ParticipateMutation) EventIDs() (ids []int64) {
+	if id := m.event; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEvent resets all changes to the "event" edge.
+func (m *ParticipateMutation) ResetEvent() {
+	m.event = nil
+	m.clearedevent = false
+}
+
+// ClearEventGroup clears the "event_group" edge to the EventGroupz entity.
+func (m *ParticipateMutation) ClearEventGroup() {
+	m.clearedevent_group = true
+}
+
+// EventGroupCleared reports if the "event_group" edge to the EventGroupz entity was cleared.
+func (m *ParticipateMutation) EventGroupCleared() bool {
+	return m.clearedevent_group
+}
+
+// EventGroupIDs returns the "event_group" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EventGroupID instead. It exists only for internal usage by the builders.
+func (m *ParticipateMutation) EventGroupIDs() (ids []int64) {
+	if id := m.event_group; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEventGroup resets all changes to the "event_group" edge.
+func (m *ParticipateMutation) ResetEventGroup() {
+	m.event_group = nil
+	m.clearedevent_group = false
+}
+
+// Where appends a list predicates to the ParticipateMutation builder.
+func (m *ParticipateMutation) Where(ps ...predicate.Participate) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ParticipateMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ParticipateMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Participate, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ParticipateMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ParticipateMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Participate).
+func (m *ParticipateMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ParticipateMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.event_group != nil {
+		fields = append(fields, participate.FieldEventGroupID)
+	}
+	if m.event != nil {
+		fields = append(fields, participate.FieldEventID)
+	}
+	if m.joined_at != nil {
+		fields = append(fields, participate.FieldJoinedAt)
+	}
+	if m.status != nil {
+		fields = append(fields, participate.FieldStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ParticipateMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case participate.FieldEventGroupID:
+		return m.EventGroupID()
+	case participate.FieldEventID:
+		return m.EventID()
+	case participate.FieldJoinedAt:
+		return m.JoinedAt()
+	case participate.FieldStatus:
+		return m.Status()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ParticipateMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, errors.New("edge schema Participate does not support getting old values")
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ParticipateMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case participate.FieldEventGroupID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventGroupID(v)
+		return nil
+	case participate.FieldEventID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventID(v)
+		return nil
+	case participate.FieldJoinedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetJoinedAt(v)
+		return nil
+	case participate.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Participate field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ParticipateMutation) AddedFields() []string {
+	var fields []string
+	if m.addstatus != nil {
+		fields = append(fields, participate.FieldStatus)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ParticipateMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case participate.FieldStatus:
+		return m.AddedStatus()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ParticipateMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case participate.FieldStatus:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Participate numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ParticipateMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ParticipateMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ParticipateMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Participate nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ParticipateMutation) ResetField(name string) error {
+	switch name {
+	case participate.FieldEventGroupID:
+		m.ResetEventGroupID()
+		return nil
+	case participate.FieldEventID:
+		m.ResetEventID()
+		return nil
+	case participate.FieldJoinedAt:
+		m.ResetJoinedAt()
+		return nil
+	case participate.FieldStatus:
+		m.ResetStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown Participate field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ParticipateMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.event != nil {
+		edges = append(edges, participate.EdgeEvent)
+	}
+	if m.event_group != nil {
+		edges = append(edges, participate.EdgeEventGroup)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ParticipateMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case participate.EdgeEvent:
+		if id := m.event; id != nil {
+			return []ent.Value{*id}
+		}
+	case participate.EdgeEventGroup:
+		if id := m.event_group; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ParticipateMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ParticipateMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ParticipateMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedevent {
+		edges = append(edges, participate.EdgeEvent)
+	}
+	if m.clearedevent_group {
+		edges = append(edges, participate.EdgeEventGroup)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ParticipateMutation) EdgeCleared(name string) bool {
+	switch name {
+	case participate.EdgeEvent:
+		return m.clearedevent
+	case participate.EdgeEventGroup:
+		return m.clearedevent_group
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ParticipateMutation) ClearEdge(name string) error {
+	switch name {
+	case participate.EdgeEvent:
+		m.ClearEvent()
+		return nil
+	case participate.EdgeEventGroup:
+		m.ClearEventGroup()
+		return nil
+	}
+	return fmt.Errorf("unknown Participate unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ParticipateMutation) ResetEdge(name string) error {
+	switch name {
+	case participate.EdgeEvent:
+		m.ResetEvent()
+		return nil
+	case participate.EdgeEventGroup:
+		m.ResetEventGroup()
+		return nil
+	}
+	return fmt.Errorf("unknown Participate edge %s", name)
 }
 
 // SubEventMutation represents an operation that mutates the SubEvent nodes in the graph.

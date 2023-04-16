@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -14,13 +13,9 @@ import (
 
 // EventGroupz is the model entity for the EventGroupz schema.
 type EventGroupz struct {
-	config `json:"-"`
+	config
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
-	// JoinedAt holds the value of the "joined_at" field.
-	JoinedAt time.Time `json:"joined_at,omitempty"`
-	// Status holds the value of the "status" field.
-	Status int64 `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EventGroupzQuery when eager-loading is set.
 	Edges        EventGroupzEdges `json:"edges"`
@@ -31,9 +26,11 @@ type EventGroupz struct {
 type EventGroupzEdges struct {
 	// Event holds the value of the event edge.
 	Event []*Event `json:"event,omitempty"`
+	// Participates holds the value of the participates edge.
+	Participates []*Participate `json:"participates,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // EventOrErr returns the Event value or an error if the edge
@@ -45,15 +42,22 @@ func (e EventGroupzEdges) EventOrErr() ([]*Event, error) {
 	return nil, &NotLoadedError{edge: "event"}
 }
 
+// ParticipatesOrErr returns the Participates value or an error if the edge
+// was not loaded in eager-loading.
+func (e EventGroupzEdges) ParticipatesOrErr() ([]*Participate, error) {
+	if e.loadedTypes[1] {
+		return e.Participates, nil
+	}
+	return nil, &NotLoadedError{edge: "participates"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*EventGroupz) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case eventgroupz.FieldID, eventgroupz.FieldStatus:
+		case eventgroupz.FieldID:
 			values[i] = new(sql.NullInt64)
-		case eventgroupz.FieldJoinedAt:
-			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -75,18 +79,6 @@ func (eg *EventGroupz) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			eg.ID = int64(value.Int64)
-		case eventgroupz.FieldJoinedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field joined_at", values[i])
-			} else if value.Valid {
-				eg.JoinedAt = value.Time
-			}
-		case eventgroupz.FieldStatus:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
-			} else if value.Valid {
-				eg.Status = value.Int64
-			}
 		default:
 			eg.selectValues.Set(columns[i], values[i])
 		}
@@ -103,6 +95,11 @@ func (eg *EventGroupz) Value(name string) (ent.Value, error) {
 // QueryEvent queries the "event" edge of the EventGroupz entity.
 func (eg *EventGroupz) QueryEvent() *EventQuery {
 	return NewEventGroupzClient(eg.config).QueryEvent(eg)
+}
+
+// QueryParticipates queries the "participates" edge of the EventGroupz entity.
+func (eg *EventGroupz) QueryParticipates() *ParticipateQuery {
+	return NewEventGroupzClient(eg.config).QueryParticipates(eg)
 }
 
 // Update returns a builder for updating this EventGroupz.
@@ -127,12 +124,7 @@ func (eg *EventGroupz) Unwrap() *EventGroupz {
 func (eg *EventGroupz) String() string {
 	var builder strings.Builder
 	builder.WriteString("EventGroupz(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", eg.ID))
-	builder.WriteString("joined_at=")
-	builder.WriteString(eg.JoinedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", eg.Status))
+	builder.WriteString(fmt.Sprintf("id=%v", eg.ID))
 	builder.WriteByte(')')
 	return builder.String()
 }

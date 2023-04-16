@@ -16,6 +16,7 @@ import (
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/participate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
 
@@ -81,6 +82,7 @@ func checkColumn(table, column string) error {
 			eventgroupz.Table:    eventgroupz.ValidColumn,
 			groupzprogress.Table: groupzprogress.ValidColumn,
 			memberprogress.Table: memberprogress.ValidColumn,
+			participate.Table:    participate.ValidColumn,
 			subevent.Table:       subevent.ValidColumn,
 		})
 	})

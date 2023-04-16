@@ -3,8 +3,6 @@
 package eventgroupz
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -14,32 +12,35 @@ const (
 	Label = "event_groupz"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldJoinedAt holds the string denoting the joined_at field in the database.
-	FieldJoinedAt = "joined_at"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
 	EdgeEvent = "event"
+	// EdgeParticipates holds the string denoting the participates edge name in mutations.
+	EdgeParticipates = "participates"
 	// Table holds the table name of the eventgroupz in the database.
 	Table = "event_groupzs"
 	// EventTable is the table that holds the event relation/edge. The primary key declared below.
-	EventTable = "event_groups"
+	EventTable = "participates"
 	// EventInverseTable is the table name for the Event entity.
 	// It exists in this package in order to avoid circular dependency with the "event" package.
 	EventInverseTable = "events"
+	// ParticipatesTable is the table that holds the participates relation/edge.
+	ParticipatesTable = "participates"
+	// ParticipatesInverseTable is the table name for the Participate entity.
+	// It exists in this package in order to avoid circular dependency with the "participate" package.
+	ParticipatesInverseTable = "participates"
+	// ParticipatesColumn is the table column denoting the participates relation/edge.
+	ParticipatesColumn = "event_group_id"
 )
 
 // Columns holds all SQL columns for eventgroupz fields.
 var Columns = []string{
 	FieldID,
-	FieldJoinedAt,
-	FieldStatus,
 }
 
 var (
 	// EventPrimaryKey and EventColumn2 are the table columns denoting the
 	// primary key for the event relation (M2M).
-	EventPrimaryKey = []string{"event_id", "event_groupz_id"}
+	EventPrimaryKey = []string{"event_id", "event_group_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -52,29 +53,12 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-var (
-	// DefaultJoinedAt holds the default value on creation for the "joined_at" field.
-	DefaultJoinedAt func() time.Time
-	// DefaultStatus holds the default value on creation for the "status" field.
-	DefaultStatus int64
-)
-
 // Order defines the ordering method for the EventGroupz queries.
 type Order func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) Order {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByJoinedAt orders the results by the joined_at field.
-func ByJoinedAt(opts ...sql.OrderTermOption) Order {
-	return sql.OrderByField(FieldJoinedAt, opts...).ToFunc()
-}
-
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) Order {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByEventCount orders the results by event count.
@@ -90,10 +74,31 @@ func ByEvent(term sql.OrderTerm, terms ...sql.OrderTerm) Order {
 		sqlgraph.OrderByNeighborTerms(s, newEventStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByParticipatesCount orders the results by participates count.
+func ByParticipatesCount(opts ...sql.OrderTermOption) Order {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newParticipatesStep(), opts...)
+	}
+}
+
+// ByParticipates orders the results by participates terms.
+func ByParticipates(term sql.OrderTerm, terms ...sql.OrderTerm) Order {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newParticipatesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newEventStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EventInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, EventTable, EventPrimaryKey...),
+	)
+}
+func newParticipatesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ParticipatesInverseTable, ParticipatesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ParticipatesTable, ParticipatesColumn),
 	)
 }

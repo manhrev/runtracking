@@ -4,9 +4,7 @@ package ent
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,34 +17,6 @@ type EventGroupzCreate struct {
 	config
 	mutation *EventGroupzMutation
 	hooks    []Hook
-}
-
-// SetJoinedAt sets the "joined_at" field.
-func (egc *EventGroupzCreate) SetJoinedAt(t time.Time) *EventGroupzCreate {
-	egc.mutation.SetJoinedAt(t)
-	return egc
-}
-
-// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
-func (egc *EventGroupzCreate) SetNillableJoinedAt(t *time.Time) *EventGroupzCreate {
-	if t != nil {
-		egc.SetJoinedAt(*t)
-	}
-	return egc
-}
-
-// SetStatus sets the "status" field.
-func (egc *EventGroupzCreate) SetStatus(i int64) *EventGroupzCreate {
-	egc.mutation.SetStatus(i)
-	return egc
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (egc *EventGroupzCreate) SetNillableStatus(i *int64) *EventGroupzCreate {
-	if i != nil {
-		egc.SetStatus(*i)
-	}
-	return egc
 }
 
 // SetID sets the "id" field.
@@ -77,7 +47,6 @@ func (egc *EventGroupzCreate) Mutation() *EventGroupzMutation {
 
 // Save creates the EventGroupz in the database.
 func (egc *EventGroupzCreate) Save(ctx context.Context) (*EventGroupz, error) {
-	egc.defaults()
 	return withHooks[*EventGroupz, EventGroupzMutation](ctx, egc.sqlSave, egc.mutation, egc.hooks)
 }
 
@@ -103,26 +72,8 @@ func (egc *EventGroupzCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (egc *EventGroupzCreate) defaults() {
-	if _, ok := egc.mutation.JoinedAt(); !ok {
-		v := eventgroupz.DefaultJoinedAt()
-		egc.mutation.SetJoinedAt(v)
-	}
-	if _, ok := egc.mutation.Status(); !ok {
-		v := eventgroupz.DefaultStatus
-		egc.mutation.SetStatus(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (egc *EventGroupzCreate) check() error {
-	if _, ok := egc.mutation.JoinedAt(); !ok {
-		return &ValidationError{Name: "joined_at", err: errors.New(`ent: missing required field "EventGroupz.joined_at"`)}
-	}
-	if _, ok := egc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "EventGroupz.status"`)}
-	}
 	return nil
 }
 
@@ -155,14 +106,6 @@ func (egc *EventGroupzCreate) createSpec() (*EventGroupz, *sqlgraph.CreateSpec) 
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := egc.mutation.JoinedAt(); ok {
-		_spec.SetField(eventgroupz.FieldJoinedAt, field.TypeTime, value)
-		_node.JoinedAt = value
-	}
-	if value, ok := egc.mutation.Status(); ok {
-		_spec.SetField(eventgroupz.FieldStatus, field.TypeInt64, value)
-		_node.Status = value
-	}
 	if nodes := egc.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -177,6 +120,10 @@ func (egc *EventGroupzCreate) createSpec() (*EventGroupz, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: egc.config, mutation: newParticipateMutation(egc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -196,7 +143,6 @@ func (egcb *EventGroupzCreateBulk) Save(ctx context.Context) ([]*EventGroupz, er
 	for i := range egcb.builders {
 		func(i int, root context.Context) {
 			builder := egcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EventGroupzMutation)
 				if !ok {

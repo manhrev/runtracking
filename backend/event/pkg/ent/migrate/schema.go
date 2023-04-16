@@ -31,8 +31,6 @@ var (
 	// EventGroupzsColumns holds the columns for the "event_groupzs" table.
 	EventGroupzsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "joined_at", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeInt64, Default: 0},
 	}
 	// EventGroupzsTable holds the schema information for the "event_groupzs" table.
 	EventGroupzsTable = &schema.Table{
@@ -83,6 +81,33 @@ var (
 			},
 		},
 	}
+	// ParticipatesColumns holds the columns for the "participates" table.
+	ParticipatesColumns = []*schema.Column{
+		{Name: "joined_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeInt64, Default: 0},
+		{Name: "event_id", Type: field.TypeInt64},
+		{Name: "event_group_id", Type: field.TypeInt64},
+	}
+	// ParticipatesTable holds the schema information for the "participates" table.
+	ParticipatesTable = &schema.Table{
+		Name:       "participates",
+		Columns:    ParticipatesColumns,
+		PrimaryKey: []*schema.Column{ParticipatesColumns[2], ParticipatesColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "participates_events_event",
+				Columns:    []*schema.Column{ParticipatesColumns[2]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "participates_event_groupzs_event_group",
+				Columns:    []*schema.Column{ParticipatesColumns[3]},
+				RefColumns: []*schema.Column{EventGroupzsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// SubEventsColumns holds the columns for the "sub_events" table.
 	SubEventsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -110,46 +135,21 @@ var (
 			},
 		},
 	}
-	// EventGroupsColumns holds the columns for the "event_groups" table.
-	EventGroupsColumns = []*schema.Column{
-		{Name: "event_id", Type: field.TypeInt64},
-		{Name: "event_groupz_id", Type: field.TypeInt64},
-	}
-	// EventGroupsTable holds the schema information for the "event_groups" table.
-	EventGroupsTable = &schema.Table{
-		Name:       "event_groups",
-		Columns:    EventGroupsColumns,
-		PrimaryKey: []*schema.Column{EventGroupsColumns[0], EventGroupsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "event_groups_event_id",
-				Columns:    []*schema.Column{EventGroupsColumns[0]},
-				RefColumns: []*schema.Column{EventsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "event_groups_event_groupz_id",
-				Columns:    []*schema.Column{EventGroupsColumns[1]},
-				RefColumns: []*schema.Column{EventGroupzsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		EventsTable,
 		EventGroupzsTable,
 		GroupzProgressesTable,
 		MemberProgressesTable,
+		ParticipatesTable,
 		SubEventsTable,
-		EventGroupsTable,
 	}
 )
 
 func init() {
 	GroupzProgressesTable.ForeignKeys[0].RefTable = SubEventsTable
 	MemberProgressesTable.ForeignKeys[0].RefTable = GroupzProgressesTable
+	ParticipatesTable.ForeignKeys[0].RefTable = EventsTable
+	ParticipatesTable.ForeignKeys[1].RefTable = EventGroupzsTable
 	SubEventsTable.ForeignKeys[0].RefTable = EventsTable
-	EventGroupsTable.ForeignKeys[0].RefTable = EventsTable
-	EventGroupsTable.ForeignKeys[1].RefTable = EventGroupzsTable
 }

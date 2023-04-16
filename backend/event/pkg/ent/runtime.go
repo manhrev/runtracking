@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/event"
-	"github.com/manhrev/runtracking/backend/event/pkg/ent/eventgroupz"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/groupzprogress"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/memberprogress"
+	"github.com/manhrev/runtracking/backend/event/pkg/ent/participate"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/schema"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent/subevent"
 )
@@ -43,16 +43,6 @@ func init() {
 	eventDescIsGlobal := eventFields[9].Descriptor()
 	// event.DefaultIsGlobal holds the default value on creation for the is_global field.
 	event.DefaultIsGlobal = eventDescIsGlobal.Default.(bool)
-	eventgroupzFields := schema.EventGroupz{}.Fields()
-	_ = eventgroupzFields
-	// eventgroupzDescJoinedAt is the schema descriptor for joined_at field.
-	eventgroupzDescJoinedAt := eventgroupzFields[1].Descriptor()
-	// eventgroupz.DefaultJoinedAt holds the default value on creation for the joined_at field.
-	eventgroupz.DefaultJoinedAt = eventgroupzDescJoinedAt.Default.(func() time.Time)
-	// eventgroupzDescStatus is the schema descriptor for status field.
-	eventgroupzDescStatus := eventgroupzFields[2].Descriptor()
-	// eventgroupz.DefaultStatus holds the default value on creation for the status field.
-	eventgroupz.DefaultStatus = eventgroupzDescStatus.Default.(int64)
 	groupzprogressFields := schema.GroupzProgress{}.Fields()
 	_ = groupzprogressFields
 	// groupzprogressDescProgress is the schema descriptor for progress field.
@@ -65,6 +55,16 @@ func init() {
 	memberprogressDescProgress := memberprogressFields[3].Descriptor()
 	// memberprogress.DefaultProgress holds the default value on creation for the progress field.
 	memberprogress.DefaultProgress = memberprogressDescProgress.Default.(int64)
+	participateFields := schema.Participate{}.Fields()
+	_ = participateFields
+	// participateDescJoinedAt is the schema descriptor for joined_at field.
+	participateDescJoinedAt := participateFields[2].Descriptor()
+	// participate.DefaultJoinedAt holds the default value on creation for the joined_at field.
+	participate.DefaultJoinedAt = participateDescJoinedAt.Default.(func() time.Time)
+	// participateDescStatus is the schema descriptor for status field.
+	participateDescStatus := participateFields[3].Descriptor()
+	// participate.DefaultStatus holds the default value on creation for the status field.
+	participate.DefaultStatus = participateDescStatus.Default.(int64)
 	subeventFields := schema.SubEvent{}.Fields()
 	_ = subeventFields
 	// subeventDescPicture is the schema descriptor for picture field.

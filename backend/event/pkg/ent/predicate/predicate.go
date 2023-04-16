@@ -18,5 +18,8 @@ type GroupzProgress func(*sql.Selector)
 // MemberProgress is the predicate function for memberprogress builders.
 type MemberProgress func(*sql.Selector)
 
+// Participate is the predicate function for participate builders.
+type Participate func(*sql.Selector)
+
 // SubEvent is the predicate function for subevent builders.
 type SubEvent func(*sql.Selector)

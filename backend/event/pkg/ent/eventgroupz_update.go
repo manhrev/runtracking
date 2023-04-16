@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,41 +26,6 @@ type EventGroupzUpdate struct {
 // Where appends a list predicates to the EventGroupzUpdate builder.
 func (egu *EventGroupzUpdate) Where(ps ...predicate.EventGroupz) *EventGroupzUpdate {
 	egu.mutation.Where(ps...)
-	return egu
-}
-
-// SetJoinedAt sets the "joined_at" field.
-func (egu *EventGroupzUpdate) SetJoinedAt(t time.Time) *EventGroupzUpdate {
-	egu.mutation.SetJoinedAt(t)
-	return egu
-}
-
-// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
-func (egu *EventGroupzUpdate) SetNillableJoinedAt(t *time.Time) *EventGroupzUpdate {
-	if t != nil {
-		egu.SetJoinedAt(*t)
-	}
-	return egu
-}
-
-// SetStatus sets the "status" field.
-func (egu *EventGroupzUpdate) SetStatus(i int64) *EventGroupzUpdate {
-	egu.mutation.ResetStatus()
-	egu.mutation.SetStatus(i)
-	return egu
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (egu *EventGroupzUpdate) SetNillableStatus(i *int64) *EventGroupzUpdate {
-	if i != nil {
-		egu.SetStatus(*i)
-	}
-	return egu
-}
-
-// AddStatus adds i to the "status" field.
-func (egu *EventGroupzUpdate) AddStatus(i int64) *EventGroupzUpdate {
-	egu.mutation.AddStatus(i)
 	return egu
 }
 
@@ -148,15 +112,6 @@ func (egu *EventGroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := egu.mutation.JoinedAt(); ok {
-		_spec.SetField(eventgroupz.FieldJoinedAt, field.TypeTime, value)
-	}
-	if value, ok := egu.mutation.Status(); ok {
-		_spec.SetField(eventgroupz.FieldStatus, field.TypeInt64, value)
-	}
-	if value, ok := egu.mutation.AddedStatus(); ok {
-		_spec.AddField(eventgroupz.FieldStatus, field.TypeInt64, value)
-	}
 	if egu.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -168,6 +123,10 @@ func (egu *EventGroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt64),
 			},
 		}
+		createE := &ParticipateCreate{config: egu.config, mutation: newParticipateMutation(egu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := egu.mutation.RemovedEventIDs(); len(nodes) > 0 && !egu.mutation.EventCleared() {
@@ -184,6 +143,10 @@ func (egu *EventGroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: egu.config, mutation: newParticipateMutation(egu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := egu.mutation.EventIDs(); len(nodes) > 0 {
@@ -200,6 +163,10 @@ func (egu *EventGroupzUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: egu.config, mutation: newParticipateMutation(egu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(egu.modifiers...)
@@ -222,41 +189,6 @@ type EventGroupzUpdateOne struct {
 	hooks     []Hook
 	mutation  *EventGroupzMutation
 	modifiers []func(*sql.UpdateBuilder)
-}
-
-// SetJoinedAt sets the "joined_at" field.
-func (eguo *EventGroupzUpdateOne) SetJoinedAt(t time.Time) *EventGroupzUpdateOne {
-	eguo.mutation.SetJoinedAt(t)
-	return eguo
-}
-
-// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
-func (eguo *EventGroupzUpdateOne) SetNillableJoinedAt(t *time.Time) *EventGroupzUpdateOne {
-	if t != nil {
-		eguo.SetJoinedAt(*t)
-	}
-	return eguo
-}
-
-// SetStatus sets the "status" field.
-func (eguo *EventGroupzUpdateOne) SetStatus(i int64) *EventGroupzUpdateOne {
-	eguo.mutation.ResetStatus()
-	eguo.mutation.SetStatus(i)
-	return eguo
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (eguo *EventGroupzUpdateOne) SetNillableStatus(i *int64) *EventGroupzUpdateOne {
-	if i != nil {
-		eguo.SetStatus(*i)
-	}
-	return eguo
-}
-
-// AddStatus adds i to the "status" field.
-func (eguo *EventGroupzUpdateOne) AddStatus(i int64) *EventGroupzUpdateOne {
-	eguo.mutation.AddStatus(i)
-	return eguo
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
@@ -372,15 +304,6 @@ func (eguo *EventGroupzUpdateOne) sqlSave(ctx context.Context) (_node *EventGrou
 			}
 		}
 	}
-	if value, ok := eguo.mutation.JoinedAt(); ok {
-		_spec.SetField(eventgroupz.FieldJoinedAt, field.TypeTime, value)
-	}
-	if value, ok := eguo.mutation.Status(); ok {
-		_spec.SetField(eventgroupz.FieldStatus, field.TypeInt64, value)
-	}
-	if value, ok := eguo.mutation.AddedStatus(); ok {
-		_spec.AddField(eventgroupz.FieldStatus, field.TypeInt64, value)
-	}
 	if eguo.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -392,6 +315,10 @@ func (eguo *EventGroupzUpdateOne) sqlSave(ctx context.Context) (_node *EventGrou
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt64),
 			},
 		}
+		createE := &ParticipateCreate{config: eguo.config, mutation: newParticipateMutation(eguo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eguo.mutation.RemovedEventIDs(); len(nodes) > 0 && !eguo.mutation.EventCleared() {
@@ -408,6 +335,10 @@ func (eguo *EventGroupzUpdateOne) sqlSave(ctx context.Context) (_node *EventGrou
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: eguo.config, mutation: newParticipateMutation(eguo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eguo.mutation.EventIDs(); len(nodes) > 0 {
@@ -424,6 +355,10 @@ func (eguo *EventGroupzUpdateOne) sqlSave(ctx context.Context) (_node *EventGrou
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &ParticipateCreate{config: eguo.config, mutation: newParticipateMutation(eguo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(eguo.modifiers...)

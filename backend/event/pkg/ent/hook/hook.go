@@ -57,6 +57,18 @@ func (f MemberProgressFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MemberProgressMutation", m)
 }
 
+// The ParticipateFunc type is an adapter to allow the use of ordinary
+// function as Participate mutator.
+type ParticipateFunc func(context.Context, *ent.ParticipateMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ParticipateFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ParticipateMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ParticipateMutation", m)
+}
+
 // The SubEventFunc type is an adapter to allow the use of ordinary
 // function as SubEvent mutator.
 type SubEventFunc func(context.Context, *ent.SubEventMutation) (ent.Value, error)

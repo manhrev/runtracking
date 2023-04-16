@@ -45,6 +45,9 @@ func (s *eventServer) CreateEvent(ctx context.Context, request *event.CreateEven
 		request.GetSubEvents(),
 		request.GetOwnerGroupId(),
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &event.CreateEventReply{
 		IdCreated: idCreated,

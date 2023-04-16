@@ -39,6 +39,6 @@ func (Event) Fields() []ent.Field {
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("subevents", SubEvent.Type),
-		edge.To("groups", EventGroupz.Type),
+		edge.To("groups", EventGroupz.Type).Through("participates", Participate.Type),
 	}
 }
