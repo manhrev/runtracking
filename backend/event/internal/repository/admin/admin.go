@@ -21,6 +21,13 @@ type Admin interface {
 		subEvents []*event_pb.CreateEventRequest_CreateSubEvent,
 		ownerGroupId int64,
 	) (int64, error)
+	UpdateEventInfo(
+		ctx context.Context,
+		eventId int64,
+		name string,
+		description string,
+		picture string,
+	) error
 	JoinEvent(
 		ctx context.Context,
 		eventId int64,

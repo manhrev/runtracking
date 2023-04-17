@@ -76,6 +76,7 @@ message CreateEventReply {
 
 message UpdateEventInfoRequest {
     // if any field is empty (0 or "" ...), it will be ignored
+    int64 event_id = 1;
     string name = 2;
     string description = 3;
     string picture = 4;
