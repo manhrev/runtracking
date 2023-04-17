@@ -26,7 +26,7 @@ func (SubEvent) Fields() []ent.Field {
 			Default(0),
 		field.Int64("rule_id"),
 		field.Int64("status").
-			Default(0),
+			Default(1),
 	}
 }
 

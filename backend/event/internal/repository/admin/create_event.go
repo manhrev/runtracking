@@ -22,7 +22,7 @@ func (a *adminImpl) CreateEvent(
 	picture string,
 	startAt *timestamppb.Timestamp,
 	isGlobal bool,
-	subEvents []*event_pb.CreateEventRequest_CreateSubEvent,
+	subEvents []*event_pb.CreateSubEvent,
 	ownerGroupId int64,
 ) (int64, error) {
 	// get owner group
@@ -86,6 +86,7 @@ func (a *adminImpl) CreateEvent(
 			SetGoal(subEvent.Goal).
 			SetRuleID(int64(subEvent.Rule)).
 			AddGroup(adminProgress).
+			SetStatus(int64(event_pb.SubEventStatus_SUB_EVENT_STATUS_NEW)).
 			Save(ctx)
 		if err != nil {
 			return 0, rollbackAndLog(tx, err, "Error CreateEvent: cannot create sub event")
@@ -117,7 +118,10 @@ func (a *adminImpl) CreateEvent(
 		return 0, rollbackAndLog(tx, fmt.Errorf("no record updated"), "Error CreateEvent: cannot update admin group state")
 	}
 
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		log.Printf("Error CreateEvent: cannot commit transaction: %v", err)
+	}
 
 	return entEventCreated.ID, nil
 }

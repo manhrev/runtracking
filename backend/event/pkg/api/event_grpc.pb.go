@@ -27,6 +27,7 @@ type EventClient interface {
 	UpdateEventInfo(ctx context.Context, in *UpdateEventInfoRequest, opts ...grpc.CallOption) (*UpdateEventInfoReply, error)
 	JoinEvent(ctx context.Context, in *JoinEventRequest, opts ...grpc.CallOption) (*JoinEventReply, error)
 	ApproveJoinEvent(ctx context.Context, in *ApproveJoinEventRequest, opts ...grpc.CallOption) (*ApproveJoinEventReply, error)
+	AddSubEventToEvent(ctx context.Context, in *AddSubEventToEventRequest, opts ...grpc.CallOption) (*AddSubEventToEventReply, error)
 	// for all
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error)
 	ListSubEvents(ctx context.Context, in *ListSubEventsRequest, opts ...grpc.CallOption) (*ListSubEventsReply, error)
@@ -78,6 +79,15 @@ func (c *eventClient) ApproveJoinEvent(ctx context.Context, in *ApproveJoinEvent
 	return out, nil
 }
 
+func (c *eventClient) AddSubEventToEvent(ctx context.Context, in *AddSubEventToEventRequest, opts ...grpc.CallOption) (*AddSubEventToEventReply, error) {
+	out := new(AddSubEventToEventReply)
+	err := c.cc.Invoke(ctx, "/event.Event/AddSubEventToEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *eventClient) ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error) {
 	out := new(ListEventsReply)
 	err := c.cc.Invoke(ctx, "/event.Event/ListEvents", in, out, opts...)
@@ -123,6 +133,7 @@ type EventServer interface {
 	UpdateEventInfo(context.Context, *UpdateEventInfoRequest) (*UpdateEventInfoReply, error)
 	JoinEvent(context.Context, *JoinEventRequest) (*JoinEventReply, error)
 	ApproveJoinEvent(context.Context, *ApproveJoinEventRequest) (*ApproveJoinEventReply, error)
+	AddSubEventToEvent(context.Context, *AddSubEventToEventRequest) (*AddSubEventToEventReply, error)
 	// for all
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error)
 	ListSubEvents(context.Context, *ListSubEventsRequest) (*ListSubEventsReply, error)
@@ -146,6 +157,9 @@ func (UnimplementedEventServer) JoinEvent(context.Context, *JoinEventRequest) (*
 }
 func (UnimplementedEventServer) ApproveJoinEvent(context.Context, *ApproveJoinEventRequest) (*ApproveJoinEventReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApproveJoinEvent not implemented")
+}
+func (UnimplementedEventServer) AddSubEventToEvent(context.Context, *AddSubEventToEventRequest) (*AddSubEventToEventReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSubEventToEvent not implemented")
 }
 func (UnimplementedEventServer) ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
@@ -244,6 +258,24 @@ func _Event_ApproveJoinEvent_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Event_AddSubEventToEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddSubEventToEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServer).AddSubEventToEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.Event/AddSubEventToEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServer).AddSubEventToEvent(ctx, req.(*AddSubEventToEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Event_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListEventsRequest)
 	if err := dec(in); err != nil {
@@ -338,6 +370,10 @@ var Event_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ApproveJoinEvent",
 			Handler:    _Event_ApproveJoinEvent_Handler,
+		},
+		{
+			MethodName: "AddSubEventToEvent",
+			Handler:    _Event_AddSubEventToEvent_Handler,
 		},
 		{
 			MethodName: "ListEvents",

@@ -10,13 +10,17 @@ import (
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 )
 
-func (s *eventServer) UpdateEventInfo(ctx context.Context, request *event.UpdateEventInfoRequest) (*event.UpdateEventInfoReply, error) {
+func (s *eventServer) AddSubEventToEvent(ctx context.Context, request *event.AddSubEventToEventRequest) (*event.AddSubEventToEventReply, error) {
 	userId, err := extractor.New().GetUserID(ctx)
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}
 
-	eventEnt, err := s.repository.Event.GetEvent(ctx, request.GetEventId())
+	if request.GetSubEvent() == nil {
+		return nil, status.InvalidArgument("No SubEvent")
+	}
+
+	eventEnt, err := s.repository.Event.GetEventWithSubEvents(ctx, request.GetEventId())
 	if err != nil {
 		return nil, err
 	}
@@ -27,30 +31,30 @@ func (s *eventServer) UpdateEventInfo(ctx context.Context, request *event.Update
 		GroupIds: []int64{ownerGroupId},
 	})
 	if err != nil {
-		log.Printf("Error UpdateEventInfo: cannot get group: %v", err)
+		log.Printf("Error AddSubEventToEvent: cannot get group: %v", err)
 		return nil, status.Internal(err.Error())
 	}
 
 	if len(res.GetGroups()) != 0 {
 		if res.GetGroups()[0].GetLeaderId() != userId {
-			log.Printf("Error UpdateEventInfo: player is not admin of the group")
+			log.Printf("Error AddSubEventToEvent: player is not admin of the group")
 			return nil, status.Internal("Player is not admin of the group")
 		}
 	} else {
-		log.Printf("Error UpdateEventInfo: group not found or duplicated")
+		log.Printf("Error AddSubEventToEvent: group not found or duplicated")
 		return nil, status.Internal("Cannot get group: group not found or duplicated")
 	}
 
-	err = s.repository.Admin.UpdateEventInfo(
+	idCreated, err := s.repository.Admin.AddSubEventToEvent(
 		ctx,
-		request.GetEventId(),
-		request.GetName(),
-		request.GetDescription(),
-		request.GetPicture(),
+		eventEnt,
+		request.GetSubEvent(),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &event.UpdateEventInfoReply{}, nil
+	return &event.AddSubEventToEventReply{
+		IdCreated: idCreated,
+	}, nil
 }

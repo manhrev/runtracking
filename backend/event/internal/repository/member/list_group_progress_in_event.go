@@ -39,7 +39,7 @@ func (m *memberImpl) ListGroupProgressInEvent(
 		groupProgress := make([]*event_pb.GroupProgressInSubEvent, len(subEvents.Edges.Group))
 		for idx, group := range subEvents.Edges.Group {
 			groupProgress[idx] = &event_pb.GroupProgressInSubEvent{
-				GroupId:  group.ID,
+				GroupId:  group.GroupID,
 				Progress: group.Progress,
 			}
 		}

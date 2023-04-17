@@ -12,6 +12,9 @@ service Event {
     rpc UpdateEventInfo (UpdateEventInfoRequest) returns (UpdateEventInfoReply) {} // update event's basic info
     rpc JoinEvent (JoinEventRequest) returns (JoinEventReply) {} // join event
     rpc ApproveJoinEvent (ApproveJoinEventRequest) returns (ApproveJoinEventReply) {} // approve join event
+    rpc AddSubEventToEvent (AddSubEventToEventRequest) returns (AddSubEventToEventReply) {} //add to end of subevent list
+    //rpc RemoveSubEventFromEvent (RemoveSubEventFromEventRequest) returns (RemoveSubEventFromEventReply) {} //only if event not started
+    //rpc UpdateSubEventInEvent (UpdateSubEventInEventRequest) returns (UpdateSubEventInEventReply) {} //only if sub event not started
 
     // for all
     rpc ListEvents (ListEventsRequest) returns (ListEventsReply) {} // get event list with basic infos
@@ -55,17 +58,17 @@ message CreateEventRequest {
     bool is_global = 4; // only app admin can use, if not admin, this field will be ignored
     repeated CreateSubEvent sub_events = 5;
     int64 owner_group_id = 6;
-    google.protobuf.Timestamp start_at = 7;
+    google.protobuf.Timestamp start_at = 7;  
+}
 
-    message CreateSubEvent {
-        string name = 1;
-        string description = 2;
-        string picture = 3;
-        int64 goal = 4;
-        Rule rule = 5;
-        google.protobuf.Timestamp start_at = 6;
-        google.protobuf.Timestamp end_at = 7;
-    }
+message CreateSubEvent {
+    string name = 1;
+    string description = 2;
+    string picture = 3;
+    int64 goal = 4;
+    Rule rule = 5;
+    google.protobuf.Timestamp start_at = 6;
+    google.protobuf.Timestamp end_at = 7;
 }
 
 message CreateEventReply {
@@ -122,6 +125,17 @@ message ApproveJoinEventRequest {
 }
 
 message ApproveJoinEventReply {
+}
+
+// ==================== Add Sub Event To Event ====================
+
+message AddSubEventToEventRequest {
+    int64 event_id = 1;
+    CreateSubEvent sub_event = 2;
+}
+
+message AddSubEventToEventReply {
+    int64 id_created = 1;
 }
 
 // ==================== List Event ====================
@@ -213,7 +227,8 @@ enum RuleStatus {
 enum SubEventStatus {
     SUB_EVENT_STATUS_UNSPECIFIED = 0;
     SUB_EVENT_STATUS_NEW = 1;
-    SUB_EVENT_STATUS_ENDED = 2;
+    SUB_EVENT_STATUS_IN_PROGRESS = 2;
+    SUB_EVENT_STATUS_ENDED = 3;
 }
 
 enum GroupStatus {
