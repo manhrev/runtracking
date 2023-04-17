@@ -18,9 +18,16 @@ type Admin interface {
 		picture string,
 		startAt *timestamppb.Timestamp,
 		isGlobal bool,
-		subEvents []*event_pb.CreateEventRequest_CreateSubEvent,
+		subEvents []*event_pb.CreateSubEvent,
 		ownerGroupId int64,
 	) (int64, error)
+	UpdateEventInfo(
+		ctx context.Context,
+		eventId int64,
+		name string,
+		description string,
+		picture string,
+	) error
 	JoinEvent(
 		ctx context.Context,
 		eventId int64,
@@ -28,8 +35,18 @@ type Admin interface {
 	) error
 	ApproveJoinEvent(
 		ctx context.Context,
-		eventId int64,
+		entEvent *ent.Event,
 		groupId int64,
+	) error
+	AddSubEventToEvent(
+		ctx context.Context,
+		eventEnt *ent.Event,
+		subEvent *event_pb.CreateSubEvent,
+	) (int64, error)
+	RemoveSubEventFromEvent(
+		ctx context.Context,
+		eventEnt *ent.Event,
+		subEventId int64,
 	) error
 }
 

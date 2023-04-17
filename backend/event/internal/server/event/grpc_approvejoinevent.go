@@ -16,7 +16,7 @@ func (s *eventServer) ApproveJoinEvent(ctx context.Context, request *event.Appro
 		return nil, status.Internal(err.Error())
 	}
 
-	entEvent, err := s.repository.Event.GetEvent(ctx, request.GetEventId())
+	entEvent, err := s.repository.Event.GetEventWithSubEvents(ctx, request.GetEventId())
 	if err != nil {
 		log.Printf("Error ApproveJoinEvent: cannot get event: %v", err)
 		return nil, err
@@ -44,7 +44,7 @@ func (s *eventServer) ApproveJoinEvent(ctx context.Context, request *event.Appro
 
 	err = s.repository.Admin.ApproveJoinEvent(
 		ctx,
-		request.GetEventId(),
+		entEvent,
 		request.GetGroupId(),
 	)
 	if err != nil {

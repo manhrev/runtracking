@@ -13,7 +13,8 @@ func (s *eventServer) ListEvents(ctx context.Context, request *event.ListEventsR
 		request.GetLimit(),
 		request.GetOffset(),
 		request.GetAscending(),
-		request.GetGroupId(),
+		request.GetGroupIds(),
+		request.GetIsGlobal(),
 		request.GetSortBy(),
 		request.GetIds(),
 	)

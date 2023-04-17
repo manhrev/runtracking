@@ -16,16 +16,17 @@ func (m *memberImpl) ListEvents(
 	limit uint32,
 	offset uint64,
 	ascending bool,
-	group_id int64,
+	group_ids []int64,
+	isGlobal bool,
 	sort_by event_pb.ListEventsRequest_SortBy,
 	ids []int64,
 ) ([]*ent.Event, int64, error) {
-	query := m.entClient.Event.Query()
+	query := m.entClient.Event.Query().Where(event.IsGlobalEQ(isGlobal))
 
-	if group_id > 0 {
+	if len(group_ids) > 0 {
 		query.Where(
 			event.HasGroupsWith(
-				eventgroupz.IDEQ(group_id),
+				eventgroupz.IDIn(group_ids...),
 			),
 		)
 	}

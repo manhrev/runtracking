@@ -15,7 +15,8 @@ type Member interface {
 		limit uint32,
 		offset uint64,
 		ascending bool,
-		group_id int64,
+		group_ids []int64,
+		isGlobal bool,
 		sort_by event_pb.ListEventsRequest_SortBy,
 		ids []int64,
 	) ([]*ent.Event, int64, error)
@@ -23,6 +24,16 @@ type Member interface {
 		ctx context.Context,
 		eventId int64,
 	) ([]*ent.SubEvent, error)
+	ListGroupsInEvent(
+		ctx context.Context,
+		eventId int64,
+		limit uint32,
+		offset uint64,
+	) ([]*ent.Participate, int64, error)
+	ListGroupProgressInEvent(
+		ctx context.Context,
+		eventId int64,
+	) ([]*event_pb.SubEventProgress, error)
 }
 
 type memberImpl struct {

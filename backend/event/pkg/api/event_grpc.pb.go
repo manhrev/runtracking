@@ -27,10 +27,13 @@ type EventClient interface {
 	UpdateEventInfo(ctx context.Context, in *UpdateEventInfoRequest, opts ...grpc.CallOption) (*UpdateEventInfoReply, error)
 	JoinEvent(ctx context.Context, in *JoinEventRequest, opts ...grpc.CallOption) (*JoinEventReply, error)
 	ApproveJoinEvent(ctx context.Context, in *ApproveJoinEventRequest, opts ...grpc.CallOption) (*ApproveJoinEventReply, error)
+	AddSubEventToEvent(ctx context.Context, in *AddSubEventToEventRequest, opts ...grpc.CallOption) (*AddSubEventToEventReply, error)
+	RemoveSubEventFromEvent(ctx context.Context, in *RemoveSubEventFromEventRequest, opts ...grpc.CallOption) (*RemoveSubEventFromEventReply, error)
 	// for all
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error)
 	ListSubEvents(ctx context.Context, in *ListSubEventsRequest, opts ...grpc.CallOption) (*ListSubEventsReply, error)
 	ListGroupsInEvent(ctx context.Context, in *ListGroupsInEventRequest, opts ...grpc.CallOption) (*ListGroupsInEventReply, error)
+	ListGroupProgressInEvent(ctx context.Context, in *ListGroupProgressInEventRequest, opts ...grpc.CallOption) (*ListGroupProgressInEventReply, error)
 }
 
 type eventClient struct {
@@ -77,6 +80,24 @@ func (c *eventClient) ApproveJoinEvent(ctx context.Context, in *ApproveJoinEvent
 	return out, nil
 }
 
+func (c *eventClient) AddSubEventToEvent(ctx context.Context, in *AddSubEventToEventRequest, opts ...grpc.CallOption) (*AddSubEventToEventReply, error) {
+	out := new(AddSubEventToEventReply)
+	err := c.cc.Invoke(ctx, "/event.Event/AddSubEventToEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventClient) RemoveSubEventFromEvent(ctx context.Context, in *RemoveSubEventFromEventRequest, opts ...grpc.CallOption) (*RemoveSubEventFromEventReply, error) {
+	out := new(RemoveSubEventFromEventReply)
+	err := c.cc.Invoke(ctx, "/event.Event/RemoveSubEventFromEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *eventClient) ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error) {
 	out := new(ListEventsReply)
 	err := c.cc.Invoke(ctx, "/event.Event/ListEvents", in, out, opts...)
@@ -104,6 +125,15 @@ func (c *eventClient) ListGroupsInEvent(ctx context.Context, in *ListGroupsInEve
 	return out, nil
 }
 
+func (c *eventClient) ListGroupProgressInEvent(ctx context.Context, in *ListGroupProgressInEventRequest, opts ...grpc.CallOption) (*ListGroupProgressInEventReply, error) {
+	out := new(ListGroupProgressInEventReply)
+	err := c.cc.Invoke(ctx, "/event.Event/ListGroupProgressInEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventServer is the server API for Event service.
 // All implementations must embed UnimplementedEventServer
 // for forward compatibility
@@ -113,10 +143,13 @@ type EventServer interface {
 	UpdateEventInfo(context.Context, *UpdateEventInfoRequest) (*UpdateEventInfoReply, error)
 	JoinEvent(context.Context, *JoinEventRequest) (*JoinEventReply, error)
 	ApproveJoinEvent(context.Context, *ApproveJoinEventRequest) (*ApproveJoinEventReply, error)
+	AddSubEventToEvent(context.Context, *AddSubEventToEventRequest) (*AddSubEventToEventReply, error)
+	RemoveSubEventFromEvent(context.Context, *RemoveSubEventFromEventRequest) (*RemoveSubEventFromEventReply, error)
 	// for all
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error)
 	ListSubEvents(context.Context, *ListSubEventsRequest) (*ListSubEventsReply, error)
 	ListGroupsInEvent(context.Context, *ListGroupsInEventRequest) (*ListGroupsInEventReply, error)
+	ListGroupProgressInEvent(context.Context, *ListGroupProgressInEventRequest) (*ListGroupProgressInEventReply, error)
 	mustEmbedUnimplementedEventServer()
 }
 
@@ -136,6 +169,12 @@ func (UnimplementedEventServer) JoinEvent(context.Context, *JoinEventRequest) (*
 func (UnimplementedEventServer) ApproveJoinEvent(context.Context, *ApproveJoinEventRequest) (*ApproveJoinEventReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApproveJoinEvent not implemented")
 }
+func (UnimplementedEventServer) AddSubEventToEvent(context.Context, *AddSubEventToEventRequest) (*AddSubEventToEventReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSubEventToEvent not implemented")
+}
+func (UnimplementedEventServer) RemoveSubEventFromEvent(context.Context, *RemoveSubEventFromEventRequest) (*RemoveSubEventFromEventReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveSubEventFromEvent not implemented")
+}
 func (UnimplementedEventServer) ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
 }
@@ -144,6 +183,9 @@ func (UnimplementedEventServer) ListSubEvents(context.Context, *ListSubEventsReq
 }
 func (UnimplementedEventServer) ListGroupsInEvent(context.Context, *ListGroupsInEventRequest) (*ListGroupsInEventReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListGroupsInEvent not implemented")
+}
+func (UnimplementedEventServer) ListGroupProgressInEvent(context.Context, *ListGroupProgressInEventRequest) (*ListGroupProgressInEventReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListGroupProgressInEvent not implemented")
 }
 func (UnimplementedEventServer) mustEmbedUnimplementedEventServer() {}
 
@@ -230,6 +272,42 @@ func _Event_ApproveJoinEvent_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Event_AddSubEventToEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddSubEventToEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServer).AddSubEventToEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.Event/AddSubEventToEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServer).AddSubEventToEvent(ctx, req.(*AddSubEventToEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Event_RemoveSubEventFromEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveSubEventFromEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServer).RemoveSubEventFromEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.Event/RemoveSubEventFromEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServer).RemoveSubEventFromEvent(ctx, req.(*RemoveSubEventFromEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Event_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListEventsRequest)
 	if err := dec(in); err != nil {
@@ -284,6 +362,24 @@ func _Event_ListGroupsInEvent_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Event_ListGroupProgressInEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListGroupProgressInEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServer).ListGroupProgressInEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.Event/ListGroupProgressInEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServer).ListGroupProgressInEvent(ctx, req.(*ListGroupProgressInEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Event_ServiceDesc is the grpc.ServiceDesc for Event service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -308,6 +404,14 @@ var Event_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Event_ApproveJoinEvent_Handler,
 		},
 		{
+			MethodName: "AddSubEventToEvent",
+			Handler:    _Event_AddSubEventToEvent_Handler,
+		},
+		{
+			MethodName: "RemoveSubEventFromEvent",
+			Handler:    _Event_RemoveSubEventFromEvent_Handler,
+		},
+		{
 			MethodName: "ListEvents",
 			Handler:    _Event_ListEvents_Handler,
 		},
@@ -318,6 +422,10 @@ var Event_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListGroupsInEvent",
 			Handler:    _Event_ListGroupsInEvent_Handler,
+		},
+		{
+			MethodName: "ListGroupProgressInEvent",
+			Handler:    _Event_ListGroupProgressInEvent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
