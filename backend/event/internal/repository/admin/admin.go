@@ -43,6 +43,11 @@ type Admin interface {
 		eventEnt *ent.Event,
 		subEvent *event_pb.CreateSubEvent,
 	) (int64, error)
+	RemoveSubEventFromEvent(
+		ctx context.Context,
+		eventEnt *ent.Event,
+		subEventId int64,
+	) error
 }
 
 type adminImpl struct {

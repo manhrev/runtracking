@@ -28,6 +28,7 @@ type EventClient interface {
 	JoinEvent(ctx context.Context, in *JoinEventRequest, opts ...grpc.CallOption) (*JoinEventReply, error)
 	ApproveJoinEvent(ctx context.Context, in *ApproveJoinEventRequest, opts ...grpc.CallOption) (*ApproveJoinEventReply, error)
 	AddSubEventToEvent(ctx context.Context, in *AddSubEventToEventRequest, opts ...grpc.CallOption) (*AddSubEventToEventReply, error)
+	RemoveSubEventFromEvent(ctx context.Context, in *RemoveSubEventFromEventRequest, opts ...grpc.CallOption) (*RemoveSubEventFromEventReply, error)
 	// for all
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error)
 	ListSubEvents(ctx context.Context, in *ListSubEventsRequest, opts ...grpc.CallOption) (*ListSubEventsReply, error)
@@ -88,6 +89,15 @@ func (c *eventClient) AddSubEventToEvent(ctx context.Context, in *AddSubEventToE
 	return out, nil
 }
 
+func (c *eventClient) RemoveSubEventFromEvent(ctx context.Context, in *RemoveSubEventFromEventRequest, opts ...grpc.CallOption) (*RemoveSubEventFromEventReply, error) {
+	out := new(RemoveSubEventFromEventReply)
+	err := c.cc.Invoke(ctx, "/event.Event/RemoveSubEventFromEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *eventClient) ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error) {
 	out := new(ListEventsReply)
 	err := c.cc.Invoke(ctx, "/event.Event/ListEvents", in, out, opts...)
@@ -134,6 +144,7 @@ type EventServer interface {
 	JoinEvent(context.Context, *JoinEventRequest) (*JoinEventReply, error)
 	ApproveJoinEvent(context.Context, *ApproveJoinEventRequest) (*ApproveJoinEventReply, error)
 	AddSubEventToEvent(context.Context, *AddSubEventToEventRequest) (*AddSubEventToEventReply, error)
+	RemoveSubEventFromEvent(context.Context, *RemoveSubEventFromEventRequest) (*RemoveSubEventFromEventReply, error)
 	// for all
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error)
 	ListSubEvents(context.Context, *ListSubEventsRequest) (*ListSubEventsReply, error)
@@ -160,6 +171,9 @@ func (UnimplementedEventServer) ApproveJoinEvent(context.Context, *ApproveJoinEv
 }
 func (UnimplementedEventServer) AddSubEventToEvent(context.Context, *AddSubEventToEventRequest) (*AddSubEventToEventReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddSubEventToEvent not implemented")
+}
+func (UnimplementedEventServer) RemoveSubEventFromEvent(context.Context, *RemoveSubEventFromEventRequest) (*RemoveSubEventFromEventReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveSubEventFromEvent not implemented")
 }
 func (UnimplementedEventServer) ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
@@ -276,6 +290,24 @@ func _Event_AddSubEventToEvent_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Event_RemoveSubEventFromEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveSubEventFromEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServer).RemoveSubEventFromEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.Event/RemoveSubEventFromEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServer).RemoveSubEventFromEvent(ctx, req.(*RemoveSubEventFromEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Event_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListEventsRequest)
 	if err := dec(in); err != nil {
@@ -374,6 +406,10 @@ var Event_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddSubEventToEvent",
 			Handler:    _Event_AddSubEventToEvent_Handler,
+		},
+		{
+			MethodName: "RemoveSubEventFromEvent",
+			Handler:    _Event_RemoveSubEventFromEvent_Handler,
 		},
 		{
 			MethodName: "ListEvents",

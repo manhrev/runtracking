@@ -13,7 +13,7 @@ service Event {
     rpc JoinEvent (JoinEventRequest) returns (JoinEventReply) {} // join event
     rpc ApproveJoinEvent (ApproveJoinEventRequest) returns (ApproveJoinEventReply) {} // approve join event
     rpc AddSubEventToEvent (AddSubEventToEventRequest) returns (AddSubEventToEventReply) {} //add to end of subevent list
-    //rpc RemoveSubEventFromEvent (RemoveSubEventFromEventRequest) returns (RemoveSubEventFromEventReply) {} //only if event not started
+    rpc RemoveSubEventFromEvent (RemoveSubEventFromEventRequest) returns (RemoveSubEventFromEventReply) {} //only if event not started
     //rpc UpdateSubEventInEvent (UpdateSubEventInEventRequest) returns (UpdateSubEventInEventReply) {} //only if sub event not started
 
     // for all
@@ -136,6 +136,16 @@ message AddSubEventToEventRequest {
 
 message AddSubEventToEventReply {
     int64 id_created = 1;
+}
+
+// ==================== Remove Sub Event From Event ====================
+
+message RemoveSubEventFromEventRequest {
+    int64 event_id = 1;
+    int64 sub_event_id = 2;
+}
+
+message RemoveSubEventFromEventReply {
 }
 
 // ==================== List Event ====================
