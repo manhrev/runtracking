@@ -10,6 +10,7 @@ import { toast } from '../toast/toast'
 export * from './abstract/gRPCClient'
 export * from './abstract/types'
 import * as Updates from 'expo-updates'
+import rpcEventClient from './client/event'
 
 const inDevelopmentMode = process.env.NODE_ENV === 'development'
 const manifest = Updates.manifest?.extra?.expoGo
@@ -21,7 +22,7 @@ const onAuthError = (error: any, serviceName: any) => {
 export var HOST: string
 
 // if (inDevelopmentMode) {
-  // HOST = `http://${manifest?.debuggerHost?.split(':').shift()?.concat(':8080')}`
+// HOST = `http://${manifest?.debuggerHost?.split(':').shift()?.concat(':8080')}`
 // } else {
 HOST = `https://gateway-jzg35jprna-as.a.run.app`
 // }
@@ -54,3 +55,4 @@ export const authClient = new rpcAuthClient(authConfig)
 export const notificationClient = new rpcNotificationClient(notificationConfig)
 export const planClient = new rpcPlanClient(notificationConfig)
 export const groupClient = new rpcGroupClient(notificationConfig)
+export const eventClient = new rpcEventClient(notificationConfig)

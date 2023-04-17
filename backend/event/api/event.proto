@@ -151,6 +151,8 @@ message RemoveSubEventFromEventReply {
 // ==================== List Event ====================
 
 message ListEventsRequest {
+    // name
+    
     uint32 limit = 1;
     uint64 offset = 2;
     bool ascending = 3;
