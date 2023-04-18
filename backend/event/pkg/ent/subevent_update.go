@@ -118,16 +118,29 @@ func (seu *SubEventUpdate) AddGoal(i int64) *SubEventUpdate {
 	return seu
 }
 
-// SetRuleID sets the "rule_id" field.
-func (seu *SubEventUpdate) SetRuleID(i int64) *SubEventUpdate {
-	seu.mutation.ResetRuleID()
-	seu.mutation.SetRuleID(i)
+// SetRule sets the "rule" field.
+func (seu *SubEventUpdate) SetRule(i int64) *SubEventUpdate {
+	seu.mutation.ResetRule()
+	seu.mutation.SetRule(i)
 	return seu
 }
 
-// AddRuleID adds i to the "rule_id" field.
-func (seu *SubEventUpdate) AddRuleID(i int64) *SubEventUpdate {
-	seu.mutation.AddRuleID(i)
+// AddRule adds i to the "rule" field.
+func (seu *SubEventUpdate) AddRule(i int64) *SubEventUpdate {
+	seu.mutation.AddRule(i)
+	return seu
+}
+
+// SetActivityType sets the "activity_type" field.
+func (seu *SubEventUpdate) SetActivityType(i int64) *SubEventUpdate {
+	seu.mutation.ResetActivityType()
+	seu.mutation.SetActivityType(i)
+	return seu
+}
+
+// AddActivityType adds i to the "activity_type" field.
+func (seu *SubEventUpdate) AddActivityType(i int64) *SubEventUpdate {
+	seu.mutation.AddActivityType(i)
 	return seu
 }
 
@@ -287,11 +300,17 @@ func (seu *SubEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := seu.mutation.AddedGoal(); ok {
 		_spec.AddField(subevent.FieldGoal, field.TypeInt64, value)
 	}
-	if value, ok := seu.mutation.RuleID(); ok {
-		_spec.SetField(subevent.FieldRuleID, field.TypeInt64, value)
+	if value, ok := seu.mutation.Rule(); ok {
+		_spec.SetField(subevent.FieldRule, field.TypeInt64, value)
 	}
-	if value, ok := seu.mutation.AddedRuleID(); ok {
-		_spec.AddField(subevent.FieldRuleID, field.TypeInt64, value)
+	if value, ok := seu.mutation.AddedRule(); ok {
+		_spec.AddField(subevent.FieldRule, field.TypeInt64, value)
+	}
+	if value, ok := seu.mutation.ActivityType(); ok {
+		_spec.SetField(subevent.FieldActivityType, field.TypeInt64, value)
+	}
+	if value, ok := seu.mutation.AddedActivityType(); ok {
+		_spec.AddField(subevent.FieldActivityType, field.TypeInt64, value)
 	}
 	if value, ok := seu.mutation.Status(); ok {
 		_spec.SetField(subevent.FieldStatus, field.TypeInt64, value)
@@ -482,16 +501,29 @@ func (seuo *SubEventUpdateOne) AddGoal(i int64) *SubEventUpdateOne {
 	return seuo
 }
 
-// SetRuleID sets the "rule_id" field.
-func (seuo *SubEventUpdateOne) SetRuleID(i int64) *SubEventUpdateOne {
-	seuo.mutation.ResetRuleID()
-	seuo.mutation.SetRuleID(i)
+// SetRule sets the "rule" field.
+func (seuo *SubEventUpdateOne) SetRule(i int64) *SubEventUpdateOne {
+	seuo.mutation.ResetRule()
+	seuo.mutation.SetRule(i)
 	return seuo
 }
 
-// AddRuleID adds i to the "rule_id" field.
-func (seuo *SubEventUpdateOne) AddRuleID(i int64) *SubEventUpdateOne {
-	seuo.mutation.AddRuleID(i)
+// AddRule adds i to the "rule" field.
+func (seuo *SubEventUpdateOne) AddRule(i int64) *SubEventUpdateOne {
+	seuo.mutation.AddRule(i)
+	return seuo
+}
+
+// SetActivityType sets the "activity_type" field.
+func (seuo *SubEventUpdateOne) SetActivityType(i int64) *SubEventUpdateOne {
+	seuo.mutation.ResetActivityType()
+	seuo.mutation.SetActivityType(i)
+	return seuo
+}
+
+// AddActivityType adds i to the "activity_type" field.
+func (seuo *SubEventUpdateOne) AddActivityType(i int64) *SubEventUpdateOne {
+	seuo.mutation.AddActivityType(i)
 	return seuo
 }
 
@@ -681,11 +713,17 @@ func (seuo *SubEventUpdateOne) sqlSave(ctx context.Context) (_node *SubEvent, er
 	if value, ok := seuo.mutation.AddedGoal(); ok {
 		_spec.AddField(subevent.FieldGoal, field.TypeInt64, value)
 	}
-	if value, ok := seuo.mutation.RuleID(); ok {
-		_spec.SetField(subevent.FieldRuleID, field.TypeInt64, value)
+	if value, ok := seuo.mutation.Rule(); ok {
+		_spec.SetField(subevent.FieldRule, field.TypeInt64, value)
 	}
-	if value, ok := seuo.mutation.AddedRuleID(); ok {
-		_spec.AddField(subevent.FieldRuleID, field.TypeInt64, value)
+	if value, ok := seuo.mutation.AddedRule(); ok {
+		_spec.AddField(subevent.FieldRule, field.TypeInt64, value)
+	}
+	if value, ok := seuo.mutation.ActivityType(); ok {
+		_spec.SetField(subevent.FieldActivityType, field.TypeInt64, value)
+	}
+	if value, ok := seuo.mutation.AddedActivityType(); ok {
+		_spec.AddField(subevent.FieldActivityType, field.TypeInt64, value)
 	}
 	if value, ok := seuo.mutation.Status(); ok {
 		_spec.SetField(subevent.FieldStatus, field.TypeInt64, value)

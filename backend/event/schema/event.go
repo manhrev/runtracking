@@ -26,7 +26,7 @@ func (Event) Fields() []ent.Field {
 		field.Time("updated_at").
 			Default(time.Now),
 		field.String("picture").
-			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
+			Default("https://placehold.jp/300x150.png"),
 		field.String("description").
 			Optional(),
 		field.Int64("status").

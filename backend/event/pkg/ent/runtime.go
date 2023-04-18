@@ -76,7 +76,7 @@ func init() {
 	// subevent.DefaultGoal holds the default value on creation for the goal field.
 	subevent.DefaultGoal = subeventDescGoal.Default.(int64)
 	// subeventDescStatus is the schema descriptor for status field.
-	subeventDescStatus := subeventFields[8].Descriptor()
+	subeventDescStatus := subeventFields[9].Descriptor()
 	// subevent.DefaultStatus holds the default value on creation for the status field.
 	subevent.DefaultStatus = subeventDescStatus.Default.(int64)
 }

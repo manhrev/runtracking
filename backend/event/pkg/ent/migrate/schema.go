@@ -16,7 +16,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "start_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
+		{Name: "picture", Type: field.TypeString, Default: "https://placehold.jp/300x150.png"},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeInt64, Default: 0},
 		{Name: "is_global", Type: field.TypeBool, Default: false},
@@ -112,13 +112,14 @@ var (
 	SubEventsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "name", Type: field.TypeString, Nullable: true},
-		{Name: "picture", Type: field.TypeString, Default: "https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"},
+		{Name: "picture", Type: field.TypeString, Default: "https://placehold.jp/300x200.png"},
 		{Name: "start_date", Type: field.TypeTime},
 		{Name: "end_date", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "goal", Type: field.TypeInt64, Default: 0},
-		{Name: "rule_id", Type: field.TypeInt64},
-		{Name: "status", Type: field.TypeInt64, Default: 0},
+		{Name: "rule", Type: field.TypeInt64},
+		{Name: "activity_type", Type: field.TypeInt64},
+		{Name: "status", Type: field.TypeInt64, Default: 1},
 		{Name: "event_subevents", Type: field.TypeInt64, Nullable: true},
 	}
 	// SubEventsTable holds the schema information for the "sub_events" table.
@@ -129,7 +130,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "sub_events_events_subevents",
-				Columns:    []*schema.Column{SubEventsColumns[9]},
+				Columns:    []*schema.Column{SubEventsColumns[10]},
 				RefColumns: []*schema.Column{EventsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
