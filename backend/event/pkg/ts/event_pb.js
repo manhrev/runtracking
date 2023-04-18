@@ -641,7 +641,8 @@ proto.event.SubEvent.toObject = function(includeInstance, msg) {
     rule: jspb.Message.getFieldWithDefault(msg, 6, 0),
     startAt: (f = msg.getStartAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     endAt: (f = msg.getEndAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    status: jspb.Message.getFieldWithDefault(msg, 9, 0)
+    status: jspb.Message.getFieldWithDefault(msg, 9, 0),
+    activityType: jspb.Message.getFieldWithDefault(msg, 10, 0)
   };
 
   if (includeInstance) {
@@ -715,6 +716,10 @@ proto.event.SubEvent.deserializeBinaryFromReader = function(msg, reader) {
     case 9:
       var value = /** @type {!proto.event.SubEventStatus} */ (reader.readEnum());
       msg.setStatus(value);
+      break;
+    case 10:
+      var value = /** @type {!proto.event.ActivityType} */ (reader.readEnum());
+      msg.setActivityType(value);
       break;
     default:
       reader.skipField();
@@ -807,6 +812,13 @@ proto.event.SubEvent.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0.0) {
     writer.writeEnum(
       9,
+      f
+    );
+  }
+  f = message.getActivityType();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      10,
       f
     );
   }
@@ -1010,6 +1022,24 @@ proto.event.SubEvent.prototype.getStatus = function() {
  */
 proto.event.SubEvent.prototype.setStatus = function(value) {
   return jspb.Message.setProto3EnumField(this, 9, value);
+};
+
+
+/**
+ * optional ActivityType activity_type = 10;
+ * @return {!proto.event.ActivityType}
+ */
+proto.event.SubEvent.prototype.getActivityType = function() {
+  return /** @type {!proto.event.ActivityType} */ (jspb.Message.getFieldWithDefault(this, 10, 0));
+};
+
+
+/**
+ * @param {!proto.event.ActivityType} value
+ * @return {!proto.event.SubEvent} returns this
+ */
+proto.event.SubEvent.prototype.setActivityType = function(value) {
+  return jspb.Message.setProto3EnumField(this, 10, value);
 };
 
 
@@ -1824,7 +1854,8 @@ proto.event.CreateSubEvent.toObject = function(includeInstance, msg) {
     goal: jspb.Message.getFieldWithDefault(msg, 4, 0),
     rule: jspb.Message.getFieldWithDefault(msg, 5, 0),
     startAt: (f = msg.getStartAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    endAt: (f = msg.getEndAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
+    endAt: (f = msg.getEndAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    activityType: jspb.Message.getFieldWithDefault(msg, 8, 0)
   };
 
   if (includeInstance) {
@@ -1890,6 +1921,10 @@ proto.event.CreateSubEvent.deserializeBinaryFromReader = function(msg, reader) {
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setEndAt(value);
+      break;
+    case 8:
+      var value = /** @type {!proto.event.ActivityType} */ (reader.readEnum());
+      msg.setActivityType(value);
       break;
     default:
       reader.skipField();
@@ -1969,6 +2004,13 @@ proto.event.CreateSubEvent.serializeBinaryToWriter = function(message, writer) {
       7,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getActivityType();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      8,
+      f
     );
   }
 };
@@ -2135,6 +2177,24 @@ proto.event.CreateSubEvent.prototype.clearEndAt = function() {
  */
 proto.event.CreateSubEvent.prototype.hasEndAt = function() {
   return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional ActivityType activity_type = 8;
+ * @return {!proto.event.ActivityType}
+ */
+proto.event.CreateSubEvent.prototype.getActivityType = function() {
+  return /** @type {!proto.event.ActivityType} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/**
+ * @param {!proto.event.ActivityType} value
+ * @return {!proto.event.CreateSubEvent} returns this
+ */
+proto.event.CreateSubEvent.prototype.setActivityType = function(value) {
+  return jspb.Message.setProto3EnumField(this, 8, value);
 };
 
 

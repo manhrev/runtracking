@@ -30,8 +30,10 @@ type SubEvent struct {
 	Description string `json:"description,omitempty"`
 	// Goal holds the value of the "goal" field.
 	Goal int64 `json:"goal,omitempty"`
-	// RuleID holds the value of the "rule_id" field.
-	RuleID int64 `json:"rule_id,omitempty"`
+	// Rule holds the value of the "rule" field.
+	Rule int64 `json:"rule,omitempty"`
+	// ActivityType holds the value of the "activity_type" field.
+	ActivityType int64 `json:"activity_type,omitempty"`
 	// Status holds the value of the "status" field.
 	Status int64 `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -79,7 +81,7 @@ func (*SubEvent) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case subevent.FieldID, subevent.FieldGoal, subevent.FieldRuleID, subevent.FieldStatus:
+		case subevent.FieldID, subevent.FieldGoal, subevent.FieldRule, subevent.FieldActivityType, subevent.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case subevent.FieldName, subevent.FieldPicture, subevent.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -144,11 +146,17 @@ func (se *SubEvent) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				se.Goal = value.Int64
 			}
-		case subevent.FieldRuleID:
+		case subevent.FieldRule:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field rule_id", values[i])
+				return fmt.Errorf("unexpected type %T for field rule", values[i])
 			} else if value.Valid {
-				se.RuleID = value.Int64
+				se.Rule = value.Int64
+			}
+		case subevent.FieldActivityType:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field activity_type", values[i])
+			} else if value.Valid {
+				se.ActivityType = value.Int64
 			}
 		case subevent.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -227,8 +235,11 @@ func (se *SubEvent) String() string {
 	builder.WriteString("goal=")
 	builder.WriteString(fmt.Sprintf("%v", se.Goal))
 	builder.WriteString(", ")
-	builder.WriteString("rule_id=")
-	builder.WriteString(fmt.Sprintf("%v", se.RuleID))
+	builder.WriteString("rule=")
+	builder.WriteString(fmt.Sprintf("%v", se.Rule))
+	builder.WriteString(", ")
+	builder.WriteString("activity_type=")
+	builder.WriteString(fmt.Sprintf("%v", se.ActivityType))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", se.Status))

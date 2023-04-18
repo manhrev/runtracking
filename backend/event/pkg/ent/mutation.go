@@ -3239,29 +3239,31 @@ func (m *ParticipateMutation) ResetEdge(name string) error {
 // SubEventMutation represents an operation that mutates the SubEvent nodes in the graph.
 type SubEventMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	name          *string
-	picture       *string
-	start_date    *time.Time
-	end_date      *time.Time
-	description   *string
-	goal          *int64
-	addgoal       *int64
-	rule_id       *int64
-	addrule_id    *int64
-	status        *int64
-	addstatus     *int64
-	clearedFields map[string]struct{}
-	event         *int64
-	clearedevent  bool
-	group         map[int64]struct{}
-	removedgroup  map[int64]struct{}
-	clearedgroup  bool
-	done          bool
-	oldValue      func(context.Context) (*SubEvent, error)
-	predicates    []predicate.SubEvent
+	op               Op
+	typ              string
+	id               *int64
+	name             *string
+	picture          *string
+	start_date       *time.Time
+	end_date         *time.Time
+	description      *string
+	goal             *int64
+	addgoal          *int64
+	rule             *int64
+	addrule          *int64
+	activity_type    *int64
+	addactivity_type *int64
+	status           *int64
+	addstatus        *int64
+	clearedFields    map[string]struct{}
+	event            *int64
+	clearedevent     bool
+	group            map[int64]struct{}
+	removedgroup     map[int64]struct{}
+	clearedgroup     bool
+	done             bool
+	oldValue         func(context.Context) (*SubEvent, error)
+	predicates       []predicate.SubEvent
 }
 
 var _ ent.Mutation = (*SubEventMutation)(nil)
@@ -3630,60 +3632,116 @@ func (m *SubEventMutation) ResetGoal() {
 	m.addgoal = nil
 }
 
-// SetRuleID sets the "rule_id" field.
-func (m *SubEventMutation) SetRuleID(i int64) {
-	m.rule_id = &i
-	m.addrule_id = nil
+// SetRule sets the "rule" field.
+func (m *SubEventMutation) SetRule(i int64) {
+	m.rule = &i
+	m.addrule = nil
 }
 
-// RuleID returns the value of the "rule_id" field in the mutation.
-func (m *SubEventMutation) RuleID() (r int64, exists bool) {
-	v := m.rule_id
+// Rule returns the value of the "rule" field in the mutation.
+func (m *SubEventMutation) Rule() (r int64, exists bool) {
+	v := m.rule
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldRuleID returns the old "rule_id" field's value of the SubEvent entity.
+// OldRule returns the old "rule" field's value of the SubEvent entity.
 // If the SubEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubEventMutation) OldRuleID(ctx context.Context) (v int64, err error) {
+func (m *SubEventMutation) OldRule(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRuleID is only allowed on UpdateOne operations")
+		return v, errors.New("OldRule is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRuleID requires an ID field in the mutation")
+		return v, errors.New("OldRule requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRuleID: %w", err)
+		return v, fmt.Errorf("querying old value for OldRule: %w", err)
 	}
-	return oldValue.RuleID, nil
+	return oldValue.Rule, nil
 }
 
-// AddRuleID adds i to the "rule_id" field.
-func (m *SubEventMutation) AddRuleID(i int64) {
-	if m.addrule_id != nil {
-		*m.addrule_id += i
+// AddRule adds i to the "rule" field.
+func (m *SubEventMutation) AddRule(i int64) {
+	if m.addrule != nil {
+		*m.addrule += i
 	} else {
-		m.addrule_id = &i
+		m.addrule = &i
 	}
 }
 
-// AddedRuleID returns the value that was added to the "rule_id" field in this mutation.
-func (m *SubEventMutation) AddedRuleID() (r int64, exists bool) {
-	v := m.addrule_id
+// AddedRule returns the value that was added to the "rule" field in this mutation.
+func (m *SubEventMutation) AddedRule() (r int64, exists bool) {
+	v := m.addrule
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetRuleID resets all changes to the "rule_id" field.
-func (m *SubEventMutation) ResetRuleID() {
-	m.rule_id = nil
-	m.addrule_id = nil
+// ResetRule resets all changes to the "rule" field.
+func (m *SubEventMutation) ResetRule() {
+	m.rule = nil
+	m.addrule = nil
+}
+
+// SetActivityType sets the "activity_type" field.
+func (m *SubEventMutation) SetActivityType(i int64) {
+	m.activity_type = &i
+	m.addactivity_type = nil
+}
+
+// ActivityType returns the value of the "activity_type" field in the mutation.
+func (m *SubEventMutation) ActivityType() (r int64, exists bool) {
+	v := m.activity_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActivityType returns the old "activity_type" field's value of the SubEvent entity.
+// If the SubEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubEventMutation) OldActivityType(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActivityType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActivityType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActivityType: %w", err)
+	}
+	return oldValue.ActivityType, nil
+}
+
+// AddActivityType adds i to the "activity_type" field.
+func (m *SubEventMutation) AddActivityType(i int64) {
+	if m.addactivity_type != nil {
+		*m.addactivity_type += i
+	} else {
+		m.addactivity_type = &i
+	}
+}
+
+// AddedActivityType returns the value that was added to the "activity_type" field in this mutation.
+func (m *SubEventMutation) AddedActivityType() (r int64, exists bool) {
+	v := m.addactivity_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetActivityType resets all changes to the "activity_type" field.
+func (m *SubEventMutation) ResetActivityType() {
+	m.activity_type = nil
+	m.addactivity_type = nil
 }
 
 // SetStatus sets the "status" field.
@@ -3869,7 +3927,7 @@ func (m *SubEventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubEventMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.name != nil {
 		fields = append(fields, subevent.FieldName)
 	}
@@ -3888,8 +3946,11 @@ func (m *SubEventMutation) Fields() []string {
 	if m.goal != nil {
 		fields = append(fields, subevent.FieldGoal)
 	}
-	if m.rule_id != nil {
-		fields = append(fields, subevent.FieldRuleID)
+	if m.rule != nil {
+		fields = append(fields, subevent.FieldRule)
+	}
+	if m.activity_type != nil {
+		fields = append(fields, subevent.FieldActivityType)
 	}
 	if m.status != nil {
 		fields = append(fields, subevent.FieldStatus)
@@ -3914,8 +3975,10 @@ func (m *SubEventMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case subevent.FieldGoal:
 		return m.Goal()
-	case subevent.FieldRuleID:
-		return m.RuleID()
+	case subevent.FieldRule:
+		return m.Rule()
+	case subevent.FieldActivityType:
+		return m.ActivityType()
 	case subevent.FieldStatus:
 		return m.Status()
 	}
@@ -3939,8 +4002,10 @@ func (m *SubEventMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldDescription(ctx)
 	case subevent.FieldGoal:
 		return m.OldGoal(ctx)
-	case subevent.FieldRuleID:
-		return m.OldRuleID(ctx)
+	case subevent.FieldRule:
+		return m.OldRule(ctx)
+	case subevent.FieldActivityType:
+		return m.OldActivityType(ctx)
 	case subevent.FieldStatus:
 		return m.OldStatus(ctx)
 	}
@@ -3994,12 +4059,19 @@ func (m *SubEventMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetGoal(v)
 		return nil
-	case subevent.FieldRuleID:
+	case subevent.FieldRule:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetRuleID(v)
+		m.SetRule(v)
+		return nil
+	case subevent.FieldActivityType:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActivityType(v)
 		return nil
 	case subevent.FieldStatus:
 		v, ok := value.(int64)
@@ -4019,8 +4091,11 @@ func (m *SubEventMutation) AddedFields() []string {
 	if m.addgoal != nil {
 		fields = append(fields, subevent.FieldGoal)
 	}
-	if m.addrule_id != nil {
-		fields = append(fields, subevent.FieldRuleID)
+	if m.addrule != nil {
+		fields = append(fields, subevent.FieldRule)
+	}
+	if m.addactivity_type != nil {
+		fields = append(fields, subevent.FieldActivityType)
 	}
 	if m.addstatus != nil {
 		fields = append(fields, subevent.FieldStatus)
@@ -4035,8 +4110,10 @@ func (m *SubEventMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case subevent.FieldGoal:
 		return m.AddedGoal()
-	case subevent.FieldRuleID:
-		return m.AddedRuleID()
+	case subevent.FieldRule:
+		return m.AddedRule()
+	case subevent.FieldActivityType:
+		return m.AddedActivityType()
 	case subevent.FieldStatus:
 		return m.AddedStatus()
 	}
@@ -4055,12 +4132,19 @@ func (m *SubEventMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddGoal(v)
 		return nil
-	case subevent.FieldRuleID:
+	case subevent.FieldRule:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddRuleID(v)
+		m.AddRule(v)
+		return nil
+	case subevent.FieldActivityType:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddActivityType(v)
 		return nil
 	case subevent.FieldStatus:
 		v, ok := value.(int64)
@@ -4129,8 +4213,11 @@ func (m *SubEventMutation) ResetField(name string) error {
 	case subevent.FieldGoal:
 		m.ResetGoal()
 		return nil
-	case subevent.FieldRuleID:
-		m.ResetRuleID()
+	case subevent.FieldRule:
+		m.ResetRule()
+		return nil
+	case subevent.FieldActivityType:
+		m.ResetActivityType()
 		return nil
 	case subevent.FieldStatus:
 		m.ResetStatus()

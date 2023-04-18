@@ -24,8 +24,10 @@ const (
 	FieldDescription = "description"
 	// FieldGoal holds the string denoting the goal field in the database.
 	FieldGoal = "goal"
-	// FieldRuleID holds the string denoting the rule_id field in the database.
-	FieldRuleID = "rule_id"
+	// FieldRule holds the string denoting the rule field in the database.
+	FieldRule = "rule"
+	// FieldActivityType holds the string denoting the activity_type field in the database.
+	FieldActivityType = "activity_type"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
@@ -59,7 +61,8 @@ var Columns = []string{
 	FieldEndDate,
 	FieldDescription,
 	FieldGoal,
-	FieldRuleID,
+	FieldRule,
+	FieldActivityType,
 	FieldStatus,
 }
 
@@ -131,9 +134,14 @@ func ByGoal(opts ...sql.OrderTermOption) Order {
 	return sql.OrderByField(FieldGoal, opts...).ToFunc()
 }
 
-// ByRuleID orders the results by the rule_id field.
-func ByRuleID(opts ...sql.OrderTermOption) Order {
-	return sql.OrderByField(FieldRuleID, opts...).ToFunc()
+// ByRule orders the results by the rule field.
+func ByRule(opts ...sql.OrderTermOption) Order {
+	return sql.OrderByField(FieldRule, opts...).ToFunc()
+}
+
+// ByActivityType orders the results by the activity_type field.
+func ByActivityType(opts ...sql.OrderTermOption) Order {
+	return sql.OrderByField(FieldActivityType, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

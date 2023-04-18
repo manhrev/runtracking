@@ -35,6 +35,7 @@ message SubEvent {
     google.protobuf.Timestamp start_at = 7;
     google.protobuf.Timestamp end_at = 8;
     SubEventStatus status = 9;
+    ActivityType activity_type = 10;
 }
 
 message EventDetail {
@@ -69,6 +70,7 @@ message CreateSubEvent {
     Rule rule = 5;
     google.protobuf.Timestamp start_at = 6;
     google.protobuf.Timestamp end_at = 7;
+    ActivityType activity_type = 8;
 }
 
 message CreateEventReply {

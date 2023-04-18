@@ -8,15 +8,16 @@ import (
 
 func TransformSubEventEntToSubEvent(entEvent *ent.SubEvent) *event_pb.SubEvent {
 	return &event_pb.SubEvent{
-		Id:          entEvent.ID,
-		Name:        entEvent.Name,
-		Description: entEvent.Description,
-		Picture:     entEvent.Picture,
-		StartAt:     timestamppb.New(entEvent.StartDate),
-		EndAt:       timestamppb.New(entEvent.EndDate),
-		Goal:        entEvent.Goal,
-		Rule:        event_pb.Rule(entEvent.RuleID),
-		Status:      event_pb.SubEventStatus(entEvent.Status),
+		Id:           entEvent.ID,
+		Name:         entEvent.Name,
+		Description:  entEvent.Description,
+		Picture:      entEvent.Picture,
+		StartAt:      timestamppb.New(entEvent.StartDate),
+		EndAt:        timestamppb.New(entEvent.EndDate),
+		Goal:         entEvent.Goal,
+		Rule:         event_pb.Rule(entEvent.Rule),
+		ActivityType: event_pb.ActivityType(entEvent.ActivityType),
+		Status:       event_pb.SubEventStatus(entEvent.Status),
 	}
 }
 
