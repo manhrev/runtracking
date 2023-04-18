@@ -17,14 +17,15 @@ func (SubEvent) Fields() []ent.Field {
 		field.String("name").
 			Optional(),
 		field.String("picture").
-			Default("https://img.freepik.com/free-vector/modern-running-background_1017-7491.jpg?w=2000"),
+			Default("https://placehold.jp/300x200.png"),
 		field.Time("start_date"),
 		field.Time("end_date"),
 		field.String("description").
 			Optional(),
 		field.Int64("goal").
 			Default(0),
-		field.Int64("rule_id"),
+		field.Int64("rule"),
+		field.Int64("activity_type"),
 		field.Int64("status").
 			Default(1),
 	}

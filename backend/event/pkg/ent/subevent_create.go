@@ -90,9 +90,15 @@ func (sec *SubEventCreate) SetNillableGoal(i *int64) *SubEventCreate {
 	return sec
 }
 
-// SetRuleID sets the "rule_id" field.
-func (sec *SubEventCreate) SetRuleID(i int64) *SubEventCreate {
-	sec.mutation.SetRuleID(i)
+// SetRule sets the "rule" field.
+func (sec *SubEventCreate) SetRule(i int64) *SubEventCreate {
+	sec.mutation.SetRule(i)
+	return sec
+}
+
+// SetActivityType sets the "activity_type" field.
+func (sec *SubEventCreate) SetActivityType(i int64) *SubEventCreate {
+	sec.mutation.SetActivityType(i)
 	return sec
 }
 
@@ -213,8 +219,11 @@ func (sec *SubEventCreate) check() error {
 	if _, ok := sec.mutation.Goal(); !ok {
 		return &ValidationError{Name: "goal", err: errors.New(`ent: missing required field "SubEvent.goal"`)}
 	}
-	if _, ok := sec.mutation.RuleID(); !ok {
-		return &ValidationError{Name: "rule_id", err: errors.New(`ent: missing required field "SubEvent.rule_id"`)}
+	if _, ok := sec.mutation.Rule(); !ok {
+		return &ValidationError{Name: "rule", err: errors.New(`ent: missing required field "SubEvent.rule"`)}
+	}
+	if _, ok := sec.mutation.ActivityType(); !ok {
+		return &ValidationError{Name: "activity_type", err: errors.New(`ent: missing required field "SubEvent.activity_type"`)}
 	}
 	if _, ok := sec.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "SubEvent.status"`)}
@@ -275,9 +284,13 @@ func (sec *SubEventCreate) createSpec() (*SubEvent, *sqlgraph.CreateSpec) {
 		_spec.SetField(subevent.FieldGoal, field.TypeInt64, value)
 		_node.Goal = value
 	}
-	if value, ok := sec.mutation.RuleID(); ok {
-		_spec.SetField(subevent.FieldRuleID, field.TypeInt64, value)
-		_node.RuleID = value
+	if value, ok := sec.mutation.Rule(); ok {
+		_spec.SetField(subevent.FieldRule, field.TypeInt64, value)
+		_node.Rule = value
+	}
+	if value, ok := sec.mutation.ActivityType(); ok {
+		_spec.SetField(subevent.FieldActivityType, field.TypeInt64, value)
+		_node.ActivityType = value
 	}
 	if value, ok := sec.mutation.Status(); ok {
 		_spec.SetField(subevent.FieldStatus, field.TypeInt64, value)

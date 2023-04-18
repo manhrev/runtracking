@@ -84,7 +84,8 @@ func (a *adminImpl) CreateEvent(
 			SetStartDate(subEvent.StartAt.AsTime()).
 			SetEndDate(subEvent.EndAt.AsTime()).
 			SetGoal(subEvent.Goal).
-			SetRuleID(int64(subEvent.Rule)).
+			SetRule(int64(subEvent.Rule)).
+			SetActivityType(int64(subEvent.ActivityType)).
 			AddGroup(adminProgress).
 			SetStatus(int64(event_pb.SubEventStatus_SUB_EVENT_STATUS_NEW)).
 			Save(ctx)

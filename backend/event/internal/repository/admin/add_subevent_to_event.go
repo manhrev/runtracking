@@ -76,7 +76,8 @@ func (a *adminImpl) AddSubEventToEvent(
 		SetEvent(eventEnt).
 		SetGoal(subEvent.Goal).
 		SetStatus(int64(event_pb.SubEventStatus_SUB_EVENT_STATUS_NEW)).
-		SetRuleID(int64(subEvent.Rule)).
+		SetRule(int64(subEvent.Rule)).
+		SetActivityType(int64(subEvent.ActivityType)).
 		AddGroup(groupsNewProgresses...).
 		Save(ctx)
 	if err != nil {
