@@ -12,6 +12,7 @@ import GetInfo from '../screens/Authentication/GetInfo'
 import RunTracking from '../screens/Run/RunTracking'
 import RunResult from '../screens/Run/RunResult'
 import PlanDetail from '../screens/Plan/PlanDetail'
+import PlanEdit from '../screens/Plan/PlanEdit'
 import PlanAdd from '../screens/Plan/PlanAdd'
 import RunCommit from '../screens/Run/RunCommit'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
@@ -76,6 +77,11 @@ export type RootBaseStackParamList = {
   }
 
   PlanDetail: {
+    planId: number
+    canEdit: boolean
+  }
+
+  PlanEdit: {
     planId: number
     canEdit: boolean
   }
@@ -226,6 +232,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={PlanDetail}
+          />
+          <Stack.Screen
+            name="PlanEdit"
+            options={{
+              title: 'Plan Edit',
+              headerBackVisible: true,
+            }}
+            component={PlanEdit}
           />
           <Stack.Screen
             name="PlanAdd"

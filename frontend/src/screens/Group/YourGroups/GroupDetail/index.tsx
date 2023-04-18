@@ -321,6 +321,7 @@ export default function GroupDetail({
 
         {userRankingList.map((item, index) => (
             <List.Item
+                key={index}
                 title={item.member?.displayName}
                 description=""
                 left={props =>
