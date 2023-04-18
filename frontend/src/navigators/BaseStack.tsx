@@ -12,6 +12,7 @@ import GetInfo from '../screens/Authentication/GetInfo'
 import RunTracking from '../screens/Run/RunTracking'
 import RunResult from '../screens/Run/RunResult'
 import PlanDetail from '../screens/Plan/PlanDetail'
+import PlanEdit from '../screens/Plan/PlanEdit'
 import PlanAdd from '../screens/Plan/PlanAdd'
 import RunCommit from '../screens/Run/RunCommit'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb'
@@ -26,6 +27,7 @@ import GroupAdd from '../screens/Group/YourGroups/GroupAdd'
 import GroupDetail from '../screens/Group/YourGroups/GroupDetail'
 import GroupEdit from '../screens/Group/YourGroups/GroupEdit'
 import GroupMembers from '../screens/Group/YourGroups/GroupMembers'
+import MemberRanking from '../screens/Group/YourGroups/MemberRanking'
 import ChallengeList from '../screens/Group/Challenge/ChallengeList'
 import ChallengeAdd from '../screens/Group/Challenge/ChallengeAdd'
 import ChallengeEdit from '../screens/Group/Challenge/ChallengeEdit'
@@ -79,6 +81,11 @@ export type RootBaseStackParamList = {
     canEdit: boolean
   }
 
+  PlanEdit: {
+    planId: number
+    canEdit: boolean
+  }
+
   PlanAdd: undefined
 
   // Profile
@@ -111,6 +118,11 @@ export type RootBaseStackParamList = {
     groupId: number
     isLeader: boolean
   }
+  MemberRanking: {
+    groupId: number
+    isLeader: boolean
+  }
+
 
   // Challenge
   ChallengeList: {
@@ -222,6 +234,14 @@ export const BaseStack = () => {
             component={PlanDetail}
           />
           <Stack.Screen
+            name="PlanEdit"
+            options={{
+              title: 'Plan Edit',
+              headerBackVisible: true,
+            }}
+            component={PlanEdit}
+          />
+          <Stack.Screen
             name="PlanAdd"
             options={{
               title: 'Add New Plan',
@@ -284,6 +304,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={GroupMembers}
+          />
+          <Stack.Screen
+            name="MemberRanking"
+            options={{
+              title: 'User Ranking',
+              headerBackVisible: true,
+            }}
+            component={MemberRanking}
           />
           <Stack.Screen
             name="ChallengeList"

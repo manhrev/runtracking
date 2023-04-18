@@ -14,6 +14,7 @@ import challengeList from './features/challengeList/slice'
 import challengeDetail from './features/challengeDetail/slice'
 import otherUser from './features/otherUser/slice'
 import messageList from './features/messageList/slice'
+import userRankingList from './features/userRankingList/slice'
 
 const rootReducer = combineReducers({
   common,
@@ -30,7 +31,8 @@ const rootReducer = combineReducers({
   challengeList,
   challengeDetail,
   otherUser,
-  messageList
+  messageList,
+  userRankingList,
 })
 
 export type RootState = ReturnType<typeof rootReducer>
