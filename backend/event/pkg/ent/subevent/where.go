@@ -85,9 +85,14 @@ func Goal(v int64) predicate.SubEvent {
 	return predicate.SubEvent(sql.FieldEQ(FieldGoal, v))
 }
 
-// RuleID applies equality check predicate on the "rule_id" field. It's identical to RuleIDEQ.
-func RuleID(v int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldEQ(FieldRuleID, v))
+// Rule applies equality check predicate on the "rule" field. It's identical to RuleEQ.
+func Rule(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldEQ(FieldRule, v))
+}
+
+// ActivityType applies equality check predicate on the "activity_type" field. It's identical to ActivityTypeEQ.
+func ActivityType(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldEQ(FieldActivityType, v))
 }
 
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
@@ -430,44 +435,84 @@ func GoalLTE(v int64) predicate.SubEvent {
 	return predicate.SubEvent(sql.FieldLTE(FieldGoal, v))
 }
 
-// RuleIDEQ applies the EQ predicate on the "rule_id" field.
-func RuleIDEQ(v int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldEQ(FieldRuleID, v))
+// RuleEQ applies the EQ predicate on the "rule" field.
+func RuleEQ(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldEQ(FieldRule, v))
 }
 
-// RuleIDNEQ applies the NEQ predicate on the "rule_id" field.
-func RuleIDNEQ(v int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldNEQ(FieldRuleID, v))
+// RuleNEQ applies the NEQ predicate on the "rule" field.
+func RuleNEQ(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldNEQ(FieldRule, v))
 }
 
-// RuleIDIn applies the In predicate on the "rule_id" field.
-func RuleIDIn(vs ...int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldIn(FieldRuleID, vs...))
+// RuleIn applies the In predicate on the "rule" field.
+func RuleIn(vs ...int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldIn(FieldRule, vs...))
 }
 
-// RuleIDNotIn applies the NotIn predicate on the "rule_id" field.
-func RuleIDNotIn(vs ...int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldNotIn(FieldRuleID, vs...))
+// RuleNotIn applies the NotIn predicate on the "rule" field.
+func RuleNotIn(vs ...int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldNotIn(FieldRule, vs...))
 }
 
-// RuleIDGT applies the GT predicate on the "rule_id" field.
-func RuleIDGT(v int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldGT(FieldRuleID, v))
+// RuleGT applies the GT predicate on the "rule" field.
+func RuleGT(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldGT(FieldRule, v))
 }
 
-// RuleIDGTE applies the GTE predicate on the "rule_id" field.
-func RuleIDGTE(v int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldGTE(FieldRuleID, v))
+// RuleGTE applies the GTE predicate on the "rule" field.
+func RuleGTE(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldGTE(FieldRule, v))
 }
 
-// RuleIDLT applies the LT predicate on the "rule_id" field.
-func RuleIDLT(v int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldLT(FieldRuleID, v))
+// RuleLT applies the LT predicate on the "rule" field.
+func RuleLT(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldLT(FieldRule, v))
 }
 
-// RuleIDLTE applies the LTE predicate on the "rule_id" field.
-func RuleIDLTE(v int64) predicate.SubEvent {
-	return predicate.SubEvent(sql.FieldLTE(FieldRuleID, v))
+// RuleLTE applies the LTE predicate on the "rule" field.
+func RuleLTE(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldLTE(FieldRule, v))
+}
+
+// ActivityTypeEQ applies the EQ predicate on the "activity_type" field.
+func ActivityTypeEQ(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldEQ(FieldActivityType, v))
+}
+
+// ActivityTypeNEQ applies the NEQ predicate on the "activity_type" field.
+func ActivityTypeNEQ(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldNEQ(FieldActivityType, v))
+}
+
+// ActivityTypeIn applies the In predicate on the "activity_type" field.
+func ActivityTypeIn(vs ...int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldIn(FieldActivityType, vs...))
+}
+
+// ActivityTypeNotIn applies the NotIn predicate on the "activity_type" field.
+func ActivityTypeNotIn(vs ...int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldNotIn(FieldActivityType, vs...))
+}
+
+// ActivityTypeGT applies the GT predicate on the "activity_type" field.
+func ActivityTypeGT(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldGT(FieldActivityType, v))
+}
+
+// ActivityTypeGTE applies the GTE predicate on the "activity_type" field.
+func ActivityTypeGTE(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldGTE(FieldActivityType, v))
+}
+
+// ActivityTypeLT applies the LT predicate on the "activity_type" field.
+func ActivityTypeLT(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldLT(FieldActivityType, v))
+}
+
+// ActivityTypeLTE applies the LTE predicate on the "activity_type" field.
+func ActivityTypeLTE(v int64) predicate.SubEvent {
+	return predicate.SubEvent(sql.FieldLTE(FieldActivityType, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
