@@ -15,6 +15,7 @@ import {
   DeleteChallengeRequest, DeleteChallengeReply,
   GetChallengeRequest, GetChallengeReply,
   ListInProgressChallengeRequest, ListInProgressChallengeReply,
+  ListUserRankingRequest, ListUserRankingReply,
 } from '../../../lib/group/group_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -138,6 +139,22 @@ class rpcGroupClient extends gRPCClientAbstract {
       req
     )
   }
+
+  async listUserRanking(param: ListUserRankingRequest.AsObject) {
+    const req = new ListUserRankingRequest()
+    req.setGroupId(param.groupId)
+    req.setAscending(param.ascending)
+    req.setLimit(param.limit)
+    req.setOffset(param.offset)
+    req.setSortby(param.sortby)
+    req.setSeasonId(param.seasonId)
+
+    return await this.gRPCClientRequest<ListUserRankingReply.AsObject>(
+      'listUserRanking',
+      req
+    )
+  }
+
 
   // challenge
   async listChallenge(param: ListChallengeRequest.AsObject) {

@@ -12,7 +12,7 @@ import {
 } from '../../../../redux/features/groupDetail/slice'
 
 import { Member, GetGroupReply, RuleStatus, ListChallengeRequest } from '../../../../lib/group/group_pb'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FabGroup } from '../../../../comp/FabGroup'
 import { groupClient } from '../../../../utils/grpc'
 import { toast } from '../../../../utils/toast/toast'
@@ -24,6 +24,9 @@ import { RefreshControl } from 'react-native-gesture-handler'
 import { getChallengesList, isChallengeListLoading } from '../../../../redux/features/challengeList/slice'
 import { listChallengeThunk } from '../../../../redux/features/challengeList/thunk'
 import { ActivityType } from '../../../../lib/activity/activity_pb'
+import { listUserRankingThunk } from '../../../../redux/features/userRankingList/thunk'
+import { isUserRankingListLoading, selectUserRankingList } from '../../../../redux/features/userRankingList/slice'
+import { useFocusEffect } from '@react-navigation/native'
 
 export default function GroupDetail({
   navigation,
@@ -65,6 +68,11 @@ export default function GroupDetail({
     const { groupDetail } = useAppSelector(selectGroupDetail)
     const groupDetailLoading = useAppSelector(isGroupDetailLoading)
     // const noData = groupDetail.length === 0 && !groupDetailLoading
+
+    // user ranking
+    const { userRankingList } = useAppSelector(selectUserRankingList)
+    const userRankingListLoading = useAppSelector(isUserRankingListLoading)
+    const noDataUserRankingList = userRankingList.length === 0 && !userRankingListLoading
 
     // challenge list
     const { challengeList } = useAppSelector(getChallengesList)
@@ -110,6 +118,19 @@ export default function GroupDetail({
         fetchGroupDetail() // reload group detail
     }
 
+    const fetchUserRankingList = async () => {
+        const { response } = await dispatch(
+        listUserRankingThunk({
+            limit: 3,
+            offset: 0,
+            ascending: false,
+            groupId: route.params.groupId,
+            sortby: 1,
+            seasonId: 1, // test
+          })
+        ).unwrap()
+      }
+
     const fetchChallengeList = async () => {
         const { response } = await dispatch(
             listChallengeThunk({
@@ -131,10 +152,13 @@ export default function GroupDetail({
         console.log(groupDetail)
     }
 
-    useEffect(() => {
-        fetchGroupDetail()
-        fetchChallengeList()
-    }, [])
+    useFocusEffect(
+        useCallback(() => {
+            fetchGroupDetail()
+            fetchUserRankingList()
+            fetchChallengeList()
+        }, [])
+    )
 
   return (
     <View style={baseStyles(theme).container}>
@@ -283,7 +307,10 @@ export default function GroupDetail({
                     marginRight: 10,
                 }}
                 mode="text"
-                onPress={() => {}}
+                onPress={() => navigation.navigate('MemberRanking', {
+                    groupId: groupDetail.groupinfo?.id || 0,
+                    isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
+                })}
                 labelStyle={{
                     fontSize: 15
                 }}
@@ -291,40 +318,29 @@ export default function GroupDetail({
                 View all &gt;
             </Button>
         </View>
-        
-        <List.Item
-            title="Username"
-            description=""
-            left={props =>
-                <>
-                    <List.Icon {...props} icon="medal" />
-                    <List.Icon {...props} icon="numeric-1-circle" />
-                </>
-            }
-            right={props => <Text>30 km</Text>}
-        />
-        <List.Item
-            title="Username"
-            description=""
-            left={props =>
-                <>
-                    <List.Icon {...props} icon="medal" />
-                    <List.Icon {...props} icon="numeric-2-circle" />
-                </>
-            }
-            right={props => <Text>30 km</Text>}
-        />
-        <List.Item
-            title="Username"
-            description=""
-            left={props =>
-                <>
-                    <List.Icon {...props} icon="medal" />
-                    <List.Icon {...props} icon="numeric-3-circle" />
-                </>
-            }
-            right={props => <Text>30 km</Text>}
-        />
+
+        {userRankingList.map((item, index) => (
+            <List.Item
+                title={item.member?.displayName}
+                description=""
+                left={props =>
+                    <>
+                        <List.Icon {...props} icon="medal" />
+                        <List.Icon {...props} icon={"numeric-" + (index + 1) + "-circle"} />
+                    </>
+                }
+                right={props => <Text>{item.point} pts</Text>}
+            />
+        ))}
+
+        {userRankingListLoading && <ActivityIndicator size="small" style={{ paddingVertical: 20, alignItems: 'center'}} />}
+
+        {noDataUserRankingList && <Text
+            variant="bodyLarge"
+            style={{ paddingVertical: 10, color: theme.colors.tertiary, textAlign: 'center', fontWeight: 'bold' }}
+        >
+            No ranking yet
+        </Text>}
 
         <View style={{
             flexDirection: 'row',

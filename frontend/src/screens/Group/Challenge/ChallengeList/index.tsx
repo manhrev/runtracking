@@ -36,7 +36,7 @@ import { groupClient } from '../../../../utils/grpc'
 import { toast } from '../../../../utils/toast/toast'
 import { FabGroup } from '../../../../comp/FabGroup'
 
-const LIMIT = 10
+const LIMIT = 100
 
 export default function ChallengeList({
   navigation,

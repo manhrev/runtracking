@@ -26,6 +26,7 @@ import GroupAdd from '../screens/Group/YourGroups/GroupAdd'
 import GroupDetail from '../screens/Group/YourGroups/GroupDetail'
 import GroupEdit from '../screens/Group/YourGroups/GroupEdit'
 import GroupMembers from '../screens/Group/YourGroups/GroupMembers'
+import MemberRanking from '../screens/Group/YourGroups/MemberRanking'
 import ChallengeList from '../screens/Group/Challenge/ChallengeList'
 import ChallengeAdd from '../screens/Group/Challenge/ChallengeAdd'
 import ChallengeEdit from '../screens/Group/Challenge/ChallengeEdit'
@@ -111,6 +112,11 @@ export type RootBaseStackParamList = {
     groupId: number
     isLeader: boolean
   }
+  MemberRanking: {
+    groupId: number
+    isLeader: boolean
+  }
+
 
   // Challenge
   ChallengeList: {
@@ -284,6 +290,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={GroupMembers}
+          />
+          <Stack.Screen
+            name="MemberRanking"
+            options={{
+              title: 'User Ranking',
+              headerBackVisible: true,
+            }}
+            component={MemberRanking}
           />
           <Stack.Screen
             name="ChallengeList"
