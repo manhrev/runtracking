@@ -283,7 +283,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: event-jzg35jprna-as.a.run.app
+                      address: event-jzg35jprna-et.a.run.app
                       port_value: 443
 
     - name: plan_cluster
