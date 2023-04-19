@@ -35,6 +35,9 @@ export class SubEvent extends jspb.Message {
   getStatus(): SubEventStatus;
   setStatus(value: SubEventStatus): SubEvent;
 
+  getActivityType(): ActivityType;
+  setActivityType(value: ActivityType): SubEvent;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SubEvent.AsObject;
   static toObject(includeInstance: boolean, msg: SubEvent): SubEvent.AsObject;
@@ -54,6 +57,7 @@ export namespace SubEvent {
     startAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     endAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     status: SubEventStatus,
+    activityType: ActivityType,
   }
 }
 
@@ -183,6 +187,9 @@ export class CreateSubEvent extends jspb.Message {
   hasEndAt(): boolean;
   clearEndAt(): CreateSubEvent;
 
+  getActivityType(): ActivityType;
+  setActivityType(value: ActivityType): CreateSubEvent;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CreateSubEvent.AsObject;
   static toObject(includeInstance: boolean, msg: CreateSubEvent): CreateSubEvent.AsObject;
@@ -200,6 +207,7 @@ export namespace CreateSubEvent {
     rule: Rule,
     startAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     endAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    activityType: ActivityType,
   }
 }
 

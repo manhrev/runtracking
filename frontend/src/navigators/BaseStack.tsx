@@ -34,7 +34,8 @@ import ChallengeStats from '../screens/Group/Challenge/ChallengeStats'
 import { toast } from '../utils/toast/toast'
 import OtherUser from '../screens/OtherUser'
 import Chat from '../screens/OtherUser/Chat'
-import { Button } from 'react-native'
+import EventDetail from '../screens/Group/Event/EventDetail'
+import { EventDetail as EventDetailPb } from '../lib/event/event_pb'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -143,6 +144,11 @@ export type RootBaseStackParamList = {
   Chat: {
     userId: number
     toUserId: number
+  }
+
+  // event
+  EventDetail: {
+    event: EventDetailPb.AsObject
   }
 }
 
@@ -340,6 +346,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={Chat}
+          />
+          <Stack.Screen
+            name="EventDetail"
+            options={{
+              title: 'Event Detail',
+              headerBackVisible: true,
+            }}
+            component={EventDetail}
           />
         </>
       ) : (
