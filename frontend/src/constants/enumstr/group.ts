@@ -1,10 +1,16 @@
-import { GroupSortBy, ListChallengeRequest, Rule } from '../../lib/group/group_pb'
+import { GroupSortBy, ListChallengeRequest, Rule, ListUserRankingRequest } from '../../lib/group/group_pb'
 import { ActivityType } from '../../lib/activity/activity_pb'
 
 export const GroupSortByStr = {
   [GroupSortBy.GROUP_SORT_BY_CREATED_TIME]: 'Created time',
   [GroupSortBy.GROUP_SORT_BY_NAME]: 'Name',
   [GroupSortBy.GROUP_SORT_BY_UNSPECIFIED]: '',
+}
+
+export const UserRankingSortBy = {
+  [ListUserRankingRequest.SortBy.SORT_BY_POINT]: 'Points',
+  [ListUserRankingRequest.SortBy.SORT_BY_COUNT_CHALLENGE_COMPLETED]: 'Challenges',
+  [ListUserRankingRequest.SortBy.SORT_BY_UNSPECIFIED]: '',
 }
 
 export const ChallengeSortByStr = {

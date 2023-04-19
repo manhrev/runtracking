@@ -30,8 +30,8 @@ export default function PlanAdd({
   const { dispatch, dispatchLoading, loading } = useDispatchWithLoading()
 
   const data = [
-    { label: 'Total Km', value: Rule.RULE_TOTAL_DISTANCE.toString() },
-    { label: 'Km per day', value: Rule.RULE_TOTAL_DISTANCE_DAILY.toString() },
+    { label: 'Total Distance', value: Rule.RULE_TOTAL_DISTANCE.toString() },
+    { label: 'Distance per day', value: Rule.RULE_TOTAL_DISTANCE_DAILY.toString() },
     { label: 'Total time', value: Rule.RULE_TOTAL_TIME.toString() },
     { label: 'Time per day', value: Rule.RULE_TOTAL_TIME_DAILY.toString() },
     { label: 'Total activities', value: Rule.RULE_TOTAL_ACTIVITY.toString() },
