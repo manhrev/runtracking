@@ -45,6 +45,27 @@ export function formatDateWithoutTime(
   return 'NA'
 }
 
+export function formatDateConversation(
+  time: Timestamp.AsObject | undefined
+): string {
+  if (time !== undefined) {
+    let date = timestampToDate(time)
+    let curDate = new Date()
+    
+
+    if(date.getDate() == curDate.getDate()){
+      return moment.unix(time.seconds).format('LT')
+    }else if(curDate.getTime() - date.getTime() <  (1000 * 60 * 60 * 24 * 7)){
+      const options : Intl.DateTimeFormatOptions = { weekday: "long" } ;
+      return new Intl.DateTimeFormat("en-US", options).format(date).substring(0, 3)
+    }else{
+      const options : Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric'} ;
+      return new Intl.DateTimeFormat("en-US", options).format(date)
+    }
+  }
+  return 'NA'
+}
+
 export function formatDateNotification(
   time: Timestamp.AsObject | undefined
 ): string {

@@ -18,5 +18,7 @@ func (s *chatServer) DeleteConversation(ctx context.Context, request *chatpb.Del
 	if err != nil {
 		return nil, err
 	}
-	return &chatpb.DeleteConversationReply{}, nil
+	return &chatpb.DeleteConversationReply{
+		Id: request.ToUserId,
+	}, nil
 }

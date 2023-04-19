@@ -14,7 +14,7 @@ export default function RightSwipe(theme: AppTheme, onPress: () => void) {
         alignItems: 'flex-end',
       }}
     >
-      <Button icon="delete-outline" onPress={onPress}></Button>
+      <Button icon="delete-outline" onPress={onPress} children={undefined}></Button>
     </View>
   )
 }

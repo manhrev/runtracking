@@ -20,9 +20,9 @@ func TransformMessageListEntToMessageList(messageList []*ent.Message, fromUserID
 		}
 
 		if fromUserID == messageEnt.FromUserID {
-			messageInfo.IsToUserSeen = messageEnt.IsSeenToUserID
+			messageInfo.IsSeen = messageEnt.IsSeenFromUserID
 		} else {
-			messageInfo.IsToUserSeen = messageEnt.IsSeenFromUserID
+			messageInfo.IsSeen = messageEnt.IsSeenToUserID
 		}
 
 		messageInfoList = append(messageInfoList, messageInfo)
@@ -53,9 +53,9 @@ func TransformMessageListEntToConversationInfo(messageList []*ent.Message,
 		}
 
 		if userID == messageEnt.FromUserID {
-			lastMessage.IsToUserSeen = messageEnt.IsSeenToUserID
+			lastMessage.IsSeen = messageEnt.IsSeenFromUserID
 		} else {
-			lastMessage.IsToUserSeen = messageEnt.IsSeenFromUserID
+			lastMessage.IsSeen = messageEnt.IsSeenToUserID
 		}
 
 		conversationInfo.LastMessage = lastMessage

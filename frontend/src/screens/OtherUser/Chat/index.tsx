@@ -102,6 +102,7 @@ export default function Chat({
   const { messageList } = useAppSelector(selectMessageList)
   const messageListLoading = useAppSelector(isMessageListLoading)
   const [canLoadmore, setCanLoadmore] = useState(false)
+  const [isInitializing, setInitializing] = useState(true)
 
   const currentOffset = useAppSelector(getOffset)
 
@@ -139,7 +140,8 @@ export default function Chat({
         offset: 0
       })
     ).unwrap()
-
+    
+    setInitializing(false)
     if (response) {
       if (response.total > LIMIT) setCanLoadmore(true)
       else setCanLoadmore(false)
@@ -206,6 +208,7 @@ export default function Chat({
 
   return (
     <>
+    <LoadingOverlay  loading={messageListLoading && isInitializing}/>
     <GiftedChat
         messages={messages}
         onSend={messages => onSend(messages)}

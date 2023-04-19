@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { Alert, NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { Button } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
 import {
@@ -17,6 +17,12 @@ import { isConversationListLoading, selectConversationList } from '../../redux/f
 import { LoadingOverlay } from '../../comp/LoadingOverlay'
 import { isMessageListLoading } from '../../redux/features/messageList/slice'
 
+const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize} : NativeScrollEvent) => {
+  const paddingToBottom = 20;
+  return layoutMeasurement.height + contentOffset.y >=
+    contentSize.height - paddingToBottom;
+};
+
 export default function ConversationList({
   navigation,
   route,
@@ -27,6 +33,7 @@ export default function ConversationList({
   const isLoading = useAppSelector(isConversationListLoading)
   const loading = useAppSelector(isMessageListLoading)
   const [canLoadmore, setCanLoadmore] = useState(true)
+  const [offset, setOffset] = useState(0)
 
   const fetchConversationList = async () => {
     const { response } = await dispatch(
@@ -42,28 +49,28 @@ export default function ConversationList({
     } else setCanLoadmore(false)
   }
 
-//   const fetchMore = async () => {
-//     const { response } = await dispatch(
-//       listMoreConversationThunk({
-//         limit: 10,
-//         offset: offset + 10,
-//       })
-//     ).unwrap()
+  const fetchMore = async () => {
+    const { response } = await dispatch(
+      listMoreConversationThunk({
+        limit: 10,
+        offset: offset + 10,
+      })
+    ).unwrap()
 
-//     if (response) {
-//       if (offset + 10 > conversationList.length) {
-//         setCanLoadmore(false)
-//       }
-//     }
-//   }
+    if (response) {
+      if (offset + 20 > conversationList.length) {
+        setCanLoadmore(false)
+      }
+    }
+  }
 
   useEffect(() => {
     fetchConversationList()
-  }, [])
+  }, [dispatch])
 
   return (
     <>
-    <LoadingOverlay loading={loading} />
+    <LoadingOverlay loading={isLoading} />
     <View style={baseStyles(theme).container}>
       <View style={baseStyles(theme).innerWrapper}>
         <ScrollView
@@ -74,6 +81,12 @@ export default function ConversationList({
               onRefresh={fetchConversationList}
             />
           }
+          onScroll={({nativeEvent}) => {
+              if (canLoadmore && !isLoading && isCloseToBottom(nativeEvent)) {
+                fetchMore()
+              }
+          } }
+          scrollEventThrottle={400}
         >
           {conversationList.map((conversation) => {
             return (
@@ -85,15 +98,6 @@ export default function ConversationList({
             )
           })}
 
-          {/* <Button
-            style={{ marginTop: 10, marginBottom: 20 }}
-            mode="elevated"
-            onPress={fetchMore}
-            loading={isLoading}
-            disabled={!canLoadmore}
-          >
-            Load more
-          </Button> */}
         </ScrollView>
       </View>
     </View>

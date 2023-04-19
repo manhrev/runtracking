@@ -221,8 +221,8 @@ export class MessageInfo extends jspb.Message {
   hasTime(): boolean;
   clearTime(): MessageInfo;
 
-  getIsToUserSeen(): boolean;
-  setIsToUserSeen(value: boolean): MessageInfo;
+  getIsSeen(): boolean;
+  setIsSeen(value: boolean): MessageInfo;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MessageInfo.AsObject;
@@ -239,7 +239,7 @@ export namespace MessageInfo {
     fromUserId: number,
     toUserId: number,
     time?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    isToUserSeen: boolean,
+    isSeen: boolean,
   }
 }
 

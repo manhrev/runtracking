@@ -1,4 +1,4 @@
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Alert } from 'react-native'
 import { Divider, Text, TouchableRipple, Avatar } from 'react-native-paper'
 import { useAppTheme, AppTheme } from '../../../theme'
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -16,7 +16,7 @@ import { RootBaseStackParamList } from '../../../navigators/BaseStack'
 import { toast } from '../../../utils/toast/toast'
 import { listPlanThunk } from '../../../redux/features/planList/thunk'
 import { ActivityType, PlanSortBy } from '../../../lib/plan/plan_pb'
-import { formatDateNotification } from '../../../utils/helpers'
+import { formatDateConversation, formatDateNotification } from '../../../utils/helpers'
 import { selectUserSlice } from '../../../redux/features/user/slice'
 import { useAppSelector } from '../../../redux/store'
 
@@ -41,9 +41,16 @@ export default function ConversationListItem({
   const {userId , displayName} =
   useAppSelector(selectUserSlice)
 
-//   const onPressDelete = async (id: number) => {
-//     await dispatch(deleteConversationInfoThunk({ id: id }))
-//   }
+  const onPressDelete = async (id: number) => {
+    const {error} = await dispatch(deleteConversationThunk({ toUserId: id})).unwrap()
+    if (error) {
+      toast.error({ message: 'An error occured, please try again!' })
+      return
+    }
+    else {
+      toast.success({ message: 'Conversation deleted!' })
+    }
+  }
 
   const viewConversation = async () => {
     navigation.navigate('Chat', 
@@ -57,9 +64,25 @@ export default function ConversationListItem({
         return ""
   }
 
+
+  const deleteConversationOrNot = () => {
+    Alert.alert(
+      'Delete Conversation',
+      'Are you sure you want to delete this conversation?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        { text: 'Yes', onPress: () => onPressDelete(partner?.userId || 0)},
+      ],
+      { cancelable: false }
+    )
+  }
+
   const rightSwipeActions = () =>
     RightSwipe(theme, () => {
-    //   onPressDelete(id)
+      deleteConversationOrNot()
     })
 
   return (
@@ -78,7 +101,7 @@ export default function ConversationListItem({
                 (
                   <Avatar.Text
                   size={60}
-                  label={displayName[0]}
+                  label={partner?.displayName.at(0) || ""}
                 />
                 )
                 : (
@@ -102,17 +125,18 @@ export default function ConversationListItem({
                     {partner?.displayName}
                   </Text>
                 </View>
-                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <Text>{getFirstStrOfFullName(userId == lastmessage?.fromUserId ? 'You' : (partner?.displayName || ""))}: {lastmessage?.message}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 50}}>
+                    <Text style={{
+                        fontWeight: lastmessage?.isSeen ? '500' : 'bold',
+                    }}>{getFirstStrOfFullName(userId == lastmessage?.fromUserId ? 'You' : (partner?.displayName || ""))}: {lastmessage?.message}</Text>
                     <Text
                     variant="labelSmall"
                     style={{
-                        // textAlign: "right",
                         color: theme.colors.secondary,
-                        // fontWeight: isSeen ? '500' : 'bold',
+                        fontWeight: lastmessage?.isSeen ? '500' : 'bold',
                     }}
                     >
-                    {formatDateNotification(lastmessage?.time)}
+                    {formatDateConversation(lastmessage?.time)}
                     </Text>
                 </View>
               </View>

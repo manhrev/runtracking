@@ -1816,7 +1816,7 @@ proto.chat.MessageInfo.toObject = function(includeInstance, msg) {
     fromUserId: jspb.Message.getFieldWithDefault(msg, 3, 0),
     toUserId: jspb.Message.getFieldWithDefault(msg, 4, 0),
     time: (f = msg.getTime()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    isToUserSeen: jspb.Message.getBooleanFieldWithDefault(msg, 6, false)
+    isSeen: jspb.Message.getBooleanFieldWithDefault(msg, 6, false)
   };
 
   if (includeInstance) {
@@ -1876,7 +1876,7 @@ proto.chat.MessageInfo.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 6:
       var value = /** @type {boolean} */ (reader.readBool());
-      msg.setIsToUserSeen(value);
+      msg.setIsSeen(value);
       break;
     default:
       reader.skipField();
@@ -1943,7 +1943,7 @@ proto.chat.MessageInfo.serializeBinaryToWriter = function(message, writer) {
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getIsToUserSeen();
+  f = message.getIsSeen();
   if (f) {
     writer.writeBool(
       6,
@@ -2063,10 +2063,10 @@ proto.chat.MessageInfo.prototype.hasTime = function() {
 
 
 /**
- * optional bool is_to_user_seen = 6;
+ * optional bool is_seen = 6;
  * @return {boolean}
  */
-proto.chat.MessageInfo.prototype.getIsToUserSeen = function() {
+proto.chat.MessageInfo.prototype.getIsSeen = function() {
   return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 6, false));
 };
 
@@ -2075,7 +2075,7 @@ proto.chat.MessageInfo.prototype.getIsToUserSeen = function() {
  * @param {boolean} value
  * @return {!proto.chat.MessageInfo} returns this
  */
-proto.chat.MessageInfo.prototype.setIsToUserSeen = function(value) {
+proto.chat.MessageInfo.prototype.setIsSeen = function(value) {
   return jspb.Message.setProto3BooleanField(this, 6, value);
 };
 
