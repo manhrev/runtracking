@@ -38,6 +38,7 @@ import OtherUser from '../screens/OtherUser'
 import Chat from '../screens/OtherUser/Chat'
 import EventDetail from '../screens/Group/Event/EventDetail'
 import { EventDetail as EventDetailPb } from '../lib/event/event_pb'
+import GroupsInEvent from '../screens/Group/Event/EventDetail/GroupsInEvent'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -124,7 +125,6 @@ export type RootBaseStackParamList = {
     isLeader: boolean
   }
 
-
   // Challenge
   ChallengeList: {
     groupId: number
@@ -161,6 +161,9 @@ export type RootBaseStackParamList = {
   // event
   EventDetail: {
     event: EventDetailPb.AsObject
+  }
+  GroupsInEvent: {
+    eventId: number
   }
 }
 
@@ -379,9 +382,18 @@ export const BaseStack = () => {
             name="EventDetail"
             options={{
               title: 'Event Detail',
+              headerShown: false,
               headerBackVisible: true,
             }}
             component={EventDetail}
+          />
+          <Stack.Screen
+            name="GroupsInEvent"
+            options={{
+              title: 'Groups in this event',
+              headerBackVisible: true,
+            }}
+            component={GroupsInEvent}
           />
         </>
       ) : (

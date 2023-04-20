@@ -1,19 +1,43 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Image, StyleSheet } from 'react-native'
 import { ScrollView, View } from 'react-native'
-import { Divider, Text } from 'react-native-paper'
+import {
+  Avatar,
+  Divider,
+  IconButton,
+  Text,
+  TouchableRipple,
+} from 'react-native-paper'
 import StepIndicator from 'react-native-step-indicator'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { formatDateWithoutTime } from '../../../../utils/helpers'
 import { baseStyles } from '../../../baseStyle'
+import Constants from 'expo-constants'
+import SubEventDisplay from './comp/SubEvent'
+import { useAppDispatch, useAppSelector } from '../../../../redux/store'
+import {
+  listGroupProgressInEventThunk,
+  listSubEventsThunk,
+} from '../../../../redux/features/eventList/thunks'
+import {
+  isAllEventListLoading,
+  selectEventList,
+} from '../../../../redux/features/eventList/slice'
+import {
+  GroupProgressInSubEvent,
+  SubEvent,
+} from '../../../../lib/event/event_pb'
+import moment from 'moment'
+import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 
 export default function EventDetail({
   navigation,
   route,
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'EventDetail'>) {
   const theme = useAppTheme()
+  const dispatch = useAppDispatch()
   const {
     id,
     description,
@@ -25,15 +49,49 @@ export default function EventDetail({
     endAt,
     startAt,
   } = route.params.event
-  const [currentSubEventIndex, setCurrentSubEventIndex] = useState(2)
+  const { subEventList, subEventProgressList } = useAppSelector(selectEventList)
+  const loading = useAppSelector(isAllEventListLoading)
+
+  const currentSubEventIndex = useMemo(
+    () => getCurrentIndexForSubEvent(subEventList),
+    [subEventList]
+  )
+
+  const [selectedSubEvent, setSelectedSubEvent] = useState(
+    subEventList[currentSubEventIndex]
+  )
+  const groupProgress = useMemo(() => {
+    return subEventProgressList.find((progress) => {
+      return (
+        progress.subEventId === subEventList[currentSubEventIndex]?.id || -1
+      )
+    })
+  }, [subEventProgressList, currentSubEventIndex, subEventList])
+
+  useMemo(() => {
+    setSelectedSubEvent(subEventList[currentSubEventIndex])
+  }, [currentSubEventIndex, subEventList])
+
+  useEffect(() => {
+    dispatch(listSubEventsThunk({ eventId: id }))
+    dispatch(listGroupProgressInEventThunk({ eventId: id }))
+  }, [])
 
   return (
     <View style={styles(theme).baseContainer}>
+      <LoadingOverlay loading={loading} />
+      <IconButton
+        icon="arrow-left"
+        size={25}
+        onPress={() => {
+          navigation.goBack()
+        }}
+      />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles(theme).innerWrapper}>
           <View style={styles(theme).titleSection}>
             <View>
-              <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{name}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{name}</Text>
               <View
                 style={{ display: 'flex', flexDirection: 'row', marginTop: 5 }}
               >
@@ -59,40 +117,49 @@ export default function EventDetail({
             </Text>
           </View>
           <View style={styles(theme).metricSection}>
-            <View style={styles(theme).metricDisplayBlock}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                Participated
-              </Text>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  paddingTop: 10,
-                  gap: 10,
-                  alignItems: 'flex-end',
-                }}
-              >
-                <Text
+            <TouchableRipple
+              style={styles(theme).metricDisplayBlock}
+              onPress={() => {
+                navigation.navigate('GroupsInEvent', { eventId: id })
+              }}
+            >
+              <>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                  Participated
+                </Text>
+
+                <View
                   style={{
-                    fontWeight: 'bold',
-                    fontSize: 35,
-                    fontStyle: 'italic',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    paddingTop: 10,
+                    gap: 10,
+                    alignItems: 'flex-end',
                   }}
                 >
-                  12
-                </Text>
-                <Text
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: 26,
-                    fontStyle: 'italic',
-                    marginBottom: 3,
-                  }}
-                >
-                  Groups
-                </Text>
-              </View>
-            </View>
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 35,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {groupProgress?.groupProgressList.length}
+                  </Text>
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 26,
+                      fontStyle: 'italic',
+                      marginBottom: 3,
+                    }}
+                  >
+                    Groups
+                  </Text>
+                </View>
+              </>
+            </TouchableRipple>
+
             <View style={styles(theme).metricDisplayBlock}>
               <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
                 Mini Events
@@ -113,7 +180,7 @@ export default function EventDetail({
                     fontStyle: 'italic',
                   }}
                 >
-                  3
+                  {subEventList.length}
                 </Text>
                 <Text
                   style={{
@@ -123,37 +190,34 @@ export default function EventDetail({
                     marginBottom: 3,
                   }}
                 >
-                  Total
+                  Challenges
                 </Text>
               </View>
             </View>
           </View>
           <View style={styles(theme).subEventProgress}>
             <Text
-              style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 30 }}
+              style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 30 }}
             >
-              Current Event
+              Challenges
             </Text>
             <StepIndicator
               customStyles={customStyles(theme)}
               currentPosition={currentSubEventIndex}
-              labels={['Event 1', 'Event 2', 'Event 3', 'Event 4']}
-              stepCount={4}
+              labels={subEventList.map((subEvent) => subEvent.name)}
+              stepCount={subEventList.length ? subEventList.length : 1}
               onPress={(index) => {
                 console.log(index)
+                setSelectedSubEvent(subEventList[index])
               }}
             />
             <Divider style={{ marginVertical: 20 }} />
-            <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                  Event 3
-                </Text>
-              </View>
-              <View style={{ flex: 2, alignItems: 'flex-end' }}>
-                <Text style={{ fontSize: 16 }}>Inprogress (19 days left)</Text>
-              </View>
-            </View>
+            {selectedSubEvent && groupProgress && (
+              <SubEventDisplay
+                subEvent={selectedSubEvent}
+                groupProgress={groupProgress}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
@@ -165,16 +229,17 @@ const styles = (theme: AppTheme) =>
   StyleSheet.create({
     baseContainer: {
       ...baseStyles(theme).container,
+      marginTop: Constants.statusBarHeight,
       // backgroundColor: theme.colors.surfaceDisabled,
     },
     innerWrapper: {
       ...baseStyles(theme).innerWrapper,
-      marginTop: 20,
+      paddingTop: 1,
     },
     coverPic: {
       width: '100%',
       height: 150,
-      marginTop: 20,
+      marginTop: 10,
     },
     titleSection: {
       backgroundColor: theme.colors.background,
@@ -195,6 +260,7 @@ const styles = (theme: AppTheme) =>
       marginTop: 20,
       ...shadow,
       backgroundColor: theme.colors.background,
+      marginBottom: 15,
     },
   })
 
@@ -208,7 +274,7 @@ const shadow = {
   shadowRadius: 2.62,
   elevation: 4,
   borderRadius: 2,
-  padding: 20,
+  padding: 18,
 }
 
 const customStyles = (theme: AppTheme) => ({
@@ -234,3 +300,17 @@ const customStyles = (theme: AppTheme) => ({
   labelSize: 15,
   currentStepLabelColor: theme.colors.primary,
 })
+
+function getCurrentIndexForSubEvent(subEvents: SubEvent.AsObject[]) {
+  let now = moment()
+  for (let i = 0; i < subEvents.length; i++) {
+    const st = subEvents[i].startAt?.seconds || 0
+    const start = moment.unix(st)
+    // compare st with current time
+
+    if (now.isBefore(start)) {
+      return i - 1 > 0 ? i - 1 : 0
+    }
+  }
+  return 0
+}
