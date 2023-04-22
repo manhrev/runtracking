@@ -40,6 +40,7 @@ goog.exportSymbol('proto.event.JoinEventRequest', null, global);
 goog.exportSymbol('proto.event.ListEventsReply', null, global);
 goog.exportSymbol('proto.event.ListEventsRequest', null, global);
 goog.exportSymbol('proto.event.ListEventsRequest.SortBy', null, global);
+goog.exportSymbol('proto.event.ListEventsRequest.Visibility', null, global);
 goog.exportSymbol('proto.event.ListGroupProgressInEventReply', null, global);
 goog.exportSymbol('proto.event.ListGroupProgressInEventRequest', null, global);
 goog.exportSymbol('proto.event.ListGroupsInEventReply', null, global);
@@ -4328,7 +4329,8 @@ proto.event.ListEventsRequest.toObject = function(includeInstance, msg) {
     sortBy: jspb.Message.getFieldWithDefault(msg, 4, 0),
     idsList: (f = jspb.Message.getRepeatedField(msg, 5)) == null ? undefined : f,
     groupIdsList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f,
-    isglobal: jspb.Message.getBooleanFieldWithDefault(msg, 7, false)
+    visibility: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    search: jspb.Message.getFieldWithDefault(msg, 8, "")
   };
 
   if (includeInstance) {
@@ -4394,8 +4396,12 @@ proto.event.ListEventsRequest.deserializeBinaryFromReader = function(msg, reader
       }
       break;
     case 7:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setIsglobal(value);
+      var value = /** @type {!proto.event.ListEventsRequest.Visibility} */ (reader.readEnum());
+      msg.setVisibility(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSearch(value);
       break;
     default:
       reader.skipField();
@@ -4468,10 +4474,17 @@ proto.event.ListEventsRequest.serializeBinaryToWriter = function(message, writer
       f
     );
   }
-  f = message.getIsglobal();
-  if (f) {
-    writer.writeBool(
+  f = message.getVisibility();
+  if (f !== 0.0) {
+    writer.writeEnum(
       7,
+      f
+    );
+  }
+  f = message.getSearch();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
       f
     );
   }
@@ -4486,6 +4499,15 @@ proto.event.ListEventsRequest.SortBy = {
   SORT_BY_NAME: 1,
   SORT_BY_START_AT: 2,
   SORT_BY_NUM_OF_GROUPS: 3
+};
+
+/**
+ * @enum {number}
+ */
+proto.event.ListEventsRequest.Visibility = {
+  VISIBILITY_UNSPECIFIED: 0,
+  VISIBILITY_GLOBAL: 1,
+  VISIBILITY_NO_GLOBAL: 2
 };
 
 /**
@@ -4635,20 +4657,38 @@ proto.event.ListEventsRequest.prototype.clearGroupIdsList = function() {
 
 
 /**
- * optional bool isGlobal = 7;
- * @return {boolean}
+ * optional Visibility visibility = 7;
+ * @return {!proto.event.ListEventsRequest.Visibility}
  */
-proto.event.ListEventsRequest.prototype.getIsglobal = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 7, false));
+proto.event.ListEventsRequest.prototype.getVisibility = function() {
+  return /** @type {!proto.event.ListEventsRequest.Visibility} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
 };
 
 
 /**
- * @param {boolean} value
+ * @param {!proto.event.ListEventsRequest.Visibility} value
  * @return {!proto.event.ListEventsRequest} returns this
  */
-proto.event.ListEventsRequest.prototype.setIsglobal = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 7, value);
+proto.event.ListEventsRequest.prototype.setVisibility = function(value) {
+  return jspb.Message.setProto3EnumField(this, 7, value);
+};
+
+
+/**
+ * optional string search = 8;
+ * @return {string}
+ */
+proto.event.ListEventsRequest.prototype.getSearch = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.event.ListEventsRequest} returns this
+ */
+proto.event.ListEventsRequest.prototype.setSearch = function(value) {
+  return jspb.Message.setProto3StringField(this, 8, value);
 };
 
 

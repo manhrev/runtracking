@@ -518,8 +518,11 @@ export class ListEventsRequest extends jspb.Message {
   clearGroupIdsList(): ListEventsRequest;
   addGroupIds(value: number, index?: number): ListEventsRequest;
 
-  getIsglobal(): boolean;
-  setIsglobal(value: boolean): ListEventsRequest;
+  getVisibility(): ListEventsRequest.Visibility;
+  setVisibility(value: ListEventsRequest.Visibility): ListEventsRequest;
+
+  getSearch(): string;
+  setSearch(value: string): ListEventsRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListEventsRequest.AsObject;
@@ -537,7 +540,8 @@ export namespace ListEventsRequest {
     sortBy: ListEventsRequest.SortBy,
     idsList: Array<number>,
     groupIdsList: Array<number>,
-    isglobal: boolean,
+    visibility: ListEventsRequest.Visibility,
+    search: string,
   }
 
   export enum SortBy { 
@@ -545,6 +549,12 @@ export namespace ListEventsRequest {
     SORT_BY_NAME = 1,
     SORT_BY_START_AT = 2,
     SORT_BY_NUM_OF_GROUPS = 3,
+  }
+
+  export enum Visibility { 
+    VISIBILITY_UNSPECIFIED = 0,
+    VISIBILITY_GLOBAL = 1,
+    VISIBILITY_NO_GLOBAL = 2,
   }
 }
 
