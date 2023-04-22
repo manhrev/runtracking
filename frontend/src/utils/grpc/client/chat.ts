@@ -3,6 +3,8 @@ import {
    DeleteConversationRequest,
    GetHistoryChatReply,
    GetHistoryChatRequest,
+   ListConversationReply,
+   ListConversationRequest,
    MessageInfo,
    SendMessageReply, 
    SendMessageRequest
@@ -50,6 +52,16 @@ import {
         req.setToUserId(param.toUserId)
         return await this.gRPCClientRequest<DeleteConversationReply.AsObject>(
           'deleteConversation',
+          req
+        )
+      }
+
+      async listConversation(param: ListConversationRequest.AsObject) {
+        const req = new ListConversationRequest()
+        req.setLimit(param.limit)
+        req.setOffset(param.offset)
+        return await this.gRPCClientRequest<ListConversationReply.AsObject>(
+          'listConversation',
           req
         )
       }

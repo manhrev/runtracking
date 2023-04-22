@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../../../redux/store'
 import { useAppTheme } from '../../../theme'
 import { baseStyles } from '../../baseStyle'
 import { ConfirmDialog } from '../../../comp/ConfirmDialog'
-import { groupClient } from '../../../utils/grpc'
+import { authClient, groupClient } from '../../../utils/grpc'
 import { toast } from '../../../utils/toast/toast'
 import { GiftedChat, InputToolbar, Message , Send} from 'react-native-gifted-chat'
 import {
@@ -35,6 +35,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { RootBaseStackParamList } from '../../../navigators/BaseStack'
 import Icon from 'react-native-paper/lib/typescript/components/Icon'
 import { IconButton } from 'react-native-paper'
+import { LoadingOverlay } from '../../../comp/LoadingOverlay'
 
 const LIMIT = 15
 export interface IMessage {
@@ -101,13 +102,14 @@ export default function Chat({
   const { messageList } = useAppSelector(selectMessageList)
   const messageListLoading = useAppSelector(isMessageListLoading)
   const [canLoadmore, setCanLoadmore] = useState(false)
+  const [isInitializing, setInitializing] = useState(true)
 
   const currentOffset = useAppSelector(getOffset)
 
   useFocusEffect(
     useCallback(() => {
-      getHistoryChat()
       fetchUserData()
+      getHistoryChat()
     }, [])
  )
 
@@ -127,7 +129,7 @@ export default function Chat({
  }, [dispatch, messageList])
 
   const fetchUserData = async () => {
-    dispatch(getUserPublicInfoThunk(userIdParam))
+    dispatch(getUserPublicInfoThunk(toUserIdParam))
   }
 
   const getHistoryChat = async () => {
@@ -138,7 +140,8 @@ export default function Chat({
         offset: 0
       })
     ).unwrap()
-
+    
+    setInitializing(false)
     if (response) {
       if (response.total > LIMIT) setCanLoadmore(true)
       else setCanLoadmore(false)
@@ -204,30 +207,33 @@ export default function Chat({
 
 
   return (
-  <GiftedChat
-      messages={messages}
-      onSend={messages => onSend(messages)}
-      user={{
-        _id: userState.userId,
-      }}
-      infiniteScroll={true}
-      isLoadingEarlier={messageListLoading}
-      onLoadEarlier={() => fetchMore()}
-      loadEarlier={canLoadmore}
-      renderInputToolbar={(props) => (
-        <InputToolbar {...props} />
-      )}
+    <>
+    <LoadingOverlay  loading={messageListLoading && isInitializing}/>
+    <GiftedChat
+        messages={messages}
+        onSend={messages => onSend(messages)}
+        user={{
+          _id: userState.userId,
+        }}
+        infiniteScroll={true}
+        isLoadingEarlier={messageListLoading}
+        onLoadEarlier={() => fetchMore()}
+        loadEarlier={canLoadmore}
+        renderInputToolbar={(props) => (
+          <InputToolbar {...props} />
+        )}
 
-      renderSend={(props) => (
-        <Send {...props} >
-            <View style={{justifyContent: 'center', height: '100%', marginRight: 10}}>
-              <IconButton icon="send" size={30} centered></IconButton>
-            </View>
-          </Send>
-    )}
-      // renderMessage={(props) => (
-      //   <Message {...props} containerStyle={{}}/>
-      // )}
-    />
+        renderSend={(props) => (
+          <Send {...props} >
+              <View style={{justifyContent: 'center', height: '100%', marginRight: 10}}>
+                <IconButton icon="send" size={30} centered></IconButton>
+              </View>
+            </Send>
+      )}
+        // renderMessage={(props) => (
+        //   <Message {...props} containerStyle={{}}/>
+        // )}
+      />
+    </>
   )
 }

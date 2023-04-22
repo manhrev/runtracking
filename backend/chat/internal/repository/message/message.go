@@ -159,7 +159,10 @@ func (c *messageImpl) ListConversation(ctx context.Context,
 							sql.ColumnsEQ(s.C(message.FieldFromUserID), t.C(message.FieldFromUserID)),
 						)),
 				),
-				sql.Or(sql.EQ(s.C(message.FieldFromUserID), userID), sql.EQ(s.C(message.FieldToUserID), userID)),
+				sql.Or(
+					sql.And(sql.EQ(s.C(message.FieldFromUserID), userID), sql.EQ(s.C(message.FieldSoftDeleteFromUserID), false)),
+					sql.And(sql.EQ(s.C(message.FieldToUserID), userID), sql.EQ(s.C(message.FieldSoftDeleteToUserID), false)),
+				),
 			))
 	}).All(ctx)
 

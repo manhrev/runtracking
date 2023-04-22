@@ -3,6 +3,108 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 
+export class ListConversationRequest extends jspb.Message {
+  getLimit(): number;
+  setLimit(value: number): ListConversationRequest;
+
+  getOffset(): number;
+  setOffset(value: number): ListConversationRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListConversationRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListConversationRequest): ListConversationRequest.AsObject;
+  static serializeBinaryToWriter(message: ListConversationRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListConversationRequest;
+  static deserializeBinaryFromReader(message: ListConversationRequest, reader: jspb.BinaryReader): ListConversationRequest;
+}
+
+export namespace ListConversationRequest {
+  export type AsObject = {
+    limit: number,
+    offset: number,
+  }
+}
+
+export class ListConversationReply extends jspb.Message {
+  getConversationsList(): Array<ConversationInfo>;
+  setConversationsList(value: Array<ConversationInfo>): ListConversationReply;
+  clearConversationsList(): ListConversationReply;
+  addConversations(value?: ConversationInfo, index?: number): ConversationInfo;
+
+  getTotal(): number;
+  setTotal(value: number): ListConversationReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListConversationReply.AsObject;
+  static toObject(includeInstance: boolean, msg: ListConversationReply): ListConversationReply.AsObject;
+  static serializeBinaryToWriter(message: ListConversationReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListConversationReply;
+  static deserializeBinaryFromReader(message: ListConversationReply, reader: jspb.BinaryReader): ListConversationReply;
+}
+
+export namespace ListConversationReply {
+  export type AsObject = {
+    conversationsList: Array<ConversationInfo.AsObject>,
+    total: number,
+  }
+}
+
+export class ConversationInfo extends jspb.Message {
+  getPartner(): UserInfo | undefined;
+  setPartner(value?: UserInfo): ConversationInfo;
+  hasPartner(): boolean;
+  clearPartner(): ConversationInfo;
+
+  getLastmessage(): MessageInfo | undefined;
+  setLastmessage(value?: MessageInfo): ConversationInfo;
+  hasLastmessage(): boolean;
+  clearLastmessage(): ConversationInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConversationInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: ConversationInfo): ConversationInfo.AsObject;
+  static serializeBinaryToWriter(message: ConversationInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConversationInfo;
+  static deserializeBinaryFromReader(message: ConversationInfo, reader: jspb.BinaryReader): ConversationInfo;
+}
+
+export namespace ConversationInfo {
+  export type AsObject = {
+    partner?: UserInfo.AsObject,
+    lastmessage?: MessageInfo.AsObject,
+  }
+}
+
+export class UserInfo extends jspb.Message {
+  getUserId(): number;
+  setUserId(value: number): UserInfo;
+
+  getDisplayName(): string;
+  setDisplayName(value: string): UserInfo;
+
+  getProfilePicture(): string;
+  setProfilePicture(value: string): UserInfo;
+
+  getUsername(): string;
+  setUsername(value: string): UserInfo;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: UserInfo): UserInfo.AsObject;
+  static serializeBinaryToWriter(message: UserInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserInfo;
+  static deserializeBinaryFromReader(message: UserInfo, reader: jspb.BinaryReader): UserInfo;
+}
+
+export namespace UserInfo {
+  export type AsObject = {
+    userId: number,
+    displayName: string,
+    profilePicture: string,
+    username: string,
+  }
+}
+
 export class DeleteConversationRequest extends jspb.Message {
   getToUserId(): number;
   setToUserId(value: number): DeleteConversationRequest;
@@ -22,6 +124,9 @@ export namespace DeleteConversationRequest {
 }
 
 export class DeleteConversationReply extends jspb.Message {
+  getId(): number;
+  setId(value: number): DeleteConversationReply;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DeleteConversationReply.AsObject;
   static toObject(includeInstance: boolean, msg: DeleteConversationReply): DeleteConversationReply.AsObject;
@@ -32,6 +137,7 @@ export class DeleteConversationReply extends jspb.Message {
 
 export namespace DeleteConversationReply {
   export type AsObject = {
+    id: number,
   }
 }
 
@@ -115,8 +221,8 @@ export class MessageInfo extends jspb.Message {
   hasTime(): boolean;
   clearTime(): MessageInfo;
 
-  getIsToUserSeen(): boolean;
-  setIsToUserSeen(value: boolean): MessageInfo;
+  getIsSeen(): boolean;
+  setIsSeen(value: boolean): MessageInfo;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MessageInfo.AsObject;
@@ -133,7 +239,7 @@ export namespace MessageInfo {
     fromUserId: number,
     toUserId: number,
     time?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    isToUserSeen: boolean,
+    isSeen: boolean,
   }
 }
 

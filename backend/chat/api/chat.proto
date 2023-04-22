@@ -39,7 +39,9 @@ message DeleteConversationRequest{
     int64 to_user_id = 1;
 }
 
-message DeleteConversationReply{}
+message DeleteConversationReply{
+    int64 id = 1;
+}
 
 message GetHistoryChatRequest{
     int64 to_user_id = 2;
@@ -62,8 +64,8 @@ message MessageInfo{
     int64 to_user_id = 4;
     google.protobuf.Timestamp time = 5; 
 
-    //use to check receiver has seen or not
-    bool is_to_user_seen = 6;
+    
+    bool is_seen = 6;
 }
 
 message SendMessageRequest{
