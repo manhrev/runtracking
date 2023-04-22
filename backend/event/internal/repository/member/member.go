@@ -16,7 +16,8 @@ type Member interface {
 		offset uint64,
 		ascending bool,
 		group_ids []int64,
-		isGlobal bool,
+		visibility event_pb.ListEventsRequest_Visibility,
+		search string,
 		sort_by event_pb.ListEventsRequest_SortBy,
 		ids []int64,
 	) ([]*ent.Event, int64, error)

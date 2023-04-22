@@ -14,7 +14,8 @@ func (s *eventServer) ListEvents(ctx context.Context, request *event.ListEventsR
 		request.GetOffset(),
 		request.GetAscending(),
 		request.GetGroupIds(),
-		request.GetIsGlobal(),
+		request.GetVisibility(),
+		request.GetSearch(),
 		request.GetSortBy(),
 		request.GetIds(),
 	)

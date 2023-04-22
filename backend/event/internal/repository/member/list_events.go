@@ -17,11 +17,23 @@ func (m *memberImpl) ListEvents(
 	offset uint64,
 	ascending bool,
 	group_ids []int64,
-	isGlobal bool,
+	visibility event_pb.ListEventsRequest_Visibility,
+	search string,
 	sort_by event_pb.ListEventsRequest_SortBy,
 	ids []int64,
 ) ([]*ent.Event, int64, error) {
-	query := m.entClient.Event.Query().Where(event.IsGlobalEQ(isGlobal))
+	query := m.entClient.Event.Query()
+
+	switch visibility {
+	case event_pb.ListEventsRequest_VISIBILITY_GLOBAL:
+		query.Where(event.IsGlobalEQ(true))
+	case event_pb.ListEventsRequest_VISIBILITY_NO_GLOBAL:
+		query.Where(event.IsGlobalEQ(false))
+	}
+
+	if search != "" {
+		query.Where(event.NameContainsFold(search))
+	}
 
 	if len(group_ids) > 0 {
 		query.Where(
