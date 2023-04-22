@@ -39,6 +39,7 @@ import Chat from '../screens/OtherUser/Chat'
 import EventDetail from '../screens/Group/Event/EventDetail'
 import { EventDetail as EventDetailPb } from '../lib/event/event_pb'
 import GroupsInEvent from '../screens/Group/Event/EventDetail/GroupsInEvent'
+import EventList from '../screens/Group/Event/EventList'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -165,6 +166,7 @@ export type RootBaseStackParamList = {
   GroupsInEvent: {
     eventId: number
   }
+  EventList: {}
 }
 
 const Stack = createNativeStackNavigator<RootBaseStackParamList>()
@@ -394,6 +396,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={GroupsInEvent}
+          />
+          <Stack.Screen
+            name="EventList"
+            options={{
+              title: 'Events',
+              headerBackVisible: true,
+            }}
+            component={EventList}
           />
         </>
       ) : (

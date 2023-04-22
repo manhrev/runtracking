@@ -550,7 +550,9 @@ export default function GroupDetail({
               marginRight: 10,
             }}
             mode="text"
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate('EventList', {})
+            }}
             labelStyle={{
               fontSize: 15,
             }}

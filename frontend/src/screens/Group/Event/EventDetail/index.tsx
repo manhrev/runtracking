@@ -108,7 +108,7 @@ export default function EventDetail({
               <Image
                 style={styles(theme).coverPic}
                 source={{
-                  uri: 'https://placehold.jp/300x150.png',
+                  uri: picture,
                 }}
               />
             </View>
