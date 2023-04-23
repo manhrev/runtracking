@@ -1,0 +1,25 @@
+import { AppTheme } from '../../../../theme'
+
+export const customStepStyles = (theme: AppTheme) => ({
+  stepIndicatorSize: 50,
+  currentStepIndicatorSize: 40,
+  separatorStrokeWidth: 2,
+  currentStepStrokeWidth: 3,
+  stepStrokeCurrentColor: theme.colors.primary,
+  stepStrokeWidth: 3,
+  stepStrokeFinishedColor: theme.colors.primary,
+  stepStrokeUnFinishedColor: theme.colors.surfaceVariant,
+  separatorFinishedColor: theme.colors.primary,
+  separatorUnFinishedColor: theme.colors.surfaceVariant,
+  stepIndicatorFinishedColor: theme.colors.primary,
+  stepIndicatorUnFinishedColor: theme.colors.background,
+  stepIndicatorCurrentColor: theme.colors.secondaryContainer,
+  stepIndicatorLabelFontSize: 13,
+  currentStepIndicatorLabelFontSize: 13,
+  stepIndicatorLabelCurrentColor: theme.colors.primary,
+  stepIndicatorLabelFinishedColor: theme.colors.background,
+  stepIndicatorLabelUnFinishedColor: theme.colors.surfaceVariant,
+  labelColor: theme.colors.onSurfaceDisabled,
+  labelSize: 15,
+  currentStepLabelColor: theme.colors.primary,
+})

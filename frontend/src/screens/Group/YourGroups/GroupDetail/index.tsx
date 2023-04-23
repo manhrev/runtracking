@@ -192,9 +192,10 @@ export default function GroupDetail({
         sortBy: ListEventsRequest.SortBy.SORT_BY_START_AT,
         groupIdsList: [route.params.groupId],
         idsList: [],
-        isglobal: false,
+        visibility: ListEventsRequest.Visibility.VISIBILITY_NO_GLOBAL,
         limit: 4,
         offset: 0,
+        search: '',
       })
     )
   }
@@ -536,7 +537,7 @@ export default function GroupDetail({
             No challenge yet
           </Text>
         )}
-
+        <Divider />
         <View
           style={{
             flexDirection: 'row',
@@ -562,8 +563,9 @@ export default function GroupDetail({
         </View>
 
         <FlatList
+          style={{ marginTop: 10 }}
           horizontal
-          data={eventList}
+          data={eventList.slice(0, 3)}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={{
@@ -574,19 +576,19 @@ export default function GroupDetail({
                 navigation.navigate('EventDetail', { event: item })
               }}
             >
-              <View
+              <Image
                 style={{
-                  width: 150,
-                  height: 130,
-                  backgroundColor: theme.colors.tertiary,
-                  borderRadius: 5,
-                  margin: 10,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  width: 300,
+                  height: 150,
+                  marginHorizontal: 10,
                 }}
-              >
-                <Text style={{ color: 'white' }}>Image</Text>
-              </View>
+                source={
+                  item.picture == ''
+                    ? require('../../../../../assets/group-img.png')
+                    : { uri: item.picture }
+                }
+              />
+
               <Text
                 style={{
                   marginLeft: 10,

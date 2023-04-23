@@ -43,18 +43,19 @@ export default function Filter({
     }
   }, [])
 
-  useEffect(() => {
-    if (filterEvent === 0) {
+  const toggleFilter = (filter: number) => {
+    setFilterEvent(filter)
+    if (filter === 0) {
       setVisibility(ListEventsRequest.Visibility.VISIBILITY_GLOBAL)
       clearYourGroup()
-    } else if (filterEvent === 1) {
+    } else if (filter === 1) {
       setVisibility(ListEventsRequest.Visibility.VISIBILITY_NO_GLOBAL)
       clearYourGroup()
-    } else if (filterEvent === 2) {
+    } else if (filter === 2) {
       setYourGroup()
       setVisibility(ListEventsRequest.Visibility.VISIBILITY_UNSPECIFIED)
     }
-  }, [filterEvent])
+  }
 
   return (
     <>
@@ -166,7 +167,7 @@ export default function Filter({
           mode={filterEvent === 0 ? 'contained' : 'text'}
           compact
           onPress={() => {
-            setFilterEvent(0)
+            toggleFilter(0)
           }}
         >
           Global
@@ -175,7 +176,7 @@ export default function Filter({
           mode={filterEvent === 1 ? 'contained' : 'text'}
           compact
           onPress={() => {
-            setFilterEvent(1)
+            toggleFilter(1)
           }}
         >
           Not global
@@ -184,7 +185,7 @@ export default function Filter({
           mode={filterEvent === 2 ? 'contained' : 'text'}
           compact
           onPress={() => {
-            setFilterEvent(2)
+            toggleFilter(2)
           }}
         >
           Your group

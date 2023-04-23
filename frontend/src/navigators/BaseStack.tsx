@@ -37,9 +37,14 @@ import { toast } from '../utils/toast/toast'
 import OtherUser from '../screens/OtherUser'
 import Chat from '../screens/OtherUser/Chat'
 import EventDetail from '../screens/Group/Event/EventDetail'
-import { EventDetail as EventDetailPb } from '../lib/event/event_pb'
+import {
+  CreateSubEvent as CreateSubEventPb,
+  EventDetail as EventDetailPb,
+} from '../lib/event/event_pb'
 import GroupsInEvent from '../screens/Group/Event/EventDetail/GroupsInEvent'
 import EventList from '../screens/Group/Event/EventList'
+import CreateEvent from '../screens/Group/Event/CreateEvent'
+import SubEventCreate from '../screens/Group/Event/CreateEvent/SubEventCreate'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -167,6 +172,13 @@ export type RootBaseStackParamList = {
     eventId: number
   }
   EventList: {}
+  CreateEvent: {
+    ownerGroupId: number
+  }
+  CreateSubEvent: {
+    subEventList: CreateSubEventPb.AsObject[]
+    setSubEventList: Function
+  }
 }
 
 const Stack = createNativeStackNavigator<RootBaseStackParamList>()
@@ -404,6 +416,22 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={EventList}
+          />
+          <Stack.Screen
+            name="CreateEvent"
+            options={{
+              title: 'Create new event',
+              headerBackVisible: true,
+            }}
+            component={CreateEvent}
+          />
+          <Stack.Screen
+            name="CreateSubEvent"
+            options={{
+              title: 'Create challenge',
+              headerBackVisible: true,
+            }}
+            component={SubEventCreate}
           />
         </>
       ) : (

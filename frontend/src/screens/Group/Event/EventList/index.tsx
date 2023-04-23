@@ -4,6 +4,8 @@ import { RefreshControl } from 'react-native'
 import { View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Button, Divider, Searchbar, Text } from 'react-native-paper'
+import { FabGroup } from '../../../../comp/FabGroup'
+import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import { useDialog } from '../../../../hooks/useDialog'
 import { ListEventsRequest } from '../../../../lib/event/event_pb'
 import { RootBaseStackParamList } from '../../../../navigators/BaseStack'
@@ -17,6 +19,7 @@ import {
   listMoreEventsThunk,
 } from '../../../../redux/features/eventList/thunks'
 import { selectGroupDetail } from '../../../../redux/features/groupDetail/slice'
+import { selectUserSlice } from '../../../../redux/features/user/slice'
 import { useAppDispatch, useAppSelector } from '../../../../redux/store'
 import { useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
@@ -30,6 +33,7 @@ export default function EventList({
 }: NativeStackScreenProps<RootBaseStackParamList, 'EventList'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
+  const { userId } = useAppSelector(selectUserSlice)
   const {
     handleToggleDialog,
     dataSelected: groupId,
@@ -39,6 +43,9 @@ export default function EventList({
   const {
     groupDetail: { groupinfo },
   } = useAppSelector(selectGroupDetail)
+
+  const ownerGroupId = groupinfo?.id || 0
+  const isAdmin = groupinfo?.leaderId === userId
 
   const { eventList } = useAppSelector(selectEventList)
   const eventListLoading = useAppSelector(isEventListLoading)
@@ -128,83 +135,104 @@ export default function EventList({
     if (query === '') setSearchByName(query)
   }
   return (
-    <View style={baseStyles(theme).container}>
-      <View style={baseStyles(theme).innerWrapper}>
-        {/* <ConfirmDialog
+    <>
+      {/* <LoadingOverlay loading={eventListLoading} /> */}
+      {isAdmin && (
+        <FabGroup
+          bottom={20}
+          type="primary"
+          actions={[
+            {
+              icon: 'plus',
+              label: 'Create new event',
+              onPress: () => {
+                navigation.navigate('CreateEvent', {
+                  ownerGroupId: ownerGroupId,
+                })
+              },
+              labelTextColor: theme.colors.elevation.level5,
+            },
+          ]}
+        />
+      )}
+      <View style={baseStyles(theme).container}>
+        <View style={baseStyles(theme).innerWrapper}>
+          {/* <ConfirmDialog
           toogleDialog={toggleDialog}
           visible={open}
           onSubmit={joinGroup}
           message="Are you sure you want to join this group?"
         /> */}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={eventListLoading}
-              onRefresh={fetchListEvent}
-            />
-          }
-        >
-          <Searchbar
-            style={{ marginTop: 20, height: 45 }}
-            placeholder="Search group name"
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            onSubmitEditing={() => {
-              setSearchByName(searchQuery)
-            }}
-          />
-          <Filter
-            asc={asc}
-            switchAsc={setAsc}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            visibility={visibility}
-            setVisibility={setVisibility}
-            setYourGroup={() => {
-              setGroupIds([groupinfo?.id || 0])
-            }}
-            clearYourGroup={() => {
-              setGroupIds([])
-            }}
-          />
-          <Divider bold />
-
-          {noData && (
-            <Text
-              variant="bodyLarge"
-              style={{ color: theme.colors.tertiary, textAlign: 'center' }}
-            >
-              No data
-            </Text>
-          )}
-          {eventList.map((event, idx) => {
-            return (
-              <EventItem
-                key={idx}
-                event={event}
-                hideTopDivider={idx === 0}
-                showBottomDivider={idx === eventList.length - 1}
-                navigateFunc={() => {}}
-                onSubmit={() => {
-                  // handleToggleDialog(group.id)
-                }}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={eventListLoading}
+                onRefresh={fetchListEvent}
               />
-            )
-          })}
-          {!noData && (
-            <Button
-              style={{ marginTop: 10, marginBottom: 20 }}
-              mode="elevated"
-              onPress={fetchMore}
-              loading={eventListLoading}
-              disabled={!canLoadmore}
-            >
-              Load more
-            </Button>
-          )}
-        </ScrollView>
+            }
+          >
+            <Searchbar
+              style={{ marginTop: 20, height: 45 }}
+              placeholder="Search group name"
+              onChangeText={onChangeSearch}
+              value={searchQuery}
+              onSubmitEditing={() => {
+                setSearchByName(searchQuery)
+              }}
+            />
+            <Filter
+              asc={asc}
+              switchAsc={setAsc}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              visibility={visibility}
+              setVisibility={setVisibility}
+              setYourGroup={() => {
+                setGroupIds([groupinfo?.id || 0])
+              }}
+              clearYourGroup={() => {
+                setGroupIds([])
+              }}
+            />
+            <Divider bold />
+
+            {noData && (
+              <Text
+                variant="bodyLarge"
+                style={{ color: theme.colors.tertiary, textAlign: 'center' }}
+              >
+                No data
+              </Text>
+            )}
+            {eventList.map((event, idx) => {
+              return (
+                <EventItem
+                  key={idx}
+                  event={event}
+                  hideTopDivider={idx === 0}
+                  showBottomDivider={idx === eventList.length - 1}
+                  navigateFunc={() => {}}
+                  onSubmit={() => {
+                    // handleToggleDialog(group.id)
+                  }}
+                />
+              )
+            })}
+            {!noData && (
+              <Button
+                style={{ marginTop: 10, marginBottom: 20 }}
+                mode="elevated"
+                onPress={fetchMore}
+                loading={eventListLoading}
+                disabled={!canLoadmore}
+              >
+                Load more
+              </Button>
+            )}
+          </ScrollView>
+        </View>
       </View>
-    </View>
+    </>
   )
 }
