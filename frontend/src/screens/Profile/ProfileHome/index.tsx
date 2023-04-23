@@ -52,6 +52,9 @@ export default function ProfileHome({
   const handleViewNofification = () => {
     navigation.navigate('NotificationList', {})
   }
+  const handleViewConversation = () => {
+    navigation.navigate('ConversationList')
+  }
 
   const { closeModal, modalVisible, openModal } = useModal()
 
@@ -126,6 +129,13 @@ export default function ProfileHome({
                   mode="contained-tonal"
                   icon="cog-outline"
                   onPress={handleSettingApp}
+                />
+              </View>
+              <View>
+              <IconButton
+                  mode="contained-tonal"
+                  icon="account-multiple"
+                  onPress={handleViewConversation}
                 />
               </View>
               <View>

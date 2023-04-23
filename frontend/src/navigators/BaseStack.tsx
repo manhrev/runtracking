@@ -23,6 +23,7 @@ import { selectUserSlice } from '../redux/features/user/slice'
 import { useEffect } from 'react'
 import { getMeThunk } from '../redux/features/user/thunk'
 import NotificationList from '../screens/Profile/NotificationList'
+import ConversationList from '../screens/Profile/ConversationList'
 import GroupAdd from '../screens/Group/YourGroups/GroupAdd'
 import GroupDetail from '../screens/Group/YourGroups/GroupDetail'
 import GroupEdit from '../screens/Group/YourGroups/GroupEdit'
@@ -102,6 +103,9 @@ export type RootBaseStackParamList = {
 
   // Notification
   NotificationList: {}
+
+  // Notification
+  ConversationList: undefined
 
   // Auth
   Login: undefined
@@ -295,6 +299,15 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={NotificationList}
+          />
+
+          <Stack.Screen
+            name="ConversationList"
+            options={{
+              title: 'Chats',
+              headerBackVisible: true,
+            }}
+            component={ConversationList}
           />
           <Stack.Screen
             name="GroupAdd"

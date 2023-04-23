@@ -164,5 +164,48 @@ export class ChatClient {
     this.methodDescriptorDeleteConversation);
   }
 
+  methodDescriptorListConversation = new grpcWeb.MethodDescriptor(
+    '/chat.Chat/ListConversation',
+    grpcWeb.MethodType.UNARY,
+    chat_pb.ListConversationRequest,
+    chat_pb.ListConversationReply,
+    (request: chat_pb.ListConversationRequest) => {
+      return request.serializeBinary();
+    },
+    chat_pb.ListConversationReply.deserializeBinary
+  );
+
+  listConversation(
+    request: chat_pb.ListConversationRequest,
+    metadata: grpcWeb.Metadata | null): Promise<chat_pb.ListConversationReply>;
+
+  listConversation(
+    request: chat_pb.ListConversationRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: chat_pb.ListConversationReply) => void): grpcWeb.ClientReadableStream<chat_pb.ListConversationReply>;
+
+  listConversation(
+    request: chat_pb.ListConversationRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: chat_pb.ListConversationReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/chat.Chat/ListConversation',
+        request,
+        metadata || {},
+        this.methodDescriptorListConversation,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/chat.Chat/ListConversation',
+    request,
+    metadata || {},
+    this.methodDescriptorListConversation);
+  }
+
 }
 
