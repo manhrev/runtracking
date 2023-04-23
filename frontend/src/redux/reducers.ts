@@ -14,6 +14,7 @@ import challengeList from './features/challengeList/slice'
 import challengeDetail from './features/challengeDetail/slice'
 import otherUser from './features/otherUser/slice'
 import messageList from './features/messageList/slice'
+import eventList from './features/eventList/slice'
 import conversationList from './features/conversationList/slice'
 import userRankingList from './features/userRankingList/slice'
 
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
   challengeDetail,
   otherUser,
   messageList,
+  eventList,
   conversationList,
   userRankingList,
 })

@@ -37,7 +37,15 @@ import ChallengeStats from '../screens/Group/Challenge/ChallengeStats'
 import { toast } from '../utils/toast/toast'
 import OtherUser from '../screens/OtherUser'
 import Chat from '../screens/OtherUser/Chat'
-import { Button } from 'react-native'
+import EventDetail from '../screens/Group/Event/EventDetail'
+import {
+  CreateSubEvent as CreateSubEventPb,
+  EventDetail as EventDetailPb,
+} from '../lib/event/event_pb'
+import GroupsInEvent from '../screens/Group/Event/EventDetail/GroupsInEvent'
+import EventList from '../screens/Group/Event/EventList'
+import CreateEvent from '../screens/Group/Event/CreateEvent'
+import SubEventCreate from '../screens/Group/Event/CreateEvent/SubEventCreate'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -127,7 +135,6 @@ export type RootBaseStackParamList = {
     isLeader: boolean
   }
 
-
   // Challenge
   ChallengeList: {
     groupId: number
@@ -159,6 +166,22 @@ export type RootBaseStackParamList = {
   Chat: {
     userId: number
     toUserId: number
+  }
+
+  // event
+  EventDetail: {
+    event: EventDetailPb.AsObject
+  }
+  GroupsInEvent: {
+    eventId: number
+  }
+  EventList: {}
+  CreateEvent: {
+    ownerGroupId: number
+  }
+  CreateSubEvent: {
+    subEventList: CreateSubEventPb.AsObject[]
+    setSubEventList: Function
   }
 }
 
@@ -381,6 +404,47 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={Chat}
+          />
+          <Stack.Screen
+            name="EventDetail"
+            options={{
+              title: 'Event Detail',
+              headerShown: false,
+              headerBackVisible: true,
+            }}
+            component={EventDetail}
+          />
+          <Stack.Screen
+            name="GroupsInEvent"
+            options={{
+              title: 'Groups in this event',
+              headerBackVisible: true,
+            }}
+            component={GroupsInEvent}
+          />
+          <Stack.Screen
+            name="EventList"
+            options={{
+              title: 'Events',
+              headerBackVisible: true,
+            }}
+            component={EventList}
+          />
+          <Stack.Screen
+            name="CreateEvent"
+            options={{
+              title: 'Create new event',
+              headerBackVisible: true,
+            }}
+            component={CreateEvent}
+          />
+          <Stack.Screen
+            name="CreateSubEvent"
+            options={{
+              title: 'Create challenge',
+              headerBackVisible: true,
+            }}
+            component={SubEventCreate}
           />
         </>
       ) : (
