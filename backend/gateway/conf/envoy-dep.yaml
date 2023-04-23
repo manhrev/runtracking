@@ -303,5 +303,5 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: plan-jzg35jprna-as.a.run.app
+                      address: plan-jzg35jprna-et.a.run.app
                       port_value: 443
