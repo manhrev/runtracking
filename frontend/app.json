@@ -2,7 +2,9 @@
   "expo": {
     "name": "runtracking",
     "slug": "runtracking",
+    "originalFullName": "@manhrev/runtracking",
     "version": "1.0.0",
+    "scheme": "gotracker",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -40,6 +42,7 @@
       },
         "googleServicesFile": "./google-services.json"
     },
+    "plugins": ["@react-native-google-signin/google-signin"],
     "web": {
       "favicon": "./assets/favicon.png"
     },

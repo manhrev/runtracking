@@ -32,6 +32,9 @@ import { baseStyles } from '../../baseStyle'
 import ProfileAchievement from '../comp/ProfileAchievement'
 import ProfileInfo from '../comp/ProfileInfo'
 import ImagePreview from './comp/ImagePreview'
+import { ProfileInfoTabStr } from '../../../constants/enumstr/group'
+import GoogleFitRecord from '../comp/GoogleFitRecord'
+
 
 export default function ProfileHome({
   navigation,
@@ -42,7 +45,9 @@ export default function ProfileHome({
   const { displayName, profiePicture, userId } = useAppSelector(selectUserSlice)
 
   const loading = useAppSelector(isUserSliceLoading)
-  const [isInfoSelected, setIsInfoSelected] = useState(true)
+  // const [isInfoSelected, setIsInfoSelected] = useState(true)
+  const [tabSelected, setTabSelected] = useState(ProfileInfoTabStr.INFO)
+
   const handleEditYourProfile = () => {
     navigation.navigate('ProfileSetting')
   }
@@ -61,6 +66,17 @@ export default function ProfileHome({
   const fetchUserData = async () => {
     await dispatch(getMeThunk())
     dispatch(getUserAchievementThunk({ userIdsList: [userId] }))
+  }
+
+  const getTabView = (tabName: string) : JSX.Element => {
+    switch(tabName){
+      case ProfileInfoTabStr.INFO:
+        return <ProfileInfo />
+        case ProfileInfoTabStr.ACHIEVEMENT:
+          return <ProfileAchievement />
+        default:
+          return <GoogleFitRecord />
+    }
   }
 
   useEffect(() => {
@@ -160,25 +176,37 @@ export default function ProfileHome({
               }}
             >
               <Button
-                mode={isInfoSelected ? 'elevated' : 'text'}
+                mode={tabSelected === ProfileInfoTabStr.INFO ? 'elevated' : 'text'}
                 onPress={() => {
-                  setIsInfoSelected(true)
+                  setTabSelected(ProfileInfoTabStr.INFO)
                 }}
               >
                 Info
               </Button>
               <Button
-                mode={!isInfoSelected ? 'elevated' : 'text'}
+                mode={tabSelected === ProfileInfoTabStr.ACHIEVEMENT ? 'elevated' : 'text'}
                 style={{ marginLeft: 4 }}
-                onPress={() => setIsInfoSelected(false)}
+                onPress={() => {
+                  setTabSelected(ProfileInfoTabStr.ACHIEVEMENT)
+                }}
               >
                 Your achievements
+              </Button>
+
+              <Button
+                mode={tabSelected === ProfileInfoTabStr.GOOGLE_FIT_RECORD? 'elevated' : 'text'}
+                style={{ marginLeft: 4 }}
+                onPress={() => {
+                  setTabSelected(ProfileInfoTabStr.GOOGLE_FIT_RECORD)
+                }}
+              >
+                Google Fit Record
               </Button>
             </View>
           </View>
         </View>
         <Divider />
-        <View>{isInfoSelected ? <ProfileInfo /> : <ProfileAchievement />}</View>
+        <View>{getTabView(tabSelected)}</View>
       </ScrollView>
     </>
   )
