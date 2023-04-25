@@ -87,6 +87,7 @@ export default function ChallengeDetail({
                 onPress={() => navigation.navigate('ChallengeEdit', {
                     groupId: challengeDetail.challengeinfo?.groupId || 0,
                     challengeInfo: challengeDetail.challengeinfo,
+                    reloadDetailFunc: fetchChallengeDetail,
                 })}
             />}
             <Image

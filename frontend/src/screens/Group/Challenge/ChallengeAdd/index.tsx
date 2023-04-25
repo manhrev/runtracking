@@ -192,6 +192,7 @@ export default function ChallengeAdd({
         } else {
           toast.success({ message: 'Challenge created!' })
           navigation.goBack()
+          route.params.reloadListFunc()
         }
     }
 

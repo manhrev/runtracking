@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View } from 'react-native'
-import { Button, Divider, Text, TextInput } from 'react-native-paper'
+import { Button, Divider, IconButton, Text, TextInput } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
 import { useAppSelector } from '../../redux/store'
@@ -48,42 +48,51 @@ export default function PlanDetail({
     <>
       <View style={styles(theme).container}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {route.params.canEdit ? (
-            <Button
-              mode="text"
-              onPress={() => navigation.navigate('PlanEdit', {
-                planId: route.params.planId,
-                canEdit: route.params.canEdit,
-              })}
-              style={styles(theme).addPlanBtn}
-              labelStyle={{ fontSize: 16 }}
-            >
-              EDIT PLAN
-            </Button>
-          ) : null}
-
-          <Text style={{
-            fontSize: 25,
-            fontWeight: 'bold',
-            marginTop: 10,
-            marginBottom: 5,
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
           }}>
-            {selectedPlan?.name}
-          </Text>
+            <View>
+              <Text style={{
+                fontSize: 25,
+                fontWeight: 'bold',
+                marginTop: 10,
+                marginBottom: 5,
+              }}>
+                {selectedPlan?.name}
+              </Text>
 
-          <Text style={{
-            fontSize: 15,
-            fontWeight: 'bold',
-            color: theme.colors.tertiary,
-          }}>
-            {toDate(selectedPlan?.startTime?.seconds || 0)} - {toDate(selectedPlan?.endTime?.seconds || 0)}
-          </Text>
+              <Text style={{
+                fontSize: 15,
+                fontWeight: 'bold',
+                color: theme.colors.tertiary,
+                marginBottom: 5,
+              }}>
+                {toDate(selectedPlan?.startTime?.seconds || 0)} - {toDate(selectedPlan?.endTime?.seconds || 0)}
+              </Text>
 
-          <Text style={{
-            fontSize: 17,
-          }}>
-            {selectedPlan?.activityType ? getTextFromActivityType(selectedPlan?.activityType) : 'Unknown'}
-          </Text>
+              <Text style={{
+                fontSize: 17,
+              }}>
+                {selectedPlan?.activityType ? getTextFromActivityType(selectedPlan?.activityType) : 'Unknown'}
+              </Text>
+            </View>
+            {route.params.canEdit &&
+              <IconButton
+                style={{
+                  alignSelf: 'flex-start',
+                }}
+                icon="pencil"
+                size={30}
+                onPress={() =>
+                  navigation.navigate('PlanEdit', {
+                    planId: route.params.planId,
+                    canEdit: route.params.canEdit,
+                  })
+                }
+              />
+            }
+          </View>
 
           <Divider bold style={{ marginVertical: 10 }} />
           <View style={{
@@ -173,10 +182,6 @@ const styles = (theme: AppTheme) =>
       marginBottom: 5,
       fontWeight: 'bold',
       fontSize: 16,
-    },
-    addPlanBtn: {
-      alignSelf: 'flex-end',
-      marginRight: 20,
     },
     dropdown: {
       marginBottom: 7,

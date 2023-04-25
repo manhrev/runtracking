@@ -143,10 +143,12 @@ export type RootBaseStackParamList = {
   }
   ChallengeAdd: {
     groupId: number
+    reloadListFunc: () => void
   }
   ChallengeEdit: {
     groupId: number
     challengeInfo: ChallengeInfo.AsObject | undefined
+    reloadDetailFunc: () => void
   }
   ChallengeDetail: {
     challengeId: number

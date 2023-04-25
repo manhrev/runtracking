@@ -237,6 +237,7 @@ export default function ChallengeEdit({
         } else {
           toast.success({ message: 'Challenge updated!' })
           navigation.goBack()
+          route.params.reloadDetailFunc()
         }
     }
 
