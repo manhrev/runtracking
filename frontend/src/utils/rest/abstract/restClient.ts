@@ -44,6 +44,7 @@ export abstract class restAbstractClient {
       });
       return response.data;
     } catch (error) {
+      console.log(error)
       throw this.handleAxiosError(error);
     }
   }
@@ -71,6 +72,7 @@ export abstract class restAbstractClient {
   }
 
   private handleAxiosError(error: any): Error {
+    console.log(error)
     if (error.response) {
       const { status, statusText, data } = error.response;
       const message = data?.message || statusText;

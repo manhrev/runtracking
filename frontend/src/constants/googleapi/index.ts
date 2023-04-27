@@ -44,6 +44,17 @@ export interface User {
       manufacturer: string;
  }
 
+ export interface Bucket {
+  startTimeMillis: string;
+  endTimeMillis: string;
+  dataset: DataSet[];
+}
+
+export interface ListBucket {
+  bucket: Bucket[];
+}
+
+
   export interface DataSet {
     minStartTimeNs: number;
     maxEndTimeNs: number;
@@ -76,24 +87,35 @@ export interface User {
       fpVal: number;
     };
   }
-  
 
- export const DATA_SOURCE = {
-    "steps": "derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas",
-    "dist": "derived:com.google.distance.delta:com.google.android.gms:from_steps<-merge_step_deltas",
-    "bpm": "derived:com.google.heart_rate.bpm:com.google.android.gms:merge_heart_rate_bpm",
-    "rhr": "derived:com.google.heart_rate.bpm:com.google.android.gms:resting_heart_rate<-merge_heart_rate_bpm",
-    "sleep" : "derived:com.google.sleep.segment:com.google.android.gms:sleep_from_activity<-raw:com.google.activity.segment:com.heytap.wearable.health:stream_sleep",
-    "cal" : "derived:com.google.calories.expended:com.google.android.gms:from_activities",
-    "move": "derived:com.google.active_minutes:com.google.android.gms:from_steps<-estimated_steps",
-    "points" : "derived:com.google.heart_minutes:com.google.android.gms:merge_heart_minutes",
-    "weight" : "derived:com.google.weight:com.google.android.gms:merge_weight"
+  export interface ListDataSetRequest{
+    startTimeNanoSeconds: number, 
+    endTimeNanoSeconds: number, 
+  }
+  
+export interface AggregateByRequest{
+  aggregateBy: AggregateBy[],
+  endTimeMillis: number,
+  startTimeMillis: number
 }
 
+export interface AggregateBy {
+  dataTypeName: string;
+  dataSourceId: string;
+}
 
-export const SCOPES = {
-  FITNESS_ACTIVITY_READ: 'https://www.googleapis.com/auth/fitness.activity.read',
-  FITNESS_ACTIVITY_WRITE: 'https://www.googleapis.com/auth/fitness.activity.write',
-  FITNESS_BODY_READ: 'https://www.googleapis.com/auth/fitness.body.read',
-  FITNESS_BODY_WRITE: 'https://www.googleapis.com/auth/fitness.body.write',
-};
+export const AGGREGATES_BY ={
+  "dis" : {
+    dataSourceId:  'derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta',
+    dataTypeName: 'com.google.distance.delta'
+  } as AggregateBy,
+  "cal" : {
+    dataSourceId:  'derived:com.google.calories.expended:com.google.android.gms:merge_calories_expended',
+    dataTypeName: 'com.google.calories.expended'
+  } as AggregateBy,
+  "min" : {
+    dataSourceId:  'derived:com.google.active_minutes:com.google.android.gms:merge_active_minutes',
+    dataTypeName: 'com.google.active_minutes'
+  } as AggregateBy,
+
+}

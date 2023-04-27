@@ -1,27 +1,33 @@
-import { DataSource, ListDataSource } from "../../../constants/googleapi";
-import { restAbstractClient } from "../abstract/restClient";
+import {
+  DataSource,
+  ListDataSource,
+  ListDataSetRequest,
+  AggregateByRequest,
+  ListBucket,
+  AGGREGATES_BY,
+} from '../../../constants/googleapi'
+import { restAbstractClient } from '../abstract/restClient'
 
 class restGoogleFitClient extends restAbstractClient {
   constructor(baseUrl: string, defaultHeaders?: Record<string, string>) {
-    super(baseUrl, defaultHeaders);
+    super(baseUrl, defaultHeaders)
   }
 
   async listDataSources(): Promise<ListDataSource> {
-    const response = await this.get<ListDataSource>('/dataSources');
-    return response;
+    const response = await this.get<ListDataSource>('/dataSources')
+    return response
   }
 
-//   async getStepsForDate(date: string) {
-//     const response = await this.get(`/fitness/v1/users/me/dataset:aggregate`, {
-//       params: {
-//         'aggregateBy': [{ 'dataTypeName': 'com.google.step_count.delta', 'dataSourceId': 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps' }],
-//         'bucketByTime': { 'durationMillis': 86400000 },
-//         'startTimeMillis': new Date(date).setHours(0, 0, 0, 0),
-//         'endTimeMillis': new Date(date).setHours(23, 59, 59, 999)
-//       }
-//     });
-//     return response.data;
-//   }
+  async listDataSets(req: ListDataSetRequest): Promise<ListBucket> {
+    const body = {
+      aggregateBy: [AGGREGATES_BY.cal, AGGREGATES_BY.dis, AGGREGATES_BY.min],
+      endTimeMillis: req.endTimeNanoSeconds,
+      startTimeMillis: req.startTimeNanoSeconds,
+    } as AggregateByRequest
+
+    const response = await this.post<ListBucket>('/dataset:aggregate', body)
+    return response
+  }
 }
 
-export default restGoogleFitClient;
+export default restGoogleFitClient
