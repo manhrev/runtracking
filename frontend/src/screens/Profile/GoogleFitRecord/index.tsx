@@ -166,7 +166,7 @@ export default function GoogleFitRecord() {
                                 setStartDate={setStartDate}
                                 key="data-setting"
                             />
-                            <FabGroup
+                            {!modalVisible && <FabGroup
                                 actions={[
                                     {
                                         icon: 'sync',
@@ -178,6 +178,7 @@ export default function GoogleFitRecord() {
                                     },
                                 ]}
                                 type="tertiary" />
+                            }
                             <View style={styles(theme).datePeriod}>
                                 <Avatar.Icon color='white' theme='white' size={30} style={styles(theme).dateIcon} icon="calendar-range" />
                                 <Text style={styles(theme).datePeriodText}>{(startDate ? startDate : new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000)).toLocaleDateString() + " -> " + (endDate ? endDate : new Date()).toLocaleDateString()}</Text>
@@ -235,7 +236,7 @@ export default function GoogleFitRecord() {
                                     onPress={() => {
                                         promptAsync();
                                     }}
-                                    
+
                                 />
                             </View>
                         </>
