@@ -15,6 +15,7 @@ import {
   logoutThunk,
   updateUserInfoThunk,
 } from './thunk'
+import { GOOGLE_ACCESS_TOKEN } from '../../../utils/rest/abstract/restClient'
 
 type UserState = {
   isSignedIn: boolean
@@ -89,6 +90,7 @@ const slice = createSlice({
     builder.addCase(logoutThunk.fulfilled, (state, { payload }) => {
       state.isSignedIn = false
       AsyncStorage.removeItem(KEY_ACCESS_TOKEN)
+      AsyncStorage.removeItem(GOOGLE_ACCESS_TOKEN)
     })
     builder.addCase(
       updateUserInfoThunk.fulfilled,
