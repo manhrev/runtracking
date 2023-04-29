@@ -33,7 +33,7 @@ import ProfileAchievement from '../comp/ProfileAchievement'
 import ProfileInfo from '../comp/ProfileInfo'
 import ImagePreview from './comp/ImagePreview'
 import { ProfileInfoTabStr } from '../../../constants/enumstr/group'
-import GoogleFitRecord from '../comp/GoogleFitRecord'
+import GoogleFitRecord from '../GoogleFitRecord/index'
 
 
 export default function ProfileHome({
