@@ -33,8 +33,8 @@ export interface GoogleFitRecordInfo {
 export default function GoogleFitRecord() {
     const theme = useAppTheme()
     WebBrowser.maybeCompleteAuthSession();
-    const [isSignedIn, setIsSignedIn] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isSignedIn, setIsSignedIn] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
     const { closeModal, modalVisible, openModal } = useModal()
     const [startDate, setStartDate] = useState<Date>(new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000))
     const [endDate, setEndDate] = useState<Date>(new Date())
@@ -149,7 +149,6 @@ export default function GoogleFitRecord() {
 
     return (
         <>
-
             <LoadingOverlay loading={isLoading} />
             <View style={styles(theme).extendedBaseContainer}>
                 <View style={baseStyles(theme).innerWrapper}>
@@ -195,7 +194,9 @@ export default function GoogleFitRecord() {
                                     left={props => <List.Icon {...props} icon="tablet-cellphone" />}
                                 >
                                     {googleFitRecord.deviceList && googleFitRecord.deviceList.map(
-                                        device => <List.Item title={device.manufacturer + " " + device.model} />
+                                        device => <List.Item 
+                                        key={device.uid}
+                                        title={device.manufacturer + " " + device.model} />
                                     )}
                                 </List.Accordion>
                             </View>
