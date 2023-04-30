@@ -55,3 +55,10 @@ export const ActivityTypeStr = {
   [ActivityType.ACTIVITY_TYPE_UNSPECIFIED]: '',
 }
 
+export const ProfileInfoTabStr = {
+  INFO: 'info',
+  ACHIEVEMENT: 'achievement',
+  GOOGLE_FIT_RECORD: 'google-fit-record',
+}
+
+
