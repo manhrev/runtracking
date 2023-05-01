@@ -35,3 +35,12 @@ export const GroupStatusInEventButtonStr = {
   [GroupStatus.GROUP_STATUS_REQUESTED]: 'Requested',
   [GroupStatus.GROUP_STATUS_REJECTED]: 'Rejected',
 }
+
+export const GroupStatusInEventStr = {
+  [GroupStatus.GROUP_STATUS_UNSPECIFIED]: '?',
+  [GroupStatus.GROUP_STATUS_ACTIVE]: 'Active',
+  [GroupStatus.GROUP_STATUS_BANNED]: 'Banned',
+  [GroupStatus.GROUP_STATUS_LEFT]: 'Left',
+  [GroupStatus.GROUP_STATUS_REQUESTED]: 'Requested',
+  [GroupStatus.GROUP_STATUS_REJECTED]: 'Rejected',
+}

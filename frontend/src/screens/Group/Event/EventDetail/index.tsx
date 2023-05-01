@@ -38,6 +38,7 @@ export default function EventDetail({
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'EventDetail'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
+  const yourGroupId = route.params.yourGroupId
   const {
     id,
     description,
@@ -51,7 +52,7 @@ export default function EventDetail({
   } = route.params.event
   const { subEventList, subEventProgressList } = useAppSelector(selectEventList)
   const loading = useAppSelector(isAllEventListLoading)
-
+  const isAdmin = yourGroupId === ownerGroupId
   const currentSubEventIndex = useMemo(
     () => getCurrentIndexForSubEvent(subEventList),
     [subEventList]
@@ -120,7 +121,10 @@ export default function EventDetail({
             <TouchableRipple
               style={styles(theme).metricDisplayBlock}
               onPress={() => {
-                navigation.navigate('GroupsInEvent', { eventId: id })
+                navigation.navigate('GroupsInEvent', {
+                  eventId: id,
+                  isAdmin: isAdmin,
+                })
               }}
             >
               <>

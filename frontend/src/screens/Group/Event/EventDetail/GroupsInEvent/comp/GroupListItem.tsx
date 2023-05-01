@@ -7,7 +7,8 @@ import {
   Text,
   TouchableRipple,
 } from 'react-native-paper'
-import { GroupInEvent } from '../../../../../../lib/event/event_pb'
+import { GroupStatusInEventStr } from '../../../../../../constants/enumstr/event'
+import { GroupInEvent, GroupStatus } from '../../../../../../lib/event/event_pb'
 import { AppTheme, useAppTheme } from '../../../../../../theme'
 import { groupEventStatusToStr } from '../../../../../../utils/helpers/enumStr'
 
@@ -15,14 +16,16 @@ interface GroupItemProps {
   hideTopDivider?: boolean
   showBottomDivider?: boolean
   group: GroupInEvent.AsObject
-  navigateFunc: () => void
+  acceptCallback: () => void
+  isAdmin: boolean
 }
 
 export default function GroupItem({
   hideTopDivider,
   showBottomDivider,
   group,
-  navigateFunc,
+  acceptCallback,
+  isAdmin,
 }: GroupItemProps) {
   const theme = useAppTheme()
   const { id, status } = group
@@ -30,7 +33,7 @@ export default function GroupItem({
   return (
     <TouchableRipple
       style={{ borderRadius: 10 }}
-      onPress={() => navigateFunc()}
+      // onPress={() => navigateFunc()}
       borderless
     >
       <View>
@@ -64,22 +67,22 @@ export default function GroupItem({
                   Groupid: {id}
                 </Text>
                 <Text variant="bodyMedium">
-                  Status: {groupEventStatusToStr(status)}
+                  Status: {GroupStatusInEventStr[status]}
                 </Text>
               </View>
-              {/* {isLeader && <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  flex: 1,
-                }}
-              >
-                <IconButton
-                  icon="account-star"
-                  iconColor={theme.colors.secondary}
-                  size={35}
-                />
-              </View>} */}
+              {isAdmin && status === GroupStatus.GROUP_STATUS_REQUESTED && (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'flex-end',
+                    flex: 1,
+                  }}
+                >
+                  <Button mode="text" onPress={acceptCallback}>
+                    Accept
+                  </Button>
+                </View>
+              )}
             </View>
           </View>
         </View>

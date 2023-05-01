@@ -72,6 +72,8 @@ export default function EventList({
     fetchListEvent()
   }, [dispatch, searchByName, sortBy, asc, visibility, groupIds])
 
+  const yourGroupId = groupinfo?.id || 0
+
   const fetchListEvent = async () => {
     const { response } = await dispatch(
       listEventsThunk({
@@ -83,7 +85,7 @@ export default function EventList({
         groupIdsList: groupIds,
         idsList: [],
         sortBy: sortBy,
-        yourGroupId: groupinfo?.id || 0,
+        yourGroupId: yourGroupId,
       })
     ).unwrap()
 
@@ -105,7 +107,7 @@ export default function EventList({
         groupIdsList: groupIds,
         idsList: [],
         sortBy: sortBy,
-        yourGroupId: groupinfo?.id || 0,
+        yourGroupId: yourGroupId,
       })
     ).unwrap()
 
@@ -168,7 +170,7 @@ export default function EventList({
             toogleDialog={toggleDialog}
             visible={open}
             onSubmit={joinEvent}
-            message="Are you sure you want to join this group?"
+            message="Are you sure you want to join this event?"
           />
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -222,6 +224,7 @@ export default function EventList({
                   navigateFunc={() => {
                     navigation.navigate('EventDetail', {
                       event: event,
+                      yourGroupId: yourGroupId,
                     })
                   }}
                   onSubmit={() => {

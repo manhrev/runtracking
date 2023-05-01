@@ -171,9 +171,11 @@ export type RootBaseStackParamList = {
   // event
   EventDetail: {
     event: EventDetailPb.AsObject
+    yourGroupId: number
   }
   GroupsInEvent: {
     eventId: number
+    isAdmin: boolean
   }
   EventList: {}
   CreateEvent: {
