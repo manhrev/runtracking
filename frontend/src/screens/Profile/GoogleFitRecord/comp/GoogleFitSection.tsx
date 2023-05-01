@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import { Image, StyleSheet, Dimensions, View } from 'react-native'
-import { Avatar, Card, Modal, Portal, Provider, Text } from 'react-native-paper'
+import { StyleSheet} from 'react-native'
+import { Avatar, Card } from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../../theme'
 
 
