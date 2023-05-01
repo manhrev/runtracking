@@ -24,7 +24,7 @@ func (s *eventServer) ListEvents(ctx context.Context, request *event.ListEventsR
 	}
 
 	return &event.ListEventsReply{
-		Events: transformer.TransformEventEntListToEventList(entEvents),
+		Events: transformer.TransformEventEntListToEventList(entEvents, request.GetYourGroupId()),
 		Total:  total,
 	}, nil
 }

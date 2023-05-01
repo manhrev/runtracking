@@ -22,10 +22,17 @@ func TransformEventEntToEvent(entEvent *ent.Event) *event_pb.EventDetail {
 	}
 }
 
-func TransformEventEntListToEventList(entEvents []*ent.Event) []*event_pb.EventDetail {
+func TransformEventEntListToEventList(entEvents []*ent.Event, yourGroupId int64) []*event_pb.EventDetail {
 	events := make([]*event_pb.EventDetail, len(entEvents))
 	for i, entEvent := range entEvents {
 		events[i] = TransformEventEntToEvent(entEvent)
+		yourGroupStatus := event_pb.GroupStatus_GROUP_STATUS_UNSPECIFIED
+		for _, participates := range entEvent.Edges.Participates {
+			if participates.EventGroupID == yourGroupId {
+				yourGroupStatus = event_pb.GroupStatus(participates.Status)
+			}
+		}
+		events[i].YourGroupStatus = yourGroupStatus
 	}
 	return events
 }

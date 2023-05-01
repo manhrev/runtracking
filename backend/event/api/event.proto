@@ -48,6 +48,7 @@ message EventDetail {
     google.protobuf.Timestamp end_at = 8;
     int64 owner_group_id = 9;
     uint32 num_of_groups = 10;
+    GroupStatus your_group_status = 11;
 }
 
 // ==================== Create Event ====================
@@ -153,8 +154,6 @@ message RemoveSubEventFromEventReply {
 // ==================== List Event ====================
 
 message ListEventsRequest {
-    // name
-    
     uint32 limit = 1;
     uint64 offset = 2;
     bool ascending = 3;
@@ -163,6 +162,7 @@ message ListEventsRequest {
     repeated int64 group_ids = 6; // list event for group, if not set, will list all events
     Visibility visibility = 7;
     string search = 8;
+    int64 your_group_id = 9;
     enum SortBy {
         SORT_BY_UNSPECIFIED = 0;
         SORT_BY_NAME = 1;
