@@ -7,17 +7,13 @@ import { baseStyles } from '../../baseStyle'
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { useEffect, useState } from 'react'
-import GoogleFit, { Scopes } from 'react-native-google-fit';
-import * as Updates from 'expo-updates'
-import { AGGREGATES_BY, Device, Point, User } from '../../../constants/googleapi'
+import { Scopes } from 'react-native-google-fit';
+import {  Device } from '../../../constants/googleapi'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { googleAuthClient, googleFitClient } from '../../../utils/rest'
 import { GOOGLE_ACCESS_TOKEN } from '../../../utils/rest/abstract/restClient'
 import { Icon, SocialIcon } from 'react-native-elements'
 import { LoadingOverlay } from '../../../comp/LoadingOverlay'
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
-import moment from 'moment'
-import { formatDateWithoutTime } from '../../../utils/helpers'
 import { FabGroup } from '../../../comp/FabGroup'
 import GoogleFitSection from './comp/GoogleFitSection'
 import { useModal } from '../../../hooks/useModal'
@@ -48,8 +44,8 @@ export default function GoogleFitRecord() {
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: '804907557897-42i6bicgec6p9e651538ue4p7s9lbgla.apps.googleusercontent.com',
-        expoClientId: '804907557897-5do8aq57fheeu8k84puq0fhiu6o3j79c.apps.googleusercontent.com',
-        // redirectUri: 'https://auth.expo.io/@manhrev/runtracking/redirect',
+        expoClientId: '804907557897-2dtudi47b86f8u2qt4fj70tnqcll4h26.apps.googleusercontent.com',
+        // redirectUri: 'https://auth.expo.io/@manhrev/gotracker',
         scopes: ['profile', 'email',
             Scopes.FITNESS_ACTIVITY_READ,
             Scopes.FITNESS_ACTIVITY_WRITE,
@@ -194,9 +190,9 @@ export default function GoogleFitRecord() {
                                     left={props => <List.Icon {...props} icon="tablet-cellphone" />}
                                 >
                                     {googleFitRecord.deviceList && googleFitRecord.deviceList.map(
-                                        device => <List.Item 
-                                        key={device.uid}
-                                        title={device.manufacturer + " " + device.model} />
+                                        device => <List.Item
+                                            key={device.uid}
+                                            title={device.manufacturer + " " + device.model} />
                                     )}
                                 </List.Accordion>
                             </View>
@@ -235,7 +231,10 @@ export default function GoogleFitRecord() {
                                     iconColor='black'
                                     underlayColor="black"
                                     onPress={() => {
-                                        promptAsync();
+                                        promptAsync({
+                                            useProxy: true,
+                                            projectNameForProxy: "@manhrev/gotracker"
+                                        });
                                     }}
 
                                 />

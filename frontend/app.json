@@ -47,9 +47,6 @@
       "eas": {
         "projectId": "f604fbb1-c0b8-4f15-bc70-9d7eecce821e"
       }
-    },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
     }
   }
 }
