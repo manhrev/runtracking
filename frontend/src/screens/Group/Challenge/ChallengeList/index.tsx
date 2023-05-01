@@ -214,7 +214,7 @@ export default function ChallengeList({
                   labelTextColor: theme.colors.onPrimary,
                   color: theme.colors.onPrimary,
                   style: { backgroundColor: theme.colors.primary },
-                  onPress: () => navigation.navigate('ChallengeAdd', { groupId: route.params.groupId }),
+                  onPress: () => navigation.navigate('ChallengeAdd', { groupId: route.params.groupId, reloadListFunc: fetchChallengeList }),
                 },
                 {
                   // select or unselect all

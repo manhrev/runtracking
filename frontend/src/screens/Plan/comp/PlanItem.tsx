@@ -53,7 +53,7 @@ export default function PlanItem({
                 }
                 color={theme.colors.onPrimary}
                 style={{
-                    borderRadius: 10,
+                    borderRadius: 50,
                     backgroundColor: theme.colors.primary,
                 }}
             />

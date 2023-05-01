@@ -10,6 +10,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
 import { RootHomeTabsParamList } from '../../navigators/HomeTab'
+import { ActivityType } from '../../lib/activity/activity_pb'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -21,7 +22,11 @@ export default function Run({
 
   return (
     <View style={styles(theme).container}>
-      <Button onPress={() => navigation.navigate('RunTracking')}>Run now &gt;</Button>
+      <Button onPress={() => navigation.navigate('RunTracking', {
+        planId: -1,
+        activityType: ActivityType.ACTIVITY_TYPE_RUNNING,
+      }
+      )}>Run now &gt;</Button>
     </View>
   )
 }

@@ -64,6 +64,7 @@ export default function RunResult({
           navigation.navigate('RunCommit', {
             activityId: res.response.idCreated,
             activityType: activityType,
+            selectedPlanId: route.params.selectedPlanId,
             resetRunInfo: route.params.resetRunInfo,
           })
         }
@@ -103,16 +104,16 @@ export default function RunResult({
         right={(props) => <Text>{route.params.display.kcal}</Text>}
       />
 
+      <Text style={styles(theme).title}>Activity Name</Text>
       <TextInput
         style={styles(theme).titleInput}
-        label="Activity Name"
         mode="outlined"
         value={activityName}
         onChangeText={(text) => setActivityName(text)}
       />
 
+      <Text style={styles(theme).title}>Activity Type</Text>
       <View style={{ marginLeft: 15 }}>
-        <Text style={{ marginTop: 20, marginBottom: 10 }}>Activity Type:</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <RadioButton
             value="running"
@@ -121,6 +122,7 @@ export default function RunResult({
                 ? 'checked'
                 : 'unchecked'
             }
+            disabled={route.params.selectedPlanId != -1}
             onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_RUNNING)}
           />
           <Text>Running</Text>
@@ -132,6 +134,7 @@ export default function RunResult({
                 ? 'checked'
                 : 'unchecked'
             }
+            disabled={route.params.selectedPlanId != -1}
             onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)}
           />
           <Text>Walking</Text>
@@ -143,17 +146,18 @@ export default function RunResult({
                 ? 'checked'
                 : 'unchecked'
             }
+            disabled={route.params.selectedPlanId != -1}
             onPress={() => setActivityType(ActivityType.ACTIVITY_TYPE_CYCLING)}
           />
           <Text>Cycling</Text>
         </View>
       </View>
-
+      
+      <Text style={styles(theme).title}>Note</Text>
       <TextInput
         style={styles(theme).noteInput}
         multiline={true}
-        numberOfLines={4}
-        label="Note"
+        numberOfLines={5}
         mode="outlined"
         value={activityNote}
         onChangeText={(text) => setActivityNote(text)}
@@ -162,7 +166,7 @@ export default function RunResult({
       <View style={styles(theme).btnContainer}>
         <Button
           mode="contained"
-          buttonColor="#e82525"
+          buttonColor={theme.colors.tertiary}
           onPress={() => deleteActivity()}
           style={styles(theme).button}
         >
@@ -185,14 +189,13 @@ const styles = (theme: AppTheme) =>
   StyleSheet.create({
     titleInput: {
       width: windowWidth * 0.9,
-      marginTop: 10,
-      // center
       marginLeft: 'auto',
       marginRight: 'auto',
     },
     button: {
       flex: 1,
-      margin: 12,
+      margin: 15,
+      alignSelf: 'flex-end',
     },
     btnContainer: {
       flex: 1,
@@ -202,10 +205,15 @@ const styles = (theme: AppTheme) =>
     },
     noteInput: {
       width: windowWidth * 0.9,
-      marginTop: 10,
-      // center
       marginLeft: 'auto',
       marginRight: 'auto',
-      maxHeight: 100,
+      maxHeight: 120,
+    },
+    title: {
+      marginTop: 10,
+      marginBottom: 5,
+      fontWeight: 'bold',
+      fontSize: 16,
+      marginLeft: 15,
     },
   })

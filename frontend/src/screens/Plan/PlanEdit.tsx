@@ -333,7 +333,7 @@ export default function PlanEdit({
           >
             <Button
               mode="contained"
-              buttonColor="#e82525"
+              buttonColor={theme.colors.tertiary}
               onPress={() => navigation.goBack()}
               style={styles(theme).button}
             >

@@ -14,7 +14,6 @@ import {
   TextInput,
   Divider,
   List,
-  ActivityIndicator,
 } from 'react-native-paper'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
@@ -80,26 +79,7 @@ export default function GroupDetail({
 
   const { eventList } = useAppSelector(selectEventList)
   const eventListLoading = useAppSelector(isEventListLoading)
-
-  const testData = [
-    {
-      id: 1,
-      title: 'Example 1',
-    },
-    {
-      id: 2,
-      title: 'Example 2',
-    },
-    {
-      id: 3,
-      title: 'Example 3',
-    },
-    {
-      id: 4,
-      title: 'Example 4',
-    },
-  ]
-
+  
   // group detail
   const { groupDetail } = useAppSelector(selectGroupDetail)
   const groupDetailLoading = useAppSelector(isGroupDetailLoading)
@@ -211,7 +191,7 @@ export default function GroupDetail({
 
   return (
     <View style={baseStyles(theme).container}>
-      <LoadingOverlay loading={groupDetailLoading && eventListLoading} />
+      <LoadingOverlay loading={groupDetailLoading && eventListLoading && userRankingListLoading && challengeListLoading} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={baseStyles(theme).innerWrapper}
@@ -419,13 +399,6 @@ export default function GroupDetail({
           />
         ))}
 
-        {userRankingListLoading && (
-          <ActivityIndicator
-            size="small"
-            style={{ paddingVertical: 20, alignItems: 'center' }}
-          />
-        )}
-
         {noDataUserRankingList && (
           <Text
             variant="bodyLarge"
@@ -517,13 +490,6 @@ export default function GroupDetail({
           />
         )}
 
-        {challengeListLoading && (
-          <ActivityIndicator
-            size="small"
-            style={{ paddingVertical: 20, alignItems: 'center' }}
-          />
-        )}
-
         {noChallengeData && (
           <Text
             variant="bodyLarge"
@@ -534,7 +500,7 @@ export default function GroupDetail({
               fontWeight: 'bold',
             }}
           >
-            No challenge yet
+            No challenge found
           </Text>
         )}
         <Divider />
@@ -612,7 +578,7 @@ export default function GroupDetail({
               fontWeight: 'bold',
             }}
           >
-            No events found
+            No event found
           </Text>
         )}
       </ScrollView>

@@ -7,6 +7,7 @@ import GroupTopTabs from './GroupTopTab'
 import { useAppTheme } from '../theme'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import TabBar from '../comp/TabBar'
+import { ActivityType } from '../lib/activity/activity_pb'
 
 export type RootHomeTabsParamList = {
   ActivityHome: undefined
@@ -35,7 +36,10 @@ export default function HomeTabs() {
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault()
-            navigation.navigate('RunTracking')
+            navigation.navigate('RunTracking', {
+              planId: -1,
+              activityType: ActivityType.ACTIVITY_TYPE_RUNNING,
+            })
           },
         })}
       />

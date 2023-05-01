@@ -140,7 +140,7 @@ export default function GroupAdd({
         <View style={styles(theme).btnContainer}>
           <Button
             mode="contained"
-            buttonColor="#e82525"
+            buttonColor={theme.colors.tertiary}
             onPress={() => navigation.goBack()}
             style={styles(theme).button}
           >
