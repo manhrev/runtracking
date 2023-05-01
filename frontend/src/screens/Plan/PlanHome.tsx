@@ -190,12 +190,13 @@ export default function Plan({
                     {
                       icon: 'plus',
                       label: 'Create new plan',
-                      labelTextColor: theme.colors.onPrimary,
-                      color: theme.colors.onPrimary,
-                      style: { backgroundColor: theme.colors.primary },
+                      labelTextColor: theme.colors.onTertiary,
+                      color: theme.colors.onTertiary,
+                      style: { backgroundColor: theme.colors.tertiary },
                       onPress: () => navigation.navigate('PlanAdd'),
                     },
                   ]}
+                  type='tertiary'
                 />
               )}
             </View>

@@ -101,7 +101,7 @@ export default function PlanDetail({
           }}>
             <AnimatedCircularProgress
               size={230}
-              width={5}
+              width={7}
               fill={isDailyActivity(selectedPlan.rule) ? getProgressOfDailyActivity(selectedPlan.progressList) / selectedPlan.goal * 100
               : selectedPlan.total / selectedPlan.goal * 100}
               tintColor='green'
