@@ -4,6 +4,7 @@ import { RefreshControl } from 'react-native'
 import { View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Button, Divider, Searchbar, Text } from 'react-native-paper'
+import { ConfirmDialog } from '../../../../comp/ConfirmDialog'
 import { FabGroup } from '../../../../comp/FabGroup'
 import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import { useDialog } from '../../../../hooks/useDialog'
@@ -15,6 +16,7 @@ import {
   selectEventList,
 } from '../../../../redux/features/eventList/slice'
 import {
+  joinEventThunk,
   listEventsThunk,
   listMoreEventsThunk,
 } from '../../../../redux/features/eventList/thunks'
@@ -22,6 +24,7 @@ import { selectGroupDetail } from '../../../../redux/features/groupDetail/slice'
 import { selectUserSlice } from '../../../../redux/features/user/slice'
 import { useAppDispatch, useAppSelector } from '../../../../redux/store'
 import { useAppTheme } from '../../../../theme'
+import { toast } from '../../../../utils/toast/toast'
 import { baseStyles } from '../../../baseStyle'
 import EventItem from './comp/EventItem'
 import Filter from './comp/Filter'
@@ -36,7 +39,7 @@ export default function EventList({
   const { userId } = useAppSelector(selectUserSlice)
   const {
     handleToggleDialog,
-    dataSelected: groupId,
+    dataSelected: eventIdToJoin,
     open,
     toggleDialog,
   } = useDialog<number>()
@@ -80,6 +83,7 @@ export default function EventList({
         groupIdsList: groupIds,
         idsList: [],
         sortBy: sortBy,
+        yourGroupId: groupinfo?.id || 0,
       })
     ).unwrap()
 
@@ -101,6 +105,7 @@ export default function EventList({
         groupIdsList: groupIds,
         idsList: [],
         sortBy: sortBy,
+        yourGroupId: groupinfo?.id || 0,
       })
     ).unwrap()
 
@@ -112,23 +117,25 @@ export default function EventList({
     }
   }
 
-  // const joinGroup = async () => {
-  //   if (groupId !== undefined) {
-  //     const { error } = await groupClient.joinGroup({ groupId: groupId })
-  //     if (error) {
-  //       toast.error({ message: 'Something went wrong, please try again later' })
-  //     } else {
-  //       toast.success({
-  //         message: 'Join group request sent, waiting for accept',
-  //       })
-  //       fetchListEvent()
-  //     }
-  //   } else {
-  //     toast.error({ message: 'Something went wrong, please try again later' })
-  //   }
-
-  //   toggleDialog()
-  // }
+  const joinEvent = async () => {
+    if (eventIdToJoin === undefined) {
+      return
+    }
+    const { error } = await dispatch(
+      joinEventThunk({
+        eventId: eventIdToJoin,
+        groupId: groupinfo?.id || 0,
+      })
+    ).unwrap()
+    if (error) {
+      return toast.error({
+        message: 'Error when join event, please try again later!',
+      })
+    }
+    toast.success({ message: 'Join event successfully!' })
+    console.log(eventIdToJoin)
+    toggleDialog()
+  }
 
   const onChangeSearch = (query: string) => {
     setSearchQuery(query)
@@ -157,12 +164,12 @@ export default function EventList({
       )}
       <View style={baseStyles(theme).container}>
         <View style={baseStyles(theme).innerWrapper}>
-          {/* <ConfirmDialog
-          toogleDialog={toggleDialog}
-          visible={open}
-          onSubmit={joinGroup}
-          message="Are you sure you want to join this group?"
-        /> */}
+          <ConfirmDialog
+            toogleDialog={toggleDialog}
+            visible={open}
+            onSubmit={joinEvent}
+            message="Are you sure you want to join this group?"
+          />
           <ScrollView
             showsVerticalScrollIndicator={false}
             refreshControl={
@@ -212,10 +219,16 @@ export default function EventList({
                   event={event}
                   hideTopDivider={idx === 0}
                   showBottomDivider={idx === eventList.length - 1}
-                  navigateFunc={() => {}}
-                  onSubmit={() => {
-                    // handleToggleDialog(group.id)
+                  navigateFunc={() => {
+                    navigation.navigate('EventDetail', {
+                      event: event,
+                    })
                   }}
+                  onSubmit={() => {
+                    handleToggleDialog(event.id)
+                  }}
+                  isAdmin={isAdmin}
+                  yourGroup={ownerGroupId}
                 />
               )
             })}

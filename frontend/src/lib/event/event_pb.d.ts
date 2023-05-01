@@ -93,6 +93,9 @@ export class EventDetail extends jspb.Message {
   getNumOfGroups(): number;
   setNumOfGroups(value: number): EventDetail;
 
+  getYourGroupStatus(): GroupStatus;
+  setYourGroupStatus(value: GroupStatus): EventDetail;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): EventDetail.AsObject;
   static toObject(includeInstance: boolean, msg: EventDetail): EventDetail.AsObject;
@@ -112,6 +115,7 @@ export namespace EventDetail {
     endAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     ownerGroupId: number,
     numOfGroups: number,
+    yourGroupStatus: GroupStatus,
   }
 }
 
@@ -524,6 +528,9 @@ export class ListEventsRequest extends jspb.Message {
   getSearch(): string;
   setSearch(value: string): ListEventsRequest;
 
+  getYourGroupId(): number;
+  setYourGroupId(value: number): ListEventsRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListEventsRequest.AsObject;
   static toObject(includeInstance: boolean, msg: ListEventsRequest): ListEventsRequest.AsObject;
@@ -542,6 +549,7 @@ export namespace ListEventsRequest {
     groupIdsList: Array<number>,
     visibility: ListEventsRequest.Visibility,
     search: string,
+    yourGroupId: number,
   }
 
   export enum SortBy { 

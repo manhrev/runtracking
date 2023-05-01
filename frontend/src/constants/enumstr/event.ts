@@ -1,4 +1,9 @@
-import { ActivityType, ListEventsRequest, Rule } from '../../lib/event/event_pb'
+import {
+  ActivityType,
+  GroupStatus,
+  ListEventsRequest,
+  Rule,
+} from '../../lib/event/event_pb'
 
 export const EventSortByStr = {
   [ListEventsRequest.SortBy.SORT_BY_UNSPECIFIED]: 'Popular',
@@ -20,4 +25,13 @@ export const SubEventRuleStr = {
   [Rule.RULE_TOTAL_DISTANCE]: 'Total distance (km)',
   [Rule.RULE_TOTAL_TIME]: 'Total time (hours)',
   [Rule.RULE_UNSPECIFIED]: 'Unknown',
+}
+
+export const GroupStatusInEventButtonStr = {
+  [GroupStatus.GROUP_STATUS_UNSPECIFIED]: 'Join',
+  [GroupStatus.GROUP_STATUS_ACTIVE]: 'Joined',
+  [GroupStatus.GROUP_STATUS_BANNED]: 'Banned',
+  [GroupStatus.GROUP_STATUS_LEFT]: 'Join',
+  [GroupStatus.GROUP_STATUS_REQUESTED]: 'Requested',
+  [GroupStatus.GROUP_STATUS_REJECTED]: 'Rejected',
 }

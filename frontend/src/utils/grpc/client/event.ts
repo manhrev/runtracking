@@ -85,13 +85,13 @@ class rpcEventClient extends gRPCClientAbstract {
     )
   }
 
-  async joinEventRequest(param: JoinEventRequest.AsObject) {
+  async joinEvent(param: JoinEventRequest.AsObject) {
     const req = new JoinEventRequest()
     req.setEventId(param.eventId)
     req.setGroupId(param.groupId)
 
     return await this.gRPCClientRequest<JoinEventReply.AsObject>(
-      'joinEventRequest',
+      'joinEvent',
       req
     )
   }
@@ -160,6 +160,7 @@ class rpcEventClient extends gRPCClientAbstract {
     req.setSortBy(param.sortBy)
     req.setGroupIdsList(param.groupIdsList)
     req.setIdsList(param.idsList)
+    req.setYourGroupId(param.yourGroupId)
 
     return await this.gRPCClientRequest<ListEventsReply.AsObject>(
       'listEvents',

@@ -4,6 +4,7 @@ import {
   ListGroupProgressInEventRequest,
   ListSubEventsRequest,
   ListGroupsInEventRequest,
+  JoinEventRequest,
 } from '../../../lib/event/event_pb'
 import { eventClient } from '../../../utils/grpc'
 
@@ -39,5 +40,12 @@ export const listGroupInEventThunk = createAsyncThunk(
   'event/listGroupInEvent',
   async (payload: ListGroupsInEventRequest.AsObject) => {
     return await eventClient.listGroupsInEvent(payload)
+  }
+)
+
+export const joinEventThunk = createAsyncThunk(
+  'event/joinEvent',
+  async (payload: JoinEventRequest.AsObject) => {
+    return await eventClient.joinEvent(payload)
   }
 )

@@ -2,13 +2,16 @@ import { createSlice } from '@reduxjs/toolkit'
 import {
   EventDetail,
   GroupInEvent,
+  GroupStatus,
   SubEvent,
   SubEventProgress,
 } from '../../../lib/event/event_pb'
+import EventList from '../../../screens/Group/Event/EventList'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
 import {
+  joinEventThunk,
   listEventsThunk,
   listGroupInEventThunk,
   listGroupProgressInEventThunk,
@@ -112,6 +115,19 @@ const slice = createSlice({
       }
       state.groupListStatus = StatusEnum.SUCCEEDED
       state.groupList = response?.groupsList || []
+    })
+    builder.addCase(joinEventThunk.fulfilled, (state, { payload, meta }) => {
+      const { error } = payload
+      if (error) {
+        return
+      }
+      const { eventId } = meta.arg
+      state.eventList = state.eventList.map((event) => {
+        if (event.id === eventId) {
+          event.yourGroupStatus = GroupStatus.GROUP_STATUS_REQUESTED
+        }
+        return event
+      })
     })
   },
 })

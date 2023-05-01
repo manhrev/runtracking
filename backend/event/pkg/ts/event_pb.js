@@ -1084,7 +1084,8 @@ proto.event.EventDetail.toObject = function(includeInstance, msg) {
     startAt: (f = msg.getStartAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     endAt: (f = msg.getEndAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     ownerGroupId: jspb.Message.getFieldWithDefault(msg, 9, 0),
-    numOfGroups: jspb.Message.getFieldWithDefault(msg, 10, 0)
+    numOfGroups: jspb.Message.getFieldWithDefault(msg, 10, 0),
+    yourGroupStatus: jspb.Message.getFieldWithDefault(msg, 11, 0)
   };
 
   if (includeInstance) {
@@ -1158,6 +1159,10 @@ proto.event.EventDetail.deserializeBinaryFromReader = function(msg, reader) {
     case 10:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setNumOfGroups(value);
+      break;
+    case 11:
+      var value = /** @type {!proto.event.GroupStatus} */ (reader.readEnum());
+      msg.setYourGroupStatus(value);
       break;
     default:
       reader.skipField();
@@ -1250,6 +1255,13 @@ proto.event.EventDetail.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeUint32(
       10,
+      f
+    );
+  }
+  f = message.getYourGroupStatus();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      11,
       f
     );
   }
@@ -1453,6 +1465,24 @@ proto.event.EventDetail.prototype.getNumOfGroups = function() {
  */
 proto.event.EventDetail.prototype.setNumOfGroups = function(value) {
   return jspb.Message.setProto3IntField(this, 10, value);
+};
+
+
+/**
+ * optional GroupStatus your_group_status = 11;
+ * @return {!proto.event.GroupStatus}
+ */
+proto.event.EventDetail.prototype.getYourGroupStatus = function() {
+  return /** @type {!proto.event.GroupStatus} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
+};
+
+
+/**
+ * @param {!proto.event.GroupStatus} value
+ * @return {!proto.event.EventDetail} returns this
+ */
+proto.event.EventDetail.prototype.setYourGroupStatus = function(value) {
+  return jspb.Message.setProto3EnumField(this, 11, value);
 };
 
 
@@ -4330,7 +4360,8 @@ proto.event.ListEventsRequest.toObject = function(includeInstance, msg) {
     idsList: (f = jspb.Message.getRepeatedField(msg, 5)) == null ? undefined : f,
     groupIdsList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f,
     visibility: jspb.Message.getFieldWithDefault(msg, 7, 0),
-    search: jspb.Message.getFieldWithDefault(msg, 8, "")
+    search: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    yourGroupId: jspb.Message.getFieldWithDefault(msg, 9, 0)
   };
 
   if (includeInstance) {
@@ -4402,6 +4433,10 @@ proto.event.ListEventsRequest.deserializeBinaryFromReader = function(msg, reader
     case 8:
       var value = /** @type {string} */ (reader.readString());
       msg.setSearch(value);
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setYourGroupId(value);
       break;
     default:
       reader.skipField();
@@ -4485,6 +4520,13 @@ proto.event.ListEventsRequest.serializeBinaryToWriter = function(message, writer
   if (f.length > 0) {
     writer.writeString(
       8,
+      f
+    );
+  }
+  f = message.getYourGroupId();
+  if (f !== 0) {
+    writer.writeInt64(
+      9,
       f
     );
   }
@@ -4689,6 +4731,24 @@ proto.event.ListEventsRequest.prototype.getSearch = function() {
  */
 proto.event.ListEventsRequest.prototype.setSearch = function(value) {
   return jspb.Message.setProto3StringField(this, 8, value);
+};
+
+
+/**
+ * optional int64 your_group_id = 9;
+ * @return {number}
+ */
+proto.event.ListEventsRequest.prototype.getYourGroupId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.event.ListEventsRequest} returns this
+ */
+proto.event.ListEventsRequest.prototype.setYourGroupId = function(value) {
+  return jspb.Message.setProto3IntField(this, 9, value);
 };
 
 
