@@ -58,7 +58,10 @@ export type RootBaseStackParamList = {
   ActivityList: {}
 
   // Run
-  RunTracking: undefined
+  RunTracking: {
+    planId: number
+    activityType: ActivityType
+  }
   RunResult: {
     display: {
       distance: string
@@ -75,6 +78,7 @@ export type RootBaseStackParamList = {
       endTime: google_protobuf_timestamp_pb.Timestamp.AsObject
       acType: ActivityType
     }
+    selectedPlanId: number
     // pass function to reset
     resetRunInfo: () => void
   }
@@ -82,6 +86,7 @@ export type RootBaseStackParamList = {
   RunCommit: {
     activityId: number
     activityType: ActivityType
+    selectedPlanId: number
     resetRunInfo: () => void
   }
 
