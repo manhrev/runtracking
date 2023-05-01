@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "runtracking",
-    "slug": "runtracking",
-    "version": "1.0.0",
+    "name": "Go Tracker",
+    "slug": "gotracker",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "gotracker",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -12,8 +13,6 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/8763674e-a0ef-4484-9925-3a3dddd79ccc"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -22,6 +21,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.manhrev.gotracker",
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
@@ -32,7 +33,6 @@
         "ACCESS_BACKGROUND_LOCATION"
       ],
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.manhrev.runtracking",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyAodBUv7nEDq2B1tJCj5jHltwGLTulJR0U"
@@ -40,16 +40,14 @@
       },
         "googleServicesFile": "./google-services.json"
     },
+    "plugins": ["@react-native-google-signin/google-signin"],
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "8763674e-a0ef-4484-9925-3a3dddd79ccc"
+        "projectId": "f604fbb1-c0b8-4f15-bc70-9d7eecce821e"
       }
-    },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
     }
   }
 }

@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { HOST, KEY_ACCESS_TOKEN } from '../grpc'
+import restGoogleFitClient from './client/googleFit'
+import restGoogleAuthClient from './client/googleAuth'
 
 class RestClient {
   url: string = ''
@@ -51,4 +53,9 @@ class RestClient {
   }
 }
 
+const GOOGLE_FIT_BASE_URL = 'https://www.googleapis.com/fitness/v1/users/me'
+const GOOGLE_AUTH_BASE_URL = 'https://www.googleapis.com/userinfo/v2'
+
 export const restUploadImageClient = new RestClient(HOST)
+export const googleFitClient = new restGoogleFitClient(GOOGLE_FIT_BASE_URL)
+export const googleAuthClient = new restGoogleAuthClient(GOOGLE_AUTH_BASE_URL)
