@@ -2,9 +2,9 @@ package cloudtask
 
 import (
 	"context"
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -41,8 +41,8 @@ var (
 	gcp_cloud_task_location_id string = os.Getenv("GCP_CLOUD_TASK_LOCATION_ID")
 	gcp_cloud_task_queue_id    string = os.Getenv("GCP_CLOUD_TASK_QUEUE_ID")
 
-	enviroment_mode      string = os.Getenv("ENVIROMENT_MODE")
-	credential_file_name string = "new-runtracking-credential-file.json"
+	enviroment_mode     string = os.Getenv("ENVIROMENT_MODE")
+	credentialKeyBase64 string = os.Getenv("CREDENTIAL_KEY")
 )
 
 func NewCloudTask() CloudTask {
@@ -59,17 +59,23 @@ func (task *cloudTask) CreateHTTPTask(url string, message NotificationTransfer, 
 	var err error
 	if enviroment_mode == "deploy" {
 		// abs_name, err := filepath.Abs(credential_file_name)
-		jsonFile, err := os.Open(credential_file_name)
+		// jsonFile, err := os.Open(credential_file_name)
+		// if err != nil {
+		// 	log.Fatal(err.Error())
+		// }
+
+		// byteValue, _ := ioutil.ReadAll(jsonFile)
+		// fmt.Println(byteValue)
+		// if err != nil {
+		// 	log.Fatal(err.Error())
+		// }
+		cred, err := b64.StdEncoding.DecodeString(credentialKeyBase64)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Printf("Error decoding JSON: %v", err)
+			return nil, err
 		}
 
-		byteValue, _ := ioutil.ReadAll(jsonFile)
-		fmt.Println(byteValue)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		client, err = cloudtasks.NewClient(ctx, option.WithCredentialsJSON(byteValue))
+		client, err = cloudtasks.NewClient(ctx, option.WithCredentialsJSON(cred))
 	} else {
 		conn, _ := grpc.Dial(fmt.Sprintf("%s:%s", gcp_cloud_task_host, gcp_cloud_task_port), grpc.WithInsecure())
 		clientOpt := option.WithGRPCConn(conn)
