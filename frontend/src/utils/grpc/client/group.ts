@@ -1,21 +1,39 @@
 import {
-  GroupInfo, ChallengeInfo, ChallengeRuleInfo,
-  ListGroupReply, ListGroupRequest,
-  GetGroupRequest, GetGroupReply,
-  CreateGroupRequest, CreateGroupReply,
-  UpdateGroupRequest, UpdateGroupReply,
-  JoinGroupRequest, JoinGroupReply,
-  DeleteGroupRequest, DeleteGroupReply,
-  ListMembersOfGroupRequest, ListMembersOfGroupReply,
-  AcceptMemberRequest, AcceptMemberReply,
-  LeaveGroupRequest, LeaveGroupReply,
-  ListChallengeRequest, ListChallengeReply,
-  CreateChallengeRequest, CreateChallengeReply,
-  UpdateChallengeRequest, UpdateChallengeReply,
-  DeleteChallengeRequest, DeleteChallengeReply,
-  GetChallengeRequest, GetChallengeReply,
-  ListInProgressChallengeRequest, ListInProgressChallengeReply,
-  ListUserRankingRequest, ListUserRankingReply,
+  GroupInfo,
+  ChallengeInfo,
+  ChallengeRuleInfo,
+  ListGroupReply,
+  ListGroupRequest,
+  GetGroupRequest,
+  GetGroupReply,
+  CreateGroupRequest,
+  CreateGroupReply,
+  UpdateGroupRequest,
+  UpdateGroupReply,
+  JoinGroupRequest,
+  JoinGroupReply,
+  DeleteGroupRequest,
+  DeleteGroupReply,
+  ListMembersOfGroupRequest,
+  ListMembersOfGroupReply,
+  AcceptMemberRequest,
+  AcceptMemberReply,
+  LeaveGroupRequest,
+  LeaveGroupReply,
+  ListChallengeRequest,
+  ListChallengeReply,
+  CreateChallengeRequest,
+  CreateChallengeReply,
+  UpdateChallengeRequest,
+  UpdateChallengeReply,
+  DeleteChallengeRequest,
+  DeleteChallengeReply,
+  GetChallengeRequest,
+  GetChallengeReply,
+  ListInProgressChallengeRequest,
+  ListInProgressChallengeReply,
+  ListUserRankingRequest,
+  ListUserRankingReply,
 } from '../../../lib/group/group_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -37,6 +55,7 @@ class rpcGroupClient extends gRPCClientAbstract {
     req.setSortBy(param.sortBy)
     req.setSearchByName(param.searchByName)
     req.setFilterBy(param.filterBy)
+    req.setGroupIdsList(param.groupIdsList)
 
     return await this.gRPCClientRequest<ListGroupReply.AsObject>(
       'listGroup',
@@ -48,10 +67,7 @@ class rpcGroupClient extends gRPCClientAbstract {
     const req = new GetGroupRequest()
     req.setGroupId(param.groupId)
 
-    return await this.gRPCClientRequest<GetGroupReply.AsObject>(
-      'getGroup',
-      req
-    )
+    return await this.gRPCClientRequest<GetGroupReply.AsObject>('getGroup', req)
   }
 
   async createGroup(param: CreateGroupRequest.AsObject) {
@@ -155,7 +171,6 @@ class rpcGroupClient extends gRPCClientAbstract {
     )
   }
 
-
   // challenge
   async listChallenge(param: ListChallengeRequest.AsObject) {
     const req = new ListChallengeRequest()
@@ -178,7 +193,7 @@ class rpcGroupClient extends gRPCClientAbstract {
       req
     )
   }
-  
+
   async createChallenge(param: CreateChallengeRequest.AsObject) {
     const challengeRuleList = Array<ChallengeRuleInfo>()
     param.challengeinfo?.challengerulesList?.forEach((rule) => {
@@ -195,7 +210,6 @@ class rpcGroupClient extends gRPCClientAbstract {
       challengeRuleList.push(challengeRuleInfo)
     })
 
-
     const challengeInfo = new ChallengeInfo()
     challengeInfo.setName(param.challengeinfo?.name || '')
     challengeInfo.setDescription(param.challengeinfo?.description || '')
@@ -209,7 +223,7 @@ class rpcGroupClient extends gRPCClientAbstract {
       new Timestamp().setSeconds(param.challengeinfo?.to?.seconds || 0)
     )
     challengeInfo.setChallengerulesList(challengeRuleList)
-    
+
     // dont need
     challengeInfo.setId(param.challengeinfo?.id || 0)
     challengeInfo.setGroupId(param.challengeinfo?.groupId || 0)
@@ -229,7 +243,8 @@ class rpcGroupClient extends gRPCClientAbstract {
 
   async updateChallenge(param: UpdateChallengeRequest.AsObject) {
     const challengeRuleList = Array<ChallengeRuleInfo>()
-    param.challengeinfo?.challengerulesList?.forEach((rule) => { // old rule list without deleted rule
+    param.challengeinfo?.challengerulesList?.forEach((rule) => {
+      // old rule list without deleted rule
       const challengeRuleInfo = new ChallengeRuleInfo()
       challengeRuleInfo.setRule(rule.rule)
       challengeRuleInfo.setId(rule.id)
@@ -301,7 +316,9 @@ class rpcGroupClient extends gRPCClientAbstract {
     )
   }
 
-  async listInProgressChallenge(param: ListInProgressChallengeRequest.AsObject) {
+  async listInProgressChallenge(
+    param: ListInProgressChallengeRequest.AsObject
+  ) {
     const req = new ListInProgressChallengeRequest()
     req.setUserId(param.userId)
     req.setActivitytype(param.activitytype)

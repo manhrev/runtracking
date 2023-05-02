@@ -37,7 +37,6 @@ export default function YourGroups({
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
   const userState = useAppSelector((state) => state.user)
-  
 
   const { yourGroupList } = useAppSelector(selectYourGroupList)
   const yourGroupsLoading = useAppSelector(isYourGroupListLoading)
@@ -61,6 +60,7 @@ export default function YourGroups({
         offset: 0,
         searchByName: '',
         sortBy: sortBy,
+        groupIdsList: [],
       })
     ).unwrap()
 
@@ -80,6 +80,7 @@ export default function YourGroups({
         offset: currentOffset + LIMIT,
         searchByName: '',
         sortBy: sortBy,
+        groupIdsList: [],
       })
     ).unwrap()
 
