@@ -85,14 +85,25 @@ export default function RunCommit({
 
   useEffect(() => {
     if (planList.length > 0) {
-      // check each plan, if it is in progress and has the same activity type as the current activity, select it
-      for (let i = 0; i < planList.length; i++) {
-        if (
-          planList[i].status === RuleStatus.RULE_STATUS_INPROGRESS &&
-          planList[i].activityType == route.params.activityType
-        ) {
-          setSelectedPlan(planList[i])
-          break
+      if(route.params.selectedPlanId != -1) {
+        // find plan that id is the same as selectedPlan.id
+        for(let i = 0; i < planList.length; i++) {
+          if(planList[i].id == route.params.selectedPlanId) {
+            setSelectedPlan(planList[i])
+            break
+          }
+        }
+      }
+      else {
+        // check each plan, if it is in progress and has the same activity type as the current activity, select it
+        for (let i = 0; i < planList.length; i++) {
+          if (
+            planList[i].status === RuleStatus.RULE_STATUS_INPROGRESS &&
+            planList[i].activityType == route.params.activityType
+          ) {
+            setSelectedPlan(planList[i])
+            break
+          }
         }
       }
     }

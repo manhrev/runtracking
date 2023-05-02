@@ -1,5 +1,5 @@
-import { ScrollView, StyleSheet, View } from 'react-native'
-import { Button, Divider, Text, TextInput } from 'react-native-paper'
+import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native'
+import { Avatar, Button, Divider, IconButton, Text, TextInput } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
 import { useAppSelector } from '../../redux/store'
@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAppDispatch } from '../../redux/store'
 import { getPlanList } from '../../redux/features/planList/slice'
 
-import { PlanInfo } from '../../lib/plan/plan_pb'
+import { PlanInfo, RuleStatus } from '../../lib/plan/plan_pb'
 import { ActivityType } from '../../lib/activity/activity_pb'
 
 import { RootHomeTabsParamList } from '../../navigators/HomeTab'
@@ -15,6 +15,7 @@ import { RootHomeTabsParamList } from '../../navigators/HomeTab'
 import { displayValue, toDate, getTextFromRule, getProgressOfDailyActivity, isDailyActivity } from '../../utils/helpers'
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { PlanRuleProgressStr } from '../../constants/enumstr/plan'
+import { ActivityTypeIcon } from '../../constants/enumstr/group'
 
 export default function PlanDetail({
   navigation,
@@ -48,42 +49,51 @@ export default function PlanDetail({
     <>
       <View style={styles(theme).container}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {route.params.canEdit ? (
-            <Button
-              mode="text"
-              onPress={() => navigation.navigate('PlanEdit', {
-                planId: route.params.planId,
-                canEdit: route.params.canEdit,
-              })}
-              style={styles(theme).addPlanBtn}
-              labelStyle={{ fontSize: 16 }}
-            >
-              EDIT PLAN
-            </Button>
-          ) : null}
-
-          <Text style={{
-            fontSize: 25,
-            fontWeight: 'bold',
-            marginTop: 10,
-            marginBottom: 5,
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
           }}>
-            {selectedPlan?.name}
-          </Text>
+            <View>
+              <Text style={{
+                fontSize: 25,
+                fontWeight: 'bold',
+                marginTop: 10,
+                marginBottom: 5,
+              }}>
+                {selectedPlan?.name}
+              </Text>
 
-          <Text style={{
-            fontSize: 15,
-            fontWeight: 'bold',
-            color: theme.colors.tertiary,
-          }}>
-            {toDate(selectedPlan?.startTime?.seconds || 0)} - {toDate(selectedPlan?.endTime?.seconds || 0)}
-          </Text>
+              <Text style={{
+                fontSize: 15,
+                fontWeight: 'bold',
+                color: theme.colors.tertiary,
+                marginBottom: 5,
+              }}>
+                {toDate(selectedPlan?.startTime?.seconds || 0)} - {toDate(selectedPlan?.endTime?.seconds || 0)}
+              </Text>
 
-          <Text style={{
-            fontSize: 17,
-          }}>
-            {selectedPlan?.activityType ? getTextFromActivityType(selectedPlan?.activityType) : 'Unknown'}
-          </Text>
+              <Text style={{
+                fontSize: 17,
+              }}>
+                {selectedPlan?.activityType ? getTextFromActivityType(selectedPlan?.activityType) : 'Unknown'}
+              </Text>
+            </View>
+            {route.params.canEdit &&
+              <IconButton
+                style={{
+                  alignSelf: 'flex-start',
+                }}
+                icon="pencil"
+                size={30}
+                onPress={() =>
+                  navigation.navigate('PlanEdit', {
+                    planId: route.params.planId,
+                    canEdit: route.params.canEdit,
+                  })
+                }
+              />
+            }
+          </View>
 
           <Divider bold style={{ marginVertical: 10 }} />
           <View style={{
@@ -92,7 +102,7 @@ export default function PlanDetail({
           }}>
             <AnimatedCircularProgress
               size={230}
-              width={5}
+              width={7}
               fill={isDailyActivity(selectedPlan.rule) ? getProgressOfDailyActivity(selectedPlan.progressList) / selectedPlan.goal * 100
               : selectedPlan.total / selectedPlan.goal * 100}
               tintColor='green'
@@ -154,6 +164,30 @@ export default function PlanDetail({
             {selectedPlan?.note}
           </Text>
 
+          {selectedPlan.status == RuleStatus.RULE_STATUS_INPROGRESS && route.params.canEdit && <TouchableOpacity
+            style={{
+              alignItems: 'center',
+              marginTop: 30,
+            }}
+            onPress={() =>
+              navigation.navigate('RunTracking', {
+                planId: selectedPlan.id,
+                activityType: selectedPlan.activityType,
+              })
+            }
+          >
+            <Avatar.Icon
+              size={60}
+              icon={ActivityTypeIcon[selectedPlan.activityType]}
+            />
+            <Text style={{
+              fontSize: 17,
+              fontWeight: 'bold',
+              marginTop: 10,
+            }}>
+              Let's start &gt;&gt;
+            </Text>
+          </TouchableOpacity>}
         </ScrollView>
       </View>
     </>
@@ -173,10 +207,6 @@ const styles = (theme: AppTheme) =>
       marginBottom: 5,
       fontWeight: 'bold',
       fontSize: 16,
-    },
-    addPlanBtn: {
-      alignSelf: 'flex-end',
-      marginRight: 20,
     },
     dropdown: {
       marginBottom: 7,

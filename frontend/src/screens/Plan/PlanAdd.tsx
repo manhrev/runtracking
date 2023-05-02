@@ -190,14 +190,14 @@ export default function PlanAdd({
     <>
       <View style={styles(theme).container}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles(theme).title}>Plan Name: </Text>
+          <Text style={styles(theme).title}>Plan Name</Text>
           <TextInput
             mode="outlined"
             value={name}
             onChangeText={(text) => setName(text)}
           />
 
-          <Text style={styles(theme).title}>Activity Type:</Text>
+          <Text style={styles(theme).title}>Activity Type</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <RadioButton
               value="running"
@@ -239,7 +239,7 @@ export default function PlanAdd({
             <Text>Cycling</Text>
           </View>
 
-          <Text style={styles(theme).title}>Plan Type: </Text>
+          <Text style={styles(theme).title}>Plan Type</Text>
           <Dropdown
             style={styles(theme).dropdown}
             placeholderStyle={styles(theme).placeholderStyle}
@@ -256,7 +256,7 @@ export default function PlanAdd({
             }}
           />
 
-          <Text style={styles(theme).title}>Start Date: </Text>
+          <Text style={styles(theme).title}>Start Date</Text>
           <TextInput
             mode="outlined"
             value={startTime.toDateString()}
@@ -278,7 +278,7 @@ export default function PlanAdd({
               onChange={setStart}
             />
           )}
-          <Text style={styles(theme).title}>End Date: </Text>
+          <Text style={styles(theme).title}>End Date</Text>
           <TextInput
             mode="outlined"
             value={endTime.toDateString()}
@@ -301,7 +301,7 @@ export default function PlanAdd({
               onChange={setEnd}
             />
           )}
-          <Text style={styles(theme).title}>Goal: </Text>
+          <Text style={styles(theme).title}>Goal</Text>
           {!(
             Number(rule) === Rule.RULE_TOTAL_TIME ||
             Number(rule) === Rule.RULE_TOTAL_TIME_DAILY
@@ -325,7 +325,7 @@ export default function PlanAdd({
             />
           )}
 
-          <Text style={styles(theme).title}>Note: </Text>
+          <Text style={styles(theme).title}>Note</Text>
           <TextInput
             style={styles(theme).noteInput}
             multiline={true}
@@ -338,7 +338,7 @@ export default function PlanAdd({
           <View style={styles(theme).btnContainer}>
             <Button
               mode="contained"
-              buttonColor="#e82525"
+              buttonColor={theme.colors.tertiary}
               onPress={() => navigation.goBack()}
               style={styles(theme).button}
             >

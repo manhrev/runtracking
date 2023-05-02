@@ -24,6 +24,7 @@ import { kCaloriesBurned } from '../../utils/calories'
 import { useAppSelector } from '../../redux/store'
 import { selectUserSlice } from '../../redux/features/user/slice'
 import { selectToggleSlice } from '../../redux/features/toggle/slice'
+import { toast } from '../../utils/toast/toast'
 
 export default function RunTracking({
   navigation,
@@ -66,9 +67,7 @@ export default function RunTracking({
   const [focusMode, setFocusMode] = useState(false)
 
   // some info
-  const [activityType, setActivityType] = useState(
-    ActivityType.ACTIVITY_TYPE_RUNNING
-  )
+  const [activityType, setActivityType] = useState(route.params.activityType)
   const [totalDistance, setTotalDistance] = useState(0)
   const [totalTime, setTotalTime] = useState(0) // seconds
   const [userState, setUserState] = useState('ready') // ready, running, paused, stopped
@@ -291,6 +290,7 @@ export default function RunTracking({
         },
         acType: activityType,
       },
+      selectedPlanId: route.params.planId,
       resetRunInfo: resetRunInfo,
     })
   }
@@ -358,6 +358,11 @@ export default function RunTracking({
   }
 
   const switchActivityType = () => {
+    if(route.params.planId != -1) {
+      toast.error({ message: "Can't change activity type while following a plan !" })
+      return
+    }
+
     if (activityType == ActivityType.ACTIVITY_TYPE_RUNNING) {
       setActivityType(ActivityType.ACTIVITY_TYPE_WALKING)
     } else if (activityType == ActivityType.ACTIVITY_TYPE_WALKING) {

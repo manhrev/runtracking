@@ -237,6 +237,7 @@ export default function ChallengeEdit({
         } else {
           toast.success({ message: 'Challenge updated!' })
           navigation.goBack()
+          route.params.reloadDetailFunc()
         }
     }
 
@@ -447,7 +448,7 @@ export default function ChallengeEdit({
         <View style={styles(theme).btnContainer}>
           <Button
             mode="contained"
-            buttonColor="#e82525"
+            buttonColor={theme.colors.tertiary}
             onPress={() => navigation.goBack()}
             style={styles(theme).button}
           >

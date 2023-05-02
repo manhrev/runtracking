@@ -258,6 +258,8 @@ message ListGroupRequest{
     
     string search_by_name = 5;
     FilterBy filter_by = 6;
+
+    repeated int64 group_ids = 7;
     
     enum FilterBy{
         FILTER_BY_UNSPECIFIED = 0;
