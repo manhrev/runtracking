@@ -35,7 +35,7 @@
       "softwareKeyboardLayoutMode": "pan",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyAodBUv7nEDq2B1tJCj5jHltwGLTulJR0U"
+          "apiKey": "AIzaSyBR9u4Z2VyRuOYTTbIWfRILkoV96eVV8JY"
         }
       },
         "googleServicesFile": "./google-services.json"
