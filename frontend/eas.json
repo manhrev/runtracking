@@ -21,6 +21,10 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "../../keys/gServiceAccountExpo/pc-api-7021422057397547775-321-aca056b6c21b.json"
+      }
+    }
   }
 }
