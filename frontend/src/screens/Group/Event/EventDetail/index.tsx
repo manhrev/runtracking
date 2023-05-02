@@ -2,13 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useMemo, useState } from 'react'
 import { Image, StyleSheet } from 'react-native'
 import { ScrollView, View } from 'react-native'
-import {
-  Avatar,
-  Divider,
-  IconButton,
-  Text,
-  TouchableRipple,
-} from 'react-native-paper'
+import { Divider, IconButton, Text, TouchableRipple } from 'react-native-paper'
 import StepIndicator from 'react-native-step-indicator'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
@@ -18,6 +12,8 @@ import Constants from 'expo-constants'
 import SubEventDisplay from './comp/SubEvent'
 import { useAppDispatch, useAppSelector } from '../../../../redux/store'
 import {
+  getGroupInfoThunk,
+  listGroupInEventThunk,
   listGroupProgressInEventThunk,
   listSubEventsThunk,
 } from '../../../../redux/features/eventList/thunks'
@@ -25,12 +21,10 @@ import {
   isAllEventListLoading,
   selectEventList,
 } from '../../../../redux/features/eventList/slice'
-import {
-  GroupProgressInSubEvent,
-  SubEvent,
-} from '../../../../lib/event/event_pb'
+import { SubEvent } from '../../../../lib/event/event_pb'
 import moment from 'moment'
 import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
+import { GroupSortBy, ListGroupRequest } from '../../../../lib/group/group_pb'
 
 export default function EventDetail({
   navigation,
@@ -76,7 +70,36 @@ export default function EventDetail({
   useEffect(() => {
     dispatch(listSubEventsThunk({ eventId: id }))
     dispatch(listGroupProgressInEventThunk({ eventId: id }))
+    fetchListEventGroupsAndInfo()
   }, [])
+
+  const fetchListEventGroupsAndInfo = async () => {
+    const { response, error } = await dispatch(
+      listGroupInEventThunk({
+        eventId: id,
+        limit: 100,
+        offset: 0,
+      })
+    ).unwrap()
+    if (error) {
+      return
+    }
+    let groupList: number[] = []
+    if (response) {
+      groupList = response.groupsList.map((group) => group.id)
+    }
+    dispatch(
+      getGroupInfoThunk({
+        ascending: true,
+        filterBy: ListGroupRequest.FilterBy.FILTER_BY_UNSPECIFIED,
+        groupIdsList: groupList,
+        limit: 999,
+        offset: 0,
+        searchByName: '',
+        sortBy: GroupSortBy.GROUP_SORT_BY_CREATED_TIME,
+      })
+    )
+  }
 
   return (
     <View style={styles(theme).baseContainer}>

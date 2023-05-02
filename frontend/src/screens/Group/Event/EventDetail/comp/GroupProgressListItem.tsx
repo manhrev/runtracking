@@ -23,6 +23,9 @@ import {
   GroupProgressInSubEvent,
   Rule,
 } from '../../../../../lib/event/event_pb'
+import { useAppSelector } from '../../../../../redux/store'
+import { selectEventList } from '../../../../../redux/features/eventList/slice'
+import { GroupInfo } from '../../../../../lib/group/group_pb'
 const windowWidth = Dimensions.get('window').width
 
 interface GroupProgressListItemProps {
@@ -44,6 +47,8 @@ export default function GroupProgressListItem({
 }: GroupProgressListItemProps) {
   const theme = useAppTheme()
   const { groupId, progress } = groupProgress
+  const { groupInfoMap } = useAppSelector(selectEventList)
+  const groupInfo = groupInfoMap[groupId] || new GroupInfo().toObject()
   return (
     <>
       <TouchableRipple onPress={() => navigateCallback()}>
@@ -53,14 +58,17 @@ export default function GroupProgressListItem({
           )}
           <View style={styles(theme).listItemContainer}>
             <View style={styles(theme).listItemTilte}>
-              <Avatar.Icon
-                size={55}
-                icon="run"
-                color={theme.colors.onPrimary}
+              <Image
                 style={{
-                  borderRadius: 10,
-                  backgroundColor: theme.colors.primary,
+                  width: 55,
+                  height: 55,
+                  borderRadius: 5,
                 }}
+                source={
+                  groupInfo.backgroundPicture == ''
+                    ? require('../../../../../../assets/group-img.png')
+                    : { uri: groupInfo.backgroundPicture }
+                }
               />
               <View
                 style={{
@@ -71,7 +79,7 @@ export default function GroupProgressListItem({
               >
                 <View style={{ marginLeft: 12 }}>
                   <Text variant="titleMedium" style={{ fontWeight: '700' }}>
-                    Group {groupProgress.groupId}
+                    {groupInfo.name}
                   </Text>
 
                   <Text
@@ -122,15 +130,15 @@ const styles = (theme: AppTheme) =>
     },
   })
 
-  export function formatDataByRule(data: number, rule: Rule) {
-    switch (rule) {
-      case Rule.RULE_TOTAL_ACTIVITY:
-        return data
-      case Rule.RULE_TOTAL_DISTANCE:
-        return mToKm(data)
-      case Rule.RULE_TOTAL_TIME:
-        return (data / 3600).toFixed(2)
-      case Rule.RULE_TOTAL_CALORIES:
-        return data
-    }
+export function formatDataByRule(data: number, rule: Rule) {
+  switch (rule) {
+    case Rule.RULE_TOTAL_ACTIVITY:
+      return data
+    case Rule.RULE_TOTAL_DISTANCE:
+      return mToKm(data)
+    case Rule.RULE_TOTAL_TIME:
+      return (data / 3600).toFixed(2)
+    case Rule.RULE_TOTAL_CALORIES:
+      return data
   }
+}

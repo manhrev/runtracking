@@ -1,5 +1,4 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect } from 'react'
 import { RefreshControl, ScrollView, View } from 'react-native'
 import { Text } from 'react-native-paper'
 import { ConfirmDialog } from '../../../../../comp/ConfirmDialog'
@@ -33,10 +32,6 @@ export default function GroupsInEvent({
   const { groupList } = useAppSelector(selectEventList)
   const groupListLoading = useAppSelector(isGroupInEventLoading)
   const noData = groupList.length === 0 && !groupListLoading
-
-  useEffect(() => {
-    fetchListEventGroups()
-  }, [dispatch])
 
   const fetchListEventGroups = async () => {
     const { response } = await dispatch(

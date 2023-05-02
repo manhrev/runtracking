@@ -6,11 +6,9 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { Button, Divider, Searchbar, Text } from 'react-native-paper'
 import { ConfirmDialog } from '../../../../comp/ConfirmDialog'
 import { FabGroup } from '../../../../comp/FabGroup'
-import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import { useDialog } from '../../../../hooks/useDialog'
 import { ListEventsRequest } from '../../../../lib/event/event_pb'
 import { RootBaseStackParamList } from '../../../../navigators/BaseStack'
-import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import {
   isEventListLoading,
   selectEventList,
@@ -183,7 +181,7 @@ export default function EventList({
           >
             <Searchbar
               style={{ marginTop: 20, height: 45 }}
-              placeholder="Search group name"
+              placeholder="Search event name"
               onChangeText={onChangeSearch}
               value={searchQuery}
               onSubmitEditing={() => {

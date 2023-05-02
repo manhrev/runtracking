@@ -1,16 +1,11 @@
 import { StyleSheet, View, Image } from 'react-native'
-import {
-  Avatar,
-  Button,
-  Divider,
-  IconButton,
-  Text,
-  TouchableRipple,
-} from 'react-native-paper'
+import { Button, Divider, Text, TouchableRipple } from 'react-native-paper'
 import { GroupStatusInEventStr } from '../../../../../../constants/enumstr/event'
 import { GroupInEvent, GroupStatus } from '../../../../../../lib/event/event_pb'
+import { GroupInfo } from '../../../../../../lib/group/group_pb'
+import { selectEventList } from '../../../../../../redux/features/eventList/slice'
+import { useAppSelector } from '../../../../../../redux/store'
 import { AppTheme, useAppTheme } from '../../../../../../theme'
-import { groupEventStatusToStr } from '../../../../../../utils/helpers/enumStr'
 
 interface GroupItemProps {
   hideTopDivider?: boolean
@@ -29,6 +24,8 @@ export default function GroupItem({
 }: GroupItemProps) {
   const theme = useAppTheme()
   const { id, status } = group
+  const { groupInfoMap } = useAppSelector(selectEventList)
+  const groupInfo = groupInfoMap[id] || new GroupInfo().toObject()
 
   return (
     <TouchableRipple
@@ -47,9 +44,9 @@ export default function GroupItem({
                 borderRadius: 5,
               }}
               source={
-                '' == ''
+                groupInfo.backgroundPicture == ''
                   ? require('../../../../../../../assets/group-img.png')
-                  : { uri: '' }
+                  : { uri: groupInfo.backgroundPicture }
               }
             />
             <View
@@ -64,7 +61,7 @@ export default function GroupItem({
                   variant="titleMedium"
                   style={{ fontWeight: '700', marginBottom: 5 }}
                 >
-                  Groupid: {id}
+                  {groupInfo.name}
                 </Text>
                 <Text variant="bodyMedium">
                   Status: {GroupStatusInEventStr[status]}
