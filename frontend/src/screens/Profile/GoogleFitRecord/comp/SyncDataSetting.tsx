@@ -44,10 +44,10 @@ const SyncDataSetting = ({
         setIsLoading(true)
         setStartDate(startDateSync)
         setEndDate(endDateSync)
+        close()
         await getGoogleFitRecord(startDateSync, endDateSync)
         toast.success({ message: 'Sync Data Successfully' })
         setIsLoading(false)
-        close()
     }
 
     const setStart = (event: DateTimePickerEvent, date: Date | undefined) => {
