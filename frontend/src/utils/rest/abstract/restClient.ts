@@ -18,6 +18,7 @@ export abstract class restAbstractClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        // console.log(config)
         return config;
       },
       (error) => {
@@ -44,7 +45,7 @@ export abstract class restAbstractClient {
       });
       return response.data;
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       throw this.handleAxiosError(error);
     }
   }
@@ -72,10 +73,10 @@ export abstract class restAbstractClient {
   }
 
   private handleAxiosError(error: any): Error {
-    console.log(error)
     if (error.response) {
       const { status, statusText, data } = error.response;
-      const message = data?.message || statusText;
+      const message = data?.error.message || statusText;
+      // console.log(data)
       return new Error(`[${status}] ${message}`);
     } else if (error.request) {
       return new Error('No response received from server');
