@@ -11,6 +11,7 @@ import (
 
 func (m *groupImpl) List(ctx context.Context,
 	userId int64,
+	groupIds []int64,
 	sortBy grouppb.GroupSortBy,
 	searchByName string,
 	filterBy grouppb.ListGroupRequest_FilterBy,
@@ -18,7 +19,7 @@ func (m *groupImpl) List(ctx context.Context,
 	limit uint32,
 	offset uint64) (*group.ListGroupReply, error) {
 
-	groupEntList, total, err := m.repository.Group.List(ctx, userId, sortBy, searchByName, filterBy, ascending, limit, offset)
+	groupEntList, total, err := m.repository.Group.List(ctx, userId, groupIds, sortBy, searchByName, filterBy, ascending, limit, offset)
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}

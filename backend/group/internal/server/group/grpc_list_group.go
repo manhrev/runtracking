@@ -17,10 +17,10 @@ func (s *groupServer) ListGroup(
 	if err != nil {
 		return nil, status.Internal(err.Error())
 	}
-
 	return s.service.Group.List(
 		ctx,
 		userId,
+		request.GetGroupIds(),
 		request.GetSortBy(),
 		request.GetSearchByName(),
 		request.GetFilterBy(),

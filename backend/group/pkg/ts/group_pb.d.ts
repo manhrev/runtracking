@@ -957,6 +957,11 @@ export class ListGroupRequest extends jspb.Message {
   getFilterBy(): ListGroupRequest.FilterBy;
   setFilterBy(value: ListGroupRequest.FilterBy): ListGroupRequest;
 
+  getGroupIdsList(): Array<number>;
+  setGroupIdsList(value: Array<number>): ListGroupRequest;
+  clearGroupIdsList(): ListGroupRequest;
+  addGroupIds(value: number, index?: number): ListGroupRequest;
+
   getSortBy(): GroupSortBy;
   setSortBy(value: GroupSortBy): ListGroupRequest;
 
@@ -975,6 +980,7 @@ export namespace ListGroupRequest {
     ascending: boolean,
     searchByName: string,
     filterBy: ListGroupRequest.FilterBy,
+    groupIdsList: Array<number>,
     sortBy: GroupSortBy,
   }
 
