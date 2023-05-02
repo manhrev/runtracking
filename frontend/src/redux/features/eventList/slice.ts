@@ -6,11 +6,13 @@ import {
   SubEvent,
   SubEventProgress,
 } from '../../../lib/event/event_pb'
+import { GroupInfo } from '../../../lib/group/group_pb'
 import EventList from '../../../screens/Group/Event/EventList'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
 import {
+  getGroupInfoThunk,
   joinEventThunk,
   listEventsThunk,
   listGroupInEventThunk,
@@ -27,6 +29,7 @@ type EventListState = {
   subEventStatus: StatusEnum
   subEventProgressStatus: StatusEnum
   groupListStatus: StatusEnum
+  groupInfoMap: Record<number, GroupInfo.AsObject>
   total: number
 } & CommonState
 
@@ -40,6 +43,7 @@ export const initialState: EventListState = {
   subEventStatus: StatusEnum.LOADING,
   subEventProgressStatus: StatusEnum.LOADING,
   groupListStatus: StatusEnum.LOADING,
+  groupInfoMap: {},
 }
 
 const slice = createSlice({
@@ -128,6 +132,19 @@ const slice = createSlice({
         }
         return event
       })
+    })
+    builder.addCase(getGroupInfoThunk.fulfilled, (state, { payload }) => {
+      const { error, response } = payload
+      if (error) {
+        return
+      }
+      const groupList = response?.groupListList || []
+      const infoMap: Record<number, GroupInfo.AsObject> = {}
+      groupList.forEach((group) => {
+        infoMap[group.id] = group
+      })
+      state.groupInfoMap = infoMap
+      console.log(state.groupInfoMap)
     })
   },
 })
