@@ -21,6 +21,7 @@ type Group interface {
 	List(
 		ctx context.Context,
 		userId int64,
+		groupIds []int64,
 		sortBy grouppb.GroupSortBy,
 		searchByName string,
 		filterBy grouppb.ListGroupRequest_FilterBy,
@@ -40,7 +41,6 @@ type Group interface {
 		groupId int64,
 		status api.Member_Status) ([]*ent.Member, error)
 
-	
 	// GetStatistic(
 	// 	ctx context.Context,
 	// 	userId int64,
@@ -78,6 +78,7 @@ func (m *groupImpl) Create(ctx context.Context, userId int64, groupInfo *grouppb
 
 func (m *groupImpl) List(ctx context.Context,
 	userId int64,
+	groupIds []int64,
 	sortBy grouppb.GroupSortBy,
 	searchByName string,
 	filterBy grouppb.ListGroupRequest_FilterBy,
@@ -103,6 +104,10 @@ func (m *groupImpl) List(ctx context.Context,
 		query.Where(group.Not(group.Or(group.HasMembersWith(member.UserIDEQ(userId), member.StatusEQ(uint32(grouppb.Member_MEMBER_STATUS_ACTIVE))), group.LeaderIDEQ(userId))))
 	case api.ListGroupRequest_FILTER_BY_IS_ADMIN:
 		query.Where(group.LeaderIDEQ(userId))
+	}
+
+	if len(groupIds) != 0 {
+		query.Where(group.IDIn(groupIds...))
 	}
 
 	// sort by type

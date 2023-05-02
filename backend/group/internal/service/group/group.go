@@ -20,6 +20,7 @@ type Group interface {
 	Delete(ctx context.Context, userId int64, groupId int64) error
 	List(ctx context.Context,
 		userId int64,
+		groupIds []int64,
 		sortBy grouppb.GroupSortBy,
 		searchByName string,
 		filterBy grouppb.ListGroupRequest_FilterBy,

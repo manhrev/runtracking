@@ -369,6 +369,7 @@ type ListGroupIRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// if no ids, return none
 	GroupIds []int64 `protobuf:"varint,1,rep,packed,name=group_ids,json=groupIds,proto3" json:"group_ids,omitempty"`
 }
 
