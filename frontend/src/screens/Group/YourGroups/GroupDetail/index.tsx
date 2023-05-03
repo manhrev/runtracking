@@ -348,7 +348,8 @@ export default function GroupDetail({
             })
           }
           labelStyle={{
-            fontSize: 15,
+            fontSize: 16,
+            fontWeight: 'bold',
           }}
         >
           Members of group ({groupDetail.groupinfo?.numOfMembers})
@@ -374,7 +375,8 @@ export default function GroupDetail({
               })
             }
             labelStyle={{
-              fontSize: 15,
+              fontSize: 16,
+              fontWeight: 'bold',
             }}
           >
             View all &gt;
@@ -434,7 +436,8 @@ export default function GroupDetail({
               })
             }
             labelStyle={{
-              fontSize: 15,
+              fontSize: 16,
+              fontWeight: 'bold',
             }}
           >
             View all &gt;
@@ -521,7 +524,8 @@ export default function GroupDetail({
               navigation.navigate('EventList', {})
             }}
             labelStyle={{
-              fontSize: 15,
+              fontSize: 16,
+              fontWeight: 'bold',
             }}
           >
             View all &gt;
@@ -576,6 +580,7 @@ export default function GroupDetail({
               color: theme.colors.tertiary,
               textAlign: 'center',
               fontWeight: 'bold',
+              marginBottom: 20,
             }}
           >
             No event found

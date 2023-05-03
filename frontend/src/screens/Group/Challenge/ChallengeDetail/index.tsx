@@ -62,6 +62,25 @@ export default function ChallengeDetail({
         fetchChallengeDetail()
     }, [])
 
+    const getMyStatsList = () => {
+        const memberProgressList = challengeDetail?.challengeinfo?.memberProgressListList || []
+        const filtered = memberProgressList.filter((memberProgress) => memberProgress.memberInfo?.userId === userState.userId)
+        
+        if(filtered.length == 0) return []
+
+        return filtered[0].ruleProgressListList
+    }
+
+    const getRuleLabel = (rule: Rule) => {
+        if(rule == Rule.RULE_TOTAL_DISTANCE) {
+            return "Kilometers"
+        }
+        else if(rule == Rule.RULE_TOTAL_TIME) {
+            return "Minutes"
+        }
+        else return "Calories"
+    }
+
   return (
     <View style={baseStyles(theme).container}>
       {!challengeDetailLoading && <ScrollView
@@ -119,10 +138,11 @@ export default function ChallengeDetail({
                 mode="text"
                 onPress={() => {}}
                 labelStyle={{
-                    fontSize: 15,
+                    fontSize: 16,
+                    fontWeight: 'bold',
                 }}
             >
-                From: {toDate(challengeDetail.challengeinfo?.from?.seconds || 0, true)}   --&gt;   To:{' '}
+                From: {toDate(challengeDetail.challengeinfo?.from?.seconds || 0, true)}   -&gt;   To:{' '}
                         {toDate(challengeDetail.challengeinfo?.to?.seconds || 0, true)}
             </Button>
         </View>
@@ -176,12 +196,54 @@ export default function ChallengeDetail({
                     leaderId: route.params.leaderId,
                 })}
                 labelStyle={{
-                    fontSize: 15,
+                    fontSize: 16,
+                    fontWeight: 'bold',
                 }}
             >
                 Members Stats &gt;&gt;
             </Button>
         </View>
+
+        <View
+            style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                alignItems: 'flex-start',
+                marginVertical: 10,
+            }}
+        >
+            {getMyStatsList().map((item, index) => {
+                return (
+                    <View style={styles(theme).achievementBox} key={index}>
+                        <Text
+                            variant="displaySmall"
+                            style={{ fontStyle: 'italic', fontWeight: 'bold' }}
+                        >
+                            {getRealDisplayValue(item.rule, item.total)}
+                        </Text>
+                        <Text variant="bodyLarge">{getRuleLabel(item.rule)}</Text>
+                    </View>
+                )
+            })}
+        </View>
+        
+        {getMyStatsList().length == 0 && <View
+            style={{
+                alignItems: 'center'
+            }}
+        >
+            <View style={styles(theme).messageBox}>
+                <Text variant="bodyMedium" style={{
+                    fontWeight: 'bold',
+                    color: theme.colors.tertiary,
+                }}>
+                    Join group to see your stats
+                </Text>
+            </View>
+        </View>}
+
+        
 
       </ScrollView>}
       {challengeDetailLoading &&
@@ -234,7 +296,22 @@ const styles = (theme: AppTheme) =>
         marginTop: 10,
         width: '40%',
         alignSelf: 'center',
-    }
+    },
+    achievementBox: {
+        backgroundColor: theme.colors.elevation.level1,
+        borderRadius: 20,
+        padding: 10,
+        margin: 5,
+        width: '45%',
+    },
+    messageBox: {
+        backgroundColor: theme.colors.elevation.level1,
+        borderRadius: 20,
+        padding: 15,
+        margin: 5,
+        width: '80%',
+        alignItems: 'center',
+    },
 })
 
 
