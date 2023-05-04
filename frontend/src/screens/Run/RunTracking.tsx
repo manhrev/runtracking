@@ -84,9 +84,10 @@ export default function RunTracking({
     totalTime,
     weight
   )
-  // console.log(kcalBurned)
+
   // dialog
   const [visible, setVisible] = useState(false)
+  const [locationVisible, setLocationVisible] = useState(false)
 
   const showDialog = () => {
     setVisible(true)
@@ -171,35 +172,35 @@ export default function RunTracking({
 
   useEffect(() => {
     ;(async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync()
+      const { status } = await Location.getForegroundPermissionsAsync()
       if (status !== 'granted') {
-        console.log('Permission to access location was denied')
-        return
+        setLocationVisible(true)
       }
+      else {
+        await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.High,
+            distanceInterval: 1,
+          },
+          (location) => {
+            const timeNow = new google_protobuf_timestamp_pb.Timestamp()
+            timeNow.fromDate(new Date())
 
-      await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          distanceInterval: 1,
-        },
-        (location) => {
-          const timeNow = new google_protobuf_timestamp_pb.Timestamp()
-          timeNow.fromDate(new Date())
-
-          setLocation({
-            latitude: location.coords.latitude,
-            longtitude: location.coords.longitude,
-            isStopPoint: false,
-            altitude: 0,
-            createdAt: {
-              seconds: timeNow.getSeconds(),
-              nanos: timeNow.getNanos(),
-            },
-          })
-        }
-      )
+            setLocation({
+              latitude: location.coords.latitude,
+              longtitude: location.coords.longitude,
+              isStopPoint: false,
+              altitude: 0,
+              createdAt: {
+                seconds: timeNow.getSeconds(),
+                nanos: timeNow.getNanos(),
+              },
+            })
+          }
+        )
+      }
     })()
-  }, [])
+  }, [locationVisible])
 
   useEffect(
     () =>
@@ -372,6 +373,24 @@ export default function RunTracking({
     }
   }
 
+  const agreeLocationPermission = async () => {
+    await requestLocationPermission()
+    setLocationVisible(false)
+  }
+
+  const notNowLocationPermission = () => {
+    setLocationVisible(false)
+    navigation.goBack()
+  }
+
+  const requestLocationPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync()
+    if (status !== 'granted') {
+      toast.error({ message: 'Location permission was denied' })
+      navigation.goBack()
+    }
+  }
+
   return (
     <View style={styles(theme).container}>
       <Portal>
@@ -383,6 +402,19 @@ export default function RunTracking({
           <Dialog.Actions>
             <Button onPress={resetRunInfo}> Yes </Button>
             <Button onPress={hideDialog}> No </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
+      <Portal>
+        <Dialog visible={locationVisible}>
+          <Dialog.Title>Location Disabled</Dialog.Title>
+          <Dialog.Content>
+            <Text>Look like your location services are disabled for Go Tracker. Please enable it to continue.</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={agreeLocationPermission}> Agree </Button>
+            <Button onPress={notNowLocationPermission}> Not now </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
