@@ -154,9 +154,10 @@ export const isEventListLoading = (state: RootState) =>
   state.eventList.status === StatusEnum.LOADING
 export const isAllEventListLoading = (state: RootState) => {
   return (
-    state.eventList.status === StatusEnum.LOADING &&
-    state.eventList.subEventStatus === StatusEnum.LOADING &&
-    state.eventList.subEventProgressStatus === StatusEnum.LOADING
+    state.eventList.status === StatusEnum.LOADING ||
+    state.eventList.subEventStatus === StatusEnum.LOADING ||
+    state.eventList.subEventProgressStatus === StatusEnum.LOADING ||
+    state.eventList.groupListStatus === StatusEnum.LOADING
   )
 }
 export const isGroupInEventLoading = (state: RootState) =>

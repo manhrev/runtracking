@@ -67,6 +67,7 @@ export default function CreateEvent({
       return
     }
     toast.success({ message: 'Create event successfully!' })
+    navigation.goBack()
   }
 
   return (

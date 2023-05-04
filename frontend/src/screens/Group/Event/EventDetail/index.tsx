@@ -21,10 +21,11 @@ import {
   isAllEventListLoading,
   selectEventList,
 } from '../../../../redux/features/eventList/slice'
-import { SubEvent } from '../../../../lib/event/event_pb'
+import { GroupStatus, SubEvent } from '../../../../lib/event/event_pb'
 import moment from 'moment'
 import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import { GroupSortBy, ListGroupRequest } from '../../../../lib/group/group_pb'
+import { FabGroup } from '../../../../comp/FabGroup'
 
 export default function EventDetail({
   navigation,
@@ -43,6 +44,7 @@ export default function EventDetail({
     picture,
     endAt,
     startAt,
+    yourGroupStatus,
   } = route.params.event
   const { subEventList, subEventProgressList } = useAppSelector(selectEventList)
   const loading = useAppSelector(isAllEventListLoading)
@@ -51,6 +53,8 @@ export default function EventDetail({
     () => getCurrentIndexForSubEvent(subEventList),
     [subEventList]
   )
+
+  const yourGroupJoined = yourGroupStatus === GroupStatus.GROUP_STATUS_ACTIVE
 
   const [selectedSubEvent, setSelectedSubEvent] = useState(
     subEventList[currentSubEventIndex]
@@ -102,59 +106,118 @@ export default function EventDetail({
   }
 
   return (
-    <View style={styles(theme).baseContainer}>
-      <LoadingOverlay loading={loading} />
-      <IconButton
-        icon="arrow-left"
-        size={25}
-        onPress={() => {
-          navigation.goBack()
-        }}
-      />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles(theme).innerWrapper}>
-          <View style={styles(theme).titleSection}>
-            <View>
-              <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{name}</Text>
-              <View
-                style={{ display: 'flex', flexDirection: 'row', marginTop: 5 }}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 15 }}>Created by: groupcv</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 15, alignSelf: 'flex-end' }}>
-                    Start: {formatDateWithoutTime(startAt)}
-                  </Text>
-                </View>
-              </View>
-
-              <Image
-                style={styles(theme).coverPic}
-                source={{
-                  uri: picture,
-                }}
-              />
-            </View>
-            <Text style={{ fontSize: 15, marginTop: 8 }}>
-              Description: Lorem eipsdf asdffw vshew ehwrhh ewh
-            </Text>
-          </View>
-          <View style={styles(theme).metricSection}>
-            <TouchableRipple
-              style={styles(theme).metricDisplayBlock}
-              onPress={() => {
-                navigation.navigate('GroupsInEvent', {
-                  eventId: id,
-                  isAdmin: isAdmin,
+    <>
+      {isAdmin && (
+        <FabGroup
+          bottom={20}
+          type="primary"
+          actions={[
+            {
+              icon: 'pencil',
+              label: 'Edit event',
+              onPress: () => {
+                navigation.navigate('CreateEvent', {
+                  ownerGroupId: ownerGroupId,
                 })
-              }}
-            >
-              <>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                  Participated
-                </Text>
+              },
+              labelTextColor: theme.colors.elevation.level5,
+            },
+          ]}
+        />
+      )}
+      <View style={styles(theme).baseContainer}>
+        <LoadingOverlay loading={loading} />
+        <IconButton
+          icon="arrow-left"
+          size={25}
+          onPress={() => {
+            navigation.goBack()
+          }}
+        />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles(theme).innerWrapper}>
+            <View style={styles(theme).titleSection}>
+              <View>
+                <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{name}</Text>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    marginTop: 5,
+                  }}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 15 }}>Created by: groupcv</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 15, alignSelf: 'flex-end' }}>
+                      Start: {formatDateWithoutTime(startAt)}
+                    </Text>
+                  </View>
+                </View>
 
+                <Image
+                  style={styles(theme).coverPic}
+                  source={{
+                    uri: picture,
+                  }}
+                />
+              </View>
+              <Text style={{ fontSize: 15, marginTop: 8 }}>
+                Description: Lorem eipsdf asdffw vshew ehwrhh ewh
+              </Text>
+            </View>
+            <View style={styles(theme).metricSection}>
+              <TouchableRipple
+                style={styles(theme).metricDisplayBlock}
+                onPress={() => {
+                  navigation.navigate('GroupsInEvent', {
+                    eventId: id,
+                    isAdmin: isAdmin,
+                  })
+                }}
+              >
+                <>
+                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                    Participated
+                  </Text>
+
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      paddingTop: 10,
+                      gap: 10,
+                      alignItems: 'flex-end',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: 35,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {groupProgress?.groupProgressList.length}
+                    </Text>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: 26,
+                        fontStyle: 'italic',
+                        marginBottom: 3,
+                      }}
+                    >
+                      Groups
+                    </Text>
+                  </View>
+                </>
+              </TouchableRipple>
+
+              <View style={styles(theme).metricDisplayBlock}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                  Mini Events
+                </Text>
                 <View
                   style={{
                     display: 'flex',
@@ -171,7 +234,7 @@ export default function EventDetail({
                       fontStyle: 'italic',
                     }}
                   >
-                    {groupProgress?.groupProgressList.length}
+                    {subEventList.length}
                   </Text>
                   <Text
                     style={{
@@ -181,74 +244,43 @@ export default function EventDetail({
                       marginBottom: 3,
                     }}
                   >
-                    Groups
+                    Challenges
                   </Text>
                 </View>
-              </>
-            </TouchableRipple>
-
-            <View style={styles(theme).metricDisplayBlock}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                Mini Events
-              </Text>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  paddingTop: 10,
-                  gap: 10,
-                  alignItems: 'flex-end',
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: 35,
-                    fontStyle: 'italic',
-                  }}
-                >
-                  {subEventList.length}
-                </Text>
-                <Text
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: 26,
-                    fontStyle: 'italic',
-                    marginBottom: 3,
-                  }}
-                >
-                  Challenges
-                </Text>
               </View>
             </View>
-          </View>
-          <View style={styles(theme).subEventProgress}>
-            <Text
-              style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 30 }}
-            >
-              Challenges
-            </Text>
-            <StepIndicator
-              customStyles={customStyles(theme)}
-              currentPosition={currentSubEventIndex}
-              labels={subEventList.map((subEvent) => subEvent.name)}
-              stepCount={subEventList.length ? subEventList.length : 1}
-              onPress={(index) => {
-                console.log(index)
-                setSelectedSubEvent(subEventList[index])
-              }}
-            />
-            <Divider style={{ marginVertical: 20 }} />
-            {selectedSubEvent && groupProgress && (
-              <SubEventDisplay
-                subEvent={selectedSubEvent}
-                groupProgress={groupProgress}
+            <View style={styles(theme).subEventProgress}>
+              <Text
+                style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 30 }}
+              >
+                Challenges
+              </Text>
+              <StepIndicator
+                customStyles={customStyles(theme)}
+                currentPosition={currentSubEventIndex}
+                labels={subEventList.map((subEvent) => subEvent.name)}
+                stepCount={subEventList.length ? subEventList.length : 1}
+                onPress={(index) => {
+                  console.log(index)
+                  setSelectedSubEvent(subEventList[index])
+                }}
               />
-            )}
+              {yourGroupJoined && (
+                <>
+                  <Divider style={{ marginVertical: 20 }} />
+                  {selectedSubEvent && groupProgress && (
+                    <SubEventDisplay
+                      subEvent={selectedSubEvent}
+                      groupProgress={groupProgress}
+                    />
+                  )}
+                </>
+              )}
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </>
   )
 }
 
