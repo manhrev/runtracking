@@ -4,8 +4,10 @@ import {
   ListGroupProgressInEventRequest,
   ListSubEventsRequest,
   ListGroupsInEventRequest,
+  JoinEventRequest,
 } from '../../../lib/event/event_pb'
-import { eventClient } from '../../../utils/grpc'
+import { ListGroupRequest } from '../../../lib/group/group_pb'
+import { eventClient, groupClient } from '../../../utils/grpc'
 
 export const listEventsThunk = createAsyncThunk(
   'event/listEvent',
@@ -39,5 +41,19 @@ export const listGroupInEventThunk = createAsyncThunk(
   'event/listGroupInEvent',
   async (payload: ListGroupsInEventRequest.AsObject) => {
     return await eventClient.listGroupsInEvent(payload)
+  }
+)
+
+export const joinEventThunk = createAsyncThunk(
+  'event/joinEvent',
+  async (payload: JoinEventRequest.AsObject) => {
+    return await eventClient.joinEvent(payload)
+  }
+)
+
+export const getGroupInfoThunk = createAsyncThunk(
+  'event/getGroupInfo',
+  async (payload: ListGroupRequest.AsObject) => {
+    return await groupClient.listGroup(payload)
   }
 )

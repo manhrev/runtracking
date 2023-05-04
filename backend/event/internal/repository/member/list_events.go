@@ -84,7 +84,7 @@ func (m *memberImpl) ListEvents(
 		query.Offset(0)
 	}
 
-	events, err := query.WithSubevents().All(ctx)
+	events, err := query.WithSubevents().WithGroups().WithParticipates().All(ctx)
 	if err != nil {
 		log.Printf("Error ListEvent: can't query events: %v", err)
 		return nil, 0, status.Internal(err.Error())

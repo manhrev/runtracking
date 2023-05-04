@@ -940,7 +940,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.group.ListGroupRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.group.ListGroupRequest.repeatedFields_, null);
 };
 goog.inherits(proto.group.ListGroupRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -8161,6 +8161,13 @@ proto.group.ListMembersOfGroupReply.prototype.setTotal = function(value) {
 
 
 
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.group.ListGroupRequest.repeatedFields_ = [7];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -8197,6 +8204,7 @@ proto.group.ListGroupRequest.toObject = function(includeInstance, msg) {
     ascending: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
     searchByName: jspb.Message.getFieldWithDefault(msg, 5, ""),
     filterBy: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    groupIdsList: (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f,
     sortBy: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
@@ -8253,6 +8261,12 @@ proto.group.ListGroupRequest.deserializeBinaryFromReader = function(msg, reader)
     case 6:
       var value = /** @type {!proto.group.ListGroupRequest.FilterBy} */ (reader.readEnum());
       msg.setFilterBy(value);
+      break;
+    case 7:
+      var values = /** @type {!Array<number>} */ (reader.isDelimited() ? reader.readPackedInt64() : [reader.readInt64()]);
+      for (var i = 0; i < values.length; i++) {
+        msg.addGroupIds(values[i]);
+      }
       break;
     case 4:
       var value = /** @type {!proto.group.GroupSortBy} */ (reader.readEnum());
@@ -8319,6 +8333,13 @@ proto.group.ListGroupRequest.serializeBinaryToWriter = function(message, writer)
   if (f !== 0.0) {
     writer.writeEnum(
       6,
+      f
+    );
+  }
+  f = message.getGroupIdsList();
+  if (f.length > 0) {
+    writer.writePackedInt64(
+      7,
       f
     );
   }
@@ -8429,6 +8450,43 @@ proto.group.ListGroupRequest.prototype.getFilterBy = function() {
  */
 proto.group.ListGroupRequest.prototype.setFilterBy = function(value) {
   return jspb.Message.setProto3EnumField(this, 6, value);
+};
+
+
+/**
+ * repeated int64 group_ids = 7;
+ * @return {!Array<number>}
+ */
+proto.group.ListGroupRequest.prototype.getGroupIdsList = function() {
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 7));
+};
+
+
+/**
+ * @param {!Array<number>} value
+ * @return {!proto.group.ListGroupRequest} returns this
+ */
+proto.group.ListGroupRequest.prototype.setGroupIdsList = function(value) {
+  return jspb.Message.setField(this, 7, value || []);
+};
+
+
+/**
+ * @param {number} value
+ * @param {number=} opt_index
+ * @return {!proto.group.ListGroupRequest} returns this
+ */
+proto.group.ListGroupRequest.prototype.addGroupIds = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 7, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.group.ListGroupRequest} returns this
+ */
+proto.group.ListGroupRequest.prototype.clearGroupIdsList = function() {
+  return this.setGroupIdsList([]);
 };
 
 

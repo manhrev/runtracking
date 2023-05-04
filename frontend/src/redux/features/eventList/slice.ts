@@ -2,13 +2,18 @@ import { createSlice } from '@reduxjs/toolkit'
 import {
   EventDetail,
   GroupInEvent,
+  GroupStatus,
   SubEvent,
   SubEventProgress,
 } from '../../../lib/event/event_pb'
+import { GroupInfo } from '../../../lib/group/group_pb'
+import EventList from '../../../screens/Group/Event/EventList'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
 import {
+  getGroupInfoThunk,
+  joinEventThunk,
   listEventsThunk,
   listGroupInEventThunk,
   listGroupProgressInEventThunk,
@@ -24,6 +29,7 @@ type EventListState = {
   subEventStatus: StatusEnum
   subEventProgressStatus: StatusEnum
   groupListStatus: StatusEnum
+  groupInfoMap: Record<number, GroupInfo.AsObject>
   total: number
 } & CommonState
 
@@ -37,6 +43,7 @@ export const initialState: EventListState = {
   subEventStatus: StatusEnum.LOADING,
   subEventProgressStatus: StatusEnum.LOADING,
   groupListStatus: StatusEnum.LOADING,
+  groupInfoMap: {},
 }
 
 const slice = createSlice({
@@ -113,6 +120,32 @@ const slice = createSlice({
       state.groupListStatus = StatusEnum.SUCCEEDED
       state.groupList = response?.groupsList || []
     })
+    builder.addCase(joinEventThunk.fulfilled, (state, { payload, meta }) => {
+      const { error } = payload
+      if (error) {
+        return
+      }
+      const { eventId } = meta.arg
+      state.eventList = state.eventList.map((event) => {
+        if (event.id === eventId) {
+          event.yourGroupStatus = GroupStatus.GROUP_STATUS_REQUESTED
+        }
+        return event
+      })
+    })
+    builder.addCase(getGroupInfoThunk.fulfilled, (state, { payload }) => {
+      const { error, response } = payload
+      if (error) {
+        return
+      }
+      const groupList = response?.groupListList || []
+      const infoMap: Record<number, GroupInfo.AsObject> = {}
+      groupList.forEach((group) => {
+        infoMap[group.id] = group
+      })
+      state.groupInfoMap = infoMap
+      console.log(state.groupInfoMap)
+    })
   },
 })
 
@@ -121,9 +154,10 @@ export const isEventListLoading = (state: RootState) =>
   state.eventList.status === StatusEnum.LOADING
 export const isAllEventListLoading = (state: RootState) => {
   return (
-    state.eventList.status === StatusEnum.LOADING &&
-    state.eventList.subEventStatus === StatusEnum.LOADING &&
-    state.eventList.subEventProgressStatus === StatusEnum.LOADING
+    state.eventList.status === StatusEnum.LOADING ||
+    state.eventList.subEventStatus === StatusEnum.LOADING ||
+    state.eventList.subEventProgressStatus === StatusEnum.LOADING ||
+    state.eventList.groupListStatus === StatusEnum.LOADING
   )
 }
 export const isGroupInEventLoading = (state: RootState) =>

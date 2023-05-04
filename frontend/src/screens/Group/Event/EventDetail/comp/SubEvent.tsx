@@ -2,6 +2,8 @@ import { View } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Avatar, Divider, Text } from 'react-native-paper'
 import { SubEvent, SubEventProgress } from '../../../../../lib/event/event_pb'
+import { GroupInfo } from '../../../../../lib/group/group_pb'
+import { selectEventList } from '../../../../../redux/features/eventList/slice'
 import { selectGroupDetail } from '../../../../../redux/features/groupDetail/slice'
 import { useAppSelector } from '../../../../../redux/store'
 import { useAppTheme } from '../../../../../theme'
@@ -22,10 +24,13 @@ const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
   const {
     groupDetail: { groupinfo },
   } = useAppSelector(selectGroupDetail)
+  const groupId = groupinfo?.id || -1
   const { groupProgressList } = groupProgress
   const yourGroupProgress = groupProgressList.find((progress) => {
-    return progress.groupId === groupinfo?.id || -1
+    return progress.groupId === groupId
   })
+  const { groupInfoMap } = useAppSelector(selectEventList)
+  const yourGroup = groupInfoMap[groupId] || new GroupInfo().toObject()
   return (
     <View>
       <View style={{ display: 'flex', flexDirection: 'row' }}>
@@ -76,7 +81,7 @@ const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
       </View>
       <Divider style={{ marginTop: 20 }} />
       <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 30 }}>
-        Your group progress
+        Your group progress ({yourGroup.name})
       </Text>
       {yourGroupProgress && (
         <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>

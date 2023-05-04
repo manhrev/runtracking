@@ -68,6 +68,7 @@ export default function Explore({
         offset: 0,
         searchByName: searchByName,
         sortBy: sortBy,
+        groupIdsList: [],
       })
     ).unwrap()
 
@@ -87,6 +88,7 @@ export default function Explore({
         offset: currentOffset + LIMIT,
         searchByName: searchByName,
         sortBy: sortBy,
+        groupIdsList: [],
       })
     ).unwrap()
 

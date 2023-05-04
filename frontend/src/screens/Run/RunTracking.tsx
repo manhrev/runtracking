@@ -25,6 +25,7 @@ import { useAppSelector } from '../../redux/store'
 import { selectUserSlice } from '../../redux/features/user/slice'
 import { selectToggleSlice } from '../../redux/features/toggle/slice'
 import { toast } from '../../utils/toast/toast'
+import { useDialog } from '../../hooks/useDialog'
 
 export default function RunTracking({
   navigation,
@@ -87,7 +88,10 @@ export default function RunTracking({
 
   // dialog
   const [visible, setVisible] = useState(false)
-  const [locationVisible, setLocationVisible] = useState(false)
+  const {
+    open: dialogLocationPolicyOpen,
+    toggleDialog: toggleDialogLocationPolicy,
+  } = useDialog()
 
   const showDialog = () => {
     setVisible(true)
@@ -174,9 +178,8 @@ export default function RunTracking({
     ;(async () => {
       const { status } = await Location.getForegroundPermissionsAsync()
       if (status !== 'granted') {
-        setLocationVisible(true)
-      }
-      else {
+        toggleDialogLocationPolicy()
+      } else {
         await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.High,
@@ -200,7 +203,7 @@ export default function RunTracking({
         )
       }
     })()
-  }, [locationVisible])
+  }, [])
 
   useEffect(
     () =>
@@ -359,8 +362,10 @@ export default function RunTracking({
   }
 
   const switchActivityType = () => {
-    if(route.params.planId != -1) {
-      toast.error({ message: "Can't change activity type while following a plan !" })
+    if (route.params.planId != -1) {
+      toast.error({
+        message: "Can't change activity type while following a plan !",
+      })
       return
     }
 
@@ -374,21 +379,42 @@ export default function RunTracking({
   }
 
   const agreeLocationPermission = async () => {
-    await requestLocationPermission()
-    setLocationVisible(false)
+    const err = await requestLocationPermission()
+    toggleDialogLocationPolicy()
+    if (err) return
+    const { coords } = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+      distanceInterval: 1,
+    })
+    mapRef.current?.animateToRegion({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      latitudeDelta: 0.002,
+      longitudeDelta: 0.003,
+    })
   }
 
   const notNowLocationPermission = () => {
-    setLocationVisible(false)
     navigation.goBack()
   }
 
   const requestLocationPermission = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync()
+    let { status, canAskAgain } =
+      await Location.requestForegroundPermissionsAsync()
+
     if (status !== 'granted') {
+      if (!canAskAgain) {
+        toast.error({
+          message: 'You must go to settings to enable location!',
+        })
+        navigation.goBack()
+        return true
+      }
       toast.error({ message: 'Location permission was denied' })
       navigation.goBack()
+      return true
     }
+    return false
   }
 
   return (
@@ -407,14 +433,31 @@ export default function RunTracking({
       </Portal>
 
       <Portal>
-        <Dialog visible={locationVisible}>
-          <Dialog.Title>Location Disabled</Dialog.Title>
+        <Dialog visible={dialogLocationPolicyOpen}>
+          <Dialog.Title>Use location?</Dialog.Title>
           <Dialog.Content>
-            <Text>Look like your location services are disabled for Go Tracker. Please enable it to continue.</Text>
+            <Text variant="bodyLarge">
+              <Text style={{ fontWeight: 'bold' }}>Go Tracker </Text>
+              needs to collect{' '}
+              <Text style={{ fontWeight: 'bold' }}>location data</Text> when the
+              app is open or running in the background to record your physical
+              activity.
+            </Text>
+            <Text variant="bodyLarge" style={{ marginTop: 10 }}>
+              <Text style={{ fontWeight: 'bold' }}>
+                Collecting data in the background
+              </Text>{' '}
+              will allow you to train without having to keep your phone screen
+              on.
+            </Text>
+            <Text variant="bodyLarge" style={{ marginTop: 10 }}>
+              Those data will help you review the activities that have been
+              saved, as well as statistics about those activities.
+            </Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={agreeLocationPermission}> Agree </Button>
-            <Button onPress={notNowLocationPermission}> Not now </Button>
+            <Button onPress={notNowLocationPermission}> Deny </Button>
+            <Button onPress={agreeLocationPermission}> Accept </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -472,6 +515,10 @@ export default function RunTracking({
         }}
         customMapStyle={isNightMode ? minimalStyleDark : minimalStyle}
         onMapLoaded={async (event) => {
+          const { status } = await Location.getForegroundPermissionsAsync()
+          if (status !== 'granted') {
+            return
+          }
           const { coords } = await Location.getCurrentPositionAsync({
             accuracy: Location.Accuracy.Balanced,
             distanceInterval: 1,
