@@ -1,18 +1,18 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useState } from 'react'
-import { ScrollView, View, Dimensions } from 'react-native'
+import { useMemo, useState } from 'react'
+import { ScrollView, View, Dimensions, Image } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { Avatar, Button, IconButton, Text, TextInput } from 'react-native-paper'
 import StepIndicator from 'react-native-step-indicator'
+import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import {
   EventActivityTypeIcon,
   SubEventRuleStr,
 } from '../../../../constants/enumstr/event'
+import { useImageUpload } from '../../../../hooks/useImageUpload'
 import {
-  ActivityType,
   CreateEventRequest,
   CreateSubEvent,
-  Rule,
 } from '../../../../lib/event/event_pb'
 import { RootBaseStackParamList } from '../../../../navigators/BaseStack'
 import { AppTheme, useAppTheme } from '../../../../theme'
@@ -35,9 +35,20 @@ export default function CreateEvent({
       new CreateEventRequest()
         .setIsGlobal(false)
         .setOwnerGroupId(ownerGroupId)
-        .setPicture('https://placehold.jp/300x150.png')
         .toObject()
     )
+  const [loading, setLoading] = useState(false)
+
+  const { pickImage, selectedImage, clearSelectedImage, uploadImage } =
+    useImageUpload({
+      aspect: [2, 1],
+      quality: 0.5,
+    })
+  useMemo(() => {
+    if (selectedImage) {
+      setEventToCreate({ ...eventToCreate, picture: selectedImage })
+    }
+  }, [selectedImage])
   const { name, description } = eventToCreate
   const [subEventList, setSubEventList] = useState<CreateSubEvent.AsObject[]>(
     []
@@ -56,7 +67,15 @@ export default function CreateEvent({
       toast.error({ message: 'Please add some challenge!' })
       return
     }
-
+    setLoading(true)
+    const { error: upImageError, imageUrl } = await uploadImage()
+    if (upImageError) {
+      toast.error({
+        message: 'Error while uploading your picture, please try again!',
+      })
+      return setLoading(false)
+    }
+    setEventToCreate({ ...eventToCreate, picture: imageUrl })
     const { error } = await eventClient.createEvent({
       ...eventToCreate,
       subEventsList: subEventList,
@@ -64,16 +83,39 @@ export default function CreateEvent({
     })
     if (error) {
       toast.error({ message: 'An error occurred, please try again later!' })
-      return
+      return setLoading(false)
     }
     toast.success({ message: 'Create event successfully!' })
+    setLoading(false)
     navigation.goBack()
   }
 
   return (
     <>
       <View style={styles(theme).container}>
+        <LoadingOverlay loading={loading} />
         <ScrollView showsVerticalScrollIndicator={false}>
+          <Image
+            style={styles(theme).eventPicture}
+            source={
+              eventToCreate.picture == ''
+                ? require('../../../../../assets/event-img.png')
+                : { uri: eventToCreate.picture }
+            }
+          />
+          <IconButton
+            icon="pencil"
+            style={{
+              zIndex: 9999,
+              position: 'relative',
+              alignSelf: 'flex-end',
+              top: -30,
+              marginBottom: -30,
+            }}
+            mode="contained"
+            onPress={pickImage}
+          />
+          {/* </View> */}
           <Text style={styles(theme).title}>Event name: </Text>
           <TextInput
             mode="outlined"
@@ -230,6 +272,13 @@ export default function CreateEvent({
 }
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
+    eventPicture: {
+      alignSelf: 'center',
+      zIndex: 2,
+      height: 200,
+      width: '100%',
+      marginTop: 20,
+    },
     container: {
       flex: 1,
       marginLeft: 16,

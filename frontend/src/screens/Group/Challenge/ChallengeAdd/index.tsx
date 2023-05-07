@@ -1,14 +1,32 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { View, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
-import { Text, Button, TextInput, RadioButton, IconButton, Menu } from 'react-native-paper'
+import {
+  View,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native'
+import {
+  Text,
+  Button,
+  TextInput,
+  RadioButton,
+  IconButton,
+  Menu,
+} from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
 import * as Clipboard from 'expo-clipboard'
 
-import { CreateChallengeRequest, ChallengeInfo, RuleStatus, Rule } from '../../../../lib/group/group_pb'
+import {
+  CreateChallengeRequest,
+  ChallengeInfo,
+  RuleStatus,
+  Rule,
+} from '../../../../lib/group/group_pb'
 
 import { createChallengeThunk } from '../../../../redux/features/challengeList/thunk'
 import { RootBaseStackParamList } from '../../../../navigators/BaseStack'
@@ -17,184 +35,206 @@ import moment from 'moment'
 import { ChallengeRuleStr } from '../../../../constants/enumstr/group'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { MultiSelect } from 'react-native-element-dropdown'
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from '@expo/vector-icons/AntDesign'
 import { ChallengeRuleInfo } from '../../../../lib/group/group_pb'
+import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
+import { useImageUpload } from '../../../../hooks/useImageUpload'
 
 export default function ChallengeAdd({
   navigation,
   route,
 }: NativeStackScreenProps<RootBaseStackParamList, 'ChallengeAdd'>) {
-    const theme = useAppTheme()
-    const dispatch = useAppDispatch()
+  const theme = useAppTheme()
+  const dispatch = useAppDispatch()
 
-    // goals object
-    const [goals, setGoals] = useState({
-      distance: 1,
-      time: 5,
-      calories: 500,
+  // goals object
+  const [goals, setGoals] = useState({
+    distance: 1,
+    time: 5,
+    calories: 500,
+  })
+
+  // dropdown list
+  const dropDownData = [
+    { label: 'Distance', value: Rule.RULE_TOTAL_DISTANCE.toString() },
+    { label: 'Time', value: Rule.RULE_TOTAL_TIME.toString() },
+    { label: 'Calories', value: Rule.RULE_TOTAL_CALORIES.toString() },
+  ]
+  const [dropdownSelected, setDropdownSelected] = useState<string[]>([
+    Rule.RULE_TOTAL_DISTANCE.toString(),
+  ])
+  const renderItem = (item: any) => {
+    return (
+      <View style={styles(theme).item}>
+        <Text style={styles(theme).selectedTextStyle}>{item.label}</Text>
+        {dropdownSelected.includes(item.value) && (
+          <AntDesign
+            style={styles(theme).icon}
+            color="black"
+            name="Safety"
+            size={20}
+          />
+        )}
+      </View>
+    )
+  }
+  const [loading, setLoading] = useState(false)
+  const { pickImage, selectedImage, clearSelectedImage, uploadImage } =
+    useImageUpload({
+      aspect: [1, 1],
+      quality: 0.5,
     })
+  // time picker
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false)
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false)
 
-    // dropdown list
-    const dropDownData = [
-      { label: 'Distance', value: Rule.RULE_TOTAL_DISTANCE.toString() },
-      { label: 'Time', value: Rule.RULE_TOTAL_TIME.toString() },
-      { label: 'Calories', value: Rule.RULE_TOTAL_CALORIES.toString() },
-    ]
-    const [dropdownSelected, setDropdownSelected] = useState<string[]>([Rule.RULE_TOTAL_DISTANCE.toString()])
-    const renderItem = (item: any) => {
-      return (
-        <View style={styles(theme).item}>
-          <Text style={styles(theme).selectedTextStyle}>{item.label}</Text>
-          {dropdownSelected.includes(item.value) && (
-            <AntDesign style={styles(theme).icon} color="black" name="Safety" size={20} />
-          )}
-        </View>
-      );
-    };
+  const [challengeInfo, setChallengeInfo] = useState<ChallengeInfo.AsObject>({
+    name: 'Example Challenge',
+    description: 'Example Description',
+    picture:
+      'https://cdn.dribbble.com/users/2984251/screenshots/15487625/media/1501cb8cd7dbdb88127b7402c2692acd.png?compress=1&resize=1000x750&vertical=top',
+    type: ActivityType.ACTIVITY_TYPE_RUNNING,
+    status: RuleStatus.RULE_STATUS_COMING_SOON,
+    challengerulesList: [],
+    from: {
+      // today
+      seconds: Math.floor(
+        moment
+          .unix(new Date().getTime() / 1000)
+          .startOf('day')
+          .valueOf() / 1000
+      ),
+      nanos: 0,
+    },
+    to: {
+      // 1 day later
+      seconds: Math.floor(
+        moment
+          .unix(new Date().getTime() / 1000 + 86400)
+          .endOf('day')
+          .valueOf() / 1000
+      ),
+      nanos: 0,
+    },
+    // dont need
+    id: 0,
+    groupId: 0,
+    memberProgressListList: [],
+  })
+  useMemo(() => {
+    if (selectedImage) {
+      setChallengeInfo({ ...challengeInfo, picture: selectedImage })
+    }
+  }, [selectedImage])
 
-    // time picker
-    const [showStartTimePicker, setShowStartTimePicker] = useState(false)
-    const [showEndTimePicker, setShowEndTimePicker] = useState(false)
-
-    const [challengeInfo, setChallengeInfo] = useState<ChallengeInfo.AsObject>({
-        name: 'Example Challenge',
-        description: 'Example Description',
-        picture:
-        'https://cdn.dribbble.com/users/2984251/screenshots/15487625/media/1501cb8cd7dbdb88127b7402c2692acd.png?compress=1&resize=1000x750&vertical=top',
-        type: ActivityType.ACTIVITY_TYPE_RUNNING,
-        status: RuleStatus.RULE_STATUS_COMING_SOON,
-        challengerulesList: [],
-        from: {
-            // today
-            seconds: Math.floor(
-                moment
-                    .unix(new Date().getTime() / 1000)
-                    .startOf('day')
-                    .valueOf() / 1000
-            ),
-            nanos: 0,
-        },
-        to: {
-            // 1 day later
-            seconds: Math.floor(
-                moment
-                    .unix(new Date().getTime() / 1000 + 86400)
-                    .endOf('day')
-                    .valueOf() / 1000
-            ),
-            nanos: 0,
-        },
-        // dont need
-        id: 0,
-        groupId: 0,
-        memberProgressListList: [],
+  const setStart = (event: any, date: any) => {
+    setShowStartTimePicker(false)
+    setChallengeInfo({
+      ...challengeInfo,
+      from: {
+        seconds: Math.floor(
+          moment
+            .unix(date.getTime() / 1000)
+            .startOf('day')
+            .valueOf() / 1000
+        ),
+        nanos: 0,
+      },
     })
+  }
 
-    const setStart = (event: any, date: any) => {
-        setShowStartTimePicker(false)
-        setChallengeInfo({ ...challengeInfo, from: {
-            seconds: Math.floor(
-                moment
-                    .unix(date.getTime() / 1000)
-                    .startOf('day')
-                    .valueOf() / 1000
-            ),
-            nanos: 0,
-        }})
+  const setEnd = (event: any, date: any) => {
+    setShowEndTimePicker(false)
+    setChallengeInfo({
+      ...challengeInfo,
+      to: {
+        seconds: Math.floor(
+          moment
+            .unix(date.getTime() / 1000)
+            .endOf('day')
+            .valueOf() / 1000
+        ),
+        nanos: 0,
+      },
+    })
+  }
+
+  const getRealGoal = (rule: Rule, goal: number) => {
+    if (rule == Rule.RULE_TOTAL_DISTANCE) {
+      return goal * 1000 // to meters
+    } else if (rule == Rule.RULE_TOTAL_TIME) {
+      return goal * 60 // to seconds
+    } else return goal // calories
+  }
+
+  const getRuleList = () => {
+    const ruleList: ChallengeRuleInfo.AsObject[] = []
+    for (let i = 0; i < dropdownSelected.length; i++) {
+      const rule = parseInt(dropdownSelected[i])
+      const goal =
+        rule == Rule.RULE_TOTAL_DISTANCE
+          ? goals.distance
+          : rule == Rule.RULE_TOTAL_TIME
+          ? goals.time
+          : goals.calories
+      ruleList.push({
+        id: i, // ignore
+        rule: rule,
+        goal: getRealGoal(rule, goal),
+      })
     }
-    
-    const setEnd = (event: any, date: any) => {
-        setShowEndTimePicker(false)
-        setChallengeInfo({ ...challengeInfo, to: {
-            seconds: Math.floor(
-                moment
-                    .unix(date.getTime() / 1000)
-                    .endOf('day')
-                    .valueOf() / 1000
-            ),
-            nanos: 0,
-        }})
-    }
+    return ruleList
+  }
 
-    const copiedTextToImageLink = async () => {
-        const text: any = await Clipboard.getStringAsync()
-        if (text == null || text == '') {
-        toast.error({ message: 'Clipboard is empty!' })
-        return
-        }
-        setChallengeInfo({ ...challengeInfo, picture: text })
-    }
-
-    const getRealGoal = (rule: Rule, goal: number) => {
-        if (rule == Rule.RULE_TOTAL_DISTANCE) {
-            return goal * 1000 // to meters
-        }
-        else if (rule == Rule.RULE_TOTAL_TIME) {
-            return goal * 60 // to seconds
-        }
-        else return goal // calories
-    }
-
-    const getRuleList = () => {
-        const ruleList: ChallengeRuleInfo.AsObject[] = []
-        for (let i = 0; i < dropdownSelected.length; i++) {
-            const rule = parseInt(dropdownSelected[i])
-            const goal = rule == Rule.RULE_TOTAL_DISTANCE ? goals.distance : rule == Rule.RULE_TOTAL_TIME ? goals.time : goals.calories
-            ruleList.push({
-                id: i, // ignore
-                rule: rule,
-                goal: getRealGoal(rule, goal),
-            })
-        }
-        return ruleList
-    }
-
-
-    const createNewChallenge = async () => {
-        if (challengeInfo.name == '' || challengeInfo.picture == '') {
-          toast.error({ message: 'Challenge name or image link cannot be empty!' })
+  const createNewChallenge = async () => {
+    if (challengeInfo.name == '' || challengeInfo.picture == '') {
+      toast.error({ message: 'Challenge name or image link cannot be empty!' })
+      return
+    } else if (dropdownSelected.length == 0) {
+      toast.error({ message: 'Please select at least 1 rule!' })
+      return
+    } else if (goals.distance <= 0 || goals.time <= 0 || goals.calories <= 0) {
+      toast.error({ message: 'Goals cannot be negative or zero!' })
+      return
+    } else if (challengeInfo.from?.seconds) {
+      if (challengeInfo.to?.seconds) {
+        if (challengeInfo.from.seconds > challengeInfo.to.seconds) {
+          toast.error({ message: 'Start date cannot be later than end date!' })
           return
         }
-        else if (dropdownSelected.length == 0) {
-          toast.error({ message: 'Please select at least 1 rule!' })
-          return
-        }
-        else if (goals.distance <= 0 || goals.time <=  0 || goals.calories <=  0) {
-          toast.error({ message: 'Goals cannot be negative or zero!' })
-          return
-        }
-        else if (challengeInfo.from?.seconds)
-        {
-          if(challengeInfo.to?.seconds)
-          {
-            if(challengeInfo.from.seconds > challengeInfo.to.seconds)
-            {
-              toast.error({ message: 'Start date cannot be later than end date!' })
-              return
-            }
-          }
-        }
-
-        const req: CreateChallengeRequest.AsObject = {
-            groupId: route.params.groupId,
-            challengeinfo: {
-                ...challengeInfo,
-                challengerulesList: getRuleList()
-            }
-        }
-
-        // console.log(req.challengeinfo?.challengerulesList)
-
-        const { error } = await dispatch(createChallengeThunk(req)).unwrap()
-        if (error) {
-          toast.error({ message: 'An error occured, please try again!' })
-          return
-        } else {
-          toast.success({ message: 'Challenge created!' })
-          navigation.goBack()
-          route.params.reloadListFunc()
-        }
+      }
     }
+    setLoading(true)
+    const { error: upImageError, imageUrl } = await uploadImage()
+    if (upImageError) {
+      toast.error({
+        message: 'Error while uploading your picture, please try again!',
+      })
+      return setLoading(false)
+    }
+    setChallengeInfo({ ...challengeInfo, picture: imageUrl })
+
+    const req: CreateChallengeRequest.AsObject = {
+      groupId: route.params.groupId,
+      challengeinfo: {
+        ...challengeInfo,
+        challengerulesList: getRuleList(),
+      },
+    }
+
+    // console.log(req.challengeinfo?.challengerulesList)
+
+    const { error } = await dispatch(createChallengeThunk(req)).unwrap()
+    if (error) {
+      toast.error({ message: 'An error occured, please try again!' })
+      return setLoading(false)
+    } else {
+      toast.success({ message: 'Challenge created!' })
+      navigation.goBack()
+      route.params.reloadListFunc()
+      setLoading(false)
+    }
+  }
 
   return (
     <View style={baseStyles(theme).container}>
@@ -202,15 +242,28 @@ export default function ChallengeAdd({
         showsVerticalScrollIndicator={false}
         style={baseStyles(theme).innerWrapper}
       >
+        <LoadingOverlay loading={loading} />
         <View style={styles(theme).imgContainer}>
-          <Image
-            style={styles(theme).profilePicture}
-            source={
-              challengeInfo.picture == ''
-                ? require('../../../../../assets/group-img.png')
-                : { uri: challengeInfo.picture }
-            }
-          />
+          <View style={{ alignSelf: 'center', position: 'relative', top: 45 }}>
+            <Image
+              style={styles(theme).profilePicture}
+              source={
+                challengeInfo.picture == ''
+                  ? require('../../../../../assets/group-img.png')
+                  : { uri: challengeInfo.picture }
+              }
+            />
+            <IconButton
+              icon="pencil"
+              style={{
+                zIndex: 9999,
+                position: 'relative',
+                right: -70,
+              }}
+              mode="contained"
+              onPress={pickImage}
+            />
+          </View>
         </View>
 
         {challengeInfo.name && (
@@ -221,73 +274,60 @@ export default function ChallengeAdd({
         <TextInput
           mode="outlined"
           value={challengeInfo.name}
-          onChangeText={(text) => setChallengeInfo({ ...challengeInfo, name: text })}
-        />
-
-        <Text style={styles(theme).title}>Image Link </Text>
-        <TextInput
-          mode="outlined"
-          value={challengeInfo.picture}
           onChangeText={(text) =>
-            setChallengeInfo({ ...challengeInfo, picture: text })
-          }
-          right={
-            challengeInfo.picture == '' ? (
-              <TextInput.Icon
-                icon="clipboard-arrow-down-outline"
-                onPress={() => copiedTextToImageLink()}
-              />
-            ) : (
-              <TextInput.Icon
-                icon="window-close"
-                onPress={() =>
-                  setChallengeInfo({ ...challengeInfo, picture: '' })
-                }
-              />
-            )
+            setChallengeInfo({ ...challengeInfo, name: text })
           }
         />
 
         <Text style={styles(theme).title}>Activity Type</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <RadioButton
-                value="running"
-                status={
-                challengeInfo.type === ActivityType.ACTIVITY_TYPE_RUNNING
-                    ? 'checked'
-                    : 'unchecked'
-                }
-                onPress={() =>
-                    setChallengeInfo({ ...challengeInfo, type: ActivityType.ACTIVITY_TYPE_RUNNING })
-                }
-            />
-            <Text>Running</Text>
+          <RadioButton
+            value="running"
+            status={
+              challengeInfo.type === ActivityType.ACTIVITY_TYPE_RUNNING
+                ? 'checked'
+                : 'unchecked'
+            }
+            onPress={() =>
+              setChallengeInfo({
+                ...challengeInfo,
+                type: ActivityType.ACTIVITY_TYPE_RUNNING,
+              })
+            }
+          />
+          <Text>Running</Text>
 
-            <RadioButton
-                value="walking"
-                status={
-                    challengeInfo.type === ActivityType.ACTIVITY_TYPE_WALKING
-                    ? 'checked'
-                    : 'unchecked'
-                }
-                onPress={() =>
-                    setChallengeInfo({ ...challengeInfo, type: ActivityType.ACTIVITY_TYPE_WALKING })
-                }
-            />
-            <Text>Walking</Text>
+          <RadioButton
+            value="walking"
+            status={
+              challengeInfo.type === ActivityType.ACTIVITY_TYPE_WALKING
+                ? 'checked'
+                : 'unchecked'
+            }
+            onPress={() =>
+              setChallengeInfo({
+                ...challengeInfo,
+                type: ActivityType.ACTIVITY_TYPE_WALKING,
+              })
+            }
+          />
+          <Text>Walking</Text>
 
-            <RadioButton
-                value="cycling"
-                status={
-                challengeInfo.type === ActivityType.ACTIVITY_TYPE_CYCLING
-                    ? 'checked'
-                    : 'unchecked'
-                }
-                onPress={() =>
-                    setChallengeInfo({ ...challengeInfo, type: ActivityType.ACTIVITY_TYPE_CYCLING })
-                }
-            />
-            <Text>Cycling</Text>
+          <RadioButton
+            value="cycling"
+            status={
+              challengeInfo.type === ActivityType.ACTIVITY_TYPE_CYCLING
+                ? 'checked'
+                : 'unchecked'
+            }
+            onPress={() =>
+              setChallengeInfo({
+                ...challengeInfo,
+                type: ActivityType.ACTIVITY_TYPE_CYCLING,
+              })
+            }
+          />
+          <Text>Cycling</Text>
         </View>
 
         <Text style={styles(theme).title}>Challenge Rules</Text>
@@ -310,7 +350,9 @@ export default function ChallengeAdd({
           renderSelectedItem={(item, unSelect) => (
             <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
               <View style={styles(theme).selectedStyle}>
-                <Text style={styles(theme).textSelectedStyle}>{item.label}</Text>
+                <Text style={styles(theme).textSelectedStyle}>
+                  {item.label}
+                </Text>
                 <AntDesign color="black" name="close" size={17} />
               </View>
             </TouchableOpacity>
@@ -318,74 +360,118 @@ export default function ChallengeAdd({
         />
 
         <Text style={styles(theme).title}>Goals</Text>
-        {dropdownSelected.length == 0 && <Text style={{marginLeft: 10}}>Please select at least one rule !</Text>}
+        {dropdownSelected.length == 0 && (
+          <Text style={{ marginLeft: 10 }}>
+            Please select at least one rule !
+          </Text>
+        )}
 
-        {dropdownSelected.includes(Rule.RULE_TOTAL_DISTANCE.toString()) && <TextInput
-          mode="outlined"
-          style={{ marginBottom: 10 }}
-          label={ChallengeRuleStr[Rule.RULE_TOTAL_DISTANCE]}
-          value={goals.distance.toString()}
-          onChangeText={(text) => setGoals({ ...goals, distance: parseInt(text == '' ? '0' : text) })}
-        />}
+        {dropdownSelected.includes(Rule.RULE_TOTAL_DISTANCE.toString()) && (
+          <TextInput
+            mode="outlined"
+            style={{ marginBottom: 10 }}
+            label={ChallengeRuleStr[Rule.RULE_TOTAL_DISTANCE]}
+            value={goals.distance.toString()}
+            onChangeText={(text) =>
+              setGoals({
+                ...goals,
+                distance: parseInt(text == '' ? '0' : text),
+              })
+            }
+          />
+        )}
 
-        {dropdownSelected.includes(Rule.RULE_TOTAL_TIME.toString()) && <TextInput
-          mode="outlined"
-          style={{ marginBottom: 10 }}
-          label={ChallengeRuleStr[Rule.RULE_TOTAL_TIME]}
-          value={goals.time.toString()}
-          onChangeText={(text) => setGoals({ ...goals, time: parseInt(text == '' ? '0' : text) })}
-        />}
+        {dropdownSelected.includes(Rule.RULE_TOTAL_TIME.toString()) && (
+          <TextInput
+            mode="outlined"
+            style={{ marginBottom: 10 }}
+            label={ChallengeRuleStr[Rule.RULE_TOTAL_TIME]}
+            value={goals.time.toString()}
+            onChangeText={(text) =>
+              setGoals({ ...goals, time: parseInt(text == '' ? '0' : text) })
+            }
+          />
+        )}
 
-        {dropdownSelected.includes(Rule.RULE_TOTAL_CALORIES.toString()) && <TextInput
-          mode="outlined"
-          label={ChallengeRuleStr[Rule.RULE_TOTAL_CALORIES]}
-          value={goals.calories.toString()}
-          onChangeText={(text) => setGoals({ ...goals, calories: parseInt(text == '' ? '0' : text) })}
-        />}
+        {dropdownSelected.includes(Rule.RULE_TOTAL_CALORIES.toString()) && (
+          <TextInput
+            mode="outlined"
+            label={ChallengeRuleStr[Rule.RULE_TOTAL_CALORIES]}
+            value={goals.calories.toString()}
+            onChangeText={(text) =>
+              setGoals({
+                ...goals,
+                calories: parseInt(text == '' ? '0' : text),
+              })
+            }
+          />
+        )}
 
         <Text style={styles(theme).title}>Start Date</Text>
         <TextInput
-            mode="outlined"
-            value={challengeInfo.from?.seconds ? new Date(challengeInfo.from.seconds * 1000).toDateString() : ''}
-            editable={false}
-            right={
-                <TextInput.Icon
-                    icon="calendar"
-                    onPress={() => setShowStartTimePicker(true)}
-                />
-            }
+          mode="outlined"
+          value={
+            challengeInfo.from?.seconds
+              ? new Date(challengeInfo.from.seconds * 1000).toDateString()
+              : ''
+          }
+          editable={false}
+          right={
+            <TextInput.Icon
+              icon="calendar"
+              onPress={() => setShowStartTimePicker(true)}
+            />
+          }
         />
         {showStartTimePicker && (
-            <DateTimePicker
-                value={challengeInfo.from?.seconds ? new Date(challengeInfo.from.seconds * 1000) : new Date()}
-                mode="date"
-                display="default"
-                minimumDate={new Date()}
-                onChange={setStart}
-            />
+          <DateTimePicker
+            value={
+              challengeInfo.from?.seconds
+                ? new Date(challengeInfo.from.seconds * 1000)
+                : new Date()
+            }
+            mode="date"
+            display="default"
+            minimumDate={new Date()}
+            onChange={setStart}
+          />
         )}
 
         <Text style={styles(theme).title}>End Date</Text>
         <TextInput
-            mode="outlined"
-            value={challengeInfo.to?.seconds ? new Date(challengeInfo.to.seconds * 1000).toDateString() : ''}
-            editable={false}
-            right={
-                <TextInput.Icon
-                    icon="calendar"
-                    onPress={() => setShowEndTimePicker(true)}
-                />
-            }
+          mode="outlined"
+          value={
+            challengeInfo.to?.seconds
+              ? new Date(challengeInfo.to.seconds * 1000).toDateString()
+              : ''
+          }
+          editable={false}
+          right={
+            <TextInput.Icon
+              icon="calendar"
+              onPress={() => setShowEndTimePicker(true)}
+            />
+          }
         />
         {showEndTimePicker && (
-            <DateTimePicker
-                value={challengeInfo.to?.seconds ? new Date(challengeInfo.to.seconds * 1000) : new Date()}
-                mode="date"
-                display="default"
-                // tommorow
-                minimumDate={new Date(challengeInfo.from?.seconds ? challengeInfo.from.seconds * 1000 + 24 * 60 * 60 * 1000 : new Date().getTime() + 24 * 60 * 60 * 1000)}
-                onChange={setEnd}
-            />
+          <DateTimePicker
+            value={
+              challengeInfo.to?.seconds
+                ? new Date(challengeInfo.to.seconds * 1000)
+                : new Date()
+            }
+            mode="date"
+            display="default"
+            // tommorow
+            minimumDate={
+              new Date(
+                challengeInfo.from?.seconds
+                  ? challengeInfo.from.seconds * 1000 + 24 * 60 * 60 * 1000
+                  : new Date().getTime() + 24 * 60 * 60 * 1000
+              )
+            }
+            onChange={setEnd}
+          />
         )}
 
         <Text style={styles(theme).title}>Challenge Description</Text>

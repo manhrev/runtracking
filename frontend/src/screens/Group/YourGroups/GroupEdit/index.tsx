@@ -4,17 +4,23 @@ import { Text, IconButton, Button, TextInput } from 'react-native-paper'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
-import * as Clipboard from 'expo-clipboard';
+import * as Clipboard from 'expo-clipboard'
 
-import { UpdateGroupRequest, GroupInfo, DeleteGroupRequest } from '../../../../lib/group/group_pb'
+import {
+  UpdateGroupRequest,
+  GroupInfo,
+  DeleteGroupRequest,
+} from '../../../../lib/group/group_pb'
 
 import {
   updateGroupThunk,
-  deleteGroupThunk
+  deleteGroupThunk,
 } from '../../../../redux/features/yourGroupList/thunk'
+import { useImageUpload } from '../../../../hooks/useImageUpload'
+import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 
 export default function GroupEdit({
   navigation,
@@ -22,28 +28,28 @@ export default function GroupEdit({
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'GroupEdit'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-
+  const { pickImage, selectedImage, clearSelectedImage, uploadImage } =
+    useImageUpload({
+      aspect: [1, 1],
+      quality: 0.5,
+    })
   const [groupInfo, setGroupInfo] = useState<GroupInfo.AsObject>({
     id: route.params.groupInfo?.id || 0,
-    name: route.params.groupInfo?.name || "",
-    description: route.params.groupInfo?.description || "",
-    backgroundPicture: route.params.groupInfo?.backgroundPicture || "",
+    name: route.params.groupInfo?.name || '',
+    description: route.params.groupInfo?.description || '',
+    backgroundPicture: route.params.groupInfo?.backgroundPicture || '',
     leaderId: 0,
     memberStatus: 0,
     numOfMembers: 0,
     numOfChallenge: 0,
     numOfEventParticipated: 0,
   })
-
-  const copiedTextToImageLink = async () => {
-    const text: any = await Clipboard.getStringAsync();
-    if(text == null || text == "")
-    {
-      toast.error({ message: 'Clipboard is empty!' })
-      return
+  const [loading, setLoading] = useState(false)
+  useMemo(() => {
+    if (selectedImage) {
+      setGroupInfo({ ...groupInfo, backgroundPicture: selectedImage })
     }
-    setGroupInfo({...groupInfo, backgroundPicture: text})
-  }
+  }, [selectedImage])
 
   const deleteGroupOrNot = () => {
     Alert.alert(
@@ -62,27 +68,33 @@ export default function GroupEdit({
 
   const deleteGroupConfirmed = async () => {
     const req: DeleteGroupRequest.AsObject = {
-      idToDelete: groupInfo.id
+      idToDelete: groupInfo.id,
     }
 
     const { error } = await dispatch(deleteGroupThunk(req)).unwrap()
     if (error) {
       toast.error({ message: 'An error occured, please try again!' })
       return
-    }
-    else {
+    } else {
       toast.success({ message: 'Group deleted!' })
       navigation.popToTop()
     }
   }
 
   const updateInfoGroup = async () => {
-    if(groupInfo.name == "" || groupInfo.backgroundPicture == "")
-    {
+    if (groupInfo.name == '' || groupInfo.backgroundPicture == '') {
       toast.error({ message: 'Group name or image link cannot be empty!' })
       return
     }
-
+    setLoading(true)
+    const { error: upImageError, imageUrl } = await uploadImage()
+    if (upImageError) {
+      toast.error({
+        message: 'Error while uploading your picture, please try again!',
+      })
+      return setLoading(false)
+    }
+    setGroupInfo({ ...groupInfo, backgroundPicture: imageUrl })
     const req: UpdateGroupRequest.AsObject = {
       groupinfo: {
         id: groupInfo.id,
@@ -94,71 +106,71 @@ export default function GroupEdit({
         numOfMembers: groupInfo.numOfMembers,
         numOfChallenge: groupInfo.numOfChallenge,
         numOfEventParticipated: groupInfo.numOfEventParticipated,
-      }
+      },
     }
 
     const { error } = await dispatch(updateGroupThunk(req)).unwrap()
     if (error) {
       toast.error({ message: 'An error occured, please try again!' })
-      return
-    }
-    else {
+      return setLoading(false)
+    } else {
       toast.success({ message: 'Group info updated!' })
       route.params.reloadDetailFunc()
       navigation.goBack()
+      setLoading(false)
     }
   }
 
   return (
     <View style={baseStyles(theme).container}>
-      <ScrollView showsVerticalScrollIndicator={false} style={baseStyles(theme).innerWrapper}>
+      <LoadingOverlay loading={loading} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={baseStyles(theme).innerWrapper}
+      >
         <View style={styles(theme).imgContainer}>
           <IconButton
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+            }}
+            icon="trash-can"
+            size={30}
+            onPress={() => deleteGroupOrNot()}
+          />
+          <View style={{ alignSelf: 'center', position: 'relative', top: 45 }}>
+            <Image
+              style={styles(theme).profilePicture}
+              source={
+                groupInfo.backgroundPicture == ''
+                  ? require('../../../../../assets/group-img.png')
+                  : { uri: groupInfo.backgroundPicture }
+              }
+            />
+            <IconButton
+              icon="pencil"
               style={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
+                zIndex: 9999,
+                position: 'relative',
+                right: -70,
               }}
-              icon="trash-can"
-              size={30}
-              onPress={() => deleteGroupOrNot()}
-          />
-          <Image
-            style={styles(theme).profilePicture}
-            source={
-              groupInfo.backgroundPicture == "" ?
-              require('../../../../../assets/group-img.png') :
-              { uri: groupInfo.backgroundPicture }
-            }
-          />
+              mode="contained"
+              onPress={pickImage}
+            />
+          </View>
         </View>
 
-        {groupInfo.name && <Text style={styles(theme).groupTitle}>{groupInfo.name}</Text>}
+        {groupInfo.name && (
+          <Text style={styles(theme).groupTitle}>{groupInfo.name}</Text>
+        )}
 
         <Text style={styles(theme).title}>Group name </Text>
         <TextInput
-            mode="outlined"
-            value={groupInfo.name}
-            onChangeText={text => setGroupInfo({...groupInfo, name: text})}
+          mode="outlined"
+          value={groupInfo.name}
+          onChangeText={(text) => setGroupInfo({ ...groupInfo, name: text })}
         />
-
-        <Text style={styles(theme).title}>Image link </Text>
-        <TextInput
-            mode="outlined"
-            value={groupInfo.backgroundPicture}
-            onChangeText={text => setGroupInfo({...groupInfo, backgroundPicture: text})}
-            right={groupInfo.backgroundPicture == "" ?
-                <TextInput.Icon
-                  icon="clipboard-arrow-down-outline"
-                  onPress={() => copiedTextToImageLink()}
-                /> :
-                <TextInput.Icon
-                  icon="window-close"
-                  onPress={() => setGroupInfo({...groupInfo, backgroundPicture: ""})}
-                />
-            }
-        />
-
         <Text style={styles(theme).title}>Group description </Text>
         <TextInput
           style={styles(theme).noteInput}
@@ -166,9 +178,11 @@ export default function GroupEdit({
           numberOfLines={6}
           mode="outlined"
           value={groupInfo.description}
-          onChangeText={(text) => setGroupInfo({...groupInfo, description: text})}
+          onChangeText={(text) =>
+            setGroupInfo({ ...groupInfo, description: text })
+          }
         />
-        
+
         <View style={styles(theme).btnContainer}>
           <Button
             mode="contained"
@@ -191,7 +205,6 @@ export default function GroupEdit({
     </View>
   )
 }
-
 
 const styles = (theme: AppTheme) =>
   StyleSheet.create({
@@ -237,6 +250,4 @@ const styles = (theme: AppTheme) =>
       fontWeight: 'bold',
       alignSelf: 'center',
     },
-})
-
-
+  })

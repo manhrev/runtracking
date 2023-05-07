@@ -33,7 +33,7 @@ export default function EventDetail({
 }: NativeStackScreenProps<RootGroupTopTabsParamList, 'EventDetail'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-  const yourGroupId = route.params.yourGroupId
+  const { yourGroupId, reloadEventList } = route.params
   const {
     id,
     description,
@@ -116,8 +116,9 @@ export default function EventDetail({
               icon: 'pencil',
               label: 'Edit event',
               onPress: () => {
-                navigation.navigate('CreateEvent', {
-                  ownerGroupId: ownerGroupId,
+                navigation.navigate('EditEvent', {
+                  event: route.params.event,
+                  reloadEvent: reloadEventList,
                 })
               },
               labelTextColor: theme.colors.elevation.level5,

@@ -34,13 +34,14 @@ export default function Filter({
   const [filterEvent, setFilterEvent] = useState(0)
 
   useEffect(() => {
-    if (visibility === ListEventsRequest.Visibility.VISIBILITY_GLOBAL) {
-      setFilterEvent(0)
-    } else if (
-      visibility === ListEventsRequest.Visibility.VISIBILITY_NO_GLOBAL
-    ) {
-      setFilterEvent(1)
-    }
+    // if (visibility === ListEventsRequest.Visibility.VISIBILITY_GLOBAL) {
+    //   setFilterEvent(0)
+    // } else if (
+    //   visibility === ListEventsRequest.Visibility.VISIBILITY_NO_GLOBAL
+    // ) {
+    //   setFilterEvent(1)
+    // }
+    setFilterEvent(2)
   }, [])
 
   const toggleFilter = (filter: number) => {

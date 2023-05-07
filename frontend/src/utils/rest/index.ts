@@ -39,12 +39,12 @@ class RestClient {
     })
 
     if (!res.ok) {
+      console.log('upload image error', res.status, ' ', res.statusText)
       return {
         error: true,
         imageUrl: '',
       }
     }
-
     const body = await res.json()
     return {
       error: false,
