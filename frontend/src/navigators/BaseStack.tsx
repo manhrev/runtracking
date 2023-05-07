@@ -46,6 +46,7 @@ import GroupsInEvent from '../screens/Group/Event/EventDetail/GroupsInEvent'
 import EventList from '../screens/Group/Event/EventList'
 import CreateEvent from '../screens/Group/Event/CreateEvent'
 import SubEventCreate from '../screens/Group/Event/CreateEvent/SubEventCreate'
+import EditEvent from '../screens/Group/Event/EditEvent'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -179,6 +180,7 @@ export type RootBaseStackParamList = {
   EventDetail: {
     event: EventDetailPb.AsObject
     yourGroupId: number
+    reloadEventList: () => void
   }
   GroupsInEvent: {
     eventId: number
@@ -191,6 +193,11 @@ export type RootBaseStackParamList = {
   CreateSubEvent: {
     subEventList: CreateSubEventPb.AsObject[]
     setSubEventList: Function
+  }
+  EditEvent: {
+    event: EventDetailPb.AsObject
+    reloadEvent: () => void
+    // yourGroupId: number
   }
 }
 
@@ -454,6 +461,14 @@ export const BaseStack = () => {
               headerBackVisible: true,
             }}
             component={SubEventCreate}
+          />
+          <Stack.Screen
+            name="EditEvent"
+            options={{
+              title: 'Edit event',
+              headerBackVisible: true,
+            }}
+            component={EditEvent}
           />
         </>
       ) : (

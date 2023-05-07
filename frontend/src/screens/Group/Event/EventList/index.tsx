@@ -1,5 +1,6 @@
+import { useFocusEffect } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { RefreshControl } from 'react-native'
 import { View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -62,13 +63,15 @@ export default function EventList({
     ListEventsRequest.SortBy.SORT_BY_UNSPECIFIED
   )
   const [visibility, setVisibility] = useState(
-    ListEventsRequest.Visibility.VISIBILITY_NO_GLOBAL
+    ListEventsRequest.Visibility.VISIBILITY_UNSPECIFIED
   )
-  const [groupIds, setGroupIds] = useState<number[]>([])
+  const [groupIds, setGroupIds] = useState<number[]>([groupinfo?.id || 0])
 
-  useEffect(() => {
-    fetchListEvent()
-  }, [dispatch, searchByName, sortBy, asc, visibility, groupIds])
+  useFocusEffect(
+    useCallback(() => {
+      fetchListEvent()
+    }, [dispatch, searchByName, sortBy, asc, visibility, groupIds])
+  )
 
   const yourGroupId = groupinfo?.id || 0
 
@@ -133,7 +136,6 @@ export default function EventList({
       })
     }
     toast.success({ message: 'Join event successfully!' })
-    console.log(eventIdToJoin)
     toggleDialog()
   }
 
@@ -223,6 +225,7 @@ export default function EventList({
                     navigation.navigate('EventDetail', {
                       event: event,
                       yourGroupId: yourGroupId,
+                      reloadEventList: fetchListEvent,
                     })
                   }}
                   onSubmit={() => {

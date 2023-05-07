@@ -79,7 +79,7 @@ export default function GroupDetail({
 
   const { eventList } = useAppSelector(selectEventList)
   const eventListLoading = useAppSelector(isEventListLoading)
-  
+
   // group detail
   const { groupDetail } = useAppSelector(selectGroupDetail)
   const groupDetailLoading = useAppSelector(isGroupDetailLoading)
@@ -176,6 +176,7 @@ export default function GroupDetail({
         limit: 4,
         offset: 0,
         search: '',
+        yourGroupId: route.params.groupId,
       })
     )
   }
@@ -191,7 +192,14 @@ export default function GroupDetail({
 
   return (
     <View style={baseStyles(theme).container}>
-      <LoadingOverlay loading={groupDetailLoading && eventListLoading && userRankingListLoading && challengeListLoading} />
+      <LoadingOverlay
+        loading={
+          groupDetailLoading &&
+          eventListLoading &&
+          userRankingListLoading &&
+          challengeListLoading
+        }
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={baseStyles(theme).innerWrapper}
@@ -543,7 +551,11 @@ export default function GroupDetail({
                 marginBottom: 10,
               }}
               onPress={() => {
-                navigation.navigate('EventDetail', { event: item })
+                navigation.navigate('EventDetail', {
+                  event: item,
+                  yourGroupId: route.params.groupId,
+                  reloadEventList: fetchEventList,
+                })
               }}
             >
               <Image

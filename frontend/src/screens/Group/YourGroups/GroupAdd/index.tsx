@@ -1,9 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { View, Image, StyleSheet, ScrollView } from 'react-native'
-import { Text, Button, TextInput } from 'react-native-paper'
+import { Text, Button, TextInput, IconButton } from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
 import * as Clipboard from 'expo-clipboard'
@@ -12,6 +12,8 @@ import { CreateGroupRequest, GroupInfo } from '../../../../lib/group/group_pb'
 
 import { createGroupThunk } from '../../../../redux/features/yourGroupList/thunk'
 import { RootBaseStackParamList } from '../../../../navigators/BaseStack'
+import { useImageUpload } from '../../../../hooks/useImageUpload'
+import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 
 export default function GroupAdd({
   navigation,
@@ -19,6 +21,12 @@ export default function GroupAdd({
 }: NativeStackScreenProps<RootBaseStackParamList, 'GroupAdd'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
+  const [loading, setLoading] = useState(false)
+  const { pickImage, selectedImage, clearSelectedImage, uploadImage } =
+    useImageUpload({
+      aspect: [1, 1],
+      quality: 0.5,
+    })
   const [groupInfo, setGroupInfo] = useState<GroupInfo.AsObject>({
     id: 0,
     name: 'Example Group',
@@ -32,20 +40,26 @@ export default function GroupAdd({
     numOfEventParticipated: 0,
   })
 
-  const copiedTextToImageLink = async () => {
-    const text: any = await Clipboard.getStringAsync()
-    if (text == null || text == '') {
-      toast.error({ message: 'Clipboard is empty!' })
-      return
+  useMemo(() => {
+    if (selectedImage) {
+      setGroupInfo({ ...groupInfo, backgroundPicture: selectedImage })
     }
-    setGroupInfo({ ...groupInfo, backgroundPicture: text })
-  }
+  }, [selectedImage])
 
   const createNewGroup = async () => {
     if (groupInfo.name == '' || groupInfo.backgroundPicture == '') {
       toast.error({ message: 'Group name or image link cannot be empty!' })
       return
     }
+    setLoading(true)
+    const { error: upImageError, imageUrl } = await uploadImage()
+    if (upImageError) {
+      toast.error({
+        message: 'Error while uploading your picture, please try again!',
+      })
+      return setLoading(false)
+    }
+    setGroupInfo({ ...groupInfo, backgroundPicture: imageUrl })
 
     const req: CreateGroupRequest.AsObject = {
       groupInfo: {
@@ -64,30 +78,44 @@ export default function GroupAdd({
     const { error } = await dispatch(createGroupThunk(req)).unwrap()
     if (error) {
       toast.error({ message: 'An error occured, please try again!' })
-      return
+      return setLoading(false)
     } else {
       toast.success({ message: 'Group created!' })
       const { reloadYourGroupList } = route.params
       reloadYourGroupList()
       navigation.goBack()
+      setLoading(false)
     }
   }
 
   return (
     <View style={baseStyles(theme).container}>
+      <LoadingOverlay loading={loading} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={baseStyles(theme).innerWrapper}
       >
         <View style={styles(theme).imgContainer}>
-          <Image
-            style={styles(theme).profilePicture}
-            source={
-              groupInfo.backgroundPicture == ''
-                ? require('../../../../../assets/group-img.png')
-                : { uri: groupInfo.backgroundPicture }
-            }
-          />
+          <View style={{ alignSelf: 'center', position: 'relative', top: 45 }}>
+            <Image
+              style={styles(theme).profilePicture}
+              source={
+                groupInfo.backgroundPicture == ''
+                  ? require('../../../../../assets/group-img.png')
+                  : { uri: groupInfo.backgroundPicture }
+              }
+            />
+            <IconButton
+              icon="pencil"
+              style={{
+                zIndex: 9999,
+                position: 'relative',
+                right: -70,
+              }}
+              mode="contained"
+              onPress={pickImage}
+            />
+          </View>
         </View>
 
         {groupInfo.name && (
@@ -99,30 +127,6 @@ export default function GroupAdd({
           mode="outlined"
           value={groupInfo.name}
           onChangeText={(text) => setGroupInfo({ ...groupInfo, name: text })}
-        />
-
-        <Text style={styles(theme).title}>Image link </Text>
-        <TextInput
-          mode="outlined"
-          value={groupInfo.backgroundPicture}
-          onChangeText={(text) =>
-            setGroupInfo({ ...groupInfo, backgroundPicture: text })
-          }
-          right={
-            groupInfo.backgroundPicture == '' ? (
-              <TextInput.Icon
-                icon="clipboard-arrow-down-outline"
-                onPress={() => copiedTextToImageLink()}
-              />
-            ) : (
-              <TextInput.Icon
-                icon="window-close"
-                onPress={() =>
-                  setGroupInfo({ ...groupInfo, backgroundPicture: '' })
-                }
-              />
-            )
-          }
         />
 
         <Text style={styles(theme).title}>Group description </Text>

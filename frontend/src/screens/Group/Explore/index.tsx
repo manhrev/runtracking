@@ -42,7 +42,7 @@ export default function Explore({
     toggleDialog,
   } = useDialog<number>()
 
-  const { groupList } = useAppSelector(selectGroupList)
+  const { groupList, total } = useAppSelector(selectGroupList)
   const groupListLoading = useAppSelector(isGroupListLoading)
   const noData = groupList.length === 0 && !groupListLoading
   const [canLoadmore, setCanLoadmore] = useState(false)
@@ -185,7 +185,7 @@ export default function Explore({
               />
             )
           })}
-          {!noData && (
+          {!noData && total > 10 && (
             <Button
               style={{ marginTop: 10, marginBottom: 20 }}
               mode="elevated"

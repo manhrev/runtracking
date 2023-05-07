@@ -38,7 +38,7 @@ export default function YourGroups({
   const dispatch = useAppDispatch()
   const userState = useAppSelector((state) => state.user)
 
-  const { yourGroupList } = useAppSelector(selectYourGroupList)
+  const { yourGroupList, total } = useAppSelector(selectYourGroupList)
   const yourGroupsLoading = useAppSelector(isYourGroupListLoading)
   const noData = yourGroupList.length === 0 && !yourGroupsLoading
   const [canLoadmore, setCanLoadmore] = useState(false)
@@ -146,7 +146,7 @@ export default function YourGroups({
             )
           })}
 
-          {!noData && (
+          {!noData && total > 10 && (
             <Button
               style={{ marginTop: 10, marginBottom: 20 }}
               mode="elevated"
