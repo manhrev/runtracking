@@ -45,7 +45,7 @@ func (s *chatServer) SendMessage(ctx context.Context, request *chatpb.SendMessag
 		ctxNoti, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*8000))
 		defer cancel()
 		_, err = s.notificationClient.PushNotification(ctxNoti, &notification.PushNotiRequest{
-			Messeage:      fmt.Sprintf("%s has recently sent you a message", userInfoMap[request.ToUserId].DisplayName),
+			Messeage:      fmt.Sprintf("%s has recently sent you a message", userInfoMap[userId].DisplayName),
 			SourceType:    notification.SOURCE_TYPE_PERSONAL,
 			ScheduledTime: timestamppb.New(time.Now().Add(time.Second * 5)),
 			ReceiveIds:    []int64{request.ToUserId},
