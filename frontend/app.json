@@ -5,7 +5,7 @@
     "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "gotracker",
+    "scheme": "com.manhrev.gotracker",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",

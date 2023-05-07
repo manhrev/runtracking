@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect, useState } from 'react'
+import { useEffect, useState , useCallback} from 'react'
 import { Alert, NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { Button } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
@@ -64,9 +64,11 @@ export default function ConversationList({
     }
   }
 
-  useEffect(() => {
-    fetchConversationList()
-  }, [dispatch])
+  useFocusEffect(
+    useCallback(() => {
+       fetchConversationList()
+    }, [dispatch, navigation])
+  );
 
   return (
     <>

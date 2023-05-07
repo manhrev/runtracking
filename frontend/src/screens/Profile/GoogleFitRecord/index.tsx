@@ -231,10 +231,7 @@ export default function GoogleFitRecord() {
                                     iconColor='black'
                                     underlayColor="black"
                                     onPress={() => {
-                                        promptAsync({
-                                            useProxy: true,
-                                            projectNameForProxy: "@manhrev/gotracker"
-                                        });
+                                        promptAsync()
                                     }}
 
                                 />
