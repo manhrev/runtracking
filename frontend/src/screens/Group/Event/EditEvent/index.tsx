@@ -57,8 +57,10 @@ export default function EditEvent({
       })
       return setLoading(false)
     }
-    setEventToUpdate({ ...eventToUpdate, picture: imageUrl })
-    const { error } = await eventClient.updateEventInfo(eventToUpdate)
+    const { error } = await eventClient.updateEventInfo({
+      ...eventToUpdate,
+      picture: imageUrl ? imageUrl : picture,
+    })
     if (error) {
       toast.error({ message: 'An error occurred, please try again later!' })
       return setLoading(false)

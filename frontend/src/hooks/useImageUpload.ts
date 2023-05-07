@@ -18,8 +18,6 @@ export function useImageUpload(pickerOption?: ImagePicker.ImagePickerOptions) {
     }
     let { assets } = await ImagePicker.launchImageLibraryAsync(option)
 
-    console.log(assets)
-
     if (assets) {
       setImage(assets[0].uri)
     }
@@ -33,7 +31,7 @@ export function useImageUpload(pickerOption?: ImagePicker.ImagePickerOptions) {
       return res
     }
     return {
-      error: true,
+      error: false,
       imageUrl: '',
     }
   }

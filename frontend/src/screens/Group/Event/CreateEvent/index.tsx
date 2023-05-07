@@ -34,6 +34,9 @@ export default function CreateEvent({
     useState<CreateEventRequest.AsObject>(
       new CreateEventRequest()
         .setIsGlobal(false)
+        .setPicture(
+          'https://storage.googleapis.com/runtracking/Frame%201%20(1).png'
+        )
         .setOwnerGroupId(ownerGroupId)
         .toObject()
     )
@@ -75,10 +78,10 @@ export default function CreateEvent({
       })
       return setLoading(false)
     }
-    setEventToCreate({ ...eventToCreate, picture: imageUrl })
     const { error } = await eventClient.createEvent({
       ...eventToCreate,
       subEventsList: subEventList,
+      picture: imageUrl ? imageUrl : eventToCreate.picture,
       startAt: subEventList[0].startAt,
     })
     if (error) {

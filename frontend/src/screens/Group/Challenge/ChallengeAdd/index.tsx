@@ -212,12 +212,12 @@ export default function ChallengeAdd({
       })
       return setLoading(false)
     }
-    setChallengeInfo({ ...challengeInfo, picture: imageUrl })
 
     const req: CreateChallengeRequest.AsObject = {
       groupId: route.params.groupId,
       challengeinfo: {
         ...challengeInfo,
+        picture: imageUrl,
         challengerulesList: getRuleList(),
       },
     }

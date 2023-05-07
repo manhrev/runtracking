@@ -66,7 +66,7 @@ export default function GroupAdd({
         id: groupInfo.id,
         name: groupInfo.name,
         description: groupInfo.description,
-        backgroundPicture: groupInfo.backgroundPicture,
+        backgroundPicture: imageUrl,
         leaderId: groupInfo.leaderId,
         memberStatus: groupInfo.memberStatus,
         numOfMembers: groupInfo.numOfMembers,

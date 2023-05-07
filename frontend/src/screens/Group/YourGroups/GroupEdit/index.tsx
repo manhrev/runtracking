@@ -94,13 +94,12 @@ export default function GroupEdit({
       })
       return setLoading(false)
     }
-    setGroupInfo({ ...groupInfo, backgroundPicture: imageUrl })
     const req: UpdateGroupRequest.AsObject = {
       groupinfo: {
         id: groupInfo.id,
         name: groupInfo.name,
         description: groupInfo.description,
-        backgroundPicture: groupInfo.backgroundPicture,
+        backgroundPicture: imageUrl ? imageUrl : groupInfo.backgroundPicture,
         leaderId: groupInfo.leaderId,
         memberStatus: groupInfo.memberStatus,
         numOfMembers: groupInfo.numOfMembers,
