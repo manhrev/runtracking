@@ -202,7 +202,7 @@ export default function ActivityDetail({
                     <Polyline
                       key={index}
                       coordinates={polyline}
-                      strokeColor="#f00"
+                      strokeColor={theme.colors.primary}
                       strokeWidth={4}
                     />
                   ))}

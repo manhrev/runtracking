@@ -359,6 +359,9 @@ export default function RunTracking({
     })
     setFocusMode(false)
     setVisible(false)
+    toast.success({
+      message: "Activity has been reset ! Let's start a new one !",
+    })
   }
 
   const switchActivityType = () => {
@@ -544,7 +547,7 @@ export default function RunTracking({
           <Polyline
             key={index}
             coordinates={polyline}
-            strokeColor="#f00"
+            strokeColor={theme.colors.primary}
             strokeWidth={4}
           />
         ))}
@@ -686,9 +689,19 @@ export default function RunTracking({
         icon="image-filter-center-focus-strong"
         mode="outlined"
         size={26}
-        iconColor={focusMode ? theme.colors.error : theme.colors.tertiary}
+        iconColor={focusMode ? theme.colors.primary : theme.colors.tertiary}
         containerColor="white"
         onPress={() => setFocusMode(!focusMode)}
+      />
+
+      <IconButton // get current position button
+        style={styles(theme).currentLocationBtn}
+        icon="crosshairs-gps"
+        mode="outlined"
+        size={26}
+        iconColor={theme.colors.tertiary}
+        containerColor="white"
+        onPress={() => getLocation()}
       />
     </View>
   )
@@ -702,15 +715,21 @@ const styles = (theme: AppTheme) =>
     map: {
       flex: 1,
     },
-    focusBtn: {
+    resetBtn: {
       position: 'absolute',
-      bottom: '30%',
+      bottom: '50%',
       right: '1%',
       alignSelf: 'flex-end', // for align to right
     },
-    resetBtn: {
+    focusBtn: {
       position: 'absolute',
-      bottom: '40%',
+      bottom: '42%',
+      right: '1%',
+      alignSelf: 'flex-end', // for align to right
+    },
+    currentLocationBtn: {
+      position: 'absolute',
+      bottom: '25%',
       right: '1%',
       alignSelf: 'flex-end', // for align to right
     },
