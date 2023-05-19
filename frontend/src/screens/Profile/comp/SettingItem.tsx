@@ -9,11 +9,12 @@ interface SettingItemProps {
   right?: string | JSX.Element; // right is string or text input
   color?: string;
   onPress: Function;
+  widthLimit?: boolean
 }
 
 export default function SettingItem(props: SettingItemProps) {
   const theme = useAppTheme();
-  const { editMode, left, right, topDivider, color, onPress } = props;
+  const { editMode, left, right, topDivider, color, onPress, widthLimit } = props;
   let action = () => {};
 
   return (
@@ -37,6 +38,7 @@ export default function SettingItem(props: SettingItemProps) {
               style={{
                 fontWeight: "bold",
                 color: color ? color : theme.colors.onBackground,
+                width: widthLimit ? 90 : '100%'
               }}
             >
               {left}

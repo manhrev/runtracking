@@ -115,6 +115,7 @@ export default function ProfileSetting({
       <View style={styles(theme).settingGroup}>
         <LoadingOverlay loading={loading} />
         <SettingItem
+          widthLimit={true}
           left="Fullname"
           right={
             editMode ? (
@@ -134,6 +135,7 @@ export default function ProfileSetting({
           onPress={() => {}}
         />
         <SettingItem
+          widthLimit={true}
           left="Username"
           right={
             editMode ? (
@@ -153,7 +155,8 @@ export default function ProfileSetting({
           onPress={() => {}}
         />
         <SettingItem
-          left="Phone number"
+          widthLimit={true}
+          left="Phone"
           right={
             editMode ? (
               <TextInput
@@ -171,6 +174,7 @@ export default function ProfileSetting({
           onPress={() => {}}
         />
         <SettingItem
+          widthLimit={true}
           left="Email"
           right={
             editMode ? (
@@ -191,6 +195,7 @@ export default function ProfileSetting({
       </View>
       <View style={styles(theme).settingGroup}>
         <SettingItem
+          widthLimit={true}
           left="Height(cm)"
           right={
             editMode ? (
@@ -208,6 +213,7 @@ export default function ProfileSetting({
           onPress={() => {}}
         />
         <SettingItem
+          widthLimit={true}
           left="Weight(kg)"
           right={
             editMode ? (
@@ -239,7 +245,7 @@ export default function ProfileSetting({
         <Button
           mode="contained"
           onPress={() => setEditMode(!editMode)}
-          buttonColor={editMode ? '#e82525' : theme.colors.primary}
+          buttonColor={editMode ? theme.colors.tertiary : theme.colors.primary}
           style={editMode ? styles(theme).redBtn : styles(theme).greenBtn}
         >
           {editMode ? 'CANCEL' : 'EDIT PROFILE'}
@@ -259,9 +265,8 @@ const styles = (theme: AppTheme) =>
       marginTop: 20,
     },
     inputStyle: {
-      backgroundColor: 'white',
+      backgroundColor: theme.colors.surface,
       height: 35,
-      marginLeft: 10,
       alignSelf: 'flex-end',
       flex: 1,
       borderRadius: 10,
@@ -277,6 +282,6 @@ const styles = (theme: AppTheme) =>
     redBtn: {
       marginTop: 20,
       marginRight: 10,
-      color: 'red',
+      color: theme.colors.tertiary,
     },
   })
