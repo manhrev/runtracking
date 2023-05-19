@@ -347,7 +347,7 @@ export default function RunTracking({
   }
 
   // reset
-  const resetRunInfo = () => {
+  const resetRunInfo = (toastMessage: boolean = false) => {
     setTotalTime(0)
     setTotalDistance(0)
     setPace(0)
@@ -359,9 +359,12 @@ export default function RunTracking({
     })
     setFocusMode(false)
     setVisible(false)
-    toast.success({
-      message: "Activity has been reset ! Let's start a new one !",
-    })
+
+    if(toastMessage) {
+      toast.success({
+        message: 'Activity has been reset. Let\'s start a new one !'
+      })
+    }
   }
 
   const switchActivityType = () => {
@@ -429,7 +432,7 @@ export default function RunTracking({
             <Text>Do you want to restart your activity ?</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={resetRunInfo}> Yes </Button>
+            <Button onPress={() => resetRunInfo(true)}> Yes </Button>
             <Button onPress={hideDialog}> No </Button>
           </Dialog.Actions>
         </Dialog>
