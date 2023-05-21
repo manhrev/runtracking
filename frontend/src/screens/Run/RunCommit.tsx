@@ -8,8 +8,10 @@ import { useState, useEffect, useRef } from 'react'
 import * as Progress from 'react-native-progress'
 import { getPlanList } from '../../redux/features/planList/slice'
 import { listPlanThunk } from '../../redux/features/planList/thunk'
+import { selectEventList } from '../../redux/features/eventList/slice'
 import { PlanInfo, RuleStatus } from '../../lib/plan/plan_pb'
 import { ChallengeInfo } from '../../lib/group/group_pb'
+import { EventDetail } from '../../lib/event/event_pb'
 import {
   ActivityType,
   CommitActivityRequest,
@@ -26,9 +28,13 @@ import {
 } from '../../utils/helpers'
 import { toast } from '../../utils/toast/toast'
 import ChallengeItem from './comp/ChallengeItem'
+import EventItem from './comp/EventItem'
 import PlanItem from './comp/PlanItem'
 import { baseStyles } from '../baseStyle'
 import { text } from 'stream/consumers'
+import { listEventsThunk } from '../../redux/features/eventList/thunks'
+import { listYourGroupThunk } from '../../redux/features/yourGroupList/thunk'
+import { selectYourGroupList } from '../../redux/features/yourGroupList/slice'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -42,6 +48,14 @@ export default function RunCommit({
   // show hide
   const [showPlan, setShowPlan] = useState(false)
   const [showChallenge, setShowChallenge] = useState(false)
+  const [showEvent, setShowEvent] = useState(false)
+  
+  const { eventList } = useAppSelector(selectEventList)
+  const [selectedEvent, setSelectedEvent] = useState<EventDetail.AsObject>(
+    {} as EventDetail.AsObject
+  )
+
+  const { yourGroupList } = useAppSelector(selectYourGroupList)
 
   const { planList } = useAppSelector(getPlanList)
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo.AsObject>(
@@ -109,10 +123,57 @@ export default function RunCommit({
     }
   }, [planList])
 
+  const fetchListEvent = async () => {
+    const response = await dispatch(
+      listYourGroupThunk({
+        ascending: true,
+        limit: 100,
+        filterBy: 1, // is member
+        offset: 0,
+        searchByName: '',
+        sortBy: 1,
+        groupIdsList: [],
+      })
+    ).unwrap()
+
+    const res = await dispatch(
+      listEventsThunk({
+        ascending: true,
+        limit: 100,
+        visibility: 0,
+        search: "",
+        offset: 0,
+        groupIdsList: getGroupIds(),
+        idsList: [],
+        sortBy: 0,
+        yourGroupId: -1,
+      })
+    ).unwrap()
+
+    if(res.error) {
+      console.log(res.error)
+    }
+    else 
+    {
+      if(filteredEventList.length > 0) {
+        setSelectedEvent(filteredEventList[0])
+      }
+    }
+  }
+
   useEffect(() => {
     fetchPlanData()
     fetchChallengeData()
+    fetchListEvent()
   }, [])
+
+  const getGroupIds = () => {
+    const groupIds: number[] = []
+    for(let i = 0; i < yourGroupList.length; i++) {
+      groupIds.push(yourGroupList[i].id)
+    }
+    return groupIds
+  }
 
   const commitToPlan = async (): Promise<boolean> => {
     const commitObj: CommitObject.AsObject = {
@@ -200,9 +261,6 @@ export default function RunCommit({
     return null
   }
 
-
-
-
   const backToHome = () => {
     route.params.resetRunInfo()
     navigation.goBack()
@@ -212,6 +270,18 @@ export default function RunCommit({
     (item) =>
       item.status === RuleStatus.RULE_STATUS_INPROGRESS &&
       item.activityType == route.params.activityType
+  )
+
+  const getSeconds = (time: number | undefined) => {
+    if (time) {
+      return time * 1000
+    }
+    return 0
+  }
+
+  const filteredEventList = eventList.filter(
+    // startAt is <= now and endAt is >= now
+    (item) => getSeconds(item.startAt?.seconds) <= Date.now() && getSeconds(item.endAt?.seconds) >= Date.now()
   )
 
   return (
@@ -373,6 +443,70 @@ export default function RunCommit({
                 )
               })}
             </View>
+
+            <View>
+              <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+              }}>
+                  <Text style={{
+                      fontSize: 17,
+                      fontWeight: 'bold',
+                  }}>Event:</Text>
+
+                  <TouchableOpacity
+                    onPress={() => setShowEvent(!showEvent)}
+                    style={{
+                      alignSelf: 'flex-end',
+                      marginRight: 10,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{
+                        fontSize: 15,
+                        fontWeight: 'bold',
+                        color: theme.colors.primary,
+                    }}>
+                      {selectedEvent.name ? selectedEvent.name : 'No data'}
+                    </Text>
+
+                    <Avatar.Icon
+                      icon={showChallenge ? 'chevron-up' : 'chevron-down'}
+                      size={35}
+                      color={theme.colors.primary}
+                      style={{
+                        backgroundColor: 'transparent',
+                      }}
+                    />
+                  </TouchableOpacity>
+              </View>
+            </View>
+
+            {!showEvent && selectEventList.name && (
+                <EventItem
+                event={selectedEvent}
+                hideTopDivider={true}
+                showBottomDivider={true}
+                setSelectedEvent={setSelectedEvent}
+                selectedEvent={selectedEvent}
+              />
+              )
+            }
+
+            {showEvent && filteredEventList.map((event: EventDetail.AsObject, idx) => {
+              return (
+                <EventItem
+                  key={idx}
+                  event={event}
+                  hideTopDivider={idx === 0}
+                  showBottomDivider={idx === filteredEventList.length - 1}
+                  setSelectedEvent={setSelectedEvent}
+                  selectedEvent={selectedEvent}
+                />
+              )
+            })}
 
             {(filteredPlanList.length > 0 ||  challengeList.length > 0) && (
               <Button
