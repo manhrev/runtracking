@@ -23,6 +23,7 @@ service Event {
     rpc ListGroupProgressInEvent (ListGroupProgressInEventRequest) returns (ListGroupProgressInEventReply) {} // get progress of a group in an event
     //rpc GetGroupRankingInEvent (GetGroupRankingInEventRequest) returns (GetGroupRankingInEventReply) {} // get ranking of a group in an event
     //rpc GetGroupRankingInSubEvent (GetGroupRankingInSubEventRequest) returns (GetGroupRankingInSubEventReply) {} // get ranking of a group in a subevent
+    
 }   
 
 message SubEvent {
