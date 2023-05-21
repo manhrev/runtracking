@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	"github.com/manhrev/runtracking/backend/auth/internal/service/token"
+	"github.com/manhrev/runtracking/backend/auth/internal/status"
 	pb "github.com/manhrev/runtracking/backend/auth/pkg/api"
+	code "github.com/manhrev/runtracking/backend/auth/pkg/code"
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent"
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent/user"
 )
@@ -40,14 +42,14 @@ func (s auth) SignIn(ctx context.Context, request *pb.LoginRequest) (*pb.LoginRe
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, nil, err
+			return nil, nil, status.New(code.Code_UNAUTHENTICATED, "Username is not correct")
 		}
-		return nil, nil, err
+		return nil, nil, status.New(code.Code_UNAUTHENTICATED, "Username is not correct")
 	}
 
 	if user.Password != request.GetPassword() {
 		log.Println("User password don't match")
-		return nil, nil, errors.New("User password don't match")
+		return nil, nil, status.New(code.Code_UNAUTHENTICATED, "Password is not correct")
 	}
 
 	tokens, err := s.token.Create(user.ID)
