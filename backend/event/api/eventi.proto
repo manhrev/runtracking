@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = "github.com/manhrev/runtracking/backend/event/pkg/api;event";
+
+import "google/protobuf/timestamp.proto";
+import "api/event.proto";
+
+service EventI {
+    rpc UpdateEventProgress(UpdateEventProgressRequest) returns (UpdateEventProgressReply);
+    rpc CheckDaily(CheckDailyRequest) returns (CheckDailyReply);
+}
+
+message UpdateEventProgressRequest {
+    int64 event_id = 1;
+    int64 user_id = 2;
+    int64 group_id = 5;
+    google.protobuf.Timestamp time = 3;
+    ActivityRecord activityRecord = 4;
+}
+
+// Including increment values needed to update challenge member rules
+message ActivityRecord{
+    int64 calories_value = 1;
+    int64 time_spend_value = 2;
+    int64 distance_value = 3;
+}
+
+message UpdateEventProgressReply {
+}
+
+message CheckDailyRequest {
+    google.protobuf.Timestamp time_check = 1;
+}
+
+message CheckDailyReply {
+}
