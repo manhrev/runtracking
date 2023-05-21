@@ -88,7 +88,7 @@ const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
           <AnimatedCircularProgress
             size={200}
             width={5}
-            fill={yourGroupProgress.progress / goal}
+            fill={(yourGroupProgress.progress * 100) / goal}
             tintColor="green"
             backgroundColor="#e0e0e0"
             // text inside the circle

@@ -90,7 +90,7 @@ export default function EventDetail({
     }
     let groupList: number[] = []
     if (response) {
-      groupList = response.groupsList.map((group) => group.id)
+      groupList = [14, 15, 16] //response.groupsList.map((group) => group.id)
     }
     dispatch(
       getGroupInfoThunk({
@@ -164,9 +164,7 @@ export default function EventDetail({
                   }}
                 />
               </View>
-              <Text style={{ fontSize: 15, marginTop: 8 }}>
-                Description: Lorem eipsdf asdffw vshew ehwrhh ewh
-              </Text>
+              <Text style={{ fontSize: 15, marginTop: 8 }}>{description}</Text>
             </View>
             <View style={styles(theme).metricSection}>
               <TouchableRipple

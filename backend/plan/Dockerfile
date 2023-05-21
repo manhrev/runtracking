@@ -1,4 +1,5 @@
 FROM golang:1.18.3-alpine 
+RUN apk add git
 WORKDIR /app
 COPY ./ /app/
 WORKDIR /app/cmd/
@@ -8,6 +9,5 @@ COPY /docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /wait-for-it.sh /docker-entrypoint.sh
 RUN apk add --no-cache bash
 EXPOSE ${LISTEN_PORT}
-
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/server"]
