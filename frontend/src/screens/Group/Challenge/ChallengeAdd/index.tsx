@@ -12,14 +12,12 @@ import {
   TextInput,
   RadioButton,
   IconButton,
-  Menu,
 } from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
 import { useMemo, useState } from 'react'
 import { useAppDispatch } from '../../../../redux/store'
 import { toast } from '../../../../utils/toast/toast'
-import * as Clipboard from 'expo-clipboard'
 
 import {
   CreateChallengeRequest,
@@ -188,7 +186,7 @@ export default function ChallengeAdd({
 
   const createNewChallenge = async () => {
     if (challengeInfo.name == '' || challengeInfo.picture == '') {
-      toast.error({ message: 'Challenge name or image link cannot be empty!' })
+      toast.error({ message: 'Challenge name or image cannot be empty!' })
       return
     } else if (dropdownSelected.length == 0) {
       toast.error({ message: 'Please select at least 1 rule!' })
