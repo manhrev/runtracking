@@ -150,6 +150,7 @@ const slice = createSlice({
 })
 
 export const selectEventList = (state: RootState) => state.eventList
+export const selectGroupInEventList = (state: RootState) => state.groupList
 export const isEventListLoading = (state: RootState) =>
   state.eventList.status === StatusEnum.LOADING
 export const isAllEventListLoading = (state: RootState) => {

@@ -60,7 +60,11 @@ export default function AppSetting({
           />
         </View>
         <View style={styles(theme).settingGroup}>
-          <SettingItem left="Notification" topDivider onPress={() => {}} />
+          <SettingItem left="Notification" topDivider
+            onPress={() => {
+              navigation.navigate('NotificationList', {})
+            }}
+          />
           <SettingItem
             left="Privacy"
             onPress={() => {
