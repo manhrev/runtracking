@@ -36,6 +36,13 @@ export interface User {
     };
     dataQualityStandard: string[];
   }
+
+  export interface DeviceRecord{
+    deviceInfo: Device;
+    totalCalories: number,
+    totalDistance: number,
+    totalTimeSpend: number,
+  }
  export interface Device{
     uid: string;
       type: string;

@@ -24,7 +24,8 @@ class restGoogleFitClient extends restAbstractClient {
       endTimeMillis: req.endTimeNanoSeconds,
       startTimeMillis: req.startTimeNanoSeconds,
     } as AggregateByRequest
-
+    // console.log("BODYYYYYYY")
+    // console.log(body)
     const response = await this.post<ListBucket>('/dataset:aggregate', body)
     return response
   }
