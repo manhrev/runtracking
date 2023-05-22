@@ -85,6 +85,11 @@ func (e *eventImpl) UpdateEventProgress(
 		icrementValue = int64(activityRecord.GetTimeSpendValue())
 	}
 
+	if icrementValue == 0 {
+		return "", status.Internal("Cannot find rule for this subevent")
+	}
+	log.Println("IcrementValue: ", icrementValue)
+
 	groupProgress, err := e.entClient.GroupzProgress.Query().Where(
 		groupzprogress.HasSubEventWith(
 			subevent.IDEQ(currentSubEvent.ID),
