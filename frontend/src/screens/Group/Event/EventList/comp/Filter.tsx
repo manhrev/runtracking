@@ -180,7 +180,7 @@ export default function Filter({
             toggleFilter(1)
           }}
         >
-          Not global
+          Normal
         </Button>
         <Button
           mode={filterEvent === 2 ? 'contained' : 'text'}

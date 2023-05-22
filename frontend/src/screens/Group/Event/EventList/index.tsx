@@ -49,7 +49,7 @@ export default function EventList({
   const ownerGroupId = groupinfo?.id || 0
   const isAdmin = groupinfo?.leaderId === userId
 
-  const { eventList } = useAppSelector(selectEventList)
+  const { eventList, total } = useAppSelector(selectEventList)
   const eventListLoading = useAppSelector(isEventListLoading)
   const noData = eventList.length === 0 && !eventListLoading
   const [canLoadmore, setCanLoadmore] = useState(false)
@@ -236,7 +236,7 @@ export default function EventList({
                 />
               )
             })}
-            {!noData && (
+            {!noData && total > 10 && (
               <Button
                 style={{ marginTop: 10, marginBottom: 20 }}
                 mode="elevated"

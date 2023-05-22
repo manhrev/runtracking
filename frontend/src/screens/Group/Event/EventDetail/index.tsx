@@ -90,7 +90,7 @@ export default function EventDetail({
     }
     let groupList: number[] = []
     if (response) {
-      groupList = [14, 15, 16] //response.groupsList.map((group) => group.id)
+      response.groupsList.map((group) => group.id)
     }
     dispatch(
       getGroupInfoThunk({
@@ -260,7 +260,6 @@ export default function EventDetail({
                 labels={subEventList.map((subEvent) => subEvent.name)}
                 stepCount={subEventList.length ? subEventList.length : 1}
                 onPress={(index) => {
-                  console.log(index)
                   setSelectedSubEvent(subEventList[index])
                 }}
               />
@@ -363,11 +362,13 @@ function getCurrentIndexForSubEvent(subEvents: SubEvent.AsObject[]) {
   let now = moment()
   for (let i = 0; i < subEvents.length; i++) {
     const st = subEvents[i].startAt?.seconds || 0
+    const en = subEvents[i].endAt?.seconds || 0
     const start = moment.unix(st)
+    const end = moment.unix(en)
     // compare st with current time
 
-    if (now.isBefore(start)) {
-      return i - 1 > 0 ? i - 1 : 0
+    if (now.isAfter(start) && now.isBefore(end)) {
+      return i
     }
   }
   return 0

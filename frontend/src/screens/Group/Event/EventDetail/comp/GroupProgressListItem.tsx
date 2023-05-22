@@ -137,7 +137,7 @@ export function formatDataByRule(data: number, rule: Rule) {
     case Rule.RULE_TOTAL_DISTANCE:
       return mToKm(data)
     case Rule.RULE_TOTAL_TIME:
-      return (data / 3600).toFixed(2)
+      return parseFloat((data / 3600).toFixed(2))
     case Rule.RULE_TOTAL_CALORIES:
       return data
   }
