@@ -7,6 +7,7 @@ import (
 	"github.com/manhrev/runtracking/backend/activity/internal/status"
 	activity "github.com/manhrev/runtracking/backend/activity/pkg/api"
 	extractor "github.com/manhrev/runtracking/backend/auth/pkg/extractor"
+	event "github.com/manhrev/runtracking/backend/event/pkg/api"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 	plan "github.com/manhrev/runtracking/backend/plan/pkg/api"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -78,7 +79,6 @@ func (s *activityServer) CommitActivity(
 				break
 			}
 			commitedToPlan = true
-
 		case activity.CommitType_COMMIT_TYPE_CHALLENGE:
 			_, err := s.groupIClient.UpdateChallengeProgress(ctx, &group.UpdateChallengeProgressRequest{
 				ChallengeId: commitObj.GetCommitId(),
@@ -94,7 +94,24 @@ func (s *activityServer) CommitActivity(
 				errfinal = status.Internal(fmt.Sprintf("Error while call UpdateChallengeProgress: %v", err))
 				break
 			}
+		case activity.CommitType_COMMIT_TYPE_EVENT:
+			_, err := s.eventIClient.UpdateEventProgress(ctx, &event.UpdateEventProgressRequest{
+				EventId: commitObj.GetCommitId(),
+				UserId:  userId,
+				GroupId: commitObj.GetUserGroupId(),
+				Time:    timestamppb.New(activityInfo.EndTime),
+				ActivityRecord: &event.ActivityRecord{
+					CaloriesValue:  int64(activityInfo.Kcal),
+					TimeSpendValue: int64(activityInfo.Duration),
+					DistanceValue:  int64(activityInfo.TotalDistance),
+				},
+			})
+			if err != nil {
+				errfinal = status.Internal(fmt.Sprintf("Error while call UpdateEventProgress: %v", err))
+				break
+			}
 		}
+
 	}
 
 	if errfinal != nil {

@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { View } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Avatar, Divider, Text } from 'react-native-paper'
@@ -31,15 +32,22 @@ const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
   })
   const { groupInfoMap } = useAppSelector(selectEventList)
   const yourGroup = groupInfoMap[groupId] || new GroupInfo().toObject()
+  const isEnded = moment().isAfter(moment.unix(endAt?.seconds || 0))
   return (
     <View>
       <View style={{ display: 'flex', flexDirection: 'row' }}>
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{name}</Text>
+          <Text style={{ fontSize: 16 }}>
+            {isEnded ? 'Ended' : 'In progress'}
+          </Text>
         </View>
         <View style={{ flex: 2, alignItems: 'flex-end' }}>
           <Text style={{ fontSize: 16 }}>
             Start: {formatDateWithoutTime(startAt)}
+          </Text>
+          <Text style={{ fontSize: 16 }}>
+            End: {formatDateWithoutTime(endAt)}
           </Text>
         </View>
       </View>

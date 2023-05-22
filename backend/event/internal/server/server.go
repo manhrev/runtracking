@@ -10,6 +10,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/manhrev/runtracking/backend/event/internal/server/event"
+	"github.com/manhrev/runtracking/backend/event/internal/server/eventi"
+
 	pb "github.com/manhrev/runtracking/backend/event/pkg/api"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
@@ -78,6 +80,7 @@ func Serve(server *grpc.Server) {
 
 	// register main and other server servers
 	pb.RegisterEventServer(server, event.NewServer(entClient, groupiClient))
+	pb.RegisterEventIServer(server, eventi.NewServer(entClient))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {

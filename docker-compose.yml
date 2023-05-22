@@ -82,6 +82,8 @@ services:
       PLANI_PORT: 8080
       GROUPI_DOMAIN: group
       GROUPI_PORT: 8080
+      EVENTI_DOMAIN: event
+      EVENTI_PORT: 8080
       IS_SECURE_CONNECTION: "false"
 
   notification:

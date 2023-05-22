@@ -130,6 +130,7 @@ message CommitObject {
     uint32 rule = 4; //rule for commit type: challenge, event or plan, view plan, group,.. api for detail 
     // when call plani or other internal api to commit, convert rule to their RuleType
     // if not needed, just pass 0
+    int64 user_group_id = 5; // user group id, if not needed, just pass 0
 }
 
 message CommitActivityReply {

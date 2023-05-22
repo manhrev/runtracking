@@ -12,6 +12,7 @@ import (
 	"github.com/manhrev/runtracking/backend/activity/internal/server/activity"
 	pb "github.com/manhrev/runtracking/backend/activity/pkg/api"
 	"github.com/manhrev/runtracking/backend/activity/pkg/ent"
+	event "github.com/manhrev/runtracking/backend/event/pkg/api"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
 	plan "github.com/manhrev/runtracking/backend/plan/pkg/api"
 
@@ -33,6 +34,8 @@ var (
 	plani_port           string = os.Getenv("PLANI_PORT")
 	groupi_domain        string = os.Getenv("GROUPI_DOMAIN")
 	groupi_port          string = os.Getenv("GROUPI_PORT")
+	eventi_domain        string = os.Getenv("EVENTI_DOMAIN")
+	eventi_port          string = os.Getenv("EVENTI_PORT")
 	is_secure_connection        = os.Getenv("IS_SECURE_CONNECTION")
 )
 
@@ -71,18 +74,22 @@ func Serve(server *grpc.Server) {
 	if err != nil {
 		log.Fatalf("error while create connect to plani service: %v", err)
 	}
-
 	planiClient := plan.NewPlanIClient(planIConn)
 
 	groupIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", groupi_domain, groupi_port), grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("error while create connect to plani service: %v", err)
 	}
-
 	groupIClient := group.NewGroupIClient(groupIConn)
 
+	eventIConn, err := grpc.Dial(fmt.Sprintf("%s:%s", eventi_domain, eventi_port), grpc.WithTransportCredentials(creds))
+	if err != nil {
+		log.Fatalf("error while create connect to plani service: %v", err)
+	}
+	eventIClient := event.NewEventIClient(eventIConn)
+
 	// register main and other server servers
-	pb.RegisterActivityServer(server, activity.NewServer(entClient, planiClient, groupIClient))
+	pb.RegisterActivityServer(server, activity.NewServer(entClient, planiClient, groupIClient, eventIClient))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))
 	if err != nil {

@@ -3,7 +3,7 @@ import moment from 'moment'
 import { ActivityType } from '../../lib/activity/activity_pb'
 import { Rule, PlanProgress } from '../../lib/plan/plan_pb'
 
-export function dateTimeToTimestamp(date: Date) : Timestamp.AsObject {
+export function dateTimeToTimestamp(date: Date): Timestamp.AsObject {
   return new Timestamp().setSeconds(date.getTime() / 1000).toObject()
 }
 
@@ -33,7 +33,7 @@ export function formatDate(time: Timestamp.AsObject | undefined): string {
 }
 
 export function mToKm(meters: number): string {
-  return (meters / 1000).toFixed(2)
+  return parseFloat((meters / 1000).toFixed(2)).toString()
 }
 
 export function formatDateWithoutTime(
@@ -51,16 +51,20 @@ export function formatDateConversation(
   if (time !== undefined) {
     let date = timestampToDate(time)
     let curDate = new Date()
-    
 
-    if(date.getDate() == curDate.getDate()){
+    if (date.getDate() == curDate.getDate()) {
       return moment.unix(time.seconds).format('LT')
-    }else if(curDate.getTime() - date.getTime() <  (1000 * 60 * 60 * 24 * 7)){
-      const options : Intl.DateTimeFormatOptions = { weekday: "long" } ;
-      return new Intl.DateTimeFormat("en-US", options).format(date).substring(0, 3)
-    }else{
-      const options : Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric'} ;
-      return new Intl.DateTimeFormat("en-US", options).format(date)
+    } else if (curDate.getTime() - date.getTime() < 1000 * 60 * 60 * 24 * 7) {
+      const options: Intl.DateTimeFormatOptions = { weekday: 'long' }
+      return new Intl.DateTimeFormat('en-US', options)
+        .format(date)
+        .substring(0, 3)
+    } else {
+      const options: Intl.DateTimeFormatOptions = {
+        month: 'long',
+        day: 'numeric',
+      }
+      return new Intl.DateTimeFormat('en-US', options).format(date)
     }
   }
   return 'NA'
