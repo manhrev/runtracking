@@ -59,6 +59,9 @@ func (e *eventImpl) UpdateEventProgress(
 	activityRecord := request.GetActivityRecord()
 
 	currentEvent, err := e.GetEventWithSubEvents(ctx, eventId)
+	if err != nil {
+		return "", status.Internal(fmt.Sprintf("Event not found: %v", err))
+	}
 
 	var currentSubEvent *ent.SubEvent
 	for _, subEvent := range currentEvent.Edges.Subevents {
