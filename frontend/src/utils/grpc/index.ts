@@ -6,6 +6,7 @@ import rpcPlanClient from './client/plan'
 import rpcGroupClient from './client/group'
 import rpcChatClient from './client/chat'
 import { toast } from '../toast/toast'
+import Constants from 'expo-constants'
 
 export * from './abstract/gRPCClient'
 export * from './abstract/types'
@@ -13,7 +14,8 @@ import * as Updates from 'expo-updates'
 import rpcEventClient from './client/event'
 
 const inDevelopmentMode = process.env.NODE_ENV === 'development'
-const manifest = Updates.manifest?.extra?.expoGo
+// const manifest = Updates.manifest?.extra?.expoGo
+const { manifest } = Constants
 
 const onAuthError = (error: any, serviceName: any) => {
   toast.error({ message: 'An error occured!' })
@@ -24,7 +26,8 @@ export var HOST: string
 // if (inDevelopmentMode) {
 // HOST = `http://${manifest?.debuggerHost?.split(':').shift()?.concat(':8080')}`
 // } else {
-HOST = `https://gateway-jzg35jprna-as.a.run.app`
+// HOST = `https://gateway-jzg35jprna-as.a.run.app`
+HOST = 'https://gateway-wqobs6gt2a-as.a.run.app'
 // }
 console.log(process.env.NODE_ENV)
 console.log("You're running on " + HOST)
