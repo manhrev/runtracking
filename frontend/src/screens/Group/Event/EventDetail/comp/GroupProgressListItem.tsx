@@ -133,12 +133,14 @@ const styles = (theme: AppTheme) =>
 export function formatDataByRule(data: number, rule: Rule) {
   switch (rule) {
     case Rule.RULE_TOTAL_ACTIVITY:
-      return data
+      return data.toFixed(0)
     case Rule.RULE_TOTAL_DISTANCE:
       return mToKm(data)
     case Rule.RULE_TOTAL_TIME:
-      return parseFloat((data / 3600).toFixed(2))
+      return parseFloat((data / 3600).toFixed(2)).toString()
     case Rule.RULE_TOTAL_CALORIES:
-      return data
+      return parseFloat(data.toFixed(2)).toString()
+    default:
+      return '0'
   }
 }

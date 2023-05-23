@@ -13,6 +13,7 @@ import { subEventRuleToStr } from '../../../../../utils/helpers/enumStr'
 import GroupProgressListItem, {
   formatDataByRule,
 } from './GroupProgressListItem'
+import { getIconWithActivityType } from '../../../../../utils/helpers/index'
 
 interface SubEventDisplayProps {
   subEvent: SubEvent.AsObject
@@ -21,7 +22,8 @@ interface SubEventDisplayProps {
 
 const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
   const theme = useAppTheme()
-  const { name, description, startAt, endAt, goal, rule, id } = subEvent
+  const { name, description, startAt, endAt, goal, rule, id, activityType } =
+    subEvent
   const {
     groupDetail: { groupinfo },
   } = useAppSelector(selectGroupDetail)
@@ -32,15 +34,24 @@ const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
   })
   const { groupInfoMap } = useAppSelector(selectEventList)
   const yourGroup = groupInfoMap[groupId] || new GroupInfo().toObject()
-  const isEnded = moment().isAfter(moment.unix(endAt?.seconds || 0))
+  const eventStatus = (() => {
+    const now = moment()
+    const start = moment.unix(startAt?.seconds || 0)
+    const end = moment.unix(endAt?.seconds || 0)
+    if (now.isBefore(start)) {
+      return <Text style={{ color: theme.colors.secondary }}>Up coming</Text>
+    } else if (now.isAfter(end)) {
+      return <Text style={{ color: theme.colors.error }}>Ended</Text>
+    } else {
+      return <Text style={{ color: theme.colors.primary }}>In progress</Text>
+    }
+  })()
   return (
     <View>
       <View style={{ display: 'flex', flexDirection: 'row' }}>
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{name}</Text>
-          <Text style={{ fontSize: 16 }}>
-            {isEnded ? 'Ended' : 'In progress'}
-          </Text>
+          <Text style={{ fontSize: 16 }}>{eventStatus}</Text>
         </View>
         <View style={{ flex: 2, alignItems: 'flex-end' }}>
           <Text style={{ fontSize: 16 }}>
@@ -60,7 +71,7 @@ const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
         }}
       >
         <View style={{ flex: 1, alignItems: 'center' }}>
-          <Avatar.Icon icon={'run'} size={70} />
+          <Avatar.Icon icon={getIconWithActivityType(activityType)} size={70} />
         </View>
         <View
           style={{
@@ -94,9 +105,14 @@ const SubEventDisplay = ({ subEvent, groupProgress }: SubEventDisplayProps) => {
       {yourGroupProgress && (
         <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
           <AnimatedCircularProgress
+            rotation={0}
             size={200}
             width={5}
-            fill={(yourGroupProgress.progress * 100) / goal}
+            fill={
+              (parseFloat(formatDataByRule(yourGroupProgress.progress, rule)) *
+                100) /
+              parseFloat(formatDataByRule(goal, rule))
+            }
             tintColor="green"
             backgroundColor="#e0e0e0"
             // text inside the circle

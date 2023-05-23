@@ -59,6 +59,9 @@ func (e *eventImpl) UpdateEventProgress(
 	activityRecord := request.GetActivityRecord()
 
 	currentEvent, err := e.GetEventWithSubEvents(ctx, eventId)
+	if err != nil {
+		return "", status.Internal(fmt.Sprintf("Event not found: %v", err))
+	}
 
 	var currentSubEvent *ent.SubEvent
 	for _, subEvent := range currentEvent.Edges.Subevents {
@@ -81,6 +84,11 @@ func (e *eventImpl) UpdateEventProgress(
 	case int64(event_pb.Rule_RULE_TOTAL_TIME):
 		icrementValue = int64(activityRecord.GetTimeSpendValue())
 	}
+
+	if icrementValue == 0 {
+		return "", status.Internal("Cannot find rule for this subevent")
+	}
+	log.Println("IcrementValue: ", icrementValue)
 
 	groupProgress, err := e.entClient.GroupzProgress.Query().Where(
 		groupzprogress.HasSubEventWith(
