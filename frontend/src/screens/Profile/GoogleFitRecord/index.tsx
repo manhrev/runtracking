@@ -34,6 +34,13 @@ export default function GoogleFitRecord() {
     const { closeModal, modalVisible, openModal } = useModal()
     const [startDate, setStartDate] = useState<Date>(new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000))
     const [endDate, setEndDate] = useState<Date>(new Date())
+    const [curDevice, setCurDevice] = useState<Device>({
+                manufacturer: "Other",
+                model: "",
+                type: "Phone",
+                uid: "Other",
+                version: "SAG124"
+            } as Device)
 
     const [googleFitRecord, setGoogleFitRecord] = useState<GoogleFitRecordInfo>({
         deviceList: [],
@@ -43,8 +50,8 @@ export default function GoogleFitRecord() {
     })
 
     const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: '804907557897-42i6bicgec6p9e651538ue4p7s9lbgla.apps.googleusercontent.com',
-        expoClientId: '804907557897-2dtudi47b86f8u2qt4fj70tnqcll4h26.apps.googleusercontent.com',
+        androidClientId: '963211982200-mcrvt7ej7546mrvukck02mhpocre1aeb.apps.googleusercontent.com',
+        expoClientId: '963211982200-k6eaer5di94gb0udn2jeb8tv3g2cd23u.apps.googleusercontent.com',
         // redirectUri: 'https://auth.expo.io/@manhrev/gotracker',
         scopes: ['profile', 'email',
             Scopes.FITNESS_ACTIVITY_READ,
@@ -64,7 +71,7 @@ export default function GoogleFitRecord() {
             setIsLoading(true)
             const endDateReq = endDate ? endDate : new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000)
             const startDateReq = startDate ? startDate : new Date()
-            getGoogleFitRecord(startDateReq, endDateReq)
+            getGoogleFitRecord(startDateReq, endDateReq, curDevice)
         }
     }, [response]);
 
@@ -74,7 +81,7 @@ export default function GoogleFitRecord() {
             setIsLoading(true)
             const endDateReq = endDate ? endDate : new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000)
             const startDateReq = startDate ? startDate : new Date()
-            getGoogleFitRecord(startDateReq, endDateReq)
+            getGoogleFitRecord(startDateReq, endDateReq, curDevice)
         })
     }, [])
 
@@ -89,7 +96,7 @@ export default function GoogleFitRecord() {
         }
     }
 
-    const getGoogleFitRecord = async (startDate: Date, endDate: Date) => {
+    const getGoogleFitRecord = async (startDate: Date, endDate: Date, device: Device) => {
         try {
             const dataSourceListPromise = googleFitClient.listDataSources()
             const bucketDatasetListPromise = googleFitClient.listDataSets({
@@ -101,15 +108,7 @@ export default function GoogleFitRecord() {
             googleFitRecord.totalTimeSpend = 0
             let googleFitRecordTemp = googleFitRecord
             const [dataSourceList, bucketDatasetList] = await Promise.all([dataSourceListPromise, bucketDatasetListPromise])
-
-            if (bucketDatasetList && bucketDatasetList.bucket && bucketDatasetList.bucket.length > 0) {
-                bucketDatasetList.bucket[0].dataset.forEach(
-                    dataset => {
-                        if (dataset.point) {
-                            googleFitRecordTemp = appendGoogleFitRecordValue(dataset.dataSourceId, dataset.point, googleFitRecord)
-                        }
-                    })
-            }
+            // console.log(bucketDatasetList)
 
             if (dataSourceList.dataSource != null) {
                 let dataDevices = dataSourceList.dataSource.
@@ -126,14 +125,23 @@ export default function GoogleFitRecord() {
             }
 
             googleFitRecordTemp.deviceList.push({
-                manufacturer: "Samsung",
-                model: "AG-134",
+                manufacturer: "Other",
+                model: "",
                 type: "Phone",
-                uid: "123456789",
+                uid: "Other",
                 version: "SAG124"
             } as Device)
-            setGoogleFitRecord(googleFitRecordTemp)
 
+            if (bucketDatasetList && bucketDatasetList.bucket && bucketDatasetList.bucket.length > 0) {
+                bucketDatasetList.bucket[0].dataset.forEach(
+                    dataset => {
+                        if (dataset.point) {
+                            googleFitRecordTemp = appendGoogleFitRecordValue(dataset.dataSourceId, dataset.point, googleFitRecord, device, googleFitRecordTemp.deviceList)
+                        }
+                    })
+            }
+
+            setGoogleFitRecord(googleFitRecordTemp)
         }
         catch (error) {
             console.log(error)
@@ -156,6 +164,7 @@ export default function GoogleFitRecord() {
                                 visible={modalVisible}
                                 endDate={endDate}
                                 startDate={startDate}
+                                device={curDevice}
                                 getGoogleFitRecord={getGoogleFitRecord}
                                 setEndDate={setEndDate}
                                 setStartDate={setStartDate}
@@ -187,12 +196,23 @@ export default function GoogleFitRecord() {
                             }}>
                                 <List.Accordion
                                     title="Devices"
+                                    description={curDevice.manufacturer + " " + curDevice.model}
                                     left={props => <List.Icon {...props} icon="tablet-cellphone" />}
                                 >
                                     {googleFitRecord.deviceList && googleFitRecord.deviceList.map(
-                                        device => <List.Item
+                                        device => (
+                                                <List.Item
                                             key={device.uid}
-                                            title={device.manufacturer + " " + device.model} />
+                                            title={device.manufacturer + " " + device.model}
+                                            style={{opacity:  (device.uid === curDevice.uid) ? 1 : 0.5}}
+                                            onPress={() => {
+                                                setCurDevice(device)
+                                                getUserInfo().then(() => {
+                                                    setIsLoading(true)
+                                                    getGoogleFitRecord(startDate, endDate, device)
+                                                })
+                                            }}
+                                            />)
                                     )}
                                 </List.Accordion>
                             </View>
@@ -200,7 +220,7 @@ export default function GoogleFitRecord() {
                             <GoogleFitSection
                                 key="distance"
                                 icon="map-marker-distance"
-                                subTitle={googleFitRecord ? googleFitRecord.totalDistance.toString() + " meters" : ''}
+                                subTitle={googleFitRecord ? Math.floor(googleFitRecord.totalDistance).toString() + " meters" : ''}
                                 title="Distance"
                             />
 

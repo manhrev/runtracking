@@ -7,17 +7,19 @@ import { AppTheme, useAppTheme } from '../../../../theme'
 import { authClient } from '../../../../utils/grpc'
 import { toast } from '../../../../utils/toast/toast'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
+import { Device } from '../../../../constants/googleapi'
 
 
 interface SyncDataSettingProps {
     visible: boolean
     hideModal: () => void
     showModal: () => void
-    getGoogleFitRecord: (startDate: Date, endDate: Date) => Promise<void>
+    getGoogleFitRecord: (startDate: Date, endDate: Date, device: Device) => Promise<void>
     setStartDate : React.Dispatch<React.SetStateAction<Date>>
     setEndDate: React.Dispatch<React.SetStateAction<Date>>
     startDate: Date
     endDate: Date
+    device: Device
 }
 
 const SyncDataSetting = ({
@@ -27,6 +29,7 @@ const SyncDataSetting = ({
     startDate,
     setEndDate,
     setStartDate,
+    device,
     getGoogleFitRecord
 }: SyncDataSettingProps) => {
     const theme = useAppTheme()
@@ -45,7 +48,7 @@ const SyncDataSetting = ({
         setStartDate(startDateSync)
         setEndDate(endDateSync)
         close()
-        await getGoogleFitRecord(startDateSync, endDateSync)
+        await getGoogleFitRecord(startDateSync, endDateSync, device)
         toast.success({ message: 'Sync Data Successfully' })
         setIsLoading(false)
     }
