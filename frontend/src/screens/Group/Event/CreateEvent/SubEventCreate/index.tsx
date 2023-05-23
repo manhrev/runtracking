@@ -44,6 +44,13 @@ export default function SubEventCreate({
   })()
 
   const onSubmit = () => {
+    // alert(subEvent.goal)
+    let goal = goalByRule(rule, parseFloat(goalStr))
+    if (goalStr == '') {
+      toast.error({ message: 'Please input goal' })
+      return
+    }
+
     if (!name) {
       toast.error({ message: 'Please input name' })
       return
@@ -72,8 +79,7 @@ export default function SubEventCreate({
       toast.error({ message: 'Start time must be before end time' })
       return
     }
-
-    setSubEventList([...subEventList, subEvent])
+    setSubEventList([...subEventList, { ...subEvent, goal: goal }])
     navigation.goBack()
   }
   return (
@@ -187,18 +193,7 @@ export default function SubEventCreate({
               const numericValue = text.replace(/[^0-9.]/g, '')
               setGoalStr(numericValue)
             }}
-            onEndEditing={() => {
-              let goal = Math.floor(parseFloat(goalStr) * 1000)
-              if (goalStr == '') {
-                setGoalStr('0')
-                goal = 0
-              }
-
-              setSubEvent({
-                ...subEvent,
-                goal: goal,
-              })
-            }}
+            onEndEditing={() => {}}
             placeholder="Set goal of challenge"
           />
           <View style={{ display: 'flex', flexDirection: 'row', gap: 20 }}>
@@ -362,3 +357,18 @@ const styles = (theme: AppTheme) =>
       justifyContent: 'center',
     },
   })
+
+function goalByRule(rule: Rule, goal: number): number {
+  switch (rule) {
+    case Rule.RULE_TOTAL_ACTIVITY:
+      return Math.floor(goal)
+    case Rule.RULE_TOTAL_DISTANCE:
+      return Math.floor(goal * 1000)
+    case Rule.RULE_TOTAL_CALORIES:
+      return Math.floor(goal)
+    case Rule.RULE_TOTAL_TIME:
+      return Math.floor(goal * 3600)
+    default:
+      return 0
+  }
+}

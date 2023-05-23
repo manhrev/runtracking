@@ -63,6 +63,7 @@ class rpcEventClient extends gRPCClientAbstract {
       sub.setPicture(subEvent.picture)
       sub.setGoal(subEvent.goal)
       sub.setRule(subEvent.rule)
+      sub.setActivityType(subEvent.activityType)
       return sub
     })
     req.setSubEventsList(subEvents)

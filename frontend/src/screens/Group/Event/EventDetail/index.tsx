@@ -53,6 +53,7 @@ export default function EventDetail({
     () => getCurrentIndexForSubEvent(subEventList),
     [subEventList]
   )
+  const { groupInfoMap } = useAppSelector(selectEventList)
 
   const yourGroupJoined = yourGroupStatus === GroupStatus.GROUP_STATUS_ACTIVE
 
@@ -105,6 +106,36 @@ export default function EventDetail({
     )
   }
 
+  const eventLabel = (() => {
+    const now = moment()
+    const endAt = subEventList[subEventList.length - 1]?.endAt
+
+    const startAt = subEventList[0]?.startAt
+    if (now.isAfter(moment.unix(endAt?.seconds || 0))) {
+      return (
+        <Text style={{ color: theme.colors.error }}>
+          Ended at: {formatDateWithoutTime(endAt)}
+        </Text>
+      )
+    } else if (now.isBefore(moment.unix(startAt?.seconds || 0))) {
+      return (
+        <Text style={{ color: theme.colors.primary }}>
+          Start at: {formatDateWithoutTime(startAt)}
+        </Text>
+      )
+    } else {
+      return (
+        <>
+          <Text style={{ color: theme.colors.primary }}>In progress</Text>
+          <Text style={{ color: theme.colors.primary }}>
+            {' '}
+            - end: {formatDateWithoutTime(endAt)}
+          </Text>
+        </>
+      )
+    }
+  })()
+
   return (
     <>
       {isAdmin && (
@@ -148,11 +179,16 @@ export default function EventDetail({
                   }}
                 >
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 15 }}>Created by: groupcv</Text>
+                    <Text style={{ fontSize: 15 }}>
+                      Created by:{' '}
+                      <Text style={{ color: theme.colors.primary }}>
+                        {groupInfoMap[yourGroupId]?.name || ''}
+                      </Text>
+                    </Text>
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 15, alignSelf: 'flex-end' }}>
-                      Start: {formatDateWithoutTime(startAt)}
+                      {eventLabel}
                     </Text>
                   </View>
                 </View>

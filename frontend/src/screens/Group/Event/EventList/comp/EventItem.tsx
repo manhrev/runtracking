@@ -1,14 +1,6 @@
+import moment from 'moment'
 import { StyleSheet, View, Image } from 'react-native'
-import {
-  Avatar,
-  Button,
-  Divider,
-  IconButton,
-  Paragraph,
-  Text,
-  TouchableRipple,
-} from 'react-native-paper'
-import { Icon } from 'react-native-paper/lib/typescript/components/Avatar/Avatar'
+import { Button, Divider, Text, TouchableRipple } from 'react-native-paper'
 import { GroupStatusInEventButtonStr } from '../../../../../constants/enumstr/event'
 import { EventDetail, GroupStatus } from '../../../../../lib/event/event_pb'
 import { useAppTheme, AppTheme } from '../../../../../theme'
@@ -47,7 +39,39 @@ export default function EventItem({
     yourGroupStatus,
   } = event
   const adminOfEvent = isAdmin && ownerGroupId === yourGroup
-
+  const eventLabel = (() => {
+    const now = moment()
+    if (now.isAfter(moment.unix(endAt?.seconds || 0))) {
+      return (
+        <Text
+          variant="bodyMedium"
+          style={{ fontWeight: 'bold', color: theme.colors.error }}
+        >
+          Ended at: {formatDateWithoutTime(endAt)}
+        </Text>
+      )
+    } else if (now.isBefore(moment.unix(startAt?.seconds || 0))) {
+      return (
+        <Text
+          variant="bodyMedium"
+          style={{ fontWeight: 'bold', color: theme.colors.primary }}
+        >
+          Upcoming - start at: {formatDateWithoutTime(startAt)}
+        </Text>
+      )
+    } else {
+      return (
+        <>
+          <Text
+            variant="bodyMedium"
+            style={{ fontWeight: 'bold', color: theme.colors.tertiary }}
+          >
+            In progress - end at: {formatDateWithoutTime(endAt)}
+          </Text>
+        </>
+      )
+    }
+  })()
   return (
     <TouchableRipple onPress={() => navigateFunc()}>
       <>
@@ -61,13 +85,14 @@ export default function EventItem({
           />
           <View style={styles(theme).cardBottom}>
             <View style={styles(theme).eventInfo}>
-              <Text
+              {/* <Text
                 variant="bodyMedium"
                 style={{ fontWeight: 'bold', color: theme.colors.secondary }}
-              >
-                From: {startAt ? formatDateWithoutTime(startAt) : '?'} -{' '}
-                {endAt ? formatDateWithoutTime(endAt) : '?'}
-              </Text>
+              > */}
+              {eventLabel}
+              {/* From: {startAt ? formatDateWithoutTime(startAt) : '?'} -{' '}
+                {endAt ? formatDateWithoutTime(endAt) : '?'} */}
+              {/* </Text> */}
               <Text variant="headlineSmall" style={{ fontWeight: 'bold' }}>
                 {name}
               </Text>
