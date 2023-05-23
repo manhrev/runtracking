@@ -83,16 +83,14 @@ export default function Login({
         <View style={{ display: 'flex', alignItems: 'center', marginTop: 20 }}>
           <Image
             style={{
-              width: 150,
-              height: 150,
+              width: 170,
+              height: 170,
               borderWidth: 1,
-              borderColor: 'blue',
-              borderRadius: 25,
             }}
-            source={require('./../../../assets/Banners/signup_banner.jpg')}
+            source={require('./../../../assets/icon.png')}
           />
         </View>
-        <View style={{ marginTop: 40 }}>
+        <View style={{ marginTop: 30 }}>
           <TextInput
             mode="outlined"
             label="Username"
