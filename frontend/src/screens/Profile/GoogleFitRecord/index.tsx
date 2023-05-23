@@ -50,8 +50,8 @@ export default function GoogleFitRecord() {
     })
 
     const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: '804907557897-42i6bicgec6p9e651538ue4p7s9lbgla.apps.googleusercontent.com',
-        expoClientId: '804907557897-2dtudi47b86f8u2qt4fj70tnqcll4h26.apps.googleusercontent.com',
+        androidClientId: '963211982200-mcrvt7ej7546mrvukck02mhpocre1aeb.apps.googleusercontent.com',
+        expoClientId: '963211982200-k6eaer5di94gb0udn2jeb8tv3g2cd23u.apps.googleusercontent.com',
         // redirectUri: 'https://auth.expo.io/@manhrev/gotracker',
         scopes: ['profile', 'email',
             Scopes.FITNESS_ACTIVITY_READ,
