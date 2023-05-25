@@ -119,6 +119,7 @@ class rpcActivityClient extends gRPCClientAbstract {
         commitObj.setCommitId(item.commitId)
         commitObj.setCommitType(item.commitType)
         commitObj.setRule(item.rule)
+        commitObj.setUserGroupId(item.userGroupId)
         return commitObj
       }
     )

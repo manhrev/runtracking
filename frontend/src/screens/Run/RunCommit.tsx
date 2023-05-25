@@ -1,5 +1,5 @@
 import { Dimensions, ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native'
-import { Button, IconButton, Text, List, Avatar } from 'react-native-paper'
+import { Button, IconButton, Text, List, Avatar, ActivityIndicator } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
@@ -8,10 +8,10 @@ import { useState, useEffect, useRef } from 'react'
 import * as Progress from 'react-native-progress'
 import { getPlanList } from '../../redux/features/planList/slice'
 import { listPlanThunk } from '../../redux/features/planList/thunk'
-import { selectEventList } from '../../redux/features/eventList/slice'
+import { isEventListLoading, isGroupInEventLoading, isGroupInfoMapLoading, selectEventList } from '../../redux/features/eventList/slice'
 import { PlanInfo, RuleStatus } from '../../lib/plan/plan_pb'
-import { ChallengeInfo } from '../../lib/group/group_pb'
-import { EventDetail } from '../../lib/event/event_pb'
+import { ChallengeInfo, GroupSortBy, ListGroupRequest } from '../../lib/group/group_pb'
+import { EventDetail, GroupInEvent } from '../../lib/event/event_pb'
 import {
   ActivityType,
   CommitActivityRequest,
@@ -30,11 +30,13 @@ import { toast } from '../../utils/toast/toast'
 import ChallengeItem from './comp/ChallengeItem'
 import EventItem from './comp/EventItem'
 import PlanItem from './comp/PlanItem'
+import GroupItem from './comp/GroupItem'
 import { baseStyles } from '../baseStyle'
 import { text } from 'stream/consumers'
-import { listEventsThunk } from '../../redux/features/eventList/thunks'
+import { getGroupInfoThunk, listEventsThunk, listGroupInEventThunk } from '../../redux/features/eventList/thunks'
 import { listYourGroupThunk } from '../../redux/features/yourGroupList/thunk'
 import { selectYourGroupList } from '../../redux/features/yourGroupList/slice'
+import { selectGroupInEventList } from '../../redux/features/eventList/slice'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -45,17 +47,28 @@ export default function RunCommit({
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
 
+  // loading
+  const groupInEventLoading = useAppSelector(isGroupInEventLoading)
+  const groupInfoMapLoading = useAppSelector(isGroupInfoMapLoading)
+  const groupLoading = groupInEventLoading || groupInfoMapLoading
+
+  const eventListLoading = useAppSelector(isEventListLoading)
+
   // show hide
   const [showPlan, setShowPlan] = useState(false)
   const [showChallenge, setShowChallenge] = useState(false)
   const [showEvent, setShowEvent] = useState(false)
+  const [showGroup, setShowGroup] = useState(false)
   
-  const { eventList } = useAppSelector(selectEventList)
+  const { eventList, groupInfoMap } = useAppSelector(selectEventList)
   const [selectedEvent, setSelectedEvent] = useState<EventDetail.AsObject>(
     {} as EventDetail.AsObject
   )
 
   const { yourGroupList } = useAppSelector(selectYourGroupList)
+
+  const [groupsInEventList, setGroupsInEventList] = useState<GroupInEvent.AsObject[]>([])
+  const [selectedGroupInEvent, setSelectedGroupInEvent] = useState<GroupInEvent.AsObject>({} as GroupInEvent.AsObject)
 
   const { planList } = useAppSelector(getPlanList)
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo.AsObject>(
@@ -161,6 +174,44 @@ export default function RunCommit({
     }
   }
 
+  const fetchListEventGroupsAndInfo = async () => {
+    const { response, error } = await dispatch(
+      listGroupInEventThunk({
+        eventId: selectedEvent.id,
+        limit: 100,
+        offset: 0,
+      })
+    ).unwrap()
+    if (error) {
+      return
+    }
+    let groupList: number[] = []
+    if (response) {
+      groupList = response.groupsList.map((group) => group.id)
+      setGroupsInEventList(response?.groupsList || [])
+      if(response?.groupsList?.length) {
+        setSelectedGroupInEvent(response?.groupsList[0]) // auto select first group
+      }
+    }
+    dispatch(
+      getGroupInfoThunk({
+        ascending: true,
+        filterBy: ListGroupRequest.FilterBy.FILTER_BY_UNSPECIFIED,
+        groupIdsList: groupList,
+        limit: 999,
+        offset: 0,
+        searchByName: '',
+        sortBy: GroupSortBy.GROUP_SORT_BY_CREATED_TIME,
+      })
+    )
+  }
+
+  useEffect(() => {
+    if(selectedEvent.id) {
+      fetchListEventGroupsAndInfo()
+    }
+  }, [selectedEvent])
+
   useEffect(() => {
     fetchPlanData()
     fetchChallengeData()
@@ -180,6 +231,7 @@ export default function RunCommit({
       commitId: selectedPlan.id,
       commitType: CommitType.COMMIT_TYPE_PLAN,
       rule: selectedPlan.rule,
+      userGroupId: 0, // ignore
     }
     const commitReq: CommitActivityRequest.AsObject = {
       activityId: route.params.activityId,
@@ -198,7 +250,29 @@ export default function RunCommit({
     const commitObj: CommitObject.AsObject = {
       commitId: selectedChallenge.id,
       commitType: CommitType.COMMIT_TYPE_CHALLENGE,
-      rule: 1, // ignore
+      rule: 1, // ignore,
+      userGroupId: 0, // ignore
+    }
+
+    const commitReq: CommitActivityRequest.AsObject = {
+      activityId: route.params.activityId,
+      commitToList: [commitObj]
+    }
+    console.log(commitReq)
+
+    const res = await activityClient.commitActivity(commitReq)
+    if (!res.error) {
+      return true
+    }
+    return false
+  }
+
+  const commitToEvent = async () => {
+    const commitObj: CommitObject.AsObject = {
+      commitId: selectedEvent.id,
+      commitType: CommitType.COMMIT_TYPE_EVENT,
+      rule: 0,
+      userGroupId: selectedGroupInEvent.id,
     }
 
     const commitReq: CommitActivityRequest.AsObject = {
@@ -217,24 +291,28 @@ export default function RunCommit({
   const commitAll = async () => {
     const planStatus = filteredPlanList.length > 0 ? await commitToPlan() : true
     const challengeStatus = challengeList.length > 0 ? await commitToChallenge() : true
+    const eventStatus = filteredEventList.length > 0 ? await commitToEvent() : true
 
-    console.log(planStatus, challengeStatus)
+    console.log(planStatus, challengeStatus, eventStatus)
 
-    if(planStatus && challengeStatus) {
-      toast.success({ message: 'Commit success' })
-      navigation.goBack()
+    let failedItems = []
+    if(!planStatus) {
+      failedItems.push('plan')
     }
-    else if(planStatus && !challengeStatus) {
-      toast.error({ message: 'Commit to challenge failed' })
-      navigation.goBack()
+    if(!challengeStatus) {
+      failedItems.push('challenge')
     }
-    else if(!planStatus && challengeStatus) {
-      toast.error({ message: 'Commit to plan failed' })
-      navigation.goBack()
+    if(!eventStatus) {
+      failedItems.push('event')
+    }
+
+    if(failedItems.length > 0) {
+      toast.error({ message: `Commit to ${failedItems.join(', ')} failed` })
     }
     else {
-      toast.error({ message: 'Commit failed' })
+      toast.success({ message: 'Commit success' })
     }
+    navigation.goBack()
   }
 
   const getSelectedPlan = () => {
@@ -473,7 +551,7 @@ export default function RunCommit({
                     </Text>
 
                     <Avatar.Icon
-                      icon={showChallenge ? 'chevron-up' : 'chevron-down'}
+                      icon={showEvent ? 'chevron-up' : 'chevron-down'}
                       size={35}
                       color={theme.colors.primary}
                       style={{
@@ -484,7 +562,9 @@ export default function RunCommit({
               </View>
             </View>
 
-            {!showEvent && selectEventList.name && (
+            
+
+            {!eventListLoading && !showEvent && selectedEvent.name && (
                 <EventItem
                 event={selectedEvent}
                 hideTopDivider={true}
@@ -495,7 +575,7 @@ export default function RunCommit({
               )
             }
 
-            {showEvent && filteredEventList.map((event: EventDetail.AsObject, idx) => {
+            {!eventListLoading && showEvent && filteredEventList.map((event: EventDetail.AsObject, idx) => {
               return (
                 <EventItem
                   key={idx}
@@ -508,7 +588,92 @@ export default function RunCommit({
               )
             })}
 
-            {(filteredPlanList.length > 0 ||  challengeList.length > 0) && (
+            {eventListLoading && (
+              <View style={{
+                alignItems: 'center',
+                marginTop: 50,
+              }}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+              </View>
+            )}
+
+            <View>
+              <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+              }}>
+                  <Text style={{
+                      fontSize: 17,
+                      fontWeight: 'bold',
+                  }}>Group in Event:</Text>
+
+                  <TouchableOpacity
+                    onPress={() => setShowGroup(!showGroup)}
+                    style={{
+                      alignSelf: 'flex-end',
+                      marginRight: 10,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{
+                        fontSize: 15,
+                        fontWeight: 'bold',
+                        color: theme.colors.primary,
+                    }}>
+                      {groupInfoMap[selectedGroupInEvent.id]?.name ? groupInfoMap[selectedGroupInEvent.id]?.name : 'No data'}
+                    </Text>
+
+                    <Avatar.Icon
+                      icon={showGroup ? 'chevron-up' : 'chevron-down'}
+                      size={35}
+                      color={theme.colors.primary}
+                      style={{
+                        backgroundColor: 'transparent',
+                      }}
+                    />
+                  </TouchableOpacity>
+              </View>
+            </View>
+            
+            {!groupLoading && !showGroup && groupInfoMap[selectedGroupInEvent.id]?.name && (
+                <GroupItem
+                  group={selectedGroupInEvent}
+                  hideTopDivider={true}
+                  showBottomDivider={true}
+                  setSelectedGroup={setSelectedGroupInEvent}
+                  selectedGroup={selectedGroupInEvent}
+                  groupInfoMap={groupInfoMap}
+                />
+              )
+            }
+
+            {!groupLoading && showGroup && groupsInEventList.map((group: GroupInEvent.AsObject, idx) => {
+              return (
+                <GroupItem
+                  key={idx}
+                  group={group}
+                  hideTopDivider={idx === 0}
+                  showBottomDivider={idx === groupsInEventList.length - 1}
+                  setSelectedGroup={setSelectedGroupInEvent}
+                  selectedGroup={selectedGroupInEvent}
+                  groupInfoMap={groupInfoMap}
+                />
+              )
+            })}
+
+            {groupLoading && (
+              <View style={{
+                alignItems: 'center',
+                marginTop: 50,
+              }}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+              </View>
+            )}
+            
+
+            {(filteredPlanList.length > 0 ||  challengeList.length > 0 || filteredEventList.length > 0) && (
               <Button
                 style={styles(theme).commitBtn}
                 mode="contained"
@@ -518,7 +683,7 @@ export default function RunCommit({
               </Button>
             )}
 
-            {filteredPlanList.length == 0 &&  challengeList.length == 0 && (
+            {filteredPlanList.length == 0 &&  challengeList.length == 0 && filteredEventList.length == 0 && (
               <View style={{
                 alignItems: 'center',
                 marginTop: 50,

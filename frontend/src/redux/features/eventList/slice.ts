@@ -30,6 +30,7 @@ type EventListState = {
   subEventProgressStatus: StatusEnum
   groupListStatus: StatusEnum
   groupInfoMap: Record<number, GroupInfo.AsObject>
+  groupInfoMapStatus: StatusEnum
   total: number
 } & CommonState
 
@@ -44,6 +45,7 @@ export const initialState: EventListState = {
   subEventProgressStatus: StatusEnum.LOADING,
   groupListStatus: StatusEnum.LOADING,
   groupInfoMap: {},
+  groupInfoMapStatus: StatusEnum.LOADING,
 }
 
 const slice = createSlice({
@@ -65,6 +67,9 @@ const slice = createSlice({
     })
     builder.addCase(listGroupInEventThunk.pending, (state) => {
       state.groupListStatus = StatusEnum.LOADING
+    })
+    builder.addCase(getGroupInfoThunk.pending, (state) => {
+      state.groupInfoMapStatus = StatusEnum.LOADING
     })
     builder.addCase(listEventsThunk.fulfilled, (state, { payload }) => {
       const { response, error } = payload
@@ -136,6 +141,7 @@ const slice = createSlice({
     builder.addCase(getGroupInfoThunk.fulfilled, (state, { payload }) => {
       const { error, response } = payload
       if (error) {
+        state.groupInfoMapStatus = StatusEnum.FAILED
         return
       }
       const groupList = response?.groupListList || []
@@ -143,6 +149,7 @@ const slice = createSlice({
       groupList.forEach((group) => {
         infoMap[group.id] = group
       })
+      state.groupInfoMapStatus = StatusEnum.SUCCEEDED
       state.groupInfoMap = infoMap
       console.log(state.groupInfoMap)
     })
@@ -163,5 +170,8 @@ export const isAllEventListLoading = (state: RootState) => {
 }
 export const isGroupInEventLoading = (state: RootState) =>
   state.eventList.groupListStatus === StatusEnum.LOADING
+
+export const isGroupInfoMapLoading = (state: RootState) =>
+  state.eventList.groupInfoMapStatus === StatusEnum.LOADING
 
 export default slice.reducer
