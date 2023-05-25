@@ -211,7 +211,8 @@ export default function StatisticSection({ reload }: StatisticSectionProps) {
             <View style={styles(theme).generalInfoContainter}>
               <View style={{ justifyContent: 'center' }}>
                 <Text variant="displayMedium">
-                  {(generalInfo.totalDistance / 1000.0).toFixed(1)} km
+                  {parseFloat((generalInfo.totalDistance / 1000.0).toFixed(1))}{' '}
+                  km
                 </Text>
                 <Text
                   variant="bodyMedium"

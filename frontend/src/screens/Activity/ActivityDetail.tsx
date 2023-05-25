@@ -81,11 +81,11 @@ export default function ActivityDetail({
                 <Text
                   style={{ color: theme.colors.primary, paddingLeft: 3 }}
                   onPress={() => {
-                    navigation.navigate('RunCommit', {
-                      activityId: activityId,
-                      activityType: type,
-                      resetRunInfo: () => {},
-                    })
+                    // navigation.navigate('RunCommit', {
+                    //   activityId: activityId,
+                    //   activityType: type,
+                    //   resetRunInfo: () => {},
+                    // })
                   }}
                 >
                   - Press to commit
@@ -111,7 +111,7 @@ export default function ActivityDetail({
                   marginBottom: -6,
                 }}
               >
-                {(totalDistance / 1000.0).toFixed(2)}
+                {parseFloat((totalDistance / 1000.0).toFixed(2))}
               </Text>
               <Text variant="bodyLarge" style={styles(theme).unit}>
                 Kilometers
@@ -137,7 +137,7 @@ export default function ActivityDetail({
                 </View>
                 <View style={styles(theme).valueBox}>
                   <Text variant="titleLarge" style={styles(theme).value}>
-                    {kcal.toFixed(3)}
+                    {parseFloat(kcal.toFixed(3))}
                   </Text>
                   <Text variant="bodyLarge" style={styles(theme).unit}>
                     KCalories
@@ -209,7 +209,12 @@ export default function ActivityDetail({
                 </MapView>
               </>
             ) : (
-              <Text>No data</Text>
+              <Text
+                variant="bodyLarge"
+                style={{ color: theme.colors.tertiary }}
+              >
+                No data to show
+              </Text>
             )}
           </View>
         </ScrollView>

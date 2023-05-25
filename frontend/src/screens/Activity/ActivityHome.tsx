@@ -80,14 +80,42 @@ export default function Activity({
                   />
                 )
               })}
-              <Button
-                mode="contained"
-                onPress={() => navigation.navigate('ActivityList', {})}
-                style={{ marginTop: 10 }}
-                loading={isLoading}
-              >
-                View all activities
-              </Button>
+              {activityList.length !== 0 ? (
+                <Button
+                  mode="contained"
+                  onPress={() => navigation.navigate('ActivityList', {})}
+                  style={{ marginTop: 10 }}
+                  loading={isLoading}
+                >
+                  View all activities
+                </Button>
+              ) : (
+                <>
+                  <Text
+                    variant="bodyLarge"
+                    style={{
+                      color: theme.colors.tertiary,
+                      textAlign: 'center',
+                      marginTop: 20,
+                      marginBottom: 20,
+                    }}
+                  >
+                    No activities to show
+                  </Text>
+                  <Button
+                    style={{ width: '40%', alignSelf: 'center' }}
+                    mode="contained"
+                    onPress={() =>
+                      navigation.navigate('RunTracking', {
+                        activityType: ActivityType.ACTIVITY_TYPE_RUNNING,
+                        planId: 0,
+                      })
+                    }
+                  >
+                    Create one!
+                  </Button>
+                </>
+              )}
             </View>
           </ScrollView>
         </View>

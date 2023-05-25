@@ -12,9 +12,7 @@ import {
   isUserRankingListLoading,
   selectUserRankingList,
 } from '../../../../redux/features/userRankingList/slice'
-import {
-  listUserRankingThunk,
-} from '../../../../redux/features/userRankingList/thunk'
+import { listUserRankingThunk } from '../../../../redux/features/userRankingList/thunk'
 import { useAppDispatch, useAppSelector } from '../../../../redux/store'
 import { useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
@@ -50,7 +48,7 @@ export default function MemberRanking({
 
   const fetchUserRankingList = async () => {
     const { response } = await dispatch(
-    listUserRankingThunk({
+      listUserRankingThunk({
         limit: LIMIT,
         offset: 0,
         ascending: asc,
@@ -60,7 +58,6 @@ export default function MemberRanking({
       })
     ).unwrap()
   }
-
 
   return (
     <View style={baseStyles(theme).container}>
@@ -85,7 +82,11 @@ export default function MemberRanking({
           {noData && (
             <Text
               variant="bodyLarge"
-              style={{ color: theme.colors.tertiary, textAlign: 'center' }}
+              style={{
+                color: theme.colors.tertiary,
+                textAlign: 'center',
+                marginTop: 20,
+              }}
             >
               No data
             </Text>
@@ -100,7 +101,11 @@ export default function MemberRanking({
                   showBottomDivider={idx === userRankingList.length - 1}
                   isLeader={route.params.isLeader}
                   viewProfile={() =>
-                    navigation.navigate('OtherUser', { userId: userRanking.member?.userId? userRanking.member.userId : 0 })
+                    navigation.navigate('OtherUser', {
+                      userId: userRanking.member?.userId
+                        ? userRanking.member.userId
+                        : 0,
+                    })
                   }
                 />
               )

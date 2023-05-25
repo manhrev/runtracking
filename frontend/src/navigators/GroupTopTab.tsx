@@ -24,9 +24,15 @@ export default function GroupTopTabs() {
         tabBarStyle: { backgroundColor: theme.colors.onPrimary },
       }}
     >
-      <Tab.Screen name="YourGroups" component={YourGroups} />
+      <Tab.Screen
+        name="YourGroups"
+        component={YourGroups}
+        options={{
+          title: 'Your Groups',
+        }}
+      />
       <Tab.Screen name="Explore" component={Explore} />
-      <Tab.Screen name="Events" component={ComingSoon} />
+      {/* <Tab.Screen name="Events" component={ComingSoon} /> */}
     </Tab.Navigator>
   )
 }

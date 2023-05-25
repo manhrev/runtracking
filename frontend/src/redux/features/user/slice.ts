@@ -85,6 +85,8 @@ const slice = createSlice({
       }
       const token = response?.accessToken || ''
       AsyncStorage.setItem(KEY_ACCESS_TOKEN, token)
+      AsyncStorage.setItem('onboard', 'true')
+
       state.isSignedIn = true
     })
     builder.addCase(logoutThunk.fulfilled, (state, { payload }) => {

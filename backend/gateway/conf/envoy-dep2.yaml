@@ -223,7 +223,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: umage-jzg35jprna-et.a.run.app
+                      address: umage-wqobs6gt2a-et.a.run.app
                       port_value: 443
 
     - name: activity_cluster

@@ -80,7 +80,11 @@ export default function GroupsInEvent({
             {noData && (
               <Text
                 variant="bodyLarge"
-                style={{ color: theme.colors.tertiary, textAlign: 'center' }}
+                style={{
+                  color: theme.colors.tertiary,
+                  textAlign: 'center',
+                  marginTop: 20,
+                }}
               >
                 No data
               </Text>

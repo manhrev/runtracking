@@ -25,10 +25,11 @@ export default function ActivityList({
 }: NativeStackScreenProps<RootBaseStackParamList, 'ActivityList'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-  const { activityList } = useAppSelector(selectActivityList)
+  const { activityList, total } = useAppSelector(selectActivityList)
   const isLoading = useAppSelector(isActivityListLoading)
   const [currentOffset, setCurrentOffset] = useState(0)
   const [canLoadmore, setCanLoadmore] = useState(true)
+  const noData = activityList.length === 0 && !isLoading
 
   const [activityType, setActivityType] = useState(
     ActivityType.ACTIVITY_TYPE_UNSPECIFIED
@@ -171,16 +172,17 @@ export default function ActivityList({
               />
             )
           })}
-
-          <Button
-            style={{ marginTop: 10, marginBottom: 60 }}
-            mode="elevated"
-            onPress={fetchMore}
-            loading={isLoading}
-            disabled={!canLoadmore}
-          >
-            Load more
-          </Button>
+          {!noData && total > 10 && (
+            <Button
+              style={{ marginTop: 10, marginBottom: 60 }}
+              mode="elevated"
+              onPress={fetchMore}
+              loading={isLoading}
+              disabled={!canLoadmore}
+            >
+              Load more
+            </Button>
+          )}
         </ScrollView>
       </View>
     </View>

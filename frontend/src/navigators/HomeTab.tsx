@@ -23,7 +23,7 @@ export default function HomeTabs() {
   const theme = useAppTheme()
   return (
     <Tab.Navigator
-      initialRouteName="GroupHome"
+      initialRouteName="ProfileHome"
       backBehavior="initialRoute"
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <TabBar {...props} theme={theme} />}

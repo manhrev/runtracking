@@ -1,7 +1,13 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect, useState , useCallback} from 'react'
-import { Alert, NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
-import { Button } from 'react-native-paper'
+import { useEffect, useState, useCallback } from 'react'
+import {
+  Alert,
+  NativeScrollEvent,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native'
+import { Button, Text } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
 import {
   listMoreConversationThunk,
@@ -13,15 +19,24 @@ import ConversationListItem from './comp/ConversationListItem'
 import { useFocusEffect } from '@react-navigation/native'
 import { baseStyles } from '../baseStyle'
 import { RefreshControl } from 'react-native-gesture-handler'
-import { isConversationListLoading, selectConversationList } from '../../redux/features/conversationList/slice'
+import {
+  isConversationListLoading,
+  selectConversationList,
+} from '../../redux/features/conversationList/slice'
 import { LoadingOverlay } from '../../comp/LoadingOverlay'
 import { isMessageListLoading } from '../../redux/features/messageList/slice'
 
-const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize} : NativeScrollEvent) => {
-  const paddingToBottom = 20;
-  return layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom;
-};
+const isCloseToBottom = ({
+  layoutMeasurement,
+  contentOffset,
+  contentSize,
+}: NativeScrollEvent) => {
+  const paddingToBottom = 20
+  return (
+    layoutMeasurement.height + contentOffset.y >=
+    contentSize.height - paddingToBottom
+  )
+}
 
 export default function ConversationList({
   navigation,
@@ -29,7 +44,9 @@ export default function ConversationList({
 }: NativeStackScreenProps<RootBaseStackParamList, 'ConversationList'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-  const { conversationList, status, total } = useAppSelector(selectConversationList)
+  const { conversationList, status, total } = useAppSelector(
+    selectConversationList
+  )
   const isLoading = useAppSelector(isConversationListLoading)
   const loading = useAppSelector(isMessageListLoading)
   const [canLoadmore, setCanLoadmore] = useState(true)
@@ -66,43 +83,55 @@ export default function ConversationList({
 
   useFocusEffect(
     useCallback(() => {
-       fetchConversationList()
+      fetchConversationList()
     }, [dispatch, navigation])
-  );
+  )
 
   return (
     <>
-    <LoadingOverlay loading={isLoading} />
-    <View style={baseStyles(theme).container}>
-      <View style={baseStyles(theme).innerWrapper}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isLoading}
-              onRefresh={fetchConversationList}
-            />
-          }
-          onScroll={({nativeEvent}) => {
+      <LoadingOverlay loading={isLoading} />
+      <View style={baseStyles(theme).container}>
+        <View style={baseStyles(theme).innerWrapper}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={fetchConversationList}
+              />
+            }
+            onScroll={({ nativeEvent }) => {
               if (canLoadmore && !isLoading && isCloseToBottom(nativeEvent)) {
                 fetchMore()
               }
-          } }
-          scrollEventThrottle={400}
-        >
-          {conversationList.map((conversation) => {
-            return (
-              <ConversationListItem
-                key={conversation.partner?.userId}
-                conversationInfo={conversation}
-                navigation={navigation}
-              />
-            )
-          })}
-
-        </ScrollView>
+            }}
+            scrollEventThrottle={400}
+          >
+            {conversationList.map((conversation) => {
+              return (
+                <ConversationListItem
+                  key={conversation.partner?.userId}
+                  conversationInfo={conversation}
+                  navigation={navigation}
+                />
+              )
+            })}
+            {!isLoading && conversationList.length === 0 && (
+              <Text
+                variant="bodyLarge"
+                style={{
+                  color: theme.colors.tertiary,
+                  textAlign: 'center',
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}
+              >
+                No conversations found!
+              </Text>
+            )}
+          </ScrollView>
+        </View>
       </View>
-    </View>
     </>
   )
 }

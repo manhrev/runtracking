@@ -39,7 +39,7 @@ var (
 
 // HandleFileUploadToBucket uploads file to bucket
 func HandleFileUploadToBucket(c *gin.Context) {
-	bucket := "runtracking"
+	bucket := "gotracker-imgs"
 
 	userId := c.Request.Header.Get("X-User-Id")
 	currentTimestamp := strconv.Itoa(int(time.Now().Unix()))

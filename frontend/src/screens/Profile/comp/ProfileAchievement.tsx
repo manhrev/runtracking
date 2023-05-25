@@ -14,6 +14,19 @@ export default function ProfileAchievement() {
   return (
     <View style={styles(theme).extendedBaseContainer}>
       <View style={baseStyles(theme).innerWrapper}>
+        {achievement.length === 0 && (
+          <Text
+            variant="bodyLarge"
+            style={{
+              color: theme.colors.tertiary,
+              textAlign: 'center',
+              marginTop: 20,
+              marginBottom: 20,
+            }}
+          >
+            You have no achievement yet!
+          </Text>
+        )}
         {achievement.map(
           ([acitivityType, { level, totalDistance, totalKcal }], idx) => (
             <View style={styles(theme).achievementSection} key={idx}>
