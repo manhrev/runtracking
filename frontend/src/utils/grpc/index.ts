@@ -12,13 +12,13 @@ export * from './abstract/gRPCClient'
 export * from './abstract/types'
 import * as Updates from 'expo-updates'
 import rpcEventClient from './client/event'
-
 const inDevelopmentMode = process.env.NODE_ENV === 'development'
 // const manifest = Updates.manifest?.extra?.expoGo
 const { manifest } = Constants
 
 const onAuthError = (error: any, serviceName: any) => {
-  toast.error({ message: 'An error occured!' })
+  if (error.code === 16) {
+  } else toast.error({ message: 'An error occured!' })
 }
 
 export var HOST: string

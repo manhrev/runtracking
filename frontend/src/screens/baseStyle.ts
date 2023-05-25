@@ -12,6 +12,11 @@ export const baseStyles = (theme: AppTheme) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
+    containerWithouHeader: {
+      marginTop: Constants.statusBarHeight,
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
     innerWrapper: {
       width: windowWidth - 26,
       alignSelf: 'center',

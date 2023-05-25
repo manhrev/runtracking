@@ -196,7 +196,7 @@ export default function Plan({
                       onPress: () => navigation.navigate('PlanAdd'),
                     },
                   ]}
-                  type='tertiary'
+                  type="tertiary"
                 />
               )}
             </View>
@@ -248,12 +248,29 @@ export default function Plan({
               />
             ))}
             {!isLoading && filteredPlanList.length == 0 && (
-              <Text
-                variant="bodyLarge"
-                style={{ color: theme.colors.tertiary, textAlign: 'center', marginTop: 10, fontWeight: 'bold' }}
-              >
-                {tabState === 'current' ? 'No current plan' : 'No history plan'}
-              </Text>
+              <>
+                <Text
+                  variant="bodyLarge"
+                  style={{
+                    color: theme.colors.tertiary,
+                    textAlign: 'center',
+                    marginTop: 20,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {tabState === 'current'
+                    ? 'You have no plan in progress'
+                    : 'No plan found'}
+                </Text>
+                {tabState === 'current' && (
+                  <Button
+                    style={{ marginTop: 10 }}
+                    onPress={() => navigation.navigate('PlanAdd')}
+                  >
+                    Create one!
+                  </Button>
+                )}
+              </>
             )}
           </ScrollView>
         </View>

@@ -59,6 +59,7 @@ import {
   selectUserRankingList,
 } from '../../../../redux/features/userRankingList/slice'
 import { useFocusEffect } from '@react-navigation/native'
+import Constants from 'expo-constants'
 
 export default function GroupDetail({
   navigation,
@@ -191,7 +192,7 @@ export default function GroupDetail({
   )
 
   return (
-    <View style={baseStyles(theme).container}>
+    <View style={baseStyles(theme).containerWithouHeader}>
       <LoadingOverlay
         loading={
           groupDetailLoading &&
@@ -259,6 +260,16 @@ export default function GroupDetail({
         )}
 
         <View style={styles(theme).imgContainer}>
+          <IconButton
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+            }}
+            icon="arrow-left"
+            size={30}
+            onPress={() => navigation.goBack()}
+          />
           {userState.userId == groupDetail.groupinfo?.leaderId && (
             <IconButton
               style={{
@@ -267,7 +278,7 @@ export default function GroupDetail({
                 right: 0,
               }}
               icon="pencil"
-              size={30}
+              size={28}
               onPress={() =>
                 navigation.navigate('GroupEdit', {
                   groupInfo: groupDetail.groupinfo
@@ -607,7 +618,7 @@ const styles = (theme: AppTheme) =>
   StyleSheet.create({
     imgContainer: {
       backgroundColor: theme.colors.tertiaryContainer,
-      height: 140,
+      height: 150,
       justifyContent: 'flex-end',
       zIndex: 1,
       marginBottom: 40,

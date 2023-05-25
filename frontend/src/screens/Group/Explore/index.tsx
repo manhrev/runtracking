@@ -160,9 +160,13 @@ export default function Explore({
           {noData && (
             <Text
               variant="bodyLarge"
-              style={{ color: theme.colors.tertiary, textAlign: 'center' }}
+              style={{
+                color: theme.colors.tertiary,
+                textAlign: 'center',
+                marginTop: 20,
+              }}
             >
-              No data
+              There's no group to show
             </Text>
           )}
           {groupList.map((group: GroupInfo.AsObject, idx) => {

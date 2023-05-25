@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   StyleSheet,
   View,
@@ -34,7 +34,7 @@ import ProfileInfo from '../comp/ProfileInfo'
 import ImagePreview from './comp/ImagePreview'
 import { ProfileInfoTabStr } from '../../../constants/enumstr/group'
 import GoogleFitRecord from '../GoogleFitRecord/index'
-
+import { useFocusEffect } from '@react-navigation/native'
 
 export default function ProfileHome({
   navigation,
@@ -46,7 +46,7 @@ export default function ProfileHome({
 
   const loading = useAppSelector(isUserSliceLoading)
   // const [isInfoSelected, setIsInfoSelected] = useState(true)
-  const [tabSelected, setTabSelected] = useState(ProfileInfoTabStr.INFO)
+  const [tabSelected, setTabSelected] = useState(ProfileInfoTabStr.ACHIEVEMENT)
 
   const handleEditYourProfile = () => {
     navigation.navigate('ProfileSetting')
@@ -65,17 +65,22 @@ export default function ProfileHome({
 
   const fetchUserData = async () => {
     await dispatch(getMeThunk())
-    dispatch(getUserAchievementThunk({ userIdsList: [userId] }))
   }
 
-  const getTabView = (tabName: string) : JSX.Element => {
-    switch(tabName){
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(getUserAchievementThunk({ userIdsList: [userId] }))
+    }, [userId])
+  )
+
+  const getTabView = (tabName: string): JSX.Element => {
+    switch (tabName) {
       case ProfileInfoTabStr.INFO:
         return <ProfileInfo />
-        case ProfileInfoTabStr.ACHIEVEMENT:
-          return <ProfileAchievement />
-        default:
-          return <GoogleFitRecord />
+      case ProfileInfoTabStr.ACHIEVEMENT:
+        return <ProfileAchievement />
+      default:
+        return <GoogleFitRecord />
     }
   }
 
@@ -148,7 +153,7 @@ export default function ProfileHome({
                 />
               </View>
               <View>
-              <IconButton
+                <IconButton
                   mode="contained-tonal"
                   icon="account-multiple"
                   onPress={handleViewConversation}
@@ -176,7 +181,9 @@ export default function ProfileHome({
               }}
             >
               <Button
-                mode={tabSelected === ProfileInfoTabStr.INFO ? 'elevated' : 'text'}
+                mode={
+                  tabSelected === ProfileInfoTabStr.INFO ? 'elevated' : 'text'
+                }
                 onPress={() => {
                   setTabSelected(ProfileInfoTabStr.INFO)
                 }}
@@ -184,7 +191,11 @@ export default function ProfileHome({
                 Info
               </Button>
               <Button
-                mode={tabSelected === ProfileInfoTabStr.ACHIEVEMENT ? 'elevated' : 'text'}
+                mode={
+                  tabSelected === ProfileInfoTabStr.ACHIEVEMENT
+                    ? 'elevated'
+                    : 'text'
+                }
                 style={{ marginLeft: 4 }}
                 onPress={() => {
                   setTabSelected(ProfileInfoTabStr.ACHIEVEMENT)
@@ -194,7 +205,11 @@ export default function ProfileHome({
               </Button>
 
               <Button
-                mode={tabSelected === ProfileInfoTabStr.GOOGLE_FIT_RECORD? 'elevated' : 'text'}
+                mode={
+                  tabSelected === ProfileInfoTabStr.GOOGLE_FIT_RECORD
+                    ? 'elevated'
+                    : 'text'
+                }
                 style={{ marginLeft: 4 }}
                 onPress={() => {
                   setTabSelected(ProfileInfoTabStr.GOOGLE_FIT_RECORD)

@@ -6,7 +6,7 @@ import {
   switchNightMode,
 } from '../../redux/features/toggle/slice'
 import { logoutThunk } from '../../redux/features/user/thunk'
-import { removeExpoPushTokenThunk} from '../../redux/features/notification/thunk'
+import { removeExpoPushTokenThunk } from '../../redux/features/notification/thunk'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
 import { AppTheme, useAppTheme } from '../../theme'
 import SettingItem from './comp/SettingItem'
@@ -25,13 +25,15 @@ export default function AppSetting({
 
   const handleLogout = async () => {
     const expoToken = await AsyncStorage.getItem(EXPO_PUSH_TOKEN)
-    
+
     // remove token when logging out
-    if(expoToken != null){
+    if (expoToken != null) {
       console.log(expoToken)
-      dispatch(removeExpoPushTokenThunk({
-        expoPushToken: expoToken,
-      }))
+      dispatch(
+        removeExpoPushTokenThunk({
+          expoPushToken: expoToken,
+        })
+      )
     }
     dispatch(logoutThunk())
     toast.success({ message: 'Logged out!' })
@@ -55,12 +57,14 @@ export default function AppSetting({
           <SettingItem left="Units of Measure" onPress={() => {}} />
           <SettingItem
             left="Night mode"
-            right={isNightMode ? 'Yes' : 'No'}
+            right={isNightMode ? 'On' : 'Off'}
             onPress={handleChangeNightMode}
           />
         </View>
         <View style={styles(theme).settingGroup}>
-          <SettingItem left="Notification" topDivider
+          <SettingItem
+            left="Notification"
+            topDivider
             onPress={() => {
               navigation.navigate('NotificationList', {})
             }}
@@ -68,7 +72,7 @@ export default function AppSetting({
           <SettingItem
             left="Privacy"
             onPress={() => {
-              toast.error({ message: 'Success!' })
+              // toast.error({ message: 'Success!' })
             }}
           />
         </View>
@@ -86,14 +90,16 @@ export default function AppSetting({
           <SettingItem left="Privacy Policy" onPress={() => {}} />
           <SettingItem left="Contact Us" onPress={() => {}} />
         </View>
-        <View style={styles(theme).settingGroup}>
+        {/* <View style={styles(theme).settingGroup}>
           <SettingItem
             left="Delete Account"
             topDivider
             color={theme.colors.error}
-            onPress={() => {}}
+            onPress={() => {
+              toast.error({ message: 'Success!' })
+            }}
           />
-        </View>
+        </View> */}
         <View style={styles(theme).settingGroup}>
           <SettingItem
             left="Log Out"
@@ -111,7 +117,7 @@ const styles = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.surfaceVariant,
+      backgroundColor: theme.colors.background,
     },
     settingGroup: {
       marginTop: 20,

@@ -121,12 +121,21 @@ export default function YourGroups({
             type="tertiary"
           />
           {noData && (
-            <Text
-              variant="bodyLarge"
-              style={{ color: theme.colors.tertiary, textAlign: 'center' }}
-            >
-              No data
-            </Text>
+            <>
+              <Text
+                variant="bodyLarge"
+                style={{
+                  color: theme.colors.tertiary,
+                  textAlign: 'center',
+                  marginTop: 20,
+                }}
+              >
+                You haven't participated in any group yet
+              </Text>
+              <Button onPress={() => navigation.navigate('Explore')}>
+                Find one!
+              </Button>
+            </>
           )}
           {yourGroupList.map((group: GroupInfo.AsObject, idx) => {
             return (

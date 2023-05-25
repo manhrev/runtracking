@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
-import { Button } from 'react-native-paper'
+import { Button, Text } from 'react-native-paper'
 import { RootBaseStackParamList } from '../../navigators/BaseStack'
 import {
   isNotificationListLoading,
@@ -24,8 +24,11 @@ export default function NotificationList({
 }: NativeStackScreenProps<RootBaseStackParamList, 'NotificationList'>) {
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
-  const { notificationList, offset } = useAppSelector(selectNotificationList)
+  const { notificationList, offset, total } = useAppSelector(
+    selectNotificationList
+  )
   const isLoading = useAppSelector(isNotificationListLoading)
+  const noData = notificationList.length === 0 && !isLoading
 
   const [canLoadmore, setCanLoadmore] = useState(true)
 
@@ -83,16 +86,29 @@ export default function NotificationList({
               />
             )
           })}
-
-          <Button
-            style={{ marginTop: 10, marginBottom: 20 }}
-            mode="elevated"
-            onPress={fetchMore}
-            loading={isLoading}
-            disabled={!canLoadmore}
-          >
-            Load more
-          </Button>
+          {noData && (
+            <Text
+              variant="bodyLarge"
+              style={{
+                color: theme.colors.tertiary,
+                textAlign: 'center',
+                marginTop: 20,
+              }}
+            >
+              No notifications found!
+            </Text>
+          )}
+          {!noData && total > 10 && (
+            <Button
+              style={{ marginTop: 10, marginBottom: 20 }}
+              mode="elevated"
+              onPress={fetchMore}
+              loading={isLoading}
+              disabled={!canLoadmore}
+            >
+              Load more
+            </Button>
+          )}
         </ScrollView>
       </View>
     </View>

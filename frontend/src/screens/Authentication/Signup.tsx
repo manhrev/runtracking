@@ -52,7 +52,8 @@ export default function Signup({
       toast.error({ message: 'An error occurred, please try again' })
     } else {
       const token = response?.tokenInfo?.accessToken || ''
-      AsyncStorage.setItem(KEY_ACCESS_TOKEN, token)
+      await AsyncStorage.setItem(KEY_ACCESS_TOKEN, token)
+      navigation.pop()
       navigation.navigate('GetInfo')
     }
   }
@@ -128,7 +129,7 @@ export default function Signup({
               style={styles(theme).inputStyle}
             />
           </View>
-          <View
+          {/* <View
             style={{ display: 'flex', flexDirection: 'row', marginTop: 15 }}
           >
             <Checkbox
@@ -144,7 +145,7 @@ export default function Signup({
               I would like to receive your newsletter and other promotional
               information.
             </Text>
-          </View>
+          </View> */}
           <Button
             mode="elevated"
             onPress={handleContinue}

@@ -46,6 +46,7 @@ class RestClient {
       }
     }
     const body = await res.json()
+    console.log(body)
     return {
       error: false,
       imageUrl: ('https://storage.googleapis.com' + body.pathname) as string,

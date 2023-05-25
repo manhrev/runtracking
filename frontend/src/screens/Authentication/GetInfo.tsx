@@ -22,6 +22,7 @@ export default function GetInfo({
       toast.error({ message: 'Please fill all fields' })
       return
     }
+
     setLoading(true)
     const { error } = await authClient.updateHealthInfo({
       age: parseInt(age),
@@ -33,7 +34,7 @@ export default function GetInfo({
     if (error) {
       toast.error({ message: 'An error occurred, please try again' })
     } else {
-      toast.success({ message: 'Create account successfully, please login' })
+      toast.success({ message: 'Create account successfully!' })
       navigation.navigate('Login')
     }
   }
@@ -75,9 +76,18 @@ export default function GetInfo({
             variant="bodyLarge"
             style={{ fontWeight: 'bold', lineHeight: 18, paddingTop: 20 }}
           >
-            We need these information to calculate your activity, you can use
-            default values here
+            We need some additional information to calculate your activity, you
+            can use default values
           </Text>
+          <Button
+            onPress={() => {
+              setAge('20')
+              setHeight('168')
+              setWeight('65')
+            }}
+          >
+            Use default value
+          </Button>
           <View style={{ marginTop: 20 }}>
             <TextInput
               mode="outlined"
@@ -86,6 +96,7 @@ export default function GetInfo({
               onChangeText={(text) => setAge(text)}
               selectionColor={theme.colors.backdrop}
               style={styles(theme).inputStyle}
+              keyboardType="number-pad"
             />
             <TextInput
               mode="outlined"
@@ -94,6 +105,7 @@ export default function GetInfo({
               onChangeText={(text) => setHeight(text)}
               selectionColor={theme.colors.backdrop}
               style={styles(theme).inputStyle}
+              keyboardType="number-pad"
             />
             <TextInput
               mode="outlined"
@@ -102,6 +114,7 @@ export default function GetInfo({
               onChangeText={(text) => setWeight(text)}
               selectionColor={theme.colors.backdrop}
               style={styles(theme).inputStyle}
+              keyboardType="number-pad"
             />
           </View>
           <Button
@@ -117,6 +130,15 @@ export default function GetInfo({
             >
               Finish
             </Text>
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => {
+              navigation.pop()
+              navigation.navigate('Login')
+            }}
+          >
+            Skip
           </Button>
         </View>
       </View>
