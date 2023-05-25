@@ -41,8 +41,12 @@ func NewServer(token token.Token, cache *cache.Cache) authv3.AuthorizationServer
 func (s *authZServer) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.CheckResponse, error) {
 	authorization := req.Attributes.Request.Http.Headers[_authorization]
 	extracted := strings.Fields(authorization)
+
+	log.Println("STARTING TO CHECK ACCESS TOKEN ...")
 	if len(extracted) == 2 && extracted[0] == _bearer {
 		tk, u, err := s.verifyAccessToken(ctx, extracted[1])
+		log.Printf("Token: %v\n", tk.Raw)
+		log.Printf("User Info: %v\n", u)
 		if err == nil {
 			return &authv3.CheckResponse{
 				HttpResponse: &authv3.CheckResponse_OkResponse{

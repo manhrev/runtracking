@@ -138,7 +138,7 @@ static_resources:
                       grpc_service:
                         envoy_grpc:
                           cluster_name: auth_cluster
-                          authority: auth-jzg35jprna-as.a.run.app
+                          authority: auth-wqobs6gt2a-as.a.run.app
                         timeout: 5s
                       transport_api_version: V3
                       failure_mode_allow: false
