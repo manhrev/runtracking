@@ -381,6 +381,9 @@ export class CommitObject extends jspb.Message {
   getRule(): number;
   setRule(value: number): CommitObject;
 
+  getUserGroupId(): number;
+  setUserGroupId(value: number): CommitObject;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CommitObject.AsObject;
   static toObject(includeInstance: boolean, msg: CommitObject): CommitObject.AsObject;
@@ -394,6 +397,7 @@ export namespace CommitObject {
     commitId: number,
     commitType: CommitType,
     rule: number,
+    userGroupId: number,
   }
 }
 

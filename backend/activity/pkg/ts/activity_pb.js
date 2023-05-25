@@ -3237,7 +3237,8 @@ proto.activity.CommitObject.toObject = function(includeInstance, msg) {
   var f, obj = {
     commitId: jspb.Message.getFieldWithDefault(msg, 1, 0),
     commitType: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    rule: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    rule: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    userGroupId: jspb.Message.getFieldWithDefault(msg, 5, 0)
   };
 
   if (includeInstance) {
@@ -3286,6 +3287,10 @@ proto.activity.CommitObject.deserializeBinaryFromReader = function(msg, reader) 
       var value = /** @type {number} */ (reader.readUint32());
       msg.setRule(value);
       break;
+    case 5:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setUserGroupId(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -3333,6 +3338,13 @@ proto.activity.CommitObject.serializeBinaryToWriter = function(message, writer) 
   if (f !== 0) {
     writer.writeUint32(
       4,
+      f
+    );
+  }
+  f = message.getUserGroupId();
+  if (f !== 0) {
+    writer.writeInt64(
+      5,
       f
     );
   }
@@ -3390,6 +3402,24 @@ proto.activity.CommitObject.prototype.getRule = function() {
  */
 proto.activity.CommitObject.prototype.setRule = function(value) {
   return jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional int64 user_group_id = 5;
+ * @return {number}
+ */
+proto.activity.CommitObject.prototype.getUserGroupId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.activity.CommitObject} returns this
+ */
+proto.activity.CommitObject.prototype.setUserGroupId = function(value) {
+  return jspb.Message.setProto3IntField(this, 5, value);
 };
 
 
