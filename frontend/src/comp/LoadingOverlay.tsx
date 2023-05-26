@@ -40,9 +40,7 @@ export const LoadingOverlay = ({
             size={60}
             animating={true}
             color={
-              isNightMode
-                ? theme.colors.primary
-                : theme.colors.tertiaryContainer
+              isNightMode ? theme.colors.primary : theme.colors.elevation.level5
             }
           />
           <Text
@@ -52,7 +50,7 @@ export const LoadingOverlay = ({
               marginTop: 10,
               color: isNightMode
                 ? theme.colors.primary
-                : theme.colors.tertiaryContainer,
+                : theme.colors.elevation.level5,
             }}
           >
             Loading...
