@@ -35,8 +35,6 @@ import { baseStyles } from '../baseStyle'
 import { text } from 'stream/consumers'
 import { getGroupInfoThunk, listEventsThunk, listGroupInEventThunk } from '../../redux/features/eventList/thunks'
 import { listYourGroupThunk } from '../../redux/features/yourGroupList/thunk'
-import { selectYourGroupList } from '../../redux/features/yourGroupList/slice'
-import { selectGroupInEventList } from '../../redux/features/eventList/slice'
 
 const windowWidth = Dimensions.get('window').width
 
@@ -64,8 +62,6 @@ export default function RunCommit({
   const [selectedEvent, setSelectedEvent] = useState<EventDetail.AsObject>(
     {} as EventDetail.AsObject
   )
-
-  const { yourGroupList } = useAppSelector(selectYourGroupList)
 
   const [groupsInEventList, setGroupsInEventList] = useState<GroupInEvent.AsObject[]>([])
   const [selectedGroupInEvent, setSelectedGroupInEvent] = useState<GroupInEvent.AsObject>({} as GroupInEvent.AsObject)
@@ -137,6 +133,7 @@ export default function RunCommit({
   }, [planList])
 
   const fetchListEvent = async () => {
+    let resGroupList = []
     const response = await dispatch(
       listYourGroupThunk({
         ascending: true,
@@ -149,6 +146,18 @@ export default function RunCommit({
       })
     ).unwrap()
 
+    if(response.error) {
+      console.log(response.error)
+      return
+    }
+    else
+    {
+        resGroupList = response.response?.groupListList || []
+        // if(resGroupList.length == 0) {
+        //   return
+        // }
+    }
+
     const res = await dispatch(
       listEventsThunk({
         ascending: true,
@@ -156,10 +165,10 @@ export default function RunCommit({
         visibility: 0,
         search: "",
         offset: 0,
-        groupIdsList: getGroupIds(),
+        groupIdsList: getGroupIds(resGroupList),
         idsList: [],
         sortBy: 0,
-        yourGroupId: -1,
+        yourGroupId: 0,
       })
     ).unwrap()
 
@@ -218,10 +227,12 @@ export default function RunCommit({
     fetchListEvent()
   }, [])
 
-  const getGroupIds = () => {
+  const getGroupIds = (groupList: any) => {
+    if(groupList.length == 0) return [0] // return [0] to get empty list when fetching event
+
     const groupIds: number[] = []
-    for(let i = 0; i < yourGroupList.length; i++) {
-      groupIds.push(yourGroupList[i].id)
+    for(let i = 0; i < groupList.length; i++) {
+      groupIds.push(groupList[i].id)
     }
     return groupIds
   }
@@ -310,7 +321,7 @@ export default function RunCommit({
       toast.error({ message: `Commit to ${failedItems.join(', ')} failed` })
     }
     else {
-      toast.success({ message: 'Commit success' })
+      toast.success({ message: 'Commit successfully' })
     }
     navigation.goBack()
   }
