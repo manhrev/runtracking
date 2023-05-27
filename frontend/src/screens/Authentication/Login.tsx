@@ -33,7 +33,7 @@ export default function Login({
     ).unwrap()
     setLoading(false)
     if (error) {
-      toast.error({ message: 'Cannot login, please try again' })
+      toast.error({ message: error.message })
     } else {
       toast.success({ message: 'Logged in' })
       dispatch(getMeThunk())
@@ -48,7 +48,7 @@ export default function Login({
         checkIfExistOrSaveExpoPushTokenThunk(req.toObject())
       ).unwrap()
       if (error) {
-        toast.error({ message: 'An error occured!' })
+        toast.error({ message: error.message })
       }
     }
   }
