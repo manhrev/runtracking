@@ -37,12 +37,12 @@ export default function Signup({
       return
     }
 
-    if(username.length < 6) {
-      toast.error({ message: 'Display name must be at least 6 characters!' })
+    if (username.length < 6) {
+      toast.error({ message: 'User name must be at least 6 characters!' })
       return
     }
 
-    if(password.length < 6) {
+    if (password.length < 6) {
       toast.error({ message: 'Password must be at least 6 characters!' })
       return
     }
@@ -59,12 +59,13 @@ export default function Signup({
     })
 
     if (error) {
-      if(error.message.includes('Duplicate entry') && error.message.includes('username')) {
+      if (
+        error.message.includes('Duplicate entry') &&
+        error.message.includes('username')
+      ) {
         toast.error({ message: 'Username already exists!' })
         return
-      }
-      else toast.error({ message: error.message })
-
+      } else toast.error({ message: error.message })
     } else {
       const token = response?.tokenInfo?.accessToken || ''
       await AsyncStorage.setItem(KEY_ACCESS_TOKEN, token)
