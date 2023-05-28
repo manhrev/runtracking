@@ -1,5 +1,18 @@
-import { Dimensions, ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native'
-import { Button, IconButton, Text, List, Avatar, ActivityIndicator } from 'react-native-paper'
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+} from 'react-native'
+import {
+  Button,
+  IconButton,
+  Text,
+  List,
+  Avatar,
+  ActivityIndicator,
+} from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AppTheme, useAppTheme } from '../../theme'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
@@ -8,9 +21,18 @@ import { useState, useEffect, useRef } from 'react'
 import * as Progress from 'react-native-progress'
 import { getPlanList } from '../../redux/features/planList/slice'
 import { listPlanThunk } from '../../redux/features/planList/thunk'
-import { isEventListLoading, isGroupInEventLoading, isGroupInfoMapLoading, selectEventList } from '../../redux/features/eventList/slice'
+import {
+  isEventListLoading,
+  isGroupInEventLoading,
+  isGroupInfoMapLoading,
+  selectEventList,
+} from '../../redux/features/eventList/slice'
 import { PlanInfo, RuleStatus } from '../../lib/plan/plan_pb'
-import { ChallengeInfo, GroupSortBy, ListGroupRequest } from '../../lib/group/group_pb'
+import {
+  ChallengeInfo,
+  GroupSortBy,
+  ListGroupRequest,
+} from '../../lib/group/group_pb'
 import { EventDetail, GroupInEvent } from '../../lib/event/event_pb'
 import {
   ActivityType,
@@ -33,7 +55,11 @@ import PlanItem from './comp/PlanItem'
 import GroupItem from './comp/GroupItem'
 import { baseStyles } from '../baseStyle'
 import { text } from 'stream/consumers'
-import { getGroupInfoThunk, listEventsThunk, listGroupInEventThunk } from '../../redux/features/eventList/thunks'
+import {
+  getGroupInfoThunk,
+  listEventsThunk,
+  listGroupInEventThunk,
+} from '../../redux/features/eventList/thunks'
 import { listYourGroupThunk } from '../../redux/features/yourGroupList/thunk'
 
 const windowWidth = Dimensions.get('window').width
@@ -57,14 +83,17 @@ export default function RunCommit({
   const [showChallenge, setShowChallenge] = useState(false)
   const [showEvent, setShowEvent] = useState(false)
   const [showGroup, setShowGroup] = useState(false)
-  
+
   const { eventList, groupInfoMap } = useAppSelector(selectEventList)
   const [selectedEvent, setSelectedEvent] = useState<EventDetail.AsObject>(
     {} as EventDetail.AsObject
   )
 
-  const [groupsInEventList, setGroupsInEventList] = useState<GroupInEvent.AsObject[]>([])
-  const [selectedGroupInEvent, setSelectedGroupInEvent] = useState<GroupInEvent.AsObject>({} as GroupInEvent.AsObject)
+  const [groupsInEventList, setGroupsInEventList] = useState<
+    GroupInEvent.AsObject[]
+  >([])
+  const [selectedGroupInEvent, setSelectedGroupInEvent] =
+    useState<GroupInEvent.AsObject>({} as GroupInEvent.AsObject)
 
   const { planList } = useAppSelector(getPlanList)
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo.AsObject>(
@@ -72,22 +101,24 @@ export default function RunCommit({
   )
 
   // user
-  const userState  = useAppSelector((state) => state.user);
+  const userState = useAppSelector((state) => state.user)
 
   // challenge commit
-  const [challengeList, setChallengeList] = useState<ChallengeInfo.AsObject[]>([])
-  const [selectedChallenge, setSelectedChallenge] = useState<ChallengeInfo.AsObject>(
-    {} as ChallengeInfo.AsObject
+  const [challengeList, setChallengeList] = useState<ChallengeInfo.AsObject[]>(
+    []
   )
+  const [selectedChallenge, setSelectedChallenge] =
+    useState<ChallengeInfo.AsObject>({} as ChallengeInfo.AsObject)
   const fetchChallengeData = async () => {
-    const res = await groupClient.listInProgressChallenge({ userId: userState.userId, activitytype: route.params.activityType })
-    if(res.error) {
+    const res = await groupClient.listInProgressChallenge({
+      userId: userState.userId,
+      activitytype: route.params.activityType,
+    })
+    if (res.error) {
       console.log(res.error)
-    }
-    else 
-    {
+    } else {
       setChallengeList(res.response?.challengeInfoListList || [])
-      if(res.response?.challengeInfoListList?.length) {
+      if (res.response?.challengeInfoListList?.length) {
         setSelectedChallenge(res.response?.challengeInfoListList[0])
       }
     }
@@ -108,16 +139,15 @@ export default function RunCommit({
 
   useEffect(() => {
     if (planList.length > 0) {
-      if(route.params.selectedPlanId != -1) {
+      if (route.params.selectedPlanId != -1) {
         // find plan that id is the same as selectedPlan.id
-        for(let i = 0; i < planList.length; i++) {
-          if(planList[i].id == route.params.selectedPlanId) {
+        for (let i = 0; i < planList.length; i++) {
+          if (planList[i].id == route.params.selectedPlanId) {
             setSelectedPlan(planList[i])
             break
           }
         }
-      }
-      else {
+      } else {
         // check each plan, if it is in progress and has the same activity type as the current activity, select it
         for (let i = 0; i < planList.length; i++) {
           if (
@@ -146,16 +176,14 @@ export default function RunCommit({
       })
     ).unwrap()
 
-    if(response.error) {
+    if (response.error) {
       console.log(response.error)
       return
-    }
-    else
-    {
-        resGroupList = response.response?.groupListList || []
-        // if(resGroupList.length == 0) {
-        //   return
-        // }
+    } else {
+      resGroupList = response.response?.groupListList || []
+      // if(resGroupList.length == 0) {
+      //   return
+      // }
     }
 
     const res = await dispatch(
@@ -163,7 +191,7 @@ export default function RunCommit({
         ascending: true,
         limit: 100,
         visibility: 0,
-        search: "",
+        search: '',
         offset: 0,
         groupIdsList: getGroupIds(resGroupList),
         idsList: [],
@@ -172,12 +200,10 @@ export default function RunCommit({
       })
     ).unwrap()
 
-    if(res.error) {
+    if (res.error) {
       console.log(res.error)
-    }
-    else 
-    {
-      if(filteredEventList.length > 0) {
+    } else {
+      if (filteredEventList.length > 0) {
         setSelectedEvent(filteredEventList[0])
       }
     }
@@ -198,7 +224,7 @@ export default function RunCommit({
     if (response) {
       groupList = response.groupsList.map((group) => group.id)
       setGroupsInEventList(response?.groupsList || [])
-      if(response?.groupsList?.length) {
+      if (response?.groupsList?.length) {
         setSelectedGroupInEvent(response?.groupsList[0]) // auto select first group
       }
     }
@@ -216,7 +242,7 @@ export default function RunCommit({
   }
 
   useEffect(() => {
-    if(selectedEvent.id) {
+    if (selectedEvent.id) {
       fetchListEventGroupsAndInfo()
     }
   }, [selectedEvent])
@@ -228,10 +254,10 @@ export default function RunCommit({
   }, [])
 
   const getGroupIds = (groupList: any) => {
-    if(groupList.length == 0) return [0] // return [0] to get empty list when fetching event
+    if (groupList.length == 0) return [0] // return [0] to get empty list when fetching event
 
     const groupIds: number[] = []
-    for(let i = 0; i < groupList.length; i++) {
+    for (let i = 0; i < groupList.length; i++) {
       groupIds.push(groupList[i].id)
     }
     return groupIds
@@ -246,7 +272,7 @@ export default function RunCommit({
     }
     const commitReq: CommitActivityRequest.AsObject = {
       activityId: route.params.activityId,
-      commitToList: [commitObj]
+      commitToList: [commitObj],
     }
     console.log(commitReq)
 
@@ -267,7 +293,7 @@ export default function RunCommit({
 
     const commitReq: CommitActivityRequest.AsObject = {
       activityId: route.params.activityId,
-      commitToList: [commitObj]
+      commitToList: [commitObj],
     }
     console.log(commitReq)
 
@@ -288,7 +314,7 @@ export default function RunCommit({
 
     const commitReq: CommitActivityRequest.AsObject = {
       activityId: route.params.activityId,
-      commitToList: [commitObj]
+      commitToList: [commitObj],
     }
     console.log(commitReq)
 
@@ -301,36 +327,37 @@ export default function RunCommit({
 
   const commitAll = async () => {
     const planStatus = filteredPlanList.length > 0 ? await commitToPlan() : true
-    const challengeStatus = challengeList.length > 0 ? await commitToChallenge() : true
-    const eventStatus = filteredEventList.length > 0 ? await commitToEvent() : true
+    const challengeStatus =
+      challengeList.length > 0 ? await commitToChallenge() : true
+    const eventStatus =
+      filteredEventList.length > 0 ? await commitToEvent() : true
 
     console.log(planStatus, challengeStatus, eventStatus)
 
     let failedItems = []
-    if(!planStatus) {
+    if (!planStatus) {
       failedItems.push('plan')
     }
-    if(!challengeStatus) {
+    if (!challengeStatus) {
       failedItems.push('challenge')
     }
-    if(!eventStatus) {
+    if (!eventStatus) {
       failedItems.push('event')
     }
 
-    if(failedItems.length > 0) {
+    if (failedItems.length > 0) {
       toast.error({ message: `Commit to ${failedItems.join(', ')} failed` })
-    }
-    else {
+    } else {
       toast.success({ message: 'Commit successfully' })
     }
     navigation.goBack()
   }
 
   const getSelectedPlan = () => {
-    if(filteredPlanList.length > 0) {
+    if (filteredPlanList.length > 0) {
       // find plan that id is the same as selectedPlan.id
-      for(let i = 0; i < filteredPlanList.length; i++) {
-        if(filteredPlanList[i].id === selectedPlan.id) {
+      for (let i = 0; i < filteredPlanList.length; i++) {
+        if (filteredPlanList[i].id === selectedPlan.id) {
           return filteredPlanList[i]
         }
       }
@@ -339,10 +366,10 @@ export default function RunCommit({
   }
 
   const getSelectedChallenge = () => {
-    if(challengeList.length > 0) {
+    if (challengeList.length > 0) {
       // find challenge that id is the same as selectedChallenge.id
-      for(let i = 0; i < challengeList.length; i++) {
-        if(challengeList[i].id === selectedChallenge.id) {
+      for (let i = 0; i < challengeList.length; i++) {
+        if (challengeList[i].id === selectedChallenge.id) {
           return challengeList[i]
         }
       }
@@ -370,7 +397,9 @@ export default function RunCommit({
 
   const filteredEventList = eventList.filter(
     // startAt is <= now and endAt is >= now
-    (item) => getSeconds(item.startAt?.seconds) <= Date.now() && getSeconds(item.endAt?.seconds) >= Date.now()
+    (item) =>
+      getSeconds(item.startAt?.seconds) <= Date.now() &&
+      getSeconds(item.endAt?.seconds) >= Date.now()
   )
 
   return (
@@ -385,270 +414,327 @@ export default function RunCommit({
               style={{ alignSelf: 'center' }}
             />
             <Text style={styles(theme).title}>
-              Your activity has been recorded !!!
+              Your activity has been recorded !
             </Text>
-            <Text style={styles(theme).title}>{filteredPlanList.length == 0 && challengeList.length == 0 ? 'Nothing to commit' : 'Choose to commit'}</Text>
+            <Text style={{ alignSelf: 'center', fontSize: 15 }}>
+              Chose a plan, challenge or event to contribute to
+            </Text>
             <View>
-              <View style={{
+              <View
+                style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-              }}>
-                  <Text style={{
-                      fontSize: 17,
-                      fontWeight: 'bold',
-                  }}>Plan:</Text>
+                  marginTop: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Plan:
+                </Text>
 
-                  <TouchableOpacity
-                    onPress={() => setShowPlan(!showPlan)}
+                <TouchableOpacity
+                  onPress={() => setShowPlan(!showPlan)}
+                  style={{
+                    alignSelf: 'flex-end',
+                    marginRight: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
                     style={{
-                      alignSelf: 'flex-end',
-                      marginRight: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                      color: theme.colors.primary,
                     }}
                   >
-                    <Text style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: theme.colors.primary,
-                    }}>
-                      {selectedPlan.name ? selectedPlan.name : 'No data'}
-                    </Text>
+                    {selectedPlan.name ? selectedPlan.name : 'No data'}
+                  </Text>
 
-                    <Avatar.Icon
-                      icon={showPlan ? 'chevron-up' : 'chevron-down'}
-                      size={35}
-                      color={theme.colors.primary}
-                      style={{
-                        backgroundColor: 'transparent',
-                      }}
-                    />
-                  </TouchableOpacity>
+                  <Avatar.Icon
+                    icon={showPlan ? 'chevron-up' : 'chevron-down'}
+                    size={35}
+                    color={theme.colors.primary}
+                    style={{
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
 
-              {!showPlan && getSelectedPlan() != null && ( // show selected plan
-                    <PlanItem
-                      key={getSelectedPlan().name}
-                      plan={getSelectedPlan()}
-                      hideTopDivider={true}
-                      showBottomDivider={true}
-                      navigateFunc={() => navigation.navigate('PlanDetail', {
+              {!showPlan &&
+                getSelectedPlan() != null && ( // show selected plan
+                  <PlanItem
+                    key={getSelectedPlan().name}
+                    plan={getSelectedPlan()}
+                    hideTopDivider={true}
+                    showBottomDivider={true}
+                    navigateFunc={() =>
+                      navigation.navigate('PlanDetail', {
                         planId: getSelectedPlan().id,
                         canEdit: false,
-                      })}
-                      selectedPlan={selectedPlan}
-                      setSelectedPlan={setSelectedPlan}
-                    />
-              )}
+                      })
+                    }
+                    selectedPlan={selectedPlan}
+                    setSelectedPlan={setSelectedPlan}
+                  />
+                )}
 
-              {showPlan && filteredPlanList.map((plan, idx) => ( // show all plans
+              {showPlan &&
+                filteredPlanList.map(
+                  (
+                    plan,
+                    idx // show all plans
+                  ) => (
                     <PlanItem
                       key={idx}
                       plan={plan}
                       hideTopDivider={idx === 0}
                       showBottomDivider={idx === filteredPlanList.length - 1}
-                      navigateFunc={() => navigation.navigate('PlanDetail', {
-                        planId: plan.id,
-                        canEdit: false,
-                      })}
+                      navigateFunc={() =>
+                        navigation.navigate('PlanDetail', {
+                          planId: plan.id,
+                          canEdit: false,
+                        })
+                      }
                       selectedPlan={selectedPlan}
                       setSelectedPlan={setSelectedPlan}
                     />
-              ))}
+                  )
+                )}
             </View>
 
             <View>
-              <View style={{
+              <View
+                style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-              }}>
-                  <Text style={{
-                      fontSize: 17,
-                      fontWeight: 'bold',
-                  }}>Challenge:</Text>
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Challenge:
+                </Text>
 
-                  <TouchableOpacity
-                    onPress={() => setShowChallenge(!showChallenge)}
+                <TouchableOpacity
+                  onPress={() => setShowChallenge(!showChallenge)}
+                  style={{
+                    alignSelf: 'flex-end',
+                    marginRight: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
                     style={{
-                      alignSelf: 'flex-end',
-                      marginRight: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                      color: theme.colors.primary,
                     }}
                   >
-                    <Text style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: theme.colors.primary,
-                    }}>
-                      {selectedChallenge.name ? selectedChallenge.name : 'No data'}
-                    </Text>
+                    {selectedChallenge.name
+                      ? selectedChallenge.name
+                      : 'No data'}
+                  </Text>
 
-                    <Avatar.Icon
-                      icon={showChallenge ? 'chevron-up' : 'chevron-down'}
-                      size={35}
-                      color={theme.colors.primary}
-                      style={{
-                        backgroundColor: 'transparent',
-                      }}
-                    />
-                  </TouchableOpacity>
+                  <Avatar.Icon
+                    icon={showChallenge ? 'chevron-up' : 'chevron-down'}
+                    size={35}
+                    color={theme.colors.primary}
+                    style={{
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
 
               {!showChallenge && getSelectedChallenge() != null && (
-                  <ChallengeItem
-                    key={selectedChallenge.name}
-                    challenge={selectedChallenge}
-                    hideTopDivider={true}
-                    showBottomDivider={true}
-                    setSelectedChallenge={setSelectedChallenge}
-                    selectedChallenge={selectedChallenge}
-                    goToChallengeDetail={() => navigation.navigate('ChallengeDetail', {
+                <ChallengeItem
+                  key={selectedChallenge.name}
+                  challenge={selectedChallenge}
+                  hideTopDivider={true}
+                  showBottomDivider={true}
+                  setSelectedChallenge={setSelectedChallenge}
+                  selectedChallenge={selectedChallenge}
+                  goToChallengeDetail={() =>
+                    navigation.navigate('ChallengeDetail', {
                       challengeId: selectedChallenge.id,
                       canEdit: false,
                       leaderId: -1, // missing
-                    })}
-                  />
-                )
-              }
+                    })
+                  }
+                />
+              )}
 
-              {showChallenge && challengeList.map((challenge: ChallengeInfo.AsObject, idx) => {
-                return (
-                  <ChallengeItem
-                    key={idx}
-                    challenge={challenge}
-                    hideTopDivider={idx === 0}
-                    showBottomDivider={idx === challengeList.length - 1}
-                    setSelectedChallenge={setSelectedChallenge}
-                    selectedChallenge={selectedChallenge}
-                    goToChallengeDetail={() => navigation.navigate('ChallengeDetail', {
-                      challengeId: challenge.id,
-                      canEdit: false,
-                      leaderId: -1, // missing
-                    })}
-                  />
-                )
-              })}
+              {showChallenge &&
+                challengeList.map((challenge: ChallengeInfo.AsObject, idx) => {
+                  return (
+                    <ChallengeItem
+                      key={idx}
+                      challenge={challenge}
+                      hideTopDivider={idx === 0}
+                      showBottomDivider={idx === challengeList.length - 1}
+                      setSelectedChallenge={setSelectedChallenge}
+                      selectedChallenge={selectedChallenge}
+                      goToChallengeDetail={() =>
+                        navigation.navigate('ChallengeDetail', {
+                          challengeId: challenge.id,
+                          canEdit: false,
+                          leaderId: -1, // missing
+                        })
+                      }
+                    />
+                  )
+                })}
             </View>
 
             <View>
-              <View style={{
+              <View
+                style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-              }}>
-                  <Text style={{
-                      fontSize: 17,
-                      fontWeight: 'bold',
-                  }}>Event:</Text>
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Event:
+                </Text>
 
-                  <TouchableOpacity
-                    onPress={() => setShowEvent(!showEvent)}
+                <TouchableOpacity
+                  onPress={() => setShowEvent(!showEvent)}
+                  style={{
+                    alignSelf: 'flex-end',
+                    marginRight: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
                     style={{
-                      alignSelf: 'flex-end',
-                      marginRight: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                      color: theme.colors.primary,
                     }}
                   >
-                    <Text style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: theme.colors.primary,
-                    }}>
-                      {selectedEvent.name ? selectedEvent.name : 'No data'}
-                    </Text>
+                    {selectedEvent.name ? selectedEvent.name : 'No data'}
+                  </Text>
 
-                    <Avatar.Icon
-                      icon={showEvent ? 'chevron-up' : 'chevron-down'}
-                      size={35}
-                      color={theme.colors.primary}
-                      style={{
-                        backgroundColor: 'transparent',
-                      }}
-                    />
-                  </TouchableOpacity>
+                  <Avatar.Icon
+                    icon={showEvent ? 'chevron-up' : 'chevron-down'}
+                    size={35}
+                    color={theme.colors.primary}
+                    style={{
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
 
-            
-
             {!eventListLoading && !showEvent && selectedEvent.name && (
-                <EventItem
+              <EventItem
                 event={selectedEvent}
                 hideTopDivider={true}
                 showBottomDivider={true}
                 setSelectedEvent={setSelectedEvent}
                 selectedEvent={selectedEvent}
               />
-              )
-            }
+            )}
 
-            {!eventListLoading && showEvent && filteredEventList.map((event: EventDetail.AsObject, idx) => {
-              return (
-                <EventItem
-                  key={idx}
-                  event={event}
-                  hideTopDivider={idx === 0}
-                  showBottomDivider={idx === filteredEventList.length - 1}
-                  setSelectedEvent={setSelectedEvent}
-                  selectedEvent={selectedEvent}
-                />
-              )
-            })}
+            {!eventListLoading &&
+              showEvent &&
+              filteredEventList.map((event: EventDetail.AsObject, idx) => {
+                return (
+                  <EventItem
+                    key={idx}
+                    event={event}
+                    hideTopDivider={idx === 0}
+                    showBottomDivider={idx === filteredEventList.length - 1}
+                    setSelectedEvent={setSelectedEvent}
+                    selectedEvent={selectedEvent}
+                  />
+                )
+              })}
 
             {eventListLoading && (
-              <View style={{
-                alignItems: 'center',
-                marginTop: 50,
-              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  marginTop: 50,
+                }}
+              >
                 <ActivityIndicator size="large" color={theme.colors.primary} />
               </View>
             )}
 
             <View>
-              <View style={{
+              <View
+                style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-              }}>
-                  <Text style={{
-                      fontSize: 17,
-                      fontWeight: 'bold',
-                  }}>Group in Event:</Text>
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Group in Event:
+                </Text>
 
-                  <TouchableOpacity
-                    onPress={() => setShowGroup(!showGroup)}
+                <TouchableOpacity
+                  onPress={() => setShowGroup(!showGroup)}
+                  style={{
+                    alignSelf: 'flex-end',
+                    marginRight: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
                     style={{
-                      alignSelf: 'flex-end',
-                      marginRight: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                      color: theme.colors.primary,
                     }}
                   >
-                    <Text style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: theme.colors.primary,
-                    }}>
-                      {groupInfoMap[selectedGroupInEvent.id]?.name ? groupInfoMap[selectedGroupInEvent.id]?.name : 'No data'}
-                    </Text>
+                    {groupInfoMap[selectedGroupInEvent.id]?.name
+                      ? groupInfoMap[selectedGroupInEvent.id]?.name
+                      : 'No data'}
+                  </Text>
 
-                    <Avatar.Icon
-                      icon={showGroup ? 'chevron-up' : 'chevron-down'}
-                      size={35}
-                      color={theme.colors.primary}
-                      style={{
-                        backgroundColor: 'transparent',
-                      }}
-                    />
-                  </TouchableOpacity>
+                  <Avatar.Icon
+                    icon={showGroup ? 'chevron-up' : 'chevron-down'}
+                    size={35}
+                    color={theme.colors.primary}
+                    style={{
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
-            
-            {!groupLoading && !showGroup && groupInfoMap[selectedGroupInEvent.id]?.name && (
+
+            {!groupLoading &&
+              !showGroup &&
+              groupInfoMap[selectedGroupInEvent.id]?.name && (
                 <GroupItem
                   group={selectedGroupInEvent}
                   hideTopDivider={true}
@@ -657,34 +743,38 @@ export default function RunCommit({
                   selectedGroup={selectedGroupInEvent}
                   groupInfoMap={groupInfoMap}
                 />
-              )
-            }
+              )}
 
-            {!groupLoading && showGroup && groupsInEventList.map((group: GroupInEvent.AsObject, idx) => {
-              return (
-                <GroupItem
-                  key={idx}
-                  group={group}
-                  hideTopDivider={idx === 0}
-                  showBottomDivider={idx === groupsInEventList.length - 1}
-                  setSelectedGroup={setSelectedGroupInEvent}
-                  selectedGroup={selectedGroupInEvent}
-                  groupInfoMap={groupInfoMap}
-                />
-              )
-            })}
+            {!groupLoading &&
+              showGroup &&
+              groupsInEventList.map((group: GroupInEvent.AsObject, idx) => {
+                return (
+                  <GroupItem
+                    key={idx}
+                    group={group}
+                    hideTopDivider={idx === 0}
+                    showBottomDivider={idx === groupsInEventList.length - 1}
+                    setSelectedGroup={setSelectedGroupInEvent}
+                    selectedGroup={selectedGroupInEvent}
+                    groupInfoMap={groupInfoMap}
+                  />
+                )
+              })}
 
             {groupLoading && (
-              <View style={{
-                alignItems: 'center',
-                marginTop: 50,
-              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  marginTop: 50,
+                }}
+              >
                 <ActivityIndicator size="large" color={theme.colors.primary} />
               </View>
             )}
-            
 
-            {(filteredPlanList.length > 0 ||  challengeList.length > 0 || filteredEventList.length > 0) && (
+            {(filteredPlanList.length > 0 ||
+              challengeList.length > 0 ||
+              filteredEventList.length > 0) && (
               <Button
                 style={styles(theme).commitBtn}
                 mode="contained"
@@ -694,20 +784,24 @@ export default function RunCommit({
               </Button>
             )}
 
-            {filteredPlanList.length == 0 &&  challengeList.length == 0 && filteredEventList.length == 0 && (
-              <View style={{
-                alignItems: 'center',
-                marginTop: 50,
-              }}>
-                <Button
-                  labelStyle={{ fontSize: 17 }}
-                  mode="contained"
-                  onPress={() => backToHome()}
+            {filteredPlanList.length == 0 &&
+              challengeList.length == 0 &&
+              filteredEventList.length == 0 && (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    marginTop: 50,
+                  }}
                 >
-                  &lt;&lt; Back to home 
-                </Button>
-              </View>
-            )}
+                  <Button
+                    labelStyle={{ fontSize: 17 }}
+                    mode="contained"
+                    onPress={() => backToHome()}
+                  >
+                    &lt;&lt; Back to home
+                  </Button>
+                </View>
+              )}
           </ScrollView>
         </View>
       </View>

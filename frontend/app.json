@@ -2,7 +2,7 @@
   "expo": {
     "name": "Go Tracker",
     "slug": "gotracker",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "com.manhrev.gotracker",
@@ -22,7 +22,7 @@
     },
     "android": {
       "package": "com.manhrev.gotracker",
-      "versionCode": 7,
+      "versionCode": 8,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
@@ -35,7 +35,7 @@
       "softwareKeyboardLayoutMode": "pan",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBR9u4Z2VyRuOYTTbIWfRILkoV96eVV8JY"
+          "apiKey": "AIzaSyDpNUZ-PMxPNeDDf69JGsOUT6Jm4K6RJ0g"
         }
       },
         "googleServicesFile": "./google-services.json"
