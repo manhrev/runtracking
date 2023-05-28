@@ -12,6 +12,7 @@ import { ListEventsRequest } from '../../../../lib/event/event_pb'
 import { RootBaseStackParamList } from '../../../../navigators/BaseStack'
 import {
   isEventListLoading,
+  resetEventList,
   selectEventList,
 } from '../../../../redux/features/eventList/slice'
 import {
@@ -72,6 +73,12 @@ export default function EventList({
       fetchListEvent()
     }, [dispatch, searchByName, sortBy, asc, visibility, groupIds])
   )
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetEventList())
+    }
+  }, [])
 
   const yourGroupId = groupinfo?.id || 0
 

@@ -182,7 +182,7 @@ export default function EventDetail({
                     <Text style={{ fontSize: 15 }}>
                       Created by:{' '}
                       <Text style={{ color: theme.colors.primary }}>
-                        {groupInfoMap[yourGroupId]?.name || ''}
+                        {groupInfoMap[ownerGroupId]?.name || ''}
                       </Text>
                     </Text>
                   </View>
