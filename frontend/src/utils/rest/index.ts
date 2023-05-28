@@ -29,7 +29,7 @@ class RestClient {
     //@ts-ignore
     data.append('file', { uri: imageUri, name: filename, type })
 
-    let res = await fetch(HOST + '/umage/upload-image', {
+    let res = await fetch(this.url + '/umage/upload-image', {
       method: 'POST',
       body: data,
       headers: {
@@ -39,7 +39,14 @@ class RestClient {
     })
 
     if (!res.ok) {
-      console.log('upload image error', res.status, ' ', res.statusText)
+      console.log(
+        'upload image error',
+        res.status,
+        ' ',
+        res.statusText,
+        ' addrr ',
+        this.url + '/umage/upload-image'
+      )
       return {
         error: true,
         imageUrl: '',
@@ -57,6 +64,8 @@ class RestClient {
 const GOOGLE_FIT_BASE_URL = 'https://www.googleapis.com/fitness/v1/users/me'
 const GOOGLE_AUTH_BASE_URL = 'https://www.googleapis.com/userinfo/v2'
 
-export const restUploadImageClient = new RestClient(HOST)
+export const restUploadImageClient = new RestClient(
+  'https://umage-wqobs6gt2a-et.a.run.app'
+)
 export const googleFitClient = new restGoogleFitClient(GOOGLE_FIT_BASE_URL)
 export const googleAuthClient = new restGoogleAuthClient(GOOGLE_AUTH_BASE_URL)
