@@ -3,9 +3,7 @@ import { GetGroupReply } from '../../../lib/group/group_pb'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
 import { RootState } from '../../reducers'
-import {
-  getGroupThunk
-} from './thunk'
+import { getGroupThunk } from './thunk'
 
 type GroupDetailState = {
   groupDetail: GetGroupReply.AsObject
@@ -19,7 +17,11 @@ export const initialState: GroupDetailState = {
 const slice = createSlice({
   name: 'group-detail',
   initialState,
-  reducers: {},
+  reducers: {
+    resetGroupDetail: (state) => {
+      state.groupDetail = {} as GetGroupReply.AsObject
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getGroupThunk.pending, (state) => {
@@ -29,12 +31,12 @@ const slice = createSlice({
         const { response, error } = payload
         if (error) return
 
-        state.groupDetail = response || {} as GetGroupReply.AsObject
+        state.groupDetail = response || ({} as GetGroupReply.AsObject)
         state.status = StatusEnum.SUCCEEDED
       })
   },
 })
-
+export const { resetGroupDetail } = slice.actions
 export const isGroupDetailLoading = (state: RootState) => {
   return state.groupDetail.status === StatusEnum.LOADING
 }

@@ -11,18 +11,22 @@ import {
 } from './thunk'
 
 type PlanListState = {
-    challengeList: Array<any>
+  challengeList: Array<any>
 } & CommonState
 
 export const initialState: PlanListState = {
-    challengeList: [],
-    status: StatusEnum.LOADING,
+  challengeList: [],
+  status: StatusEnum.LOADING,
 }
 
 const slice = createSlice({
   name: 'challenge-list',
   initialState,
-  reducers: {},
+  reducers: {
+    resetChallengeList: (state) => {
+      state.challengeList = []
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(listChallengeThunk.pending, (state) => {
       state.status = StatusEnum.LOADING
@@ -70,14 +74,14 @@ const slice = createSlice({
         return
       }
       state.status = StatusEnum.SUCCEEDED
-      
+
       state.challengeList = state.challengeList.filter((item: any) => {
         return item.id !== deletedId
       })
     })
   },
 })
-
+export const { resetChallengeList } = slice.actions
 export const getChallengesList = (state: RootState) => state.challengeList
 export const isChallengeListLoading = (state: RootState) =>
   state.challengeList.status === StatusEnum.LOADING

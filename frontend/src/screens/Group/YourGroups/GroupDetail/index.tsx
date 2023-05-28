@@ -7,14 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native'
-import {
-  Text,
-  IconButton,
-  Button,
-  TextInput,
-  Divider,
-  List,
-} from 'react-native-paper'
+import { Text, IconButton, Button, Divider, List } from 'react-native-paper'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
 import { baseStyles } from '../../../baseStyle'
@@ -23,11 +16,11 @@ import { useAppDispatch, useAppSelector } from '../../../../redux/store'
 import {
   selectGroupDetail,
   isGroupDetailLoading,
+  resetGroupDetail,
 } from '../../../../redux/features/groupDetail/slice'
 
 import {
   Member,
-  GetGroupReply,
   RuleStatus,
   ListChallengeRequest,
 } from '../../../../lib/group/group_pb'
@@ -43,11 +36,13 @@ import { RefreshControl } from 'react-native-gesture-handler'
 import {
   getChallengesList,
   isChallengeListLoading,
+  resetChallengeList,
 } from '../../../../redux/features/challengeList/slice'
 import { listChallengeThunk } from '../../../../redux/features/challengeList/thunk'
 import { ActivityType } from '../../../../lib/activity/activity_pb'
 import {
   isEventListLoading,
+  resetEventList,
   selectEventList,
 } from '../../../../redux/features/eventList/slice'
 import { listEventsThunk } from '../../../../redux/features/eventList/thunks'
@@ -56,10 +51,10 @@ import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import { listUserRankingThunk } from '../../../../redux/features/userRankingList/thunk'
 import {
   isUserRankingListLoading,
+  resetUserRankingList,
   selectUserRankingList,
 } from '../../../../redux/features/userRankingList/slice'
 import { useFocusEffect } from '@react-navigation/native'
-import Constants from 'expo-constants'
 
 export default function GroupDetail({
   navigation,
@@ -191,6 +186,15 @@ export default function GroupDetail({
     }, [])
   )
 
+  useEffect(() => {
+    return () => {
+      dispatch(resetEventList())
+      dispatch(resetUserRankingList())
+      dispatch(resetGroupDetail())
+      dispatch(resetChallengeList())
+    }
+  }, [])
+
   return (
     <View style={baseStyles(theme).containerWithouHeader}>
       <LoadingOverlay
@@ -268,7 +272,7 @@ export default function GroupDetail({
             }}
             icon="arrow-left"
             size={30}
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.pop()}
           />
           {userState.userId == groupDetail.groupinfo?.leaderId && (
             <IconButton
@@ -302,7 +306,7 @@ export default function GroupDetail({
         <Text style={styles(theme).groupTitle}>
           {groupDetail.groupinfo?.name}
         </Text>
-        
+
         {groupDetail.groupinfo?.memberStatus ===
           Member.Status.MEMBER_STATUS_UNSPECIFIED && (
           <Button
@@ -332,19 +336,19 @@ export default function GroupDetail({
         )}
 
         {userState.userId != groupDetail.groupinfo?.leaderId &&
-        groupDetail.groupinfo?.memberStatus ===
-          Member.Status.MEMBER_STATUS_ACTIVE && (
-          <Button
-            style={styles(theme).joinButton}
-            mode="contained"
-            onPress={() => {}}
-            labelStyle={{
-              fontSize: 15,
-            }}
-          >
-            Joined &#10003;
-          </Button>
-        )}
+          groupDetail.groupinfo?.memberStatus ===
+            Member.Status.MEMBER_STATUS_ACTIVE && (
+            <Button
+              style={styles(theme).joinButton}
+              mode="contained"
+              onPress={() => {}}
+              labelStyle={{
+                fontSize: 15,
+              }}
+            >
+              Joined &#10003;
+            </Button>
+          )}
         {groupDetail.groupinfo?.memberStatus ===
           Member.Status.MEMBER_STATUS_WAITING && (
           <Button
@@ -389,12 +393,13 @@ export default function GroupDetail({
             alignSelf: 'center',
           }}
           mode="text"
-          onPress={() =>
-            navigation.navigate('GroupMembers', {
-              groupId: groupDetail.groupinfo?.id || 0,
-              isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
-            })
-          }
+          onPress={() => {
+            if (route.params.detailFrom == 'YourGroups')
+              navigation.navigate('GroupMembers', {
+                groupId: groupDetail.groupinfo?.id || 0,
+                isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
+              })
+          }}
           labelStyle={{
             fontSize: 16,
             fontWeight: 'bold',
@@ -463,63 +468,149 @@ export default function GroupDetail({
           </Text>
         )}
 
-        {route.params.detailFrom == "YourGroups" && <View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Text style={styles(theme).title}>Challenges</Text>
-            <Button
+        {route.params.detailFrom == 'YourGroups' && (
+          <View>
+            <View
               style={{
-                alignSelf: 'flex-end',
-                marginRight: 10,
-              }}
-              mode="text"
-              onPress={() =>
-                navigation.navigate('ChallengeList', {
-                  groupId: groupDetail.groupinfo?.id || 0,
-                  isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
-                  leaderId: groupDetail.groupinfo?.leaderId || 0,
-                })
-              }
-              labelStyle={{
-                fontSize: 16,
-                fontWeight: 'bold',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}
             >
-              View all &gt;
-            </Button>
-          </View>
+              <Text style={styles(theme).title}>Challenges</Text>
+              <Button
+                style={{
+                  alignSelf: 'flex-end',
+                  marginRight: 10,
+                }}
+                mode="text"
+                onPress={() =>
+                  navigation.navigate('ChallengeList', {
+                    groupId: groupDetail.groupinfo?.id || 0,
+                    isLeader:
+                      userState.userId == groupDetail.groupinfo?.leaderId,
+                    leaderId: groupDetail.groupinfo?.leaderId || 0,
+                  })
+                }
+                labelStyle={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                }}
+              >
+                View all &gt;
+              </Button>
+            </View>
 
-          {/* // Horizontal FlatList of challenges */}
-          {!challengeListLoading && (
+            {/* // Horizontal FlatList of challenges */}
+            {!challengeListLoading && (
+              <FlatList
+                horizontal
+                data={challengeList}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: 'column',
+                      marginBottom: 10,
+                    }}
+                    onPress={() =>
+                      navigation.navigate('ChallengeDetail', {
+                        canEdit:
+                          groupDetail.groupinfo?.leaderId == userState.userId &&
+                          item.status === RuleStatus.RULE_STATUS_COMING_SOON,
+                        leaderId: groupDetail.groupinfo?.leaderId || 0,
+                        challengeId: item.id,
+                      })
+                    }
+                  >
+                    <Image
+                      style={{
+                        width: 150,
+                        height: 130,
+                        borderRadius: 5,
+                        margin: 10,
+                      }}
+                      source={
+                        item.picture == ''
+                          ? require('../../../../../assets/group-img.png')
+                          : { uri: item.picture }
+                      }
+                    />
+                    <Text
+                      style={{
+                        marginLeft: 10,
+                        fontWeight: 'bold',
+                        fontSize: 15,
+                      }}
+                    >
+                      {item.name}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => item.id.toString()}
+              />
+            )}
+
+            {noChallengeData && (
+              <Text
+                variant="bodyLarge"
+                style={{
+                  paddingVertical: 10,
+                  color: theme.colors.tertiary,
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                }}
+              >
+                No challenge found
+              </Text>
+            )}
+            <Divider />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Text style={styles(theme).title}>Events</Text>
+              <Button
+                style={{
+                  alignSelf: 'flex-end',
+                  marginRight: 10,
+                }}
+                mode="text"
+                onPress={() => {
+                  navigation.navigate('EventList', {})
+                }}
+                labelStyle={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                }}
+              >
+                View all &gt;
+              </Button>
+            </View>
+
             <FlatList
+              style={{ marginTop: 10 }}
               horizontal
-              data={challengeList}
+              data={eventList.slice(0, 3)}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={{
                     flexDirection: 'column',
                     marginBottom: 10,
                   }}
-                  onPress={() =>
-                    navigation.navigate('ChallengeDetail', {
-                      canEdit:
-                        groupDetail.groupinfo?.leaderId == userState.userId &&
-                        item.status === RuleStatus.RULE_STATUS_COMING_SOON,
-                      leaderId: groupDetail.groupinfo?.leaderId || 0,
-                      challengeId: item.id,
+                  onPress={() => {
+                    navigation.navigate('EventDetail', {
+                      event: item,
+                      yourGroupId: route.params.groupId,
+                      reloadEventList: fetchEventList,
                     })
-                  }
+                  }}
                 >
                   <Image
                     style={{
-                      width: 150,
-                      height: 130,
-                      borderRadius: 5,
-                      margin: 10,
+                      width: 300,
+                      height: 150,
+                      marginHorizontal: 10,
                     }}
                     source={
                       item.picture == ''
@@ -527,6 +618,7 @@ export default function GroupDetail({
                         : { uri: item.picture }
                     }
                   />
+
                   <Text
                     style={{
                       marginLeft: 10,
@@ -540,106 +632,22 @@ export default function GroupDetail({
               )}
               keyExtractor={(item) => item.id.toString()}
             />
-          )}
-
-          {noChallengeData && (
-            <Text
-              variant="bodyLarge"
-              style={{
-                paddingVertical: 10,
-                color: theme.colors.tertiary,
-                textAlign: 'center',
-                fontWeight: 'bold',
-              }}
-            >
-              No challenge found
-            </Text>
-          )}
-          <Divider />
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Text style={styles(theme).title}>Events</Text>
-            <Button
-              style={{
-                alignSelf: 'flex-end',
-                marginRight: 10,
-              }}
-              mode="text"
-              onPress={() => {
-                navigation.navigate('EventList', {})
-              }}
-              labelStyle={{
-                fontSize: 16,
-                fontWeight: 'bold',
-              }}
-            >
-              View all &gt;
-            </Button>
-          </View>
-
-          <FlatList
-            style={{ marginTop: 10 }}
-            horizontal
-            data={eventList.slice(0, 3)}
-            renderItem={({ item }) => (
-              <TouchableOpacity
+            {!eventList.length && (
+              <Text
+                variant="bodyLarge"
                 style={{
-                  flexDirection: 'column',
-                  marginBottom: 10,
-                }}
-                onPress={() => {
-                  navigation.navigate('EventDetail', {
-                    event: item,
-                    yourGroupId: route.params.groupId,
-                    reloadEventList: fetchEventList,
-                  })
+                  paddingVertical: 10,
+                  color: theme.colors.tertiary,
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  marginBottom: 20,
                 }}
               >
-                <Image
-                  style={{
-                    width: 300,
-                    height: 150,
-                    marginHorizontal: 10,
-                  }}
-                  source={
-                    item.picture == ''
-                      ? require('../../../../../assets/group-img.png')
-                      : { uri: item.picture }
-                  }
-                />
-
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontWeight: 'bold',
-                    fontSize: 15,
-                  }}
-                >
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
+                No event found
+              </Text>
             )}
-            keyExtractor={(item) => item.id.toString()}
-          />
-          {!eventList.length && (
-            <Text
-              variant="bodyLarge"
-              style={{
-                paddingVertical: 10,
-                color: theme.colors.tertiary,
-                textAlign: 'center',
-                fontWeight: 'bold',
-                marginBottom: 20,
-              }}
-            >
-              No event found
-            </Text>
-          )}
-        </View>}
+          </View>
+        )}
       </ScrollView>
     </View>
   )

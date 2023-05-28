@@ -155,7 +155,6 @@ const slice = createSlice({
       })
       state.groupInfoMapStatus = StatusEnum.SUCCEEDED
       state.groupInfoMap = infoMap
-      console.log(state.groupInfoMap)
     })
   },
 })

@@ -19,7 +19,11 @@ export const initialState: UserRankingListState = {
 const slice = createSlice({
   name: 'user-ranking-list',
   initialState,
-  reducers: {},
+  reducers: {
+    resetUserRankingList: (state) => {
+      state.userRankingList = []
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(listUserRankingThunk.pending, (state) => {
@@ -38,6 +42,7 @@ const slice = createSlice({
   },
 })
 
+export const { resetUserRankingList } = slice.actions
 export const isUserRankingListLoading = (state: RootState) => {
   return state.userRankingList.status === StatusEnum.LOADING
 }
