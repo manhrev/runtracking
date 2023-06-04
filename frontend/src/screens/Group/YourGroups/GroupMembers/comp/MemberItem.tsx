@@ -18,6 +18,7 @@ interface GroupItemProps {
   acceptMemberFunc: () => void
   isLeader: boolean
   viewProfile: () => void
+  isYourself?: boolean
 }
 
 export default function GroupItem({
@@ -27,6 +28,7 @@ export default function GroupItem({
   acceptMemberFunc,
   isLeader,
   viewProfile,
+  isYourself,
 }: GroupItemProps) {
   const theme = useAppTheme()
 
@@ -56,7 +58,7 @@ export default function GroupItem({
             >
               <View style={{ marginLeft: 12, justifyContent: 'center' }}>
                 <Text variant="titleMedium" style={{ fontWeight: '700' }}>
-                  {member.displayName}
+                  {member.displayName} {isYourself && '(You)'}
                 </Text>
                 <Text variant="bodyMedium">
                   Joined at {formatDateWithoutTime(member.createdAt)}

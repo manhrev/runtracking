@@ -394,11 +394,10 @@ export default function GroupDetail({
           }}
           mode="text"
           onPress={() => {
-            if (route.params.detailFrom == 'YourGroups')
-              navigation.navigate('GroupMembers', {
-                groupId: groupDetail.groupinfo?.id || 0,
-                isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
-              })
+            navigation.navigate('GroupMembers', {
+              groupId: groupDetail.groupinfo?.id || 0,
+              isLeader: userState.userId == groupDetail.groupinfo?.leaderId,
+            })
           }}
           labelStyle={{
             fontSize: 16,

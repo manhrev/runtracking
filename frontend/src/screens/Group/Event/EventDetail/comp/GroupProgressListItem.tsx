@@ -1,23 +1,7 @@
 import { Dimensions, StyleSheet, View, Image } from 'react-native'
-import {
-  Avatar,
-  Button,
-  Divider,
-  IconButton,
-  Text,
-  TouchableRipple,
-} from 'react-native-paper'
-import { Icon } from 'react-native-paper/lib/typescript/components/Avatar/Avatar'
-import { PlanInfo } from '../../../../../lib/plan/plan_pb'
-import { ActivityType } from '../../../../../lib/activity/activity_pb'
+import { Divider, Text, TouchableRipple } from 'react-native-paper'
 import { AppTheme, useAppTheme } from '../../../../../theme'
-import {
-  displayValue,
-  getProgressOfDailyActivity,
-  isDailyActivity,
-  mToKm,
-  toDate,
-} from '../../../../../utils/helpers'
+import { mToKm } from '../../../../../utils/helpers'
 import * as Progress from 'react-native-progress'
 import {
   GroupProgressInSubEvent,
