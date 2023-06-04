@@ -222,6 +222,8 @@ services:
       DB_NAME: event
       GROUPI_DOMAIN: group
       GROUPI_PORT: 8080
+      NOTIFICATIONI_DOMAIN: notification
+      NOTIFICATIONI_PORT: 8080
       IS_SECURE_CONNECTION: "false"
 
   gcloud-tasks-emulator:

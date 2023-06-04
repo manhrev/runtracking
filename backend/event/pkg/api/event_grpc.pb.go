@@ -34,6 +34,9 @@ type EventClient interface {
 	ListSubEvents(ctx context.Context, in *ListSubEventsRequest, opts ...grpc.CallOption) (*ListSubEventsReply, error)
 	ListGroupsInEvent(ctx context.Context, in *ListGroupsInEventRequest, opts ...grpc.CallOption) (*ListGroupsInEventReply, error)
 	ListGroupProgressInEvent(ctx context.Context, in *ListGroupProgressInEventRequest, opts ...grpc.CallOption) (*ListGroupProgressInEventReply, error)
+	//rpc GetGroupRankingInEvent (GetGroupRankingInEventRequest) returns (GetGroupRankingInEventReply) {} // get ranking of a group in an event
+	//rpc GetGroupRankingInSubEvent (GetGroupRankingInSubEventRequest) returns (GetGroupRankingInSubEventReply) {} // get ranking of a group in a subevent
+	InviteGroupsToEvent(ctx context.Context, in *InviteGroupsToEventRequest, opts ...grpc.CallOption) (*InviteGroupsToEventReply, error)
 }
 
 type eventClient struct {
@@ -134,6 +137,15 @@ func (c *eventClient) ListGroupProgressInEvent(ctx context.Context, in *ListGrou
 	return out, nil
 }
 
+func (c *eventClient) InviteGroupsToEvent(ctx context.Context, in *InviteGroupsToEventRequest, opts ...grpc.CallOption) (*InviteGroupsToEventReply, error) {
+	out := new(InviteGroupsToEventReply)
+	err := c.cc.Invoke(ctx, "/event.Event/InviteGroupsToEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventServer is the server API for Event service.
 // All implementations must embed UnimplementedEventServer
 // for forward compatibility
@@ -150,6 +162,9 @@ type EventServer interface {
 	ListSubEvents(context.Context, *ListSubEventsRequest) (*ListSubEventsReply, error)
 	ListGroupsInEvent(context.Context, *ListGroupsInEventRequest) (*ListGroupsInEventReply, error)
 	ListGroupProgressInEvent(context.Context, *ListGroupProgressInEventRequest) (*ListGroupProgressInEventReply, error)
+	//rpc GetGroupRankingInEvent (GetGroupRankingInEventRequest) returns (GetGroupRankingInEventReply) {} // get ranking of a group in an event
+	//rpc GetGroupRankingInSubEvent (GetGroupRankingInSubEventRequest) returns (GetGroupRankingInSubEventReply) {} // get ranking of a group in a subevent
+	InviteGroupsToEvent(context.Context, *InviteGroupsToEventRequest) (*InviteGroupsToEventReply, error)
 	mustEmbedUnimplementedEventServer()
 }
 
@@ -186,6 +201,9 @@ func (UnimplementedEventServer) ListGroupsInEvent(context.Context, *ListGroupsIn
 }
 func (UnimplementedEventServer) ListGroupProgressInEvent(context.Context, *ListGroupProgressInEventRequest) (*ListGroupProgressInEventReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListGroupProgressInEvent not implemented")
+}
+func (UnimplementedEventServer) InviteGroupsToEvent(context.Context, *InviteGroupsToEventRequest) (*InviteGroupsToEventReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InviteGroupsToEvent not implemented")
 }
 func (UnimplementedEventServer) mustEmbedUnimplementedEventServer() {}
 
@@ -380,6 +398,24 @@ func _Event_ListGroupProgressInEvent_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Event_InviteGroupsToEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InviteGroupsToEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServer).InviteGroupsToEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.Event/InviteGroupsToEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServer).InviteGroupsToEvent(ctx, req.(*InviteGroupsToEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Event_ServiceDesc is the grpc.ServiceDesc for Event service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -426,6 +462,10 @@ var Event_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListGroupProgressInEvent",
 			Handler:    _Event_ListGroupProgressInEvent_Handler,
+		},
+		{
+			MethodName: "InviteGroupsToEvent",
+			Handler:    _Event_InviteGroupsToEvent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
