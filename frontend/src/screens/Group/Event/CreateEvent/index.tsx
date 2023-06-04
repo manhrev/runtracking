@@ -35,7 +35,7 @@ export default function CreateEvent({
       new CreateEventRequest()
         .setIsGlobal(false)
         .setPicture(
-          'https://storage.googleapis.com/runtracking/Frame%201%20(1).png'
+          'https://storage.googleapis.com/gotracker-imgs/Frame%201%20(1).png'
         )
         .setOwnerGroupId(ownerGroupId)
         .toObject()

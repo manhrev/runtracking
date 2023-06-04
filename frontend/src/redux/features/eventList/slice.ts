@@ -51,7 +51,11 @@ export const initialState: EventListState = {
 const slice = createSlice({
   name: 'event-list',
   initialState,
-  reducers: {},
+  reducers: {
+    resetEventList: (state) => {
+      state.eventList = []
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(listEventsThunk.pending, (state) => {
       state.status = StatusEnum.LOADING
@@ -151,10 +155,11 @@ const slice = createSlice({
       })
       state.groupInfoMapStatus = StatusEnum.SUCCEEDED
       state.groupInfoMap = infoMap
-      console.log(state.groupInfoMap)
     })
   },
 })
+
+export const { resetEventList } = slice.actions
 
 export const selectEventList = (state: RootState) => state.eventList
 export const selectGroupInEventList = (state: RootState) => state.groupList

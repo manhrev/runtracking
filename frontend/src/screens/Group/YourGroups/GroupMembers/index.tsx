@@ -22,6 +22,7 @@ import { baseStyles } from '../../../baseStyle'
 import Filter from './comp/Filter'
 import MemberItem from './comp/MemberItem'
 import { toast } from '../../../../utils/toast/toast'
+import { selectUserSlice } from '../../../../redux/features/user/slice'
 
 const LIMIT = 100
 
@@ -32,6 +33,7 @@ export default function GroupMembers({
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
 
+  const { userId } = useAppSelector(selectUserSlice)
   const { memberList } = useAppSelector(selectMemberList)
   const memberListLoading = useAppSelector(isMemberListLoading)
   const noData = memberList.length === 0 && !memberListLoading
@@ -138,9 +140,13 @@ export default function GroupMembers({
                   showBottomDivider={idx === memberList.length - 1}
                   acceptMemberFunc={() => acceptMember(member.memberId)}
                   isLeader={route.params.isLeader}
-                  viewProfile={() =>
-                    navigation.navigate('OtherUser', { userId: member.userId })
-                  }
+                  viewProfile={() => {
+                    if (member.userId != userId)
+                      navigation.navigate('OtherUser', {
+                        userId: member.userId,
+                      })
+                  }}
+                  isYourself={member.userId === userId}
                 />
               )
             })}

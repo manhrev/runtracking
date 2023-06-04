@@ -2,7 +2,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useEffect, useMemo, useState } from 'react'
 import { Image, StyleSheet } from 'react-native'
 import { ScrollView, View } from 'react-native'
-import { Divider, IconButton, Text, TouchableRipple } from 'react-native-paper'
+import {
+  Divider,
+  IconButton,
+  List,
+  Text,
+  TouchableRipple,
+} from 'react-native-paper'
 import StepIndicator from 'react-native-step-indicator'
 import { RootGroupTopTabsParamList } from '../../../../navigators/GroupTopTab'
 import { AppTheme, useAppTheme } from '../../../../theme'
@@ -21,7 +27,11 @@ import {
   isAllEventListLoading,
   selectEventList,
 } from '../../../../redux/features/eventList/slice'
-import { GroupStatus, SubEvent } from '../../../../lib/event/event_pb'
+import {
+  GroupStatus,
+  SubEvent,
+  SubEventProgress,
+} from '../../../../lib/event/event_pb'
 import moment from 'moment'
 import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import { GroupSortBy, ListGroupRequest } from '../../../../lib/group/group_pb'
@@ -34,6 +44,7 @@ export default function EventDetail({
   const theme = useAppTheme()
   const dispatch = useAppDispatch()
   const { yourGroupId, reloadEventList } = route.params
+
   const {
     id,
     description,
@@ -56,17 +67,23 @@ export default function EventDetail({
   const { groupInfoMap } = useAppSelector(selectEventList)
 
   const yourGroupJoined = yourGroupStatus === GroupStatus.GROUP_STATUS_ACTIVE
-
+  const groupRankingList = useMemo(() => {
+    return groupProgressesToGroupRanking(subEventProgressList)
+  }, [subEventProgressList])
   const [selectedSubEvent, setSelectedSubEvent] = useState(
     subEventList[currentSubEventIndex]
   )
   const groupProgress = useMemo(() => {
     return subEventProgressList.find((progress) => {
-      return (
-        progress.subEventId === subEventList[currentSubEventIndex]?.id || -1
-      )
+      console.log(progress.subEventId)
+      return progress.subEventId === selectedSubEvent.id
     })
-  }, [subEventProgressList, currentSubEventIndex, subEventList])
+  }, [
+    subEventProgressList,
+    currentSubEventIndex,
+    subEventList,
+    selectedSubEvent,
+  ])
 
   useMemo(() => {
     setSelectedSubEvent(subEventList[currentSubEventIndex])
@@ -182,7 +199,7 @@ export default function EventDetail({
                     <Text style={{ fontSize: 15 }}>
                       Created by:{' '}
                       <Text style={{ color: theme.colors.primary }}>
-                        {groupInfoMap[yourGroupId]?.name || ''}
+                        {groupInfoMap[ownerGroupId]?.name || ''}
                       </Text>
                     </Text>
                   </View>
@@ -281,6 +298,43 @@ export default function EventDetail({
                   >
                     Challenges
                   </Text>
+                </View>
+              </View>
+            </View>
+            <View style={{ ...styles(theme).titleSection, marginTop: 10 }}>
+              <View>
+                <Text style={{ fontWeight: 'bold', fontSize: 22 }}>
+                  Leaderboards
+                </Text>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginTop: 5,
+                  }}
+                >
+                  {groupRankingList.map((item, index) => (
+                    <List.Item
+                      key={index}
+                      title={groupInfoMap[item.groupId]?.name || item.groupId}
+                      description=""
+                      left={(props) => (
+                        <>
+                          <List.Icon
+                            {...props}
+                            color={colorFromIndex(index)}
+                            icon="medal"
+                          />
+                          <List.Icon
+                            {...props}
+                            color={colorFromIndex(index)}
+                            icon={'numeric-' + (index + 1) + '-circle'}
+                          />
+                        </>
+                      )}
+                      // right={(props) => <Text>{item.} pts</Text>}
+                    />
+                  ))}
                 </View>
               </View>
             </View>
@@ -408,4 +462,37 @@ function getCurrentIndexForSubEvent(subEvents: SubEvent.AsObject[]) {
     }
   }
   return 0
+}
+
+interface GroupInLeaderboard {
+  groupId: number
+  score: number
+}
+
+function groupProgressesToGroupRanking(list: SubEventProgress.AsObject[]) {
+  const groupRanking: Record<number, GroupInLeaderboard> = {}
+  list.forEach((item, index) => {
+    item.groupProgressList.forEach((groupProgress) => {
+      groupRanking[groupProgress.groupId] = {
+        groupId: groupProgress.groupId,
+        score:
+          groupProgress.progress +
+          (groupRanking[groupProgress.groupId]?.score || 0),
+      }
+    })
+  })
+  return Object.values(groupRanking).sort((a, b) => b.score - a.score)
+}
+
+function colorFromIndex(idx: number) {
+  switch (idx) {
+    case 0:
+      return '#FFD700'
+    case 1:
+      return '#C0C0C0'
+    case 2:
+      return '#CD7F32'
+    default:
+      return '#000000'
+  }
 }
