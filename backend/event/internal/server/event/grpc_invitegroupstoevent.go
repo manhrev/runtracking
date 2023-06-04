@@ -14,10 +14,15 @@ import (
 
 func (s *eventServer) InviteGroupsToEvent(ctx context.Context, request *event.InviteGroupsToEventRequest) (*event.InviteGroupsToEventReply, error) {
 	res, err := s.groupIClient.ListGroupI(ctx, &group.ListGroupIRequest{
-		GroupIds: []int64{request.GetOwnerGroupId()},
+		GroupIds: append([]int64{request.GetOwnerGroupId()}, request.GetGroupIds()...),
 	})
 	if err != nil {
 		return nil, status.Internal(fmt.Sprintf("Cannot invite: cannot get group name: %v", err.Error()))
+	}
+
+	adminIds := []int64{}
+	for i := 1; i < len(res.Groups); i++ {
+		adminIds = append(adminIds, res.Groups[i].GetLeaderId())
 	}
 
 	eventRes, err := s.repository.Event.GetEvent(ctx, request.GetEventId())
@@ -26,11 +31,11 @@ func (s *eventServer) InviteGroupsToEvent(ctx context.Context, request *event.In
 	}
 
 	_, err = s.notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
-		Messeage:      `Your group has been invited to join "` + eventRes.Name + "` event by " + res.Groups[0].Name + " group.",
+		Messeage:      `You has been invited to join "` + eventRes.Name + "` event by " + res.Groups[0].Name + " group.",
 		ScheduledTime: timestamppb.New(time.Now().Add(5 * time.Second)),
 		SourceType:    notification.SOURCE_TYPE_EVENT,
 		SourceId:      request.GetEventId(),
-		ReceiveIds:    request.GetGroupIds(),
+		ReceiveIds:    adminIds,
 		SourceImage:   "https://media.istockphoto.com/id/1151187641/vector/red-flag-icon.jpg?s=612x612&w=0&k=20&c=TZdiR3nWkzz7jpmfXZRIx8gt4vPV66hP-JUBIw7euTg=",
 	})
 	if err != nil {
