@@ -33,7 +33,7 @@ func (s *eventServer) InviteGroupsToEvent(ctx context.Context, request *event.In
 	_, err = s.notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
 		Messeage:      `You has been invited to join "` + eventRes.Name + "` event by " + res.Groups[0].Name + " group.",
 		ScheduledTime: timestamppb.New(time.Now().Add(5 * time.Second)),
-		SourceType:    notification.SOURCE_TYPE_EVENT,
+		SourceType:    notification.SOURCE_TYPE_ADMIN,
 		SourceId:      request.GetEventId(),
 		ReceiveIds:    adminIds,
 		SourceImage:   "https://media.istockphoto.com/id/1151187641/vector/red-flag-icon.jpg?s=612x612&w=0&k=20&c=TZdiR3nWkzz7jpmfXZRIx8gt4vPV66hP-JUBIw7euTg=",
