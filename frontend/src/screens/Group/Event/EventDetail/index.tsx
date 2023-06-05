@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Image, StyleSheet } from 'react-native'
 import { ScrollView, View } from 'react-native'
 import {
+  Button,
   Divider,
   IconButton,
   List,
@@ -36,6 +37,8 @@ import moment from 'moment'
 import { LoadingOverlay } from '../../../../comp/LoadingOverlay'
 import { GroupSortBy, ListGroupRequest } from '../../../../lib/group/group_pb'
 import { FabGroup } from '../../../../comp/FabGroup'
+import { eventClient } from '../../../../utils/grpc'
+import { toast } from '../../../../utils/toast/toast'
 
 export default function EventDetail({
   navigation,
@@ -67,6 +70,8 @@ export default function EventDetail({
   const { groupInfoMap } = useAppSelector(selectEventList)
 
   const yourGroupJoined = yourGroupStatus === GroupStatus.GROUP_STATUS_ACTIVE
+  const yourGroupRequested =
+    yourGroupStatus === GroupStatus.GROUP_STATUS_REQUESTED
   const groupRankingList = useMemo(() => {
     return groupProgressesToGroupRanking(subEventProgressList)
   }, [subEventProgressList])
@@ -365,6 +370,36 @@ export default function EventDetail({
                 </>
               )}
             </View>
+            {!yourGroupJoined && !yourGroupRequested && (
+              <Button
+                style={{ marginBottom: 20 }}
+                mode="contained"
+                onPress={async () => {
+                  const { error } = await eventClient.joinEvent({
+                    eventId: id,
+                    groupId: yourGroupId,
+                  })
+                  if (error) {
+                    toast.error({
+                      message: 'An error occured!',
+                    })
+                  } else {
+                    toast.success({
+                      message: 'Sent join request!',
+                    })
+                    reloadEventList()
+                    navigation.goBack()
+                  }
+                }}
+              >
+                Join now!
+              </Button>
+            )}
+            {!yourGroupJoined && yourGroupRequested && (
+              <Button style={{ marginBottom: 20 }} mode="contained" disabled>
+                Requested
+              </Button>
+            )}
           </View>
         </ScrollView>
       </View>

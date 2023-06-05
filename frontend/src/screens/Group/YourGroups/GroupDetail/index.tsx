@@ -144,9 +144,12 @@ export default function GroupDetail({
   }
 
   const fetchGroupDetail = async () => {
-    return await dispatch(
+    const { error } = await dispatch(
       getGroupThunk({ groupId: route.params.groupId })
     ).unwrap()
+    if (error && route.params.detailFrom === 'Notification') {
+      navigation.goBack()
+    }
   }
   const fetchUserRankingList = async () => {
     const { response } = await dispatch(
@@ -467,7 +470,8 @@ export default function GroupDetail({
           </Text>
         )}
 
-        {route.params.detailFrom == 'YourGroups' && (
+        {(route.params.detailFrom == 'YourGroups' ||
+          route.params.detailFrom === 'Notification') && (
           <View>
             <View
               style={{

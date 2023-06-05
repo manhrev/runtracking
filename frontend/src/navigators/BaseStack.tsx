@@ -52,6 +52,7 @@ import SubEventCreate from '../screens/Group/Event/CreateEvent/SubEventCreate'
 import EditEvent from '../screens/Group/Event/EditEvent'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LoadingOverlay } from '../comp/LoadingOverlay'
+import GoToEvent from '../screens/Profile/GoToEvent'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -130,7 +131,7 @@ export type RootBaseStackParamList = {
   }
   GroupDetail: {
     groupId: number
-    detailFrom: 'YourGroups' | 'Explore'
+    detailFrom: 'YourGroups' | 'Explore' | 'Notification'
     reloadListFunc: () => void
   }
   GroupEdit: {
@@ -203,6 +204,9 @@ export type RootBaseStackParamList = {
     event: EventDetailPb.AsObject
     reloadEvent: () => void
     // yourGroupId: number
+  }
+  GoToEvent: {
+    eventId: number
   }
 }
 
@@ -484,6 +488,14 @@ export const BaseStack = () => {
                 headerBackVisible: true,
               }}
               component={EditEvent}
+            />
+            <Stack.Screen
+              name="GoToEvent"
+              options={{
+                title: 'Chosse your group',
+                headerBackVisible: true,
+              }}
+              component={GoToEvent}
             />
           </>
         ) : (
