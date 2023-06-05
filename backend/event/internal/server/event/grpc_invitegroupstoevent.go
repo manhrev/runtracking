@@ -31,7 +31,7 @@ func (s *eventServer) InviteGroupsToEvent(ctx context.Context, request *event.In
 	}
 
 	_, err = s.notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
-		Messeage:      `You has been invited to join "` + eventRes.Name + "` event by " + res.Groups[0].Name + " group.",
+		Messeage:      `You has been invited to join "` + eventRes.Name + `" event by ` + res.Groups[0].Name + " group.",
 		ScheduledTime: timestamppb.New(time.Now().Add(5 * time.Second)),
 		SourceType:    notification.SOURCE_TYPE_ADMIN,
 		SourceId:      request.GetEventId(),
