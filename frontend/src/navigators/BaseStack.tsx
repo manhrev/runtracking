@@ -53,6 +53,7 @@ import EditEvent from '../screens/Group/Event/EditEvent'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LoadingOverlay } from '../comp/LoadingOverlay'
 import GoToEvent from '../screens/Profile/GoToEvent'
+import InviteGroupsToEvent from '../screens/Group/Event/InviteGroupsToEvent'
 
 export type RootBaseStackParamList = {
   // Home tabs
@@ -207,6 +208,10 @@ export type RootBaseStackParamList = {
   }
   GoToEvent: {
     eventId: number
+  }
+  InviteGroupsToEvent: {
+    eventId: number
+    ownerGroupId: number
   }
 }
 
@@ -496,6 +501,14 @@ export const BaseStack = () => {
                 headerBackVisible: true,
               }}
               component={GoToEvent}
+            />
+            <Stack.Screen
+              name="InviteGroupsToEvent"
+              options={{
+                title: 'Invite groups to event',
+                headerBackVisible: true,
+              }}
+              component={InviteGroupsToEvent}
             />
           </>
         ) : (

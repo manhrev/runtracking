@@ -465,5 +465,48 @@ export class EventClient {
     this.methodDescriptorListGroupProgressInEvent);
   }
 
+  methodDescriptorInviteGroupsToEvent = new grpcWeb.MethodDescriptor(
+    '/event.Event/InviteGroupsToEvent',
+    grpcWeb.MethodType.UNARY,
+    event_pb.InviteGroupsToEventRequest,
+    event_pb.InviteGroupsToEventReply,
+    (request: event_pb.InviteGroupsToEventRequest) => {
+      return request.serializeBinary();
+    },
+    event_pb.InviteGroupsToEventReply.deserializeBinary
+  );
+
+  inviteGroupsToEvent(
+    request: event_pb.InviteGroupsToEventRequest,
+    metadata: grpcWeb.Metadata | null): Promise<event_pb.InviteGroupsToEventReply>;
+
+  inviteGroupsToEvent(
+    request: event_pb.InviteGroupsToEventRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: event_pb.InviteGroupsToEventReply) => void): grpcWeb.ClientReadableStream<event_pb.InviteGroupsToEventReply>;
+
+  inviteGroupsToEvent(
+    request: event_pb.InviteGroupsToEventRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: event_pb.InviteGroupsToEventReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/event.Event/InviteGroupsToEvent',
+        request,
+        metadata || {},
+        this.methodDescriptorInviteGroupsToEvent,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/event.Event/InviteGroupsToEvent',
+    request,
+    metadata || {},
+    this.methodDescriptorInviteGroupsToEvent);
+  }
+
 }
 
