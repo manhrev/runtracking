@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (usd *UserSettingDelete) Where(ps ...predicate.UserSetting) *UserSettingDel
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (usd *UserSettingDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(usd.hooks) == 0 {
-		affected, err = usd.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*UserSettingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			usd.mutation = mutation
-			affected, err = usd.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(usd.hooks) - 1; i >= 0; i-- {
-			if usd.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = usd.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, usd.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, UserSettingMutation](ctx, usd.sqlExec, usd.mutation, usd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -88,12 +60,19 @@ func (usd *UserSettingDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	usd.mutation.done = true
 	return affected, err
 }
 
 // UserSettingDeleteOne is the builder for deleting a single UserSetting entity.
 type UserSettingDeleteOne struct {
 	usd *UserSettingDelete
+}
+
+// Where appends a list predicates to the UserSettingDelete builder.
+func (usdo *UserSettingDeleteOne) Where(ps ...predicate.UserSetting) *UserSettingDeleteOne {
+	usdo.usd.mutation.Where(ps...)
+	return usdo
 }
 
 // Exec executes the deletion query.
@@ -111,5 +90,7 @@ func (usdo *UserSettingDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (usdo *UserSettingDeleteOne) ExecX(ctx context.Context) {
-	usdo.usd.ExecX(ctx)
+	if err := usdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

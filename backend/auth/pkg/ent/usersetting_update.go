@@ -85,40 +85,7 @@ func (usu *UserSettingUpdate) ClearUser() *UserSettingUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (usu *UserSettingUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(usu.hooks) == 0 {
-		if err = usu.check(); err != nil {
-			return 0, err
-		}
-		affected, err = usu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*UserSettingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = usu.check(); err != nil {
-				return 0, err
-			}
-			usu.mutation = mutation
-			affected, err = usu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(usu.hooks) - 1; i >= 0; i-- {
-			if usu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = usu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, usu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, UserSettingMutation](ctx, usu.sqlSave, usu.mutation, usu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -152,6 +119,9 @@ func (usu *UserSettingUpdate) check() error {
 }
 
 func (usu *UserSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := usu.check(); err != nil {
+		return n, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   usersetting.Table,
@@ -224,6 +194,7 @@ func (usu *UserSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	usu.mutation.done = true
 	return n, nil
 }
 
@@ -298,46 +269,7 @@ func (usuo *UserSettingUpdateOne) Select(field string, fields ...string) *UserSe
 
 // Save executes the query and returns the updated UserSetting entity.
 func (usuo *UserSettingUpdateOne) Save(ctx context.Context) (*UserSetting, error) {
-	var (
-		err  error
-		node *UserSetting
-	)
-	if len(usuo.hooks) == 0 {
-		if err = usuo.check(); err != nil {
-			return nil, err
-		}
-		node, err = usuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*UserSettingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = usuo.check(); err != nil {
-				return nil, err
-			}
-			usuo.mutation = mutation
-			node, err = usuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(usuo.hooks) - 1; i >= 0; i-- {
-			if usuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = usuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, usuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*UserSetting)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from UserSettingMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*UserSetting, UserSettingMutation](ctx, usuo.sqlSave, usuo.mutation, usuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -371,6 +303,9 @@ func (usuo *UserSettingUpdateOne) check() error {
 }
 
 func (usuo *UserSettingUpdateOne) sqlSave(ctx context.Context) (_node *UserSetting, err error) {
+	if err := usuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   usersetting.Table,
@@ -463,5 +398,6 @@ func (usuo *UserSettingUpdateOne) sqlSave(ctx context.Context) (_node *UserSetti
 		}
 		return nil, err
 	}
+	usuo.mutation.done = true
 	return _node, nil
 }

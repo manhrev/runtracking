@@ -6,6 +6,7 @@ import (
 	"github.com/manhrev/runtracking/backend/auth/internal/cache"
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signin"
 	"github.com/manhrev/runtracking/backend/auth/internal/feature/signup"
+	"github.com/manhrev/runtracking/backend/auth/internal/repository"
 	"github.com/manhrev/runtracking/backend/auth/internal/service/token"
 	auth "github.com/manhrev/runtracking/backend/auth/pkg/api"
 	"github.com/manhrev/runtracking/backend/auth/pkg/ent"
@@ -20,7 +21,8 @@ func NewServer(entClient *ent.Client,
 	signUp signup.SignUp,
 	cache *cache.Cache,
 	extractor extractor.Extractor,
-	notificationClient notification.NotificationIClient) auth.AuthServer {
+	notificationClient notification.NotificationIClient,
+) auth.AuthServer {
 	return &authServer{
 		entClient:          entClient,
 		token:              token,
@@ -29,6 +31,7 @@ func NewServer(entClient *ent.Client,
 		cache:              cache,
 		extractor:          extractor,
 		notificationClient: notificationClient,
+		repository:         repository.New(entClient),
 	}
 }
 
@@ -40,6 +43,8 @@ type authServer struct {
 	cache              *cache.Cache
 	extractor          extractor.Extractor
 	notificationClient notification.NotificationIClient
+
+	repository *repository.Repository
 
 	auth.UnimplementedAuthServer
 }

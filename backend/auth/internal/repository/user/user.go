@@ -62,7 +62,7 @@ func (m *userImpl) List(
 	}
 
 	if search_by_name != "" {
-		query.Where(user.UsernameContains(search_by_name))
+		query.Where(user.DisplayNameContainsFold(search_by_name))
 	}
 
 	if len(user_ids) > 0 {

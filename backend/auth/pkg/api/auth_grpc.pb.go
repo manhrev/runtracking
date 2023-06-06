@@ -32,6 +32,7 @@ type AuthClient interface {
 	GetUserById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*UserInfo, error)
 	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...grpc.CallOption) (*UpdateUserInfoReply, error)
 	GetUsersPublicInfo(ctx context.Context, in *GetUsersPublicInfoRequest, opts ...grpc.CallOption) (*GetUsersPublicInfoReply, error)
+	ListUser(ctx context.Context, in *ListUserInfoRequest, opts ...grpc.CallOption) (*ListUserInfoReply, error)
 }
 
 type authClient struct {
@@ -123,6 +124,15 @@ func (c *authClient) GetUsersPublicInfo(ctx context.Context, in *GetUsersPublicI
 	return out, nil
 }
 
+func (c *authClient) ListUser(ctx context.Context, in *ListUserInfoRequest, opts ...grpc.CallOption) (*ListUserInfoReply, error) {
+	out := new(ListUserInfoReply)
+	err := c.cc.Invoke(ctx, "/auth.Auth/ListUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -136,6 +146,7 @@ type AuthServer interface {
 	GetUserById(context.Context, *GetByIdRequest) (*UserInfo, error)
 	UpdateUserInfo(context.Context, *UpdateUserInfoRequest) (*UpdateUserInfoReply, error)
 	GetUsersPublicInfo(context.Context, *GetUsersPublicInfoRequest) (*GetUsersPublicInfoReply, error)
+	ListUser(context.Context, *ListUserInfoRequest) (*ListUserInfoReply, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -169,6 +180,9 @@ func (UnimplementedAuthServer) UpdateUserInfo(context.Context, *UpdateUserInfoRe
 }
 func (UnimplementedAuthServer) GetUsersPublicInfo(context.Context, *GetUsersPublicInfoRequest) (*GetUsersPublicInfoReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsersPublicInfo not implemented")
+}
+func (UnimplementedAuthServer) ListUser(context.Context, *ListUserInfoRequest) (*ListUserInfoReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUser not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -345,6 +359,24 @@ func _Auth_GetUsersPublicInfo_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_ListUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).ListUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/ListUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).ListUser(ctx, req.(*ListUserInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -387,6 +419,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsersPublicInfo",
 			Handler:    _Auth_GetUsersPublicInfo_Handler,
+		},
+		{
+			MethodName: "ListUser",
+			Handler:    _Auth_ListUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
