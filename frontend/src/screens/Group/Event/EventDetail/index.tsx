@@ -166,6 +166,17 @@ export default function EventDetail({
           type="primary"
           actions={[
             {
+              icon: 'account-multiple-plus',
+              label: 'Invite other groups',
+              onPress: () => {
+                navigation.navigate('InviteGroupsToEvent', {
+                  eventId: route.params.event.id,
+                  ownerGroupId: route.params.event.ownerGroupId,
+                })
+              },
+              labelTextColor: theme.colors.elevation.level5,
+            },
+            {
               icon: 'pencil',
               label: 'Edit event',
               onPress: () => {

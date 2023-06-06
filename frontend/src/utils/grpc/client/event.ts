@@ -20,6 +20,8 @@ import {
   RemoveSubEventFromEventRequest,
   UpdateEventInfoReply,
   UpdateEventInfoRequest,
+  InviteGroupsToEventRequest,
+  InviteGroupsToEventReply,
 } from '../../../lib/event/event_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -198,6 +200,18 @@ class rpcEventClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<ListGroupProgressInEventReply.AsObject>(
       'listGroupProgressInEvent',
+      req
+    )
+  }
+
+  async inviteGroupsToEvent(param: InviteGroupsToEventRequest.AsObject) {
+    const req = new InviteGroupsToEventRequest()
+    req.setEventId(param.eventId)
+    req.setGroupIdsList(param.groupIdsList)
+    req.setOwnerGroupId(param.ownerGroupId)
+
+    return await this.gRPCClientRequest<InviteGroupsToEventReply.AsObject>(
+      'inviteGroupsToEvent',
       req
     )
   }

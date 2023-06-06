@@ -3,6 +3,48 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 
+export class InviteGroupsToEventRequest extends jspb.Message {
+  getEventId(): number;
+  setEventId(value: number): InviteGroupsToEventRequest;
+
+  getGroupIdsList(): Array<number>;
+  setGroupIdsList(value: Array<number>): InviteGroupsToEventRequest;
+  clearGroupIdsList(): InviteGroupsToEventRequest;
+  addGroupIds(value: number, index?: number): InviteGroupsToEventRequest;
+
+  getOwnerGroupId(): number;
+  setOwnerGroupId(value: number): InviteGroupsToEventRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): InviteGroupsToEventRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: InviteGroupsToEventRequest): InviteGroupsToEventRequest.AsObject;
+  static serializeBinaryToWriter(message: InviteGroupsToEventRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): InviteGroupsToEventRequest;
+  static deserializeBinaryFromReader(message: InviteGroupsToEventRequest, reader: jspb.BinaryReader): InviteGroupsToEventRequest;
+}
+
+export namespace InviteGroupsToEventRequest {
+  export type AsObject = {
+    eventId: number,
+    groupIdsList: Array<number>,
+    ownerGroupId: number,
+  }
+}
+
+export class InviteGroupsToEventReply extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): InviteGroupsToEventReply.AsObject;
+  static toObject(includeInstance: boolean, msg: InviteGroupsToEventReply): InviteGroupsToEventReply.AsObject;
+  static serializeBinaryToWriter(message: InviteGroupsToEventReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): InviteGroupsToEventReply;
+  static deserializeBinaryFromReader(message: InviteGroupsToEventReply, reader: jspb.BinaryReader): InviteGroupsToEventReply;
+}
+
+export namespace InviteGroupsToEventReply {
+  export type AsObject = {
+  }
+}
+
 export class SubEvent extends jspb.Message {
   getId(): number;
   setId(value: number): SubEvent;
