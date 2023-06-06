@@ -18,11 +18,9 @@ import (
 // UserSettingQuery is the builder for querying UserSetting entities.
 type UserSettingQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
+	ctx        *QueryContext
 	order      []OrderFunc
-	fields     []string
+	inters     []Interceptor
 	predicates []predicate.UserSetting
 	withUser   *UserQuery
 	withFKs    bool
@@ -37,26 +35,26 @@ func (usq *UserSettingQuery) Where(ps ...predicate.UserSetting) *UserSettingQuer
 	return usq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (usq *UserSettingQuery) Limit(limit int) *UserSettingQuery {
-	usq.limit = &limit
+	usq.ctx.Limit = &limit
 	return usq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (usq *UserSettingQuery) Offset(offset int) *UserSettingQuery {
-	usq.offset = &offset
+	usq.ctx.Offset = &offset
 	return usq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (usq *UserSettingQuery) Unique(unique bool) *UserSettingQuery {
-	usq.unique = &unique
+	usq.ctx.Unique = &unique
 	return usq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (usq *UserSettingQuery) Order(o ...OrderFunc) *UserSettingQuery {
 	usq.order = append(usq.order, o...)
 	return usq
@@ -64,7 +62,7 @@ func (usq *UserSettingQuery) Order(o ...OrderFunc) *UserSettingQuery {
 
 // QueryUser chains the current query on the "user" edge.
 func (usq *UserSettingQuery) QueryUser() *UserQuery {
-	query := &UserQuery{config: usq.config}
+	query := (&UserClient{config: usq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := usq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -87,7 +85,7 @@ func (usq *UserSettingQuery) QueryUser() *UserQuery {
 // First returns the first UserSetting entity from the query.
 // Returns a *NotFoundError when no UserSetting was found.
 func (usq *UserSettingQuery) First(ctx context.Context) (*UserSetting, error) {
-	nodes, err := usq.Limit(1).All(ctx)
+	nodes, err := usq.Limit(1).All(setContextOp(ctx, usq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +108,7 @@ func (usq *UserSettingQuery) FirstX(ctx context.Context) *UserSetting {
 // Returns a *NotFoundError when no UserSetting ID was found.
 func (usq *UserSettingQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = usq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = usq.Limit(1).IDs(setContextOp(ctx, usq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -133,7 +131,7 @@ func (usq *UserSettingQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one UserSetting entity is found.
 // Returns a *NotFoundError when no UserSetting entities are found.
 func (usq *UserSettingQuery) Only(ctx context.Context) (*UserSetting, error) {
-	nodes, err := usq.Limit(2).All(ctx)
+	nodes, err := usq.Limit(2).All(setContextOp(ctx, usq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +159,7 @@ func (usq *UserSettingQuery) OnlyX(ctx context.Context) *UserSetting {
 // Returns a *NotFoundError when no entities are found.
 func (usq *UserSettingQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = usq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = usq.Limit(2).IDs(setContextOp(ctx, usq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -186,10 +184,12 @@ func (usq *UserSettingQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of UserSettings.
 func (usq *UserSettingQuery) All(ctx context.Context) ([]*UserSetting, error) {
+	ctx = setContextOp(ctx, usq.ctx, "All")
 	if err := usq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return usq.sqlAll(ctx)
+	qr := querierAll[[]*UserSetting, *UserSettingQuery]()
+	return withInterceptors[[]*UserSetting](ctx, usq, qr, usq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -204,6 +204,7 @@ func (usq *UserSettingQuery) AllX(ctx context.Context) []*UserSetting {
 // IDs executes the query and returns a list of UserSetting IDs.
 func (usq *UserSettingQuery) IDs(ctx context.Context) ([]int64, error) {
 	var ids []int64
+	ctx = setContextOp(ctx, usq.ctx, "IDs")
 	if err := usq.Select(usersetting.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -221,10 +222,11 @@ func (usq *UserSettingQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (usq *UserSettingQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, usq.ctx, "Count")
 	if err := usq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return usq.sqlCount(ctx)
+	return withInterceptors[int](ctx, usq, querierCount[*UserSettingQuery](), usq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -238,10 +240,15 @@ func (usq *UserSettingQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (usq *UserSettingQuery) Exist(ctx context.Context) (bool, error) {
-	if err := usq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, usq.ctx, "Exist")
+	switch _, err := usq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return usq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -261,22 +268,21 @@ func (usq *UserSettingQuery) Clone() *UserSettingQuery {
 	}
 	return &UserSettingQuery{
 		config:     usq.config,
-		limit:      usq.limit,
-		offset:     usq.offset,
+		ctx:        usq.ctx.Clone(),
 		order:      append([]OrderFunc{}, usq.order...),
+		inters:     append([]Interceptor{}, usq.inters...),
 		predicates: append([]predicate.UserSetting{}, usq.predicates...),
 		withUser:   usq.withUser.Clone(),
 		// clone intermediate query.
-		sql:    usq.sql.Clone(),
-		path:   usq.path,
-		unique: usq.unique,
+		sql:  usq.sql.Clone(),
+		path: usq.path,
 	}
 }
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
 func (usq *UserSettingQuery) WithUser(opts ...func(*UserQuery)) *UserSettingQuery {
-	query := &UserQuery{config: usq.config}
+	query := (&UserClient{config: usq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -300,16 +306,11 @@ func (usq *UserSettingQuery) WithUser(opts ...func(*UserQuery)) *UserSettingQuer
 //		Scan(ctx, &v)
 //
 func (usq *UserSettingQuery) GroupBy(field string, fields ...string) *UserSettingGroupBy {
-	grbuild := &UserSettingGroupBy{config: usq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := usq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return usq.sqlQuery(ctx), nil
-	}
+	usq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &UserSettingGroupBy{build: usq}
+	grbuild.flds = &usq.ctx.Fields
 	grbuild.label = usersetting.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -327,11 +328,11 @@ func (usq *UserSettingQuery) GroupBy(field string, fields ...string) *UserSettin
 //		Scan(ctx, &v)
 //
 func (usq *UserSettingQuery) Select(fields ...string) *UserSettingSelect {
-	usq.fields = append(usq.fields, fields...)
-	selbuild := &UserSettingSelect{UserSettingQuery: usq}
-	selbuild.label = usersetting.Label
-	selbuild.flds, selbuild.scan = &usq.fields, selbuild.Scan
-	return selbuild
+	usq.ctx.Fields = append(usq.ctx.Fields, fields...)
+	sbuild := &UserSettingSelect{UserSettingQuery: usq}
+	sbuild.label = usersetting.Label
+	sbuild.flds, sbuild.scan = &usq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a UserSettingSelect configured with the given aggregations.
@@ -340,7 +341,17 @@ func (usq *UserSettingQuery) Aggregate(fns ...AggregateFunc) *UserSettingSelect 
 }
 
 func (usq *UserSettingQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range usq.fields {
+	for _, inter := range usq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, usq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range usq.ctx.Fields {
 		if !usersetting.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -410,6 +421,9 @@ func (usq *UserSettingQuery) loadUser(ctx context.Context, query *UserQuery, nod
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(user.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -429,22 +443,11 @@ func (usq *UserSettingQuery) loadUser(ctx context.Context, query *UserQuery, nod
 
 func (usq *UserSettingQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := usq.querySpec()
-	_spec.Node.Columns = usq.fields
-	if len(usq.fields) > 0 {
-		_spec.Unique = usq.unique != nil && *usq.unique
+	_spec.Node.Columns = usq.ctx.Fields
+	if len(usq.ctx.Fields) > 0 {
+		_spec.Unique = usq.ctx.Unique != nil && *usq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, usq.driver, _spec)
-}
-
-func (usq *UserSettingQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := usq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (usq *UserSettingQuery) querySpec() *sqlgraph.QuerySpec {
@@ -460,10 +463,10 @@ func (usq *UserSettingQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   usq.sql,
 		Unique: true,
 	}
-	if unique := usq.unique; unique != nil {
+	if unique := usq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := usq.fields; len(fields) > 0 {
+	if fields := usq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, usersetting.FieldID)
 		for i := range fields {
@@ -479,10 +482,10 @@ func (usq *UserSettingQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := usq.limit; limit != nil {
+	if limit := usq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := usq.offset; offset != nil {
+	if offset := usq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := usq.order; len(ps) > 0 {
@@ -498,7 +501,7 @@ func (usq *UserSettingQuery) querySpec() *sqlgraph.QuerySpec {
 func (usq *UserSettingQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(usq.driver.Dialect())
 	t1 := builder.Table(usersetting.Table)
-	columns := usq.fields
+	columns := usq.ctx.Fields
 	if len(columns) == 0 {
 		columns = usersetting.Columns
 	}
@@ -507,7 +510,7 @@ func (usq *UserSettingQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = usq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if usq.unique != nil && *usq.unique {
+	if usq.ctx.Unique != nil && *usq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range usq.predicates {
@@ -516,12 +519,12 @@ func (usq *UserSettingQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range usq.order {
 		p(selector)
 	}
-	if offset := usq.offset; offset != nil {
+	if offset := usq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := usq.limit; limit != nil {
+	if limit := usq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -529,13 +532,8 @@ func (usq *UserSettingQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // UserSettingGroupBy is the group-by builder for UserSetting entities.
 type UserSettingGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *UserSettingQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -544,58 +542,46 @@ func (usgb *UserSettingGroupBy) Aggregate(fns ...AggregateFunc) *UserSettingGrou
 	return usgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (usgb *UserSettingGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := usgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, usgb.build.ctx, "GroupBy")
+	if err := usgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	usgb.sql = query
-	return usgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*UserSettingQuery, *UserSettingGroupBy](ctx, usgb.build, usgb, usgb.build.inters, v)
 }
 
-func (usgb *UserSettingGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range usgb.fields {
-		if !usersetting.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (usgb *UserSettingGroupBy) sqlScan(ctx context.Context, root *UserSettingQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(usgb.fns))
+	for _, fn := range usgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := usgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*usgb.flds)+len(usgb.fns))
+		for _, f := range *usgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*usgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := usgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := usgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (usgb *UserSettingGroupBy) sqlQuery() *sql.Selector {
-	selector := usgb.sql.Select()
-	aggregation := make([]string, 0, len(usgb.fns))
-	for _, fn := range usgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(usgb.fields)+len(usgb.fns))
-		for _, f := range usgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(usgb.fields...)...)
-}
-
 // UserSettingSelect is the builder for selecting fields of UserSetting entities.
 type UserSettingSelect struct {
 	*UserSettingQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -606,26 +592,27 @@ func (uss *UserSettingSelect) Aggregate(fns ...AggregateFunc) *UserSettingSelect
 
 // Scan applies the selector query and scans the result into the given value.
 func (uss *UserSettingSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, uss.ctx, "Select")
 	if err := uss.prepareQuery(ctx); err != nil {
 		return err
 	}
-	uss.sql = uss.UserSettingQuery.sqlQuery(ctx)
-	return uss.sqlScan(ctx, v)
+	return scanWithInterceptors[*UserSettingQuery, *UserSettingSelect](ctx, uss.UserSettingQuery, uss, uss.inters, v)
 }
 
-func (uss *UserSettingSelect) sqlScan(ctx context.Context, v any) error {
+func (uss *UserSettingSelect) sqlScan(ctx context.Context, root *UserSettingQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(uss.fns))
 	for _, fn := range uss.fns {
-		aggregation = append(aggregation, fn(uss.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*uss.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		uss.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		uss.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := uss.sql.Query()
+	query, args := selector.Query()
 	if err := uss.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

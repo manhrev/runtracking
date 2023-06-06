@@ -44,11 +44,20 @@ export default function GroupItem({
         )}
         <View style={styles(theme).listItemContainer}>
           <View style={styles(theme).listItemTilte}>
-            <Avatar.Icon
-              size={55}
-              icon="account-outline"
-              style={{ borderRadius: 50 }}
-            />
+            {!member?.profilePicture ? 
+                (
+                  <Avatar.Text
+                  size={60}
+                  label={member?.displayName.at(0) || ""}
+                />
+                )
+                : (
+                  <Avatar.Image
+                size={60}
+                source={{uri: member?.profilePicture}}
+              />
+                )
+            }
             <View
               style={{
                 display: 'flex',

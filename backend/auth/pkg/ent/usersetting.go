@@ -125,14 +125,14 @@ func (us *UserSetting) assignValues(columns []string, values []any) error {
 
 // QueryUser queries the "user" edge of the UserSetting entity.
 func (us *UserSetting) QueryUser() *UserQuery {
-	return (&UserSettingClient{config: us.config}).QueryUser(us)
+	return NewUserSettingClient(us.config).QueryUser(us)
 }
 
 // Update returns a builder for updating this UserSetting.
 // Note that you need to call UserSetting.Unwrap() before calling this method if this UserSetting
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (us *UserSetting) Update() *UserSettingUpdateOne {
-	return (&UserSettingClient{config: us.config}).UpdateOne(us)
+	return NewUserSettingClient(us.config).UpdateOne(us)
 }
 
 // Unwrap unwraps the UserSetting entity that was returned from a transaction after it was closed,

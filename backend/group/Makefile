@@ -26,7 +26,7 @@ generate-ent:
 # rm -r ./pkg/ent/schema
 	
 generate:
-	make generate-proto generate-code generate-ent generate-cache
+	make generate-proto generate-code generate-ent generate-ts
 
 run:
 	go run ./cmd/.

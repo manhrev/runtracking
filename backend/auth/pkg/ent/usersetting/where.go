@@ -12,462 +12,302 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.UserSetting(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.UserSetting(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.UserSetting(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.UserSetting(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.UserSetting(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.UserSetting(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int64) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.UserSetting(sql.FieldLTE(FieldID, id))
 }
 
 // Region applies equality check predicate on the "region" field. It's identical to RegionEQ.
 func Region(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldRegion, v))
 }
 
 // Language applies equality check predicate on the "language" field. It's identical to LanguageEQ.
 func Language(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldLanguage, v))
 }
 
 // IsNotification applies equality check predicate on the "is_notification" field. It's identical to IsNotificationEQ.
 func IsNotification(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldIsNotification, v))
 }
 
 // DateModified applies equality check predicate on the "date_modified" field. It's identical to DateModifiedEQ.
 func DateModified(v time.Time) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDateModified), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldDateModified, v))
 }
 
 // RegionEQ applies the EQ predicate on the "region" field.
 func RegionEQ(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldRegion, v))
 }
 
 // RegionNEQ applies the NEQ predicate on the "region" field.
 func RegionNEQ(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldNEQ(FieldRegion, v))
 }
 
 // RegionIn applies the In predicate on the "region" field.
 func RegionIn(vs ...string) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldRegion), v...))
-	})
+	return predicate.UserSetting(sql.FieldIn(FieldRegion, vs...))
 }
 
 // RegionNotIn applies the NotIn predicate on the "region" field.
 func RegionNotIn(vs ...string) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldRegion), v...))
-	})
+	return predicate.UserSetting(sql.FieldNotIn(FieldRegion, vs...))
 }
 
 // RegionGT applies the GT predicate on the "region" field.
 func RegionGT(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldGT(FieldRegion, v))
 }
 
 // RegionGTE applies the GTE predicate on the "region" field.
 func RegionGTE(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldGTE(FieldRegion, v))
 }
 
 // RegionLT applies the LT predicate on the "region" field.
 func RegionLT(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldLT(FieldRegion, v))
 }
 
 // RegionLTE applies the LTE predicate on the "region" field.
 func RegionLTE(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldLTE(FieldRegion, v))
 }
 
 // RegionContains applies the Contains predicate on the "region" field.
 func RegionContains(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldContains(FieldRegion, v))
 }
 
 // RegionHasPrefix applies the HasPrefix predicate on the "region" field.
 func RegionHasPrefix(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldHasPrefix(FieldRegion, v))
 }
 
 // RegionHasSuffix applies the HasSuffix predicate on the "region" field.
 func RegionHasSuffix(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldHasSuffix(FieldRegion, v))
 }
 
 // RegionEqualFold applies the EqualFold predicate on the "region" field.
 func RegionEqualFold(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldEqualFold(FieldRegion, v))
 }
 
 // RegionContainsFold applies the ContainsFold predicate on the "region" field.
 func RegionContainsFold(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldRegion), v))
-	})
+	return predicate.UserSetting(sql.FieldContainsFold(FieldRegion, v))
 }
 
 // LanguageEQ applies the EQ predicate on the "language" field.
 func LanguageEQ(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldLanguage, v))
 }
 
 // LanguageNEQ applies the NEQ predicate on the "language" field.
 func LanguageNEQ(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldNEQ(FieldLanguage, v))
 }
 
 // LanguageIn applies the In predicate on the "language" field.
 func LanguageIn(vs ...string) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldLanguage), v...))
-	})
+	return predicate.UserSetting(sql.FieldIn(FieldLanguage, vs...))
 }
 
 // LanguageNotIn applies the NotIn predicate on the "language" field.
 func LanguageNotIn(vs ...string) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldLanguage), v...))
-	})
+	return predicate.UserSetting(sql.FieldNotIn(FieldLanguage, vs...))
 }
 
 // LanguageGT applies the GT predicate on the "language" field.
 func LanguageGT(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldGT(FieldLanguage, v))
 }
 
 // LanguageGTE applies the GTE predicate on the "language" field.
 func LanguageGTE(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldGTE(FieldLanguage, v))
 }
 
 // LanguageLT applies the LT predicate on the "language" field.
 func LanguageLT(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldLT(FieldLanguage, v))
 }
 
 // LanguageLTE applies the LTE predicate on the "language" field.
 func LanguageLTE(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldLTE(FieldLanguage, v))
 }
 
 // LanguageContains applies the Contains predicate on the "language" field.
 func LanguageContains(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldContains(FieldLanguage, v))
 }
 
 // LanguageHasPrefix applies the HasPrefix predicate on the "language" field.
 func LanguageHasPrefix(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldHasPrefix(FieldLanguage, v))
 }
 
 // LanguageHasSuffix applies the HasSuffix predicate on the "language" field.
 func LanguageHasSuffix(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldHasSuffix(FieldLanguage, v))
 }
 
 // LanguageEqualFold applies the EqualFold predicate on the "language" field.
 func LanguageEqualFold(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldEqualFold(FieldLanguage, v))
 }
 
 // LanguageContainsFold applies the ContainsFold predicate on the "language" field.
 func LanguageContainsFold(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldLanguage), v))
-	})
+	return predicate.UserSetting(sql.FieldContainsFold(FieldLanguage, v))
 }
 
 // IsNotificationEQ applies the EQ predicate on the "is_notification" field.
 func IsNotificationEQ(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldIsNotification, v))
 }
 
 // IsNotificationNEQ applies the NEQ predicate on the "is_notification" field.
 func IsNotificationNEQ(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldNEQ(FieldIsNotification, v))
 }
 
 // IsNotificationIn applies the In predicate on the "is_notification" field.
 func IsNotificationIn(vs ...string) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldIsNotification), v...))
-	})
+	return predicate.UserSetting(sql.FieldIn(FieldIsNotification, vs...))
 }
 
 // IsNotificationNotIn applies the NotIn predicate on the "is_notification" field.
 func IsNotificationNotIn(vs ...string) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldIsNotification), v...))
-	})
+	return predicate.UserSetting(sql.FieldNotIn(FieldIsNotification, vs...))
 }
 
 // IsNotificationGT applies the GT predicate on the "is_notification" field.
 func IsNotificationGT(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldGT(FieldIsNotification, v))
 }
 
 // IsNotificationGTE applies the GTE predicate on the "is_notification" field.
 func IsNotificationGTE(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldGTE(FieldIsNotification, v))
 }
 
 // IsNotificationLT applies the LT predicate on the "is_notification" field.
 func IsNotificationLT(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldLT(FieldIsNotification, v))
 }
 
 // IsNotificationLTE applies the LTE predicate on the "is_notification" field.
 func IsNotificationLTE(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldLTE(FieldIsNotification, v))
 }
 
 // IsNotificationContains applies the Contains predicate on the "is_notification" field.
 func IsNotificationContains(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldContains(FieldIsNotification, v))
 }
 
 // IsNotificationHasPrefix applies the HasPrefix predicate on the "is_notification" field.
 func IsNotificationHasPrefix(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldHasPrefix(FieldIsNotification, v))
 }
 
 // IsNotificationHasSuffix applies the HasSuffix predicate on the "is_notification" field.
 func IsNotificationHasSuffix(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldHasSuffix(FieldIsNotification, v))
 }
 
 // IsNotificationEqualFold applies the EqualFold predicate on the "is_notification" field.
 func IsNotificationEqualFold(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldEqualFold(FieldIsNotification, v))
 }
 
 // IsNotificationContainsFold applies the ContainsFold predicate on the "is_notification" field.
 func IsNotificationContainsFold(v string) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldIsNotification), v))
-	})
+	return predicate.UserSetting(sql.FieldContainsFold(FieldIsNotification, v))
 }
 
 // DateModifiedEQ applies the EQ predicate on the "date_modified" field.
 func DateModifiedEQ(v time.Time) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDateModified), v))
-	})
+	return predicate.UserSetting(sql.FieldEQ(FieldDateModified, v))
 }
 
 // DateModifiedNEQ applies the NEQ predicate on the "date_modified" field.
 func DateModifiedNEQ(v time.Time) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDateModified), v))
-	})
+	return predicate.UserSetting(sql.FieldNEQ(FieldDateModified, v))
 }
 
 // DateModifiedIn applies the In predicate on the "date_modified" field.
 func DateModifiedIn(vs ...time.Time) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldDateModified), v...))
-	})
+	return predicate.UserSetting(sql.FieldIn(FieldDateModified, vs...))
 }
 
 // DateModifiedNotIn applies the NotIn predicate on the "date_modified" field.
 func DateModifiedNotIn(vs ...time.Time) predicate.UserSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldDateModified), v...))
-	})
+	return predicate.UserSetting(sql.FieldNotIn(FieldDateModified, vs...))
 }
 
 // DateModifiedGT applies the GT predicate on the "date_modified" field.
 func DateModifiedGT(v time.Time) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDateModified), v))
-	})
+	return predicate.UserSetting(sql.FieldGT(FieldDateModified, v))
 }
 
 // DateModifiedGTE applies the GTE predicate on the "date_modified" field.
 func DateModifiedGTE(v time.Time) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDateModified), v))
-	})
+	return predicate.UserSetting(sql.FieldGTE(FieldDateModified, v))
 }
 
 // DateModifiedLT applies the LT predicate on the "date_modified" field.
 func DateModifiedLT(v time.Time) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDateModified), v))
-	})
+	return predicate.UserSetting(sql.FieldLT(FieldDateModified, v))
 }
 
 // DateModifiedLTE applies the LTE predicate on the "date_modified" field.
 func DateModifiedLTE(v time.Time) predicate.UserSetting {
-	return predicate.UserSetting(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDateModified), v))
-	})
+	return predicate.UserSetting(sql.FieldLTE(FieldDateModified, v))
 }
 
 // HasUser applies the HasEdge predicate on the "user" edge.
@@ -475,7 +315,6 @@ func HasUser() predicate.UserSetting {
 	return predicate.UserSetting(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(UserTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, UserTable, UserColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

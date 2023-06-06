@@ -31,7 +31,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -131,6 +131,25 @@ func (c *Client) Use(hooks ...Hook) {
 	c.UserSetting.Use(hooks...)
 }
 
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.User.Intercept(interceptors...)
+	c.UserSetting.Intercept(interceptors...)
+}
+
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *UserMutation:
+		return c.User.mutate(ctx, m)
+	case *UserSettingMutation:
+		return c.UserSetting.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -145,6 +164,12 @@ func NewUserClient(c config) *UserClient {
 // A call to `Use(f, g, h)` equals to `user.Hooks(f(g(h())))`.
 func (c *UserClient) Use(hooks ...Hook) {
 	c.hooks.User = append(c.hooks.User, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `user.Intercept(f(g(h())))`.
+func (c *UserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.User = append(c.inters.User, interceptors...)
 }
 
 // Create returns a builder for creating a User entity.
@@ -199,6 +224,8 @@ func (c *UserClient) DeleteOneID(id int64) *UserDeleteOne {
 func (c *UserClient) Query() *UserQuery {
 	return &UserQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeUser},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -218,7 +245,7 @@ func (c *UserClient) GetX(ctx context.Context, id int64) *User {
 
 // QueryUserSetting queries the user_setting edge of a User.
 func (c *UserClient) QueryUserSetting(u *User) *UserSettingQuery {
-	query := &UserSettingQuery{config: c.config}
+	query := (&UserSettingClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
@@ -237,6 +264,26 @@ func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
 }
 
+// Interceptors returns the client interceptors.
+func (c *UserClient) Interceptors() []Interceptor {
+	return c.inters.User
+}
+
+func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown User mutation op: %q", m.Op())
+	}
+}
+
 // UserSettingClient is a client for the UserSetting schema.
 type UserSettingClient struct {
 	config
@@ -251,6 +298,12 @@ func NewUserSettingClient(c config) *UserSettingClient {
 // A call to `Use(f, g, h)` equals to `usersetting.Hooks(f(g(h())))`.
 func (c *UserSettingClient) Use(hooks ...Hook) {
 	c.hooks.UserSetting = append(c.hooks.UserSetting, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usersetting.Intercept(f(g(h())))`.
+func (c *UserSettingClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserSetting = append(c.inters.UserSetting, interceptors...)
 }
 
 // Create returns a builder for creating a UserSetting entity.
@@ -305,6 +358,8 @@ func (c *UserSettingClient) DeleteOneID(id int64) *UserSettingDeleteOne {
 func (c *UserSettingClient) Query() *UserSettingQuery {
 	return &UserSettingQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserSetting},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -324,7 +379,7 @@ func (c *UserSettingClient) GetX(ctx context.Context, id int64) *UserSetting {
 
 // QueryUser queries the user edge of a UserSetting.
 func (c *UserSettingClient) QueryUser(us *UserSetting) *UserQuery {
-	query := &UserQuery{config: c.config}
+	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := us.ID
 		step := sqlgraph.NewStep(
@@ -341,4 +396,24 @@ func (c *UserSettingClient) QueryUser(us *UserSetting) *UserQuery {
 // Hooks returns the client hooks.
 func (c *UserSettingClient) Hooks() []Hook {
 	return c.hooks.UserSetting
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserSettingClient) Interceptors() []Interceptor {
+	return c.inters.UserSetting
+}
+
+func (c *UserSettingClient) mutate(ctx context.Context, m *UserSettingMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserSettingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserSettingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserSettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserSettingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserSetting mutation op: %q", m.Op())
+	}
 }

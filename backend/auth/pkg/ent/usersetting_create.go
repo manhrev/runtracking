@@ -77,50 +77,8 @@ func (usc *UserSettingCreate) Mutation() *UserSettingMutation {
 
 // Save creates the UserSetting in the database.
 func (usc *UserSettingCreate) Save(ctx context.Context) (*UserSetting, error) {
-	var (
-		err  error
-		node *UserSetting
-	)
 	usc.defaults()
-	if len(usc.hooks) == 0 {
-		if err = usc.check(); err != nil {
-			return nil, err
-		}
-		node, err = usc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*UserSettingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = usc.check(); err != nil {
-				return nil, err
-			}
-			usc.mutation = mutation
-			if node, err = usc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(usc.hooks) - 1; i >= 0; i-- {
-			if usc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = usc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, usc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*UserSetting)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from UserSettingMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*UserSetting, UserSettingMutation](ctx, usc.sqlSave, usc.mutation, usc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -174,6 +132,9 @@ func (usc *UserSettingCreate) check() error {
 }
 
 func (usc *UserSettingCreate) sqlSave(ctx context.Context) (*UserSetting, error) {
+	if err := usc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := usc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, usc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -185,6 +146,8 @@ func (usc *UserSettingCreate) sqlSave(ctx context.Context) (*UserSetting, error)
 		id := _spec.ID.Value.(int64)
 		_node.ID = int64(id)
 	}
+	usc.mutation.id = &_node.ID
+	usc.mutation.done = true
 	return _node, nil
 }
 
