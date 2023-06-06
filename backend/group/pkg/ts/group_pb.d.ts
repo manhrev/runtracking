@@ -1216,6 +1216,9 @@ export class Member extends jspb.Message {
   getEmail(): string;
   setEmail(value: string): Member;
 
+  getProfilePicture(): string;
+  setProfilePicture(value: string): Member;
+
   getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): Member;
   hasCreatedAt(): boolean;
@@ -1242,6 +1245,7 @@ export namespace Member {
     displayName: string,
     username: string,
     email: string,
+    profilePicture: string,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     status: Member.Status,
     isAdmin: boolean,

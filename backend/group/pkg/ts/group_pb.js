@@ -10137,6 +10137,7 @@ proto.group.Member.toObject = function(includeInstance, msg) {
     displayName: jspb.Message.getFieldWithDefault(msg, 7, ""),
     username: jspb.Message.getFieldWithDefault(msg, 2, ""),
     email: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    profilePicture: jspb.Message.getFieldWithDefault(msg, 11, ""),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     status: jspb.Message.getFieldWithDefault(msg, 8, 0),
     isAdmin: jspb.Message.getBooleanFieldWithDefault(msg, 10, false)
@@ -10195,6 +10196,10 @@ proto.group.Member.deserializeBinaryFromReader = function(msg, reader) {
     case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setEmail(value);
+      break;
+    case 11:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfilePicture(value);
       break;
     case 6:
       var value = new google_protobuf_timestamp_pb.Timestamp;
@@ -10270,6 +10275,13 @@ proto.group.Member.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       3,
+      f
+    );
+  }
+  f = message.getProfilePicture();
+  if (f.length > 0) {
+    writer.writeString(
+      11,
       f
     );
   }
@@ -10396,6 +10408,24 @@ proto.group.Member.prototype.getEmail = function() {
  */
 proto.group.Member.prototype.setEmail = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string profile_picture = 11;
+ * @return {string}
+ */
+proto.group.Member.prototype.getProfilePicture = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.group.Member} returns this
+ */
+proto.group.Member.prototype.setProfilePicture = function(value) {
+  return jspb.Message.setProto3StringField(this, 11, value);
 };
 
 
