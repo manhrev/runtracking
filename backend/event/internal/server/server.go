@@ -15,6 +15,7 @@ import (
 	pb "github.com/manhrev/runtracking/backend/event/pkg/api"
 	"github.com/manhrev/runtracking/backend/event/pkg/ent"
 	group "github.com/manhrev/runtracking/backend/group/pkg/api"
+	notification "github.com/manhrev/runtracking/backend/notification/pkg/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -78,8 +79,14 @@ func Serve(server *grpc.Server) {
 
 	groupiClient := group.NewGroupIClient(groupIConn)
 
+	notiConn, err := grpc.Dial(fmt.Sprintf("%s:%s", notificationi_domain, notificationi_port), grpc.WithTransportCredentials(creds))
+	// log.Printf("Conn : %v", conn)
+	if err != nil {
+		log.Fatalf("error while create connect to notification service: %v", err)
+	}
+	notificationClient := notification.NewNotificationIClient(notiConn)
 	// register main and other server servers
-	pb.RegisterEventServer(server, event.NewServer(entClient, groupiClient))
+	pb.RegisterEventServer(server, event.NewServer(entClient, groupiClient, notificationClient))
 	pb.RegisterEventIServer(server, eventi.NewServer(entClient))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", listen_port))

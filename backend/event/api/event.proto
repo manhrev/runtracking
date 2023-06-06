@@ -23,8 +23,19 @@ service Event {
     rpc ListGroupProgressInEvent (ListGroupProgressInEventRequest) returns (ListGroupProgressInEventReply) {} // get progress of a group in an event
     //rpc GetGroupRankingInEvent (GetGroupRankingInEventRequest) returns (GetGroupRankingInEventReply) {} // get ranking of a group in an event
     //rpc GetGroupRankingInSubEvent (GetGroupRankingInSubEventRequest) returns (GetGroupRankingInSubEventReply) {} // get ranking of a group in a subevent
+    rpc InviteGroupsToEvent (InviteGroupsToEventRequest) returns (InviteGroupsToEventReply) {} // invite groups to join event
     
 }   
+
+// ==================== InviteGroupsToEvent ====================
+message InviteGroupsToEventRequest {
+    int64 event_id = 1;
+    repeated int64 group_ids = 2;
+    int64 owner_group_id = 3;
+}
+
+message InviteGroupsToEventReply {
+}
 
 message SubEvent {
     int64 id = 1;

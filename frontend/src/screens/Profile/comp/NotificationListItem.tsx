@@ -12,12 +12,13 @@ import {
   deleteNotificationInfoThunk,
   updateNotificationInfoThunk,
 } from '../../../redux/features/notification/thunk'
-import { useAppDispatch } from '../../../redux/store'
+import { useAppDispatch, useAppSelector } from '../../../redux/store'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootBaseStackParamList } from '../../../navigators/BaseStack'
 import { toast } from '../../../utils/toast/toast'
 import { listPlanThunk } from '../../../redux/features/planList/thunk'
 import { ActivityType, PlanSortBy } from '../../../lib/plan/plan_pb'
+import { selectUserSlice } from '../../../redux/features/user/slice'
 
 interface NotificationListItemProps {
   notificationInfo: NotificationInfo.AsObject
@@ -33,7 +34,7 @@ export default function NotificationListItem({
   notificationInfo,
 }: NotificationListItemProps) {
   const theme = useAppTheme()
-
+  const { userId } = useAppSelector(selectUserSlice)
   const { id, image, isSeen, message, sourceId, sourceType, time } =
     notificationInfo
   const dispatch = useAppDispatch()
@@ -43,34 +44,51 @@ export default function NotificationListItem({
   }
 
   const viewNoti = async () => {
-    const { error } = await dispatch(
-      updateNotificationInfoThunk({ id: id, isSeen: true })
-    ).unwrap()
-    if (error) toast.error({ message: 'An error occurred, please try again' })
-    else {
-      switch (sourceType) {
-        case SOURCE_TYPE.PLAN:
-          const { error } = await dispatch(
-            listPlanThunk({
-              activityType: ActivityType.ACTIVITY_TYPE_UNSPECIFIED,
-              ascending: true,
-              idsList: [sourceId],
-              limit: 1,
-              offset: 0,
-              sortBy: PlanSortBy.PLAN_SORT_BY_CREATED_TIME,
-              from: undefined,
-              to: undefined,
-            })
-          ).unwrap()
+    dispatch(updateNotificationInfoThunk({ id: id, isSeen: true })).unwrap()
+    console.log(notificationInfo)
 
-          if (error)
-            toast.error({ message: 'An error occurred, please try again' })
-          else
-            navigation.navigate('PlanDetail', {
-              planId: sourceId,
-              canEdit: false,
-            })
-      }
+    switch (sourceType) {
+      case SOURCE_TYPE.PLAN:
+        const { error } = await dispatch(
+          listPlanThunk({
+            activityType: ActivityType.ACTIVITY_TYPE_UNSPECIFIED,
+            ascending: true,
+            idsList: [sourceId],
+            limit: 1,
+            offset: 0,
+            sortBy: PlanSortBy.PLAN_SORT_BY_CREATED_TIME,
+            from: undefined,
+            to: undefined,
+          })
+        ).unwrap()
+
+        if (error)
+          toast.error({ message: 'An error occurred, please try again' })
+        else
+          navigation.navigate('PlanDetail', {
+            planId: sourceId,
+            canEdit: false,
+          })
+      case SOURCE_TYPE.ADMIN:
+        navigation.navigate('GoToEvent', { eventId: sourceId })
+      case SOURCE_TYPE.GROUP:
+        if (message.includes('Your request to')) {
+          navigation.navigate('GroupDetail', {
+            groupId: sourceId,
+            detailFrom: 'Notification',
+            reloadListFunc: () => {},
+          })
+        }
+      case SOURCE_TYPE.PERSONAL:
+        if (message.includes('sent a join group')) {
+          navigation.navigate('GroupDetail', {
+            groupId: sourceId,
+            detailFrom: 'Notification',
+            reloadListFunc: () => {},
+          })
+        } else if (message.includes('sent you a message')) {
+          navigation.navigate('Chat', { userId: userId, toUserId: sourceId })
+        }
     }
   }
 
@@ -91,18 +109,15 @@ export default function NotificationListItem({
             }}
           >
             <View style={styles(theme).listItemContainer}>
-              <Avatar.Image
-                size={60}
-                source={{uri: image}}
-              />
+              <Avatar.Image size={60} source={{ uri: image }} />
               <View style={styles(theme).listItemContent}>
-                <View style={{flexDirection: 'row', width: '90%' }}>
+                <View style={{ flexDirection: 'row', width: '90%' }}>
                   <Text
                     variant="bodyMedium"
                     style={[
                       styles(theme).listItemValue,
-                      { fontWeight: isSeen ? '500' : 'bold'},
-                      {flex: 1, flexWrap: 'wrap' }
+                      { fontWeight: isSeen ? '500' : 'bold' },
+                      { flex: 1, flexWrap: 'wrap' },
                     ]}
                   >
                     {message}
@@ -138,7 +153,7 @@ const styles = (theme: AppTheme) =>
     },
     listItemContent: {
       marginLeft: 20,
-      width: '90%'
+      width: '90%',
       // width: '90%'
       // flexDirection: 'row',
     },
