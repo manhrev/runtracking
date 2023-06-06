@@ -3,6 +3,75 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 
 
+export class ListUserInfoRequest extends jspb.Message {
+  getLimit(): number;
+  setLimit(value: number): ListUserInfoRequest;
+
+  getOffset(): number;
+  setOffset(value: number): ListUserInfoRequest;
+
+  getAscending(): boolean;
+  setAscending(value: boolean): ListUserInfoRequest;
+
+  getSortBy(): ListUserInfoRequest.UserSortBy;
+  setSortBy(value: ListUserInfoRequest.UserSortBy): ListUserInfoRequest;
+
+  getUserIdsList(): Array<number>;
+  setUserIdsList(value: Array<number>): ListUserInfoRequest;
+  clearUserIdsList(): ListUserInfoRequest;
+  addUserIds(value: number, index?: number): ListUserInfoRequest;
+
+  getSearchByName(): string;
+  setSearchByName(value: string): ListUserInfoRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListUserInfoRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListUserInfoRequest): ListUserInfoRequest.AsObject;
+  static serializeBinaryToWriter(message: ListUserInfoRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListUserInfoRequest;
+  static deserializeBinaryFromReader(message: ListUserInfoRequest, reader: jspb.BinaryReader): ListUserInfoRequest;
+}
+
+export namespace ListUserInfoRequest {
+  export type AsObject = {
+    limit: number,
+    offset: number,
+    ascending: boolean,
+    sortBy: ListUserInfoRequest.UserSortBy,
+    userIdsList: Array<number>,
+    searchByName: string,
+  }
+
+  export enum UserSortBy { 
+    USER_SORT_BY_UNSPECIFIED = 0,
+    USER_SORT_BY_NAME = 1,
+  }
+}
+
+export class ListUserInfoReply extends jspb.Message {
+  getUsersList(): Array<UserInfo>;
+  setUsersList(value: Array<UserInfo>): ListUserInfoReply;
+  clearUsersList(): ListUserInfoReply;
+  addUsers(value?: UserInfo, index?: number): UserInfo;
+
+  getTotal(): number;
+  setTotal(value: number): ListUserInfoReply;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListUserInfoReply.AsObject;
+  static toObject(includeInstance: boolean, msg: ListUserInfoReply): ListUserInfoReply.AsObject;
+  static serializeBinaryToWriter(message: ListUserInfoReply, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListUserInfoReply;
+  static deserializeBinaryFromReader(message: ListUserInfoReply, reader: jspb.BinaryReader): ListUserInfoReply;
+}
+
+export namespace ListUserInfoReply {
+  export type AsObject = {
+    usersList: Array<UserInfo.AsObject>,
+    total: number,
+  }
+}
+
 export class GetAllUsersReply extends jspb.Message {
   getUsersList(): Array<UserInfo>;
   setUsersList(value: Array<UserInfo>): GetAllUsersReply;

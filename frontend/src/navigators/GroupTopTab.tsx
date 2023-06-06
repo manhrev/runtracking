@@ -4,12 +4,13 @@ import { RootBaseStackParamList } from './BaseStack'
 import ComingSoon from '../screens/ComingSoon'
 import YourGroups from '../screens/Group/YourGroups'
 import Explore from '../screens/Group/Explore'
+import UserSearch from '../screens/Group/UserSearch'
 import Constants from 'expo-constants'
 
 export type RootGroupTopTabsParamList = {
   YourGroups: undefined
   Explore: undefined
-  Events: undefined
+  UserSearch: undefined
 } & RootBaseStackParamList
 
 const Tab = createMaterialTopTabNavigator<RootGroupTopTabsParamList>()
@@ -32,7 +33,13 @@ export default function GroupTopTabs() {
         }}
       />
       <Tab.Screen name="Explore" component={Explore} />
-      {/* <Tab.Screen name="Events" component={ComingSoon} /> */}
+      <Tab.Screen
+        name="UserSearch"
+        component={UserSearch}
+        options={{
+          title: 'People',
+        }}
+      />
     </Tab.Navigator>
   )
 }
