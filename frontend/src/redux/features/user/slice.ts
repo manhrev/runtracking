@@ -4,6 +4,9 @@ import {
   AchievementDetail,
   UserAchievement,
 } from '../../../lib/activity/activity_pb'
+import {
+  UserInfo,
+} from '../../../lib/auth/auth_pb'
 import { KEY_ACCESS_TOKEN } from '../../../utils/grpc'
 import { CommonState } from '../../common/types'
 import { StatusEnum } from '../../constant'
@@ -14,6 +17,8 @@ import {
   loginThunk,
   logoutThunk,
   updateUserInfoThunk,
+  listUserInfoThunk,
+  listMoreUserInfoThunk,
 } from './thunk'
 import { GOOGLE_ACCESS_TOKEN } from '../../../utils/rest/abstract/restClient'
 
@@ -29,6 +34,8 @@ type UserState = {
   userId: number
   profiePicture: string
   achievement: [number, AchievementDetail.AsObject][]
+  userSearchList: UserInfo.AsObject[]
+  userSearchListTotal: number
 } & CommonState
 
 export const initialState: UserState = {
@@ -44,6 +51,8 @@ export const initialState: UserState = {
   age: 0,
   userId: 0,
   achievement: [],
+  userSearchList: [],
+  userSearchListTotal: 0,
 }
 
 const slice = createSlice({
@@ -128,6 +137,32 @@ const slice = createSlice({
           )
         }
       }
+      state.status = StatusEnum.SUCCEEDED
+    })
+    builder.addCase(listUserInfoThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING
+    })
+    builder.addCase(listUserInfoThunk.fulfilled, (state, { payload }) => {
+      const { response, error } = payload
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
+      state.userSearchList = response?.usersList || []
+      state.userSearchListTotal = response?.total || 0
+      state.status = StatusEnum.SUCCEEDED
+    })
+    builder.addCase(listMoreUserInfoThunk.pending, (state) => {
+      state.status = StatusEnum.LOADING
+    })
+    builder.addCase(listMoreUserInfoThunk.fulfilled, (state, { payload }) => {
+      const { response, error } = payload
+      if (error) {
+        state.status = StatusEnum.SUCCEEDED
+        return
+      }
+      state.userSearchList = state.userSearchList.concat(response?.usersList || [])
+      state.userSearchListTotal += response?.total || 0
       state.status = StatusEnum.SUCCEEDED
     })
   },

@@ -11,6 +11,8 @@ import {
   UserInfo,
   GetUsersPublicInfoRequest,
   GetUsersPublicInfoReply,
+  ListUserInfoRequest,
+  ListUserInfoReply,
 } from '../../../lib/auth/auth_pb'
 
 import { GRPCClientConfig } from '../abstract/types'
@@ -82,6 +84,21 @@ class rpcAuthClient extends gRPCClientAbstract {
 
     return await this.gRPCClientRequest<GetUsersPublicInfoReply.AsObject>(
       'getUsersPublicInfo',
+      req
+    )
+  }
+
+  async listUserInfo(param: ListUserInfoRequest.AsObject) {
+    const req = new ListUserInfoRequest()
+    req.setLimit(param.limit)
+    req.setOffset(param.offset)
+    req.setAscending(param.ascending)
+    req.setSortBy(param.sortBy)
+    req.setUserIdsList(param.userIdsList || [])
+    req.setSearchByName(param.searchByName || '')
+
+    return await this.gRPCClientRequest<ListUserInfoReply.AsObject>(
+      'listUser',
       req
     )
   }

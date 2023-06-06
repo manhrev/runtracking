@@ -423,6 +423,49 @@ export class AuthClient {
     this.methodDescriptorGetUsersPublicInfo);
   }
 
+  methodDescriptorListUser = new grpcWeb.MethodDescriptor(
+    '/auth.Auth/ListUser',
+    grpcWeb.MethodType.UNARY,
+    auth_pb.ListUserInfoRequest,
+    auth_pb.ListUserInfoReply,
+    (request: auth_pb.ListUserInfoRequest) => {
+      return request.serializeBinary();
+    },
+    auth_pb.ListUserInfoReply.deserializeBinary
+  );
+
+  listUser(
+    request: auth_pb.ListUserInfoRequest,
+    metadata: grpcWeb.Metadata | null): Promise<auth_pb.ListUserInfoReply>;
+
+  listUser(
+    request: auth_pb.ListUserInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: auth_pb.ListUserInfoReply) => void): grpcWeb.ClientReadableStream<auth_pb.ListUserInfoReply>;
+
+  listUser(
+    request: auth_pb.ListUserInfoRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: auth_pb.ListUserInfoReply) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/auth.Auth/ListUser',
+        request,
+        metadata || {},
+        this.methodDescriptorListUser,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/auth.Auth/ListUser',
+    request,
+    metadata || {},
+    this.methodDescriptorListUser);
+  }
+
 }
 
 export class UserClient {

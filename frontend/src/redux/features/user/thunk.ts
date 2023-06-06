@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { GetUsersAchievementRequest } from '../../../lib/activity/activity_pb'
-import { LoginRequest, UpdateUserInfoRequest } from '../../../lib/auth/auth_pb'
+import { LoginRequest, UpdateUserInfoRequest, ListUserInfoRequest } from '../../../lib/auth/auth_pb'
 import { activityClient, authClient } from '../../../utils/grpc'
 
 export const getMeThunk = createAsyncThunk('auth/getMe', async () => {
@@ -32,3 +32,18 @@ export const getUserAchievementThunk = createAsyncThunk(
     return await activityClient.getUserAchievement(param)
   }
 )
+
+export const listUserInfoThunk = createAsyncThunk(
+  'auth/listUserInfo',
+  async (param: ListUserInfoRequest.AsObject) => {
+    return await authClient.listUserInfo(param)
+  }
+)
+
+export const listMoreUserInfoThunk = createAsyncThunk(
+  'auth/listMoreUserInfo',
+  async (param: ListUserInfoRequest.AsObject) => {
+    return await authClient.listUserInfo(param)
+  }
+)
+
