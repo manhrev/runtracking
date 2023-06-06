@@ -44,13 +44,14 @@ func TransformUserInfoListToMemberList(userInfoList []*auth.UserInfo, memberMap 
 	memberList := []*group.Member{}
 	for _, userInfo := range userInfoList {
 		member := &group.Member{
-			UserId:      userInfo.GetUserId(),
-			MemberId:    memberMap[userInfo.GetUserId()].ID,
-			DisplayName: userInfo.GetDisplayName(),
-			Username:    userInfo.GetUsername(),
-			Email:       userInfo.GetEmail(),
-			CreatedAt:   timestamppb.New(memberMap[userInfo.GetUserId()].CreatedAt),
-			Status:      group.Member_Status(memberMap[userInfo.GetUserId()].Status),
+			UserId:         userInfo.GetUserId(),
+			MemberId:       memberMap[userInfo.GetUserId()].ID,
+			DisplayName:    userInfo.GetDisplayName(),
+			ProfilePicture: userInfo.GetProfilePicture(),
+			Username:       userInfo.GetUsername(),
+			Email:          userInfo.GetEmail(),
+			CreatedAt:      timestamppb.New(memberMap[userInfo.GetUserId()].CreatedAt),
+			Status:         group.Member_Status(memberMap[userInfo.GetUserId()].Status),
 		}
 
 		if groupz != nil {
