@@ -13,16 +13,23 @@ import (
 )
 
 func (s *eventServer) InviteGroupsToEvent(ctx context.Context, request *event.InviteGroupsToEventRequest) (*event.InviteGroupsToEventReply, error) {
-	res, err := s.groupIClient.ListGroupI(ctx, &group.ListGroupIRequest{
-		GroupIds: append([]int64{request.GetOwnerGroupId()}, request.GetGroupIds()...),
+	adminGroup, err := s.groupIClient.ListGroupI(ctx, &group.ListGroupIRequest{
+		GroupIds: []int64{request.GetOwnerGroupId()},
+	})
+	if err != nil {
+		return nil, status.Internal(fmt.Sprintf("Cannot invite: cannot get admin group name: %v", err.Error()))
+	}
+
+	adminGroups, err := s.groupIClient.ListGroupI(ctx, &group.ListGroupIRequest{
+		GroupIds: request.GetGroupIds(),
 	})
 	if err != nil {
 		return nil, status.Internal(fmt.Sprintf("Cannot invite: cannot get group name: %v", err.Error()))
 	}
 
 	adminIds := []int64{}
-	for i := 1; i < len(res.Groups); i++ {
-		adminIds = append(adminIds, res.Groups[i].GetLeaderId())
+	for i := 0; i < len(adminGroups.Groups); i++ {
+		adminIds = append(adminIds, adminGroups.Groups[i].GetLeaderId())
 	}
 
 	eventRes, err := s.repository.Event.GetEvent(ctx, request.GetEventId())
@@ -31,7 +38,7 @@ func (s *eventServer) InviteGroupsToEvent(ctx context.Context, request *event.In
 	}
 
 	_, err = s.notificationIClient.PushNotification(ctx, &notification.PushNotiRequest{
-		Messeage:      `You has been invited to join "` + eventRes.Name + `" event by ` + res.Groups[0].Name + " group.",
+		Messeage:      `You has been invited to join "` + eventRes.Name + `" event by ` + adminGroup.Groups[0].Name + " group.",
 		ScheduledTime: timestamppb.New(time.Now().Add(5 * time.Second)),
 		SourceType:    notification.SOURCE_TYPE_ADMIN,
 		SourceId:      request.GetEventId(),
